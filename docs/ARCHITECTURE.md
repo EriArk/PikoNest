@@ -1,0 +1,648 @@
+# PIKOOS Architecture
+
+## Status
+
+This document defines architectural boundaries and the intended shape of the system. It is not a claim that every mechanism described here has already been proven.
+
+Where a detail is still experimental, it is marked as such.
+
+## 1. Architectural goals
+
+PIKOOS must satisfy several constraints that pull in different directions:
+
+1. use the user's official PICO-8 runtime as the authoritative execution engine;
+2. provide a much friendlier handheld-first creation environment around it;
+3. keep ordinary projects compatible with real PICO-8;
+4. work first on Android handhelds;
+5. remain portable to Linux handhelds later;
+6. support devices with different screens and control layouts;
+7. function without a physical keyboard;
+8. keep optional PIKOOS-only experiments from contaminating the standard project path.
+
+The architecture should therefore be modular, with the PICO-8 project model and editor logic above a replaceable platform/runtime layer.
+
+## 2. High-level layers
+
+```text
+┌──────────────────────────────────────────────┐
+│                 PIKOOS UI                    │
+│ Library · Create · Learn · Editors · Play   │
+└──────────────────────────────────────────────┘
+                       │
+┌──────────────────────────────────────────────┐
+│            Application workflows             │
+│ Open · Save · Remix · Test · Import · Run   │
+└──────────────────────────────────────────────┘
+                       │
+┌──────────────────────────────────────────────┐
+│              Portable core/domain             │
+│                                              │
+│ P8 model/parser/writer                       │
+│ Project model                                │
+│ Mechanics library                           │
+│ Learning/context model                       │
+│ Budget/compatibility analysis                │
+│ Cartridge/library metadata                  │
+│ Multicart model                              │
+└──────────────────────────────────────────────┘
+                       │
+┌──────────────────────────────────────────────┐
+│                 Port interfaces               │
+│ Runtime · Input · Storage · Bridge · Network │
+└──────────────────────────────────────────────┘
+             │                       │
+┌──────────────────────┐   ┌──────────────────────┐
+│   Android adapters   │   │    Linux adapters    │
+│       first          │   │       later          │
+└──────────────────────┘   └──────────────────────┘
+```
+
+Platform code must not leak upward unnecessarily.
+
+## 3. Suggested top-level modules
+
+Exact source directories depend on the chosen framework/language, but the conceptual modules should remain recognizable.
+
+### `core/p8`
+
+Responsibilities:
+
+- parse `.p8` text cartridges;
+- represent cartridge sections;
+- write `.p8` safely;
+- preserve unknown/unmodified material where possible;
+- calculate code/token/resource budgets;
+- inspect symbols and basic Lua/PICO-8 structure;
+- eventually support `.p8.png` import/export if feasible and useful.
+
+This is one of the most important correctness-sensitive modules.
+
+### `core/project`
+
+Responsibilities:
+
+- represent a PIKOOS project;
+- map canonical carts to optional `.pikoos/` metadata;
+- represent multicart relationships;
+- manage project identity without changing the cart unnecessarily;
+- create remix/project copies.
+
+### `core/mechanics`
+
+Responsibilities:
+
+- mechanic definitions;
+- parameters;
+- dependencies;
+- preview metadata;
+- code/data generation;
+- human explanations;
+- learning concepts associated with each mechanic.
+
+A mechanic must ultimately produce normal PICO-8-compatible code/data.
+
+### `core/learning`
+
+Responsibilities:
+
+- known/encountered concepts;
+- contextual explanation state;
+- optional tiny challenges;
+- skill-book progress;
+- mappings from editor actions/mechanics/errors to learning concepts.
+
+Learning state is PIKOOS metadata, not part of the game cart unless explicitly chosen for a game feature.
+
+### `core/library`
+
+Responsibilities:
+
+- installed/local carts;
+- favorites;
+- play history;
+- screenshots;
+- metadata/cache;
+- relationship between an original cart and local remixes/projects.
+
+### `core/compatibility`
+
+Responsibilities:
+
+- standard vs PIKOOS-enhanced capability classification;
+- required extensions;
+- resource warnings;
+- verification results;
+- compatibility badges/status.
+
+## 4. Runtime boundary
+
+The official PICO-8 process must be treated as an external runtime controlled through a replaceable backend.
+
+Conceptual interface:
+
+```text
+PicoRuntimeBackend
+  detectRuntime()
+  importRuntime(source)
+  validateRuntime()
+  getRuntimeInfo()
+  launchCart(cartPath, launchOptions)
+  launchEditor(optionalCartPath)
+  stop()
+  getCapabilities()
+```
+
+The application should not care whether the implementation is Android/proot or native Linux.
+
+### Runtime capabilities
+
+Backends may expose capabilities such as:
+
+```text
+canLaunchCart
+canLaunchSplore
+canLaunchEditor
+canReturnExitCode
+canCaptureLogs
+canInjectInput
+canUseBridge
+canUseLinkPlay
+```
+
+Experimental features should check capabilities rather than assume them.
+
+## 5. Android runtime backend
+
+### Intended direction
+
+The user imports their own official ARM64/Raspberry Pi PICO-8 distribution.
+
+PIKOOS stores/validates the imported runtime in app-controlled storage and launches it through a small Linux compatibility environment, likely using a proot-style setup and any required shim/adaptation.
+
+Conceptually:
+
+```text
+PIKOOS Android app
+        │
+        ▼
+Android runtime adapter
+        │
+        ▼
+minimal Linux/proot environment
+        │
+        ▼
+official user-provided PICO-8 ARM64 binary
+```
+
+### Important rule
+
+Do not bury application logic inside the wrapper.
+
+The wrapper's job is to make official PICO-8 execute correctly and map platform facilities. Project/editor logic remains outside it.
+
+### Research tasks
+
+Before depending on this architecture, prove:
+
+- runtime import;
+- reliable launch on target Android versions;
+- graphics/audio/input behavior;
+- gamepad mappings;
+- filesystem paths;
+- launching a specified cart;
+- clean exit/return to PIKOOS;
+- suspend/resume behavior;
+- lifecycle when Android backgrounds the app;
+- whether an LD_PRELOAD/native shim is necessary;
+- whether the wrapper can later expose a safe PIKOOS bridge.
+
+## 6. Linux runtime backend
+
+The future Linux backend should reuse the same runtime interface.
+
+On compatible handhelds it may be able to launch a user-provided official PICO-8 Linux/ARM build with much less indirection.
+
+Conceptually:
+
+```text
+PIKOOS Linux app
+      │
+      ▼
+LinuxRuntimeBackend
+      │
+      ▼
+official PICO-8
+```
+
+Do not assume a desktop Linux environment. Targets may use game-console-style sessions, unusual compositors, controller-only input and read-only/system-managed filesystems.
+
+## 7. Platform services boundary
+
+Additional abstractions should exist where platform differences are expected.
+
+### Storage
+
+```text
+StorageProvider
+  appDataRoot()
+  projectsRoot()
+  cartsRoot()
+  runtimeRoot()
+  importFile(...)
+  exportFile(...)
+```
+
+Android scoped storage and Linux filesystem access are different; core logic should not know the details.
+
+### Input
+
+```text
+InputProvider
+  actions
+  devices
+  bindings
+  textInput
+  touch/pointer availability
+```
+
+Map physical controls to semantic actions such as:
+
+- confirm;
+- cancel;
+- menu;
+- tool primary/secondary;
+- modifier left/right;
+- next/previous tab;
+- run/test;
+- undo/redo;
+- directional navigation.
+
+Never make core/editor logic depend on a Retroid/Anbernic key code.
+
+### Platform lifecycle
+
+Abstract:
+
+- foreground/background;
+- suspend/resume;
+- runtime process state;
+- low-memory events if relevant;
+- external controller connect/disconnect.
+
+## 8. Responsive handheld UI
+
+PIKOOS must support very different display shapes.
+
+Examples may include:
+
+- near-square handheld screens;
+- 4:3;
+- 16:9;
+- taller Android displays;
+- dual-screen Linux/Android devices in the future.
+
+Avoid layouts that only work because one reference device is approximately square.
+
+### Layout strategy
+
+Prefer adaptive composition based on available space, for example:
+
+- compact single-pane layout;
+- wide split-pane layout;
+- optional secondary-pane layout;
+- future dual-screen layout.
+
+The PICO-8 128×128 viewport is naturally square, but editor chrome should adapt around it.
+
+## 9. Project layout
+
+Default conceptual layout:
+
+```text
+my-game/
+  my-game.p8
+  .pikoos/
+    project.json
+    notes/
+    screenshots/
+    tests/
+    history/
+```
+
+### `my-game.p8`
+
+Canonical game content.
+
+### `.pikoos/project.json`
+
+May contain information such as:
+
+- display title overrides;
+- project UUID;
+- editor state;
+- multicart relationships;
+- learning/help preferences;
+- mechanic provenance metadata;
+- test definitions;
+- PIKOOS extension declarations.
+
+Do not store data in `project.json` when it is part of the actual game and belongs in the cart.
+
+## 10. P8 parser/writer design
+
+The parser/writer must be conservative.
+
+Requirements:
+
+- recognize standard PICO-8 sections;
+- preserve section order where practical;
+- preserve unmodified raw text where practical;
+- avoid reformatting all Lua just because one field changed;
+- preserve comments;
+- avoid destructive normalization;
+- round-trip existing carts through tests;
+- handle line endings safely;
+- keep backups/history before risky transformations.
+
+### Editing strategy
+
+Where possible, retain both:
+
+- parsed semantic representation;
+- original/raw spans.
+
+This makes targeted edits safer than regenerating the entire file from a normalized AST/data model.
+
+## 11. Lua understanding
+
+PIKOOS does not need a full compiler to deliver its first editor, but it benefits from gradually understanding more structure.
+
+Possible stages:
+
+1. lexer/tokenizer;
+2. symbol extraction;
+3. block matching (`if/end`, functions, loops);
+4. lightweight syntax tree;
+5. basic diagnostics/context;
+6. safe structured insertion/refactoring.
+
+The official runtime remains the authority for execution semantics.
+
+## 12. Mechanics representation
+
+A mechanic definition should conceptually contain:
+
+```text
+id
+name
+category
+summary
+learningConcepts[]
+parameters[]
+requirements[]
+conflicts[]
+preview
+codeGenerator
+optionalDataGenerator
+explanation
+```
+
+Example:
+
+```text
+id: movement.variable_jump
+parameters:
+  jumpForce
+  gravity
+  holdFrames
+  coyoteFrames
+  bufferFrames
+```
+
+The generator produces normal Lua/data inserted into the project.
+
+### Dependency behavior
+
+If `variable_jump` needs a velocity variable and grounded detection, the tool should either:
+
+- detect existing compatible structures;
+- offer to create the missing pieces;
+- clearly show what it is adding.
+
+Do not silently generate a second incompatible player system.
+
+## 13. Learning integration
+
+Learning should observe meaningful application events rather than inspect everything after the fact.
+
+Example events:
+
+```text
+VariableCreated
+ConditionInserted
+FunctionCreated
+MechanicAdded
+RawCodeEdited
+PicoErrorObserved
+LoopUsed
+TableUsed
+```
+
+The learning service can decide whether a contextual explanation is useful.
+
+This keeps learning logic out of individual widgets.
+
+## 14. Editor state and undo
+
+All creation tools should participate in a shared command/history system where practical.
+
+Benefits:
+
+- undo/redo across controller/touch operations;
+- history visualization later;
+- safer mechanic insertion;
+- potential teaching explanations such as “this action changed these lines.”
+
+Do not make every UI component mutate files directly.
+
+Use application commands/transactions around edits.
+
+## 15. Test/run workflow
+
+Conceptual sequence:
+
+```text
+Editor
+  │
+  ├─ save/flush project safely
+  │
+  ├─ ask RuntimeBackend to launch cart
+  │
+  ▼
+Official PICO-8
+  │
+  └─ exit
+       │
+       ▼
+PIKOOS restores previous editor context
+```
+
+Persist enough editor state that a test run does not feel like leaving the application.
+
+## 16. Verification
+
+`Verify in PICO-8` should mean something concrete:
+
+- save current standard project;
+- run it through the official runtime;
+- present runtime errors/logs when available;
+- show compatibility/resource analysis;
+- distinguish PIKOOS-enhanced features from standard PICO-8 support.
+
+Do not label a project “compatible” merely because a custom preview engine accepted it.
+
+## 17. Multicart project model
+
+PIKOOS may represent several `.p8` carts under one project.
+
+Example:
+
+```text
+adventure/
+  boot.p8
+  town.p8
+  forest.p8
+  castle.p8
+  .pikoos/
+    project.json
+```
+
+`project.json` can describe human-facing structure and relationships, while the actual carts use standard PICO-8 mechanisms.
+
+Do not hide the underlying files from advanced users.
+
+## 18. Standard and enhanced capability model
+
+Each project/cart can declare or be detected as one of:
+
+### Standard
+
+No PIKOOS runtime extensions required.
+
+### Enhanced
+
+Uses explicit PIKOOS services such as an online bridge.
+
+Example metadata:
+
+```text
+extensions:
+  - online.v1
+```
+
+The exact declaration mechanism is TBD and must not break the cart when opened in ordinary PICO-8.
+
+## 19. Bridge architecture (experimental)
+
+Desired conceptual shape:
+
+```text
+official PICO-8
+      ↕
+platform shim / bridge endpoint
+      ↕
+PIKOOS BridgeService
+      ↕
+network / second handheld / services
+```
+
+Potential uses:
+
+- online-cart communication;
+- Link Play;
+- achievements;
+- diagnostic hooks.
+
+This mechanism is **not yet proven** for the native official runtime path.
+
+Keep bridge work isolated behind an interface such as:
+
+```text
+BridgeBackend
+  available()
+  openChannel(...)
+  send(...)
+  receive(...)
+```
+
+Standard projects must work when `available() == false`.
+
+## 20. Online services architecture
+
+If online cartridges are implemented, separate:
+
+- PIKOOS application account/services, if any;
+- game-specific server/account data;
+- cartridge token binding;
+- routine PIN authentication.
+
+The server must remain authoritative for persistent online state.
+
+See `ONLINE_CARTRIDGES.md`.
+
+## 21. Security boundary
+
+Never treat client/cart data as trusted server authority.
+
+For online games:
+
+- cartridge tokens must be random/high entropy;
+- tokens must be revocable;
+- PIN attempts must be rate-limited server-side;
+- game-critical persistent state should be validated server-side;
+- a factory reset only removes local/cart binding — it does not erase the account unless explicitly requested through an account-management flow.
+
+## 22. Data migration/versioning
+
+Version all PIKOOS-owned metadata formats from the beginning.
+
+Examples:
+
+```text
+projectSchemaVersion
+mechanicsSchemaVersion
+onlineBindingVersion
+```
+
+Do not version the PICO-8 format itself; it is external.
+
+## 23. Framework/language decision
+
+This architecture intentionally does not freeze the UI framework yet.
+
+The final choice should be evaluated against:
+
+- Android support;
+- Linux handheld support;
+- controller/gamepad input quality;
+- touch/pointer handling;
+- animation performance;
+- process/runtime integration;
+- native bridge/shim interoperability;
+- filesystem portability;
+- packaging size/complexity;
+- maintainability.
+
+Whichever framework is chosen, maintain the core/platform separation described above.
+
+## 24. First architecture proof
+
+Before building a large UI, create small proofs for:
+
+1. official PICO-8 launch/exit on Android;
+2. `.p8` round-trip parsing and writing;
+3. controller abstraction across at least two differing input layouts if available;
+4. responsive square/wide editor layout concept;
+5. one tiny mechanic inserted as real Lua and verified in official PICO-8.
+
+If these work cleanly, the rest of the product has a solid base.
