@@ -76,6 +76,10 @@ my-game/
 
 ## Status
 
+Owner-provided PICO-8 0.2.7 archives for private development are stored in
+[`dev-runtime/`](dev-runtime/README.md). They must stay outside application
+packages and public releases; end users still import their own runtime.
+
 Very early concept / architecture stage. The first milestone is not a polished UI; it is proving the three foundations:
 
 1. reliably launching the user's official PICO-8 runtime from Android and returning to PIKOOS;
