@@ -9,6 +9,8 @@ Version 0.0.4 adds a project shelf, creation from the small-game template and
 independent copies, with separate editing context for each project.
 Version 0.0.5 adds a drawing-tool chooser, connected fill, previewed lines and
 a color picker, all reachable through the same semantic controller actions.
+Version 0.0.6 adds rectangular sheet selection, drawing beyond 16×16 and a
+16-pixel zoom window that follows the controller cursor.
 
 The visual direction is approved; this implementation remains an experiment,
 not a decision to use Java/Android Views for the production application.
@@ -138,7 +140,7 @@ requirements do not imply implemented editors. See
   Brush, Eraser, Fill, Line or Picker; B leaves the old tool selected.
   Touch can open the chooser directly. A/B hints respect the configured mapping.
 - Fill changes only the four-connected area containing the cursor, bounded by
-  the current 16×16 image. Diagonally touching areas remain separate.
+  the selected image/region. Diagonally touching areas remain separate.
 - Line: A anchors the start; D-pad moves the other endpoint with a live preview.
   A commits the whole line. B or Y cancels the preview without changing the file
   or earlier undo history. Start commits it before passing saved bytes to runtime.
@@ -151,11 +153,50 @@ requirements do not imply implemented editors. See
   retry. Line endpoints, color and tool survive process recreation in optional
   UI preferences; only confirmed pixels belong to `game.p8`.
 - All drawing operations use the portable cartridge/session core and preserve
-  unrelated gfx, Lua, line endings and unknown sections. This still edits the
-  eight owned-template regions, not arbitrary sprite/map layouts.
+  unrelated gfx, Lua, line endings and unknown sections. The eight cards remain
+  shortcuts into the owned template; 0.0.6 also exposes rectangular sheet areas.
 
-Held-button brush strokes, touch drags, zoom/pan, shapes and persistent undo
+Held-button brush strokes, touch drags, shapes and persistent undo
 remain future work. [Device captures and checks](../../docs/design/android-drawing-04/README.md).
+
+### Rectangular sheet areas (0.0.6)
+
+- Below the eight cards, **Область листа · другой размер** opens the sheet.
+  D-pad chooses the first 8×8 cell, A anchors it, D-pad chooses the opposite
+  cell, A opens that rectangle. Either corner order works. Touch uses two taps.
+  B returns from the second corner to the first, then to the previous screen.
+  Selection never resizes/moves pixels or writes a file. Other modal actions
+  cannot launch, undo or switch tools while choosing a rectangle.
+- Brush, eraser, fill, line preview and picker work on the selected rectangle.
+  Undo treats an entire fill/line as one operation, including any appended gfx
+  rows. Omitted trailing rows read as zero and are added only when a nonzero
+  pixel needs them. Original row bytes, line endings and other sections survive.
+- **Приблизить** shows up to 16×16 pixels; the viewport follows the cursor.
+  **Весь рисунок** fits the complete rectangle without changing its aspect ratio.
+  Both are reachable in normal D-pad tool navigation. **Рамка** selects another
+  rectangle; **Лист** returns to the eight existing shortcuts. Region, cursor,
+  zoom and a pending line survive process recreation as optional UI preferences.
+  An unfinished choice of corners is not restored; the last confirmed area is.
+- `SpriteRegion` and `P8Graphics` are portable and cover the full 128×128 sheet,
+  including non-tile-aligned rectangles. Lower-half sharing is explicitly
+  exposed by `sharesMap()`. This UI deliberately selects only the upper 128×64,
+  in 8-pixel increments, until map-aware editing is designed. These are current
+  PIKOOS editing restrictions, not PICO-8 limits.
+- A rectangle is a view of existing sheet pixels, not a new owned resource or
+  reservation. Overlapping selections see the same pixels. Blank margins are
+  not automatically allocated. The legacy New/Copy/Assign operations remain
+  confined to the eight 16×16 shortcuts. Large-region hero binding, hitboxes,
+  resource naming/copy placement and a shared map workflow are still future work.
+- The gfx decoder currently accepts complete 128-hex-character rows with LF
+  or CRLF (and an optional final newline); unsupported row layouts are refused
+  without rewriting the source. This is still an owned-template workshop,
+  not general cart import.
+
+Checked against the [official 0.2.7 manual](https://www.lexaloffle.com/dl/docs/pico-8_manual.html):
+128×128 sheet, 8×8 tile addressing, lower-half map sharing, `spr` dimensions in
+tile units and `sspr` pixel rectangles. The separate ordinary-cart
+[`sprite_regions.p8`](../runtime-smoke/sprite_regions.p8) exercises a 32×24
+image through both APIs. See [device evidence](../../docs/design/android-regions-05/README.md).
 
 Parameters are drafts until confirmation; switching tools cannot silently
 discard an active draft. Writes use AtomicFile and update the in-memory model

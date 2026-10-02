@@ -66,11 +66,17 @@ to ordinary PICO-8 data/code. Test the affected data and behavior, including
 official-runtime checks where applicable; do not claim unobserved verification.
 
 Temporary prototype restrictions are implementation scope, not console rules.
-For example, the current editor exposes eight 16×16 images. PICO-8 uses 8×8
+For example, the first editor slice exposed eight 16×16 images. PICO-8 uses 8×8
 sprite cells and supports drawing larger or rectangular regions with `spr()`
 or pixel-addressed regions with `sspr()`. Future editor sizes must use that
 underlying model and account for occupied sheet regions and shared map memory.
 Do not bake the experiment's fixed image slots into the production resource model.
+
+Android lab 0.0.6 now also selects rectangular areas in the upper 128×64 pixels,
+while its portable gfx model addresses all 128×128. The UI's 8-pixel selection
+step and exclusion of shared-map rows are temporary editing scope. The selected
+rectangle is a view of ordinary pixels, not a custom cartridge resource format.
+See [implementation and observed runtime evidence](design/android-regions-05/README.md).
 
 An operation may remain unsupported while the editor grows. Label that as a
 PIKOOS editing limitation, preserve the cartridge and avoid destructive fallback

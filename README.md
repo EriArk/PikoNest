@@ -89,6 +89,10 @@ controller workflow. See [device captures](docs/design/android-sprites-02/README
 Drawing now includes a controller-operated tool chooser, connected fill,
 line preview/confirmation and a picker, with whole-operation undo. See
 [drawing captures](docs/design/android-drawing-04/README.md).
+Rectangular sheet areas now support images beyond 16×16, the same drawing tools
+and cursor-following zoom. The current selector covers the upper half of the
+standard sheet; large-image hero binding and shared-map editing are next steps.
+See [region editing and runtime evidence](docs/design/android-regions-05/README.md).
 The native project shelf now opens separate games, creates a fresh small-game
 template and makes independent copies, retaining each project's editing context.
 See [library device captures](docs/design/android-library-03/README.md).

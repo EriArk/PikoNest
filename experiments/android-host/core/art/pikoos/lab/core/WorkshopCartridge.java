@@ -10,6 +10,7 @@ public final class WorkshopCartridge {
     /** This owned template exposes eight non-overlapping 16x16 regions in its first two tile rows. */
     public static final int SPRITE_COUNT = 8;
     private final P8Document document;
+    private final P8Graphics graphics;
     private final int lua, gfx;
     private final int heroFrom, heroTo, heroSlot;
     private final byte[] pixels;
@@ -17,6 +18,7 @@ public final class WorkshopCartridge {
     private final int[] rows = new int[16];
     public WorkshopCartridge(byte[] source) {
         document = P8Document.parse(source);
+        graphics = new P8Graphics(document);
         lua = document.uniqueSection("lua");
         gfx = document.uniqueSection("gfx");
         String code = code();
@@ -50,6 +52,12 @@ public final class WorkshopCartridge {
         }
     }
     public byte[] bytes() { return document.bytes(); }
+    public int pixel(SpriteRegion region,int x,int y){return graphics.pixel(region,x,y);}
+    public int sheetPixel(int x,int y){return graphics.pixel(x,y);}
+    private WorkshopCartridge edited(P8Document next){return next==document?this:new WorkshopCartridge(next.bytes());}
+    public WorkshopCartridge withPixel(SpriteRegion r,int x,int y,int color){return edited(graphics.withPixel(r,x,y,color));}
+    public WorkshopCartridge withFill(SpriteRegion r,int x,int y,int color){return edited(graphics.withFill(r,x,y,color));}
+    public WorkshopCartridge withLine(SpriteRegion r,int x0,int y0,int x1,int y1,int color){return edited(graphics.withLine(r,x0,y0,x1,y1,color));}
     public int heroSlot() { return heroSlot; }
     public WorkshopCartridge withHero(int slot) {
         checkSlot(slot);
@@ -73,19 +81,14 @@ public final class WorkshopCartridge {
     }
     public int pixel(int slot, int x, int y) {
         checkSlot(slot);
-        checkPixel(x, y);
-        return Character.digit((char)pixels[rows[y] + slot * 16 + x], 16);
+        return pixel(legacyRegion(slot),x,y);
     }
     public WorkshopCartridge withPixel(int x, int y, int color) {
         return withPixel(0, x, y, color);
     }
     public WorkshopCartridge withPixel(int slot, int x, int y, int color) {
         checkSlot(slot);
-        checkPixel(x, y);
-        if (color < 0 || color > 15) throw new IllegalArgumentException("Color out of range");
-        int at = rows[y] + slot * 16 + x;
-        return new WorkshopCartridge(document.edit(gfx, at, at + 1,
-            new byte[]{(byte)"0123456789abcdef".charAt(color)}).bytes());
+        return withPixel(legacyRegion(slot),x,y,color);
     }
     public boolean empty(int slot) {
         checkSlot(slot);
@@ -94,37 +97,13 @@ public final class WorkshopCartridge {
     }
     /** Four-connected fill restricted to one 16x16 region, preserving all other bytes. */
     public WorkshopCartridge withFill(int slot, int x, int y, int color) {
-        checkSlot(slot);checkPixel(x,y);checkColor(color);
-        int old=pixel(slot,x,y);if(old==color)return this;
-        byte[] changed=pixels.clone();int[] queue=new int[256];int head=0,tail=0;
-        queue[tail++]=y*16+x;changed[rows[y]+slot*16+x]=hex(color);
-        while(head<tail){
-            int at=queue[head++],px=at%16,py=at/16;
-            int[] neighbors={px>0?at-1:-1,px<15?at+1:-1,py>0?at-16:-1,py<15?at+16:-1};
-            for(int next:neighbors)if(next>=0){
-                int offset=rows[next/16]+slot*16+next%16;
-                if(Character.digit((char)changed[offset],16)==old){changed[offset]=hex(color);queue[tail++]=next;}
-            }
-        }
-        return new WorkshopCartridge(document.edit(gfx,0,pixels.length,changed).bytes());
+        checkSlot(slot);return withFill(legacyRegion(slot),x,y,color);
     }
     /** Inclusive Bresenham line. Canonical endpoint order makes reversal identical. */
     public WorkshopCartridge withLine(int slot, int x0, int y0, int x1, int y1, int color) {
-        checkSlot(slot);checkPixel(x0,y0);checkPixel(x1,y1);checkColor(color);
-        if(x0>x1||(x0==x1&&y0>y1)){int swap=x0;x0=x1;x1=swap;swap=y0;y0=y1;y1=swap;}
-        byte[] changed=pixels.clone();int dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0);
-        int sx=x0<x1?1:-1,sy=y0<y1?1:-1,error=dx+dy;
-        while(true){
-            int offset=rows[y0]+slot*16+x0;
-            if(Character.digit((char)changed[offset],16)!=color)changed[offset]=hex(color);
-            if(x0==x1&&y0==y1)break;
-            int twice=2*error;if(twice>=dy){error+=dy;x0+=sx;}if(twice<=dx){error+=dx;y0+=sy;}
-        }
-        if(java.util.Arrays.equals(changed,pixels))return this;
-        return new WorkshopCartridge(document.edit(gfx,0,pixels.length,changed).bytes());
+        checkSlot(slot);return withLine(legacyRegion(slot),x0,y0,x1,y1,color);
     }
-    private static byte hex(int color){return (byte)"0123456789abcdef".charAt(color);}
-    private static void checkColor(int color){if(color<0||color>15)throw new IllegalArgumentException("Color out of range");}
+    private static SpriteRegion legacyRegion(int slot){return new SpriteRegion(slot*16,0,16,16);}
     public int firstFreeSlot() {
         // An erased but still assigned hero is not available for automatic allocation.
         for (int i = 0; i < SPRITE_COUNT; i++) if (i != heroSlot && empty(i)) return i;
@@ -142,8 +121,5 @@ public final class WorkshopCartridge {
     }
     private static void checkSlot(int slot) {
         if (slot < 0 || slot >= SPRITE_COUNT) throw new IllegalArgumentException("Sprite slot out of range");
-    }
-    private static void checkPixel(int x, int y) {
-        if (x < 0 || y < 0 || x > 15 || y > 15) throw new IllegalArgumentException("Pixel out of range");
     }
 }

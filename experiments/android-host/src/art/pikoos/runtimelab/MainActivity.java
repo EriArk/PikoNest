@@ -13,6 +13,7 @@ import android.view.WindowInsetsController;
 import android.view.View;
 import android.widget.TextView;
 import art.pikoos.lab.core.WorkshopCartridge;
+import art.pikoos.lab.core.SpriteRegion;
 import art.pikoos.lab.core.LibrarySession;
 import art.pikoos.lab.core.WorkshopSession;
 import art.pikoos.lab.core.WorkshopSession.Action;
@@ -142,14 +143,17 @@ public final class MainActivity extends Activity {
             .putInt("lineX",session.pendingLine()?session.lineX:-1).putInt("lineY",session.pendingLine()?session.lineY:-1)
             .putInt("field",session.field).putInt("draft",session.draft)
             .putInt("spriteSlot",session.spriteSlot).putInt("sheetFocus",session.sheetFocus)
+            .putBoolean("region",session.region!=null).putBoolean("zoom",session.zoom)
+            .putInt("regionX",session.selection().x).putInt("regionY",session.selection().y)
+            .putInt("regionWidth",session.selection().width).putInt("regionHeight",session.selection().height)
             .putBoolean("browsingSprites",session.browsingSprites)
             .putString("mode",session.mode==Mode.CANVAS||session.pendingLine()?"CANVAS":session.mode==Mode.VALUE?"VALUE":"NAVIGATE").apply();
     }
     private int bounded(String key,int fallback,int max){return Math.max(0,Math.min(max,prefs.getInt(key,fallback)));}
     private void restoreUi(){
-        session.tool=bounded("tool",0,2);session.focus=bounded("focus",0,4);
+        session.tool=bounded("tool",0,2);session.focus=bounded("focus",0,session.tool==2?5:4);
         session.codeLine=bounded("line",session.cart().line(0),session.cart().code().split("\n",-1).length-1);
-        session.cursorX=bounded("x",7,15);session.cursorY=bounded("y",7,15);session.color=bounded("color",14,15);
+        session.color=bounded("color",14,15);
         try{session.drawTool=DrawTool.valueOf(prefs.getString("drawTool",prefs.getBoolean("eraser",false)?"ERASER":"BRUSH"));}
         catch(IllegalArgumentException e){session.drawTool=DrawTool.BRUSH;}
         try{session.pickerReturn=DrawTool.valueOf(prefs.getString("pickerReturn","BRUSH"));}
@@ -157,14 +161,22 @@ public final class MainActivity extends Activity {
         if(session.pickerReturn==DrawTool.PICKER)session.pickerReturn=DrawTool.BRUSH;
         session.swapAB=prefs.getBoolean("swapAB",false);
         session.spriteSlot=bounded("spriteSlot",session.cart().heroSlot(),7);
-        session.sheetFocus=bounded("sheetFocus",session.spriteSlot,10);
+        session.sheetFocus=bounded("sheetFocus",session.spriteSlot,11);
         session.browsingSprites=prefs.getBoolean("browsingSprites",true);
+        if(prefs.getBoolean("region",false)&&!session.browsingSprites){
+            try{
+                SpriteRegion r=new SpriteRegion(prefs.getInt("regionX",0),prefs.getInt("regionY",0),prefs.getInt("regionWidth",16),prefs.getInt("regionHeight",16));
+                if(!r.sharesMap()&&r.x%8==0&&r.y%8==0&&r.width%8==0&&r.height%8==0)session.region=r;
+            }catch(IllegalArgumentException ignored){/* Invalid optional view state cannot damage a cartridge. */}
+        }
+        session.cursorX=bounded("x",7,session.selection().width-1);session.cursorY=bounded("y",7,session.selection().height-1);
+        session.zoom=prefs.getBoolean("zoom",false);
         if(session.tool==2){
             if(session.browsingSprites)session.mode=Mode.SHEET;
             else if(prefs.getString("mode","").equals("CANVAS"))session.mode=Mode.CANVAS;
         }
         int lineX=prefs.getInt("lineX",-1),lineY=prefs.getInt("lineY",-1);
-        if(session.mode==Mode.CANVAS&&session.drawTool==DrawTool.LINE&&lineX>=0&&lineX<16&&lineY>=0&&lineY<16){session.lineX=lineX;session.lineY=lineY;}
+        if(session.mode==Mode.CANVAS&&session.drawTool==DrawTool.LINE&&lineX>=0&&lineX<session.selection().width&&lineY>=0&&lineY<session.selection().height){session.lineX=lineX;session.lineY=lineY;}
         if(session.tool!=2&&prefs.getString("mode","").equals("VALUE")){
             session.mode=Mode.VALUE;session.field=bounded("field",0,1);session.draft=Math.max(1,bounded("draft",2,4));
         }

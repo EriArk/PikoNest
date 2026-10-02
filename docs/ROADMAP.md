@@ -151,7 +151,12 @@ its own editing context. Blank-cart creation, naming/import/export and arbitrary
 cartridge editing remain open; this does not complete 0.1 or 0.2.
 Android lab 0.0.5 extends drawing with connected fill, two-endpoint line preview
 and a picker. Whole-operation undo and recovery of a pending line are verified;
-held brush strokes, zoom/pan and a full sprite/map editor remain open.
+held brush strokes and a full sprite/map editor remain open.
+Android lab 0.0.6 adds rectangular selection on the upper sheet, drawing beyond
+16×16 and a cursor-following zoom window. Portable gfx addressing covers the
+full 128×128 sheet; current UI limits are explicit. Large-image hero binding,
+resource copy placement and shared-map editing remain separate next steps.
+See [region evidence](design/android-regions-05/README.md).
 
 Features:
 

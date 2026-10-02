@@ -17,3 +17,11 @@ Home/resume and sleep/wake and repeat the controls.
 The external wrapper is a research tool; this cart does not imply that PIKOOS
 has implemented a production runtime backend. See the execution plan and findings in
 [`ANDROID_RUNTIME_POC.md`](../../docs/ANDROID_RUNTIME_POC.md).
+
+`sprite_regions.p8` is a separate rendering check for Android lab 0.0.6. Its gfx
+is the exact sheet exported from the test copy after drawing a 32×24 cloud at
+64,24 through the workshop. Only Lua was replaced with a diagnostic display:
+`spr(56,48,27,4,3)` and `sspr(64,24,32,24,32,70,64,48)` draw the same region at
+native size and 2×. It uses ordinary PICO-8 data/APIs, with no sidecar or bridge.
+Observed in the owner's official 0.2.7 runtime; see
+[captures and limits](../../docs/design/android-regions-05/README.md).

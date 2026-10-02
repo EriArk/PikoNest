@@ -13,6 +13,7 @@ import art.pikoos.lab.core.WorkshopSession;
 import art.pikoos.lab.core.WorkshopSession.Action;
 import art.pikoos.lab.core.WorkshopSession.Mode;
 import art.pikoos.lab.core.WorkshopCartridge;
+import art.pikoos.lab.core.SpriteRegion;
 import art.pikoos.lab.core.WorkshopSession.DrawTool;
 import java.util.ArrayList;
 
@@ -33,6 +34,7 @@ final class WorkshopView extends View {
     private String previousNotice="Сохранено";
     private long noticeUntil;
     private RectF spriteArea;
+    private int viewX,viewY,viewWidth,viewHeight;
     private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка"};
     private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из рисунка","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из рисунка"};
     private static final class Hit {
@@ -89,7 +91,7 @@ final class WorkshopView extends View {
         }
         rect(0,140,w,4,0);
         c.save();c.clipRect(0,144,w,bodyBottom);
-        if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
+        if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
         c.restore();
         footer();
         if(!previousNotice.equals(s.notice)){previousNotice=s.notice;noticeUntil=SystemClock.uptimeMillis()+2200;}
@@ -108,16 +110,17 @@ final class WorkshopView extends View {
         rect(0,bodyBottom,w,44,0);
         String confirm=s.swapAB?"B":"A",cancel=s.swapAB?"A":"B";
         String[] drawVerbs={"пиксель","стереть","залить",s.pendingLine()?"линия":"начало","цвет"};
-        String verb=s.mode==Mode.VALUE?"готово":s.mode==Mode.CANVAS?drawVerbs[s.drawTool.ordinal()]:s.mode==Mode.PALETTE?"цвет":s.mode==Mode.SHEET&&s.sheetFocus<8?"рисовать":"выбор";
+        String verb=s.mode==Mode.REGION?(s.choosingEnd?"рисовать":"угол"):s.mode==Mode.VALUE?"готово":s.mode==Mode.CANVAS?drawVerbs[s.drawTool.ordinal()]:s.mode==Mode.PALETTE?"цвет":s.mode==Mode.SHEET&&s.sheetFocus<8?"рисовать":"выбор";
         key(confirm+" "+verb,12,bodyBottom,10,()->action(Action.CONFIRM));
         key(cancel+(s.pendingLine()?" отмена":" назад"),w<500?142:156,bodyBottom,6,()->action(Action.CANCEL));
         if(w>=540){
             if(s.pendingLine())text("Конец линии",260,bodyBottom+28,18,6);
             else if(s.mode==Mode.VALUE)text("← → число",260,bodyBottom+28,18,6);
             else if(s.mode==Mode.PALETTE)text("↑ ↓ ← → цвет",260,bodyBottom+28,18,6);
+            else if(s.mode==Mode.REGION)text("↑ ↓ ← → рамка",260,bodyBottom+28,18,6);
             else key("L/R инструм.",260,bodyBottom,6,()->action(Action.NEXT));
         }
-        key("START тест",w-126,bodyBottom,14,()->action(Action.TEST));
+        if(s.mode!=Mode.REGION)key("START тест",w-126,bodyBottom,14,()->action(Action.TEST));
     }
     private void key(String label,float x,float y,int color,Runnable run) {
         text(label,x,y+28,18,color);hit(x,y,width(label,18)+8,44,run);
@@ -222,38 +225,53 @@ final class WorkshopView extends View {
     private void sprites() {
         float size=Math.min(256,Math.min((w-56)*.46f,bodyBottom-232));size=Math.max(128,((int)size/16)*16);
         float x=16,y=180,right=size+32,rw=w-right-16;
-        text("РИСУНОК "+(s.spriteSlot+1)+" / 16 × 16",16,169,18,14);
-        outline(x-4,y-4,size+8,size+8,s.focus==0||s.mode==Mode.CANVAS?10:0);
-        sprite(s.spriteSlot,x,y,size,true);spriteArea=new RectF(x,y,x+size,y+size);
+        SpriteRegion region=s.selection();
+        text((s.region==null?"РИСУНОК "+(s.spriteSlot+1):"ОБЛАСТЬ")+" / "+region.width+" × "+region.height,16,169,18,14);
+        viewWidth=s.zoom?Math.min(16,region.width):region.width;viewHeight=s.zoom?Math.min(16,region.height):region.height;
+        viewX=s.zoom?Math.max(0,Math.min(region.width-viewWidth,s.cursorX-viewWidth/2)):0;
+        viewY=s.zoom?Math.max(0,Math.min(region.height-viewHeight,s.cursorY-viewHeight/2)):0;
+        float cell=Math.max(1,(int)(size/Math.max(viewWidth,viewHeight)));
+        float sw=cell*viewWidth,sh=cell*viewHeight;
+        x+=(size-sw)/2;y+=(size-sh)/2;
+        outline(x-4,y-4,sw+8,sh+8,s.focus==0||s.mode==Mode.CANVAS?10:0);
+        WorkshopCartridge picture=s.canvasPreview();
+        for(int py=0;py<viewHeight;py++)for(int px=0;px<viewWidth;px++){
+            int color=picture.pixel(region,viewX+px,viewY+py);
+            rect(x+px*cell,y+py*cell,cell,cell,color==0?((px+viewX+py+viewY)%2==0?0:1):color);
+        }
+        spriteArea=new RectF(x,y,x+sw,y+sh);
         if(s.pendingLine()){
-            float cell=size/16;outline(x+s.lineX*cell,y+s.lineY*cell,cell,cell,10);
+            if(s.lineX>=viewX&&s.lineX<viewX+viewWidth&&s.lineY>=viewY&&s.lineY<viewY+viewHeight)
+                outline(x+(s.lineX-viewX)*cell,y+(s.lineY-viewY)*cell,cell,cell,10);
         }
         if(s.mode==Mode.CANVAS) {
-            float cell=size/16;outline(x+s.cursorX*cell,y+s.cursorY*cell,cell,cell,0);
-            outline(x+s.cursorX*cell+2,y+s.cursorY*cell+2,cell-4,cell-4,7);
+            float cx=x+(s.cursorX-viewX)*cell,cy=y+(s.cursorY-viewY)*cell;
+            outline(cx-1,cy-1,cell+2,cell+2,0);outline(cx,cy,cell,cell,7);
         }
-        fitted(s.pendingLine()?"Линия: "+ok()+" готово · "+back()+" отмена":s.mode==Mode.CANVAS?DRAW_NAMES[s.drawTool.ordinal()]+" · "+s.cursorX+", "+s.cursorY:ok()+": войти в рисунок",16,y+size+24,16,s.pendingLine()?10:6,size);
-        if(y+size+48<bodyBottom)fitted(s.pendingLine()?"Начало: "+s.lineX+", "+s.lineY:s.drawTool==DrawTool.LINE?ok()+": начало, затем конец":"X цвет · Y отмена",16,y+size+48,16,6,size);
+        fitted(s.pendingLine()?"Линия: "+ok()+" готово · "+back()+" отмена":s.mode==Mode.CANVAS?DRAW_NAMES[s.drawTool.ordinal()]+" · "+s.cursorX+", "+s.cursorY:ok()+": войти в рисунок",16,180+size+24,16,s.pendingLine()?10:6,size);
+        if(180+size+48<bodyBottom)fitted(s.zoom?"Крупно · окно следует за курсором":s.pendingLine()?"Начало: "+s.lineX+", "+s.lineY:"X цвет · Y отмена",16,180+size+48,16,6,size);
         text("ИНСТРУМЕНТЫ",right,169,18,14);
         button(DRAW_NAMES[s.drawTool.ordinal()]+"  >",right,180,rw,44,s.mode==Mode.NAVIGATE&&s.focus==1,()->action(Action.DRAW_TOOLS));
         boolean paletteActive=s.mode==Mode.PALETTE;
-        if(s.mode==Mode.NAVIGATE&&s.focus==2)outline(right-2,232,rw+4,142,10);
+        float step=Math.min(34,(bodyBottom-340)/4);
+        if(s.mode==Mode.NAVIGATE&&s.focus==2)outline(right-2,232,rw+4,step*4+6,10);
         float cw=rw/4;
-        for(int i=0;i<16;i++) {final int color=i;float cx=right+(i%4)*cw,cy=236+(i/4)*34;
-            rect(cx+2,cy+2,cw-4,30,i);
-            if(i==s.color) {outline(cx+6,cy+6,cw-12,22,7);text("+",cx+cw/2-5,cy+23,20,i==7?0:7);}
-            if(paletteActive&&i==s.paletteCursor)outline(cx,cy,cw,34,10);
-            hit(cx,cy,cw,34,()->{if(s.mode==Mode.NAVIGATE||s.mode==Mode.CANVAS)s.act(Action.CONTEXT);s.chooseColor(color);changed.run();invalidate();});
+        for(int i=0;i<16;i++) {final int color=i;float cx=right+(i%4)*cw,cy=236+(i/4)*step;
+            rect(cx+2,cy+2,cw-4,step-4,i);
+            if(i==s.color) {outline(cx+6,cy+6,cw-12,step-12,7);text("+",cx+cw/2-5,cy+step/2+7,20,i==7?0:7);}
+            if(paletteActive&&i==s.paletteCursor)outline(cx,cy,cw,step,10);
+            hit(cx,cy,cw,step,()->{if(s.mode==Mode.NAVIGATE||s.mode==Mode.CANVAS)s.act(Action.CONTEXT);s.chooseColor(color);changed.run();invalidate();});
         }
-        button("Лист",right,382,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==3,()->action(Action.SPRITE_SHEET));
-        button("Герою",right+(rw+8)/2,382,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==4,()->action(Action.ASSIGN_HERO));
-        fitted(s.spriteSlot==s.cart().heroSlot()?"Использует герой · Y отмена":"Не назначен герою · Y отмена",right,Math.min(451,bodyBottom-8),16,s.spriteSlot==s.cart().heroSlot()?11:6,rw);
+        float by=246+step*4;
+        button("Лист",right,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==3,()->action(Action.SPRITE_SHEET));
+        button(s.region==null?"Герою":"Рамка",right+(rw+8)/2,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==4,()->action(s.region==null?Action.ASSIGN_HERO:Action.REGION));
+        button(s.zoom?"Весь рисунок":"Приблизить",right,by+52,rw,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
     }
     private void spriteSheet() {
         text("РИСУНКИ ПРОЕКТА",16,169,18,14);
         if(w>=500)text("16 × 16 · X копия",w-186,169,16,6);
         float gap=10,cw=(w-32-gap*3)/4;
-        float ch=Math.min(112,(bodyBottom-180-88-gap)/2);
+        float ch=Math.min(112,(bodyBottom-180-104-gap)/2);
         for(int i=0;i<8;i++) {
             final int slot=i;float x=16+(i%4)*(cw+gap),y=180+(i/4)*(ch+gap);
             boolean chosen=s.sheetFocus==i,used=s.cart().heroSlot()==i;
@@ -271,7 +289,29 @@ final class WorkshopView extends View {
         for(int i=0;i<3;i++){final int choice=8+i;
             button(labels[i],16+i*(bw+8),by,bw,44,s.sheetFocus==choice,()->{s.selectSheet(choice);changed.run();invalidate();});
         }
-        fitted("Рисунок "+(s.spriteSlot+1)+" · Герой использует "+(s.cart().heroSlot()+1),16,by+67,16,6,w-32);
+        button("Область листа · другой размер",16,by+48,w-32,36,s.sheetFocus==11,()->{s.selectSheet(11);changed.run();invalidate();});
+    }
+    private void regionChooser(){
+        text("ОБЛАСТЬ ЛИСТА",16,169,18,14);
+        fitted(s.choosingEnd?"2 / Выбери противоположный угол":"1 / Выбери первый угол",16,196,20,7,w-32);
+        float cell=Math.max(1,(int)Math.min((w-32)/128,(bodyBottom-292)/64));
+        float x=(w-cell*128)/2,y=214;
+        for(int py=0;py<64;py++)for(int px=0;px<128;px++){
+            int color=s.cart().sheetPixel(px,py);
+            rect(x+px*cell,y+py*cell,cell,cell,color==0?((px/8+py/8)%2==0?0:1):color);
+        }
+        outline(x-2,y-2,128*cell+4,64*cell+4,13);
+        SpriteRegion r=s.regionDraft();
+        outline(x+r.x*cell,y+r.y*cell,r.width*cell,r.height*cell,10);
+        outline(x+s.regionX*8*cell,y+s.regionY*8*cell,8*cell,8*cell,7);
+        if(s.choosingEnd)rect(x+s.anchorX*8*cell+2,y+s.anchorY*8*cell+2,4,4,14);
+        for(int ty=0;ty<8;ty++)for(int tx=0;tx<16;tx++){
+            final int px=tx,py=ty;hit(x+tx*8*cell,y+ty*8*cell,8*cell,8*cell,()->{s.pointRegion(px,py);changed.run();invalidate();});
+        }
+        float bottom=y+64*cell;
+        text(r.width+" × "+r.height+" пикселей",16,bottom+29,24,10);
+        fitted("Рамка выбирает пиксели, не растягивает их.",16,bottom+54,16,6,w-32);
+        fitted("Нижние 64 строки связаны с картой — редактор позже.",16,bottom+77,16,13,w-32);
     }
     private void dialog() {
         hits.clear(); // Modal controls trap touch as well as controller focus.
@@ -331,7 +371,7 @@ final class WorkshopView extends View {
             }
             if(Math.abs(x-downX)>20||Math.abs(y-downY)>20)return true;
             if(spriteArea!=null && spriteArea.contains(x,y) && (s.mode==Mode.NAVIGATE||s.mode==Mode.CANVAS)) {
-                s.paintAt((int)((x-spriteArea.left)*16/spriteArea.width()),(int)((y-spriteArea.top)*16/spriteArea.height()));
+                s.paintAt(viewX+(int)((x-spriteArea.left)*viewWidth/spriteArea.width()),viewY+(int)((y-spriteArea.top)*viewHeight/spriteArea.height()));
                 changed.run();invalidate();return true;
             }
             for(int i=hits.size()-1;i>=0;i--) if(hits.get(i).rect.contains(x,y)){hits.get(i).action.run();break;}
