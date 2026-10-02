@@ -413,6 +413,13 @@ A beginner may start with playful controls and presets, then reveal the real PIC
 
 As elsewhere, PIKOOS should progressively expose the underlying system rather than replace it.
 
+The owner explicitly confirmed sound-effect and music creation on 2026-10-02.
+Plan for controller-first note/phrase editing, editable effect presets,
+pattern arrangement, audition/stop and undo. Shared SFX resources and channel
+use must remain understandable when combining music with gameplay sounds.
+See [sound-tool requirements](UX_DIRECTION.md) for the proposed workflows and
+future acceptance scenario; these editors are not implemented yet.
+
 ## 18. Edit → Test loop
 
 The edit/test cycle must be extremely short.

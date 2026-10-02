@@ -264,8 +264,10 @@ Complete the core creative loop.
 
 Features:
 
-- SFX editor v1;
-- Music editor v1;
+- SFX editor v1: creation from scratch, editable presets, note parameters,
+  phrase speed/loop, audition and undo with controller input;
+- Music editor v1: note/phrase editing, channel parts, pattern sequencing and
+  loops, with shared-resource awareness and official-runtime sound checks;
 - stronger project screen;
 - screenshots;
 - notes/TODO;
@@ -283,6 +285,11 @@ Features:
 ### Definition of done
 
 A player can discover a cart locally, inspect it, make a remix, understand some of its construction and turn the remix into their own project.
+
+Sound acceptance also requires creating an effect and a short looping piece
+with a controller, testing both together in official PICO-8 and returning to
+the selected editing step. See [UX direction](UX_DIRECTION.md) for the planned
+sound workflows, preservation rules and unresolved preview implementation.
 
 ---
 
