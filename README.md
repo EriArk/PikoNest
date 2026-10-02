@@ -76,11 +76,14 @@ my-game/
 
 ## Status
 
-The owner rejected the runtime lab's Android-form appearance. A new
-[PICO-8-style UX proposal](docs/UX_DIRECTION.md) and
-[interactive study](experiments/ux-study/README.md) now cover the workshop,
-code, sprite editing and controller flow. These are review materials, not an
-accepted visual baseline or implemented production editor.
+The owner accepted the [PICO-8-style visual baseline](docs/UX_DIRECTION.md)
+after rejecting the original Android form, and authorized its implementation
+with controller-first interaction. The installed
+[Android workshop experiment](experiments/android-host/README.md) now edits
+real speed/jump parameters and a 16×16 sprite in an ordinary `.p8`, with
+controller navigation, explicit commit/cancel, undo and runtime launch.
+The [interactive study](experiments/ux-study/README.md) also illustrates future
+library flows. Physical ergonomics and the complete product remain unaccepted.
 
 Owner-provided PICO-8 0.2.7 archives for private development are stored in
 [`dev-runtime/`](dev-runtime/README.md). They must stay outside application

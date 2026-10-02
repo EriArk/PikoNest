@@ -223,3 +223,67 @@ Source inspection was pinned to upstream commit
 old target SDK, broad storage access and bundled bootstrap still need their own
 evaluation before choosing a production integration. Using its prebuilt APK
 here is a runtime experiment, not a framework or distribution decision.
+
+## Controller workshop implementation — 2026-10-02
+
+The owner approved the PICO-8 visual study and its transfer to Android,
+explicitly requiring almost everything to work from the controller. Lab 0.0.2
+now uses the accepted palette and Tiny5 pixel font, with native workshop,
+actual Lua and sprite tools. The JDK-only session handles semantic actions;
+Android keys/hat/stick and touch are adapters. This extends the existing
+SDK-only experiment, without choosing the production UI framework.
+
+The new owned `moon-garden.p8` is ordinary Lua/data. Speed, jump and individual
+hero pixels use byte-scoped edits through the shared P8 document. The previous
+private `files/game.p8` was retained (1298 bytes); the new canonical project is
+`files/projects/moon-garden/game.p8`. No runtime binary enters the host APK.
+
+Observed on the same Retroid, 1240×1080, using ADB-injected Android keys:
+
+- D-pad selects before editing; A enters/commits a value, B cancels without
+  changing the cartridge. L1/R1 navigate workshop/code/sprites. Start launches.
+- X opens the color palette; D-pad selects color and moves the pixel cursor;
+  A paints, Y restores the pixel. A/B exchange is reachable in the Select menu,
+  and changes the hints. Modal dialogs trap navigation and Start.
+- Portable test run: **799 assertions** covering every hero pixel address,
+  one-byte parameter edits, CRLF/unknown data preservation, draft cancellation,
+  committed launch snapshots, controller paths, focus retention, undo and
+  failed-save rollback; original `LabCartridgeTest` also passed.
+- The saved new cart was byte-identical to its original asset after reverting
+  test changes. Original fixture SHA-256:
+  `1afbcdf44e942ab54fb6afd9daa52fdaf470adca02ff56430aa8c7616e08af76`.
+- Official PICO-8 displayed the same hero/scene and responded to movement and
+  jumping. A speed-3 launch and a subsequent speed-2 launch both ran.
+- Killing the background host while PICO-8 ran, then exiting with Ctrl+Q,
+  restored the sprite tool, cursor (8,7) and color. Separately, a pending
+  speed-3 draft survived host process replacement (PID 14805 → 14951); B then
+  cancelled it and retained saved speed 2.
+- Touch entry into the contextual explanation also worked. The scene shown
+  in the editor is labelled an illustration, not a captured/live runtime frame.
+
+Two earlier cold launch attempts returned before any game frame. This time
+the wrapper's `logs/shim.log` supplied specific evidence:
+
+```text
+SDL Error: Could not setup connection to PulseAudio
+** FATAL ERROR: Unable to initialize SDL
+```
+
+`pico_err.txt` also reported that `/proc/self/fd/7` could not be sanitized.
+A third attempt worked, and a later complete exit/relaunch also worked. This
+isolates these observed early exits to runtime initialization, but does not
+prove the root cause of every previous early return or fix warm restart.
+The wrapper startup script waits for a directory rather than a ready audio
+connection; a startup race is a hypothesis to investigate, not a confirmed fix.
+
+Physical held-input ergonomics, simultaneous key/hat reports and Select exit
+still need hardware acceptance. The upstream source maps physical Select to
+`IntentExit`, but synthetic Select (including gamepad source) did not establish
+that behavior. Automated exit used Ctrl+Q. The host cannot inspect the other
+package's exit status and does not label a return as verification.
+
+Final installed lab APK SHA-256:
+`fea6df6fb9049efa5a87f4f8485f6840ffbcd14cee8a84a76496cebe79f832c8`.
+Actual device captures: [workshop evidence](design/android-workshop-01/README.md).
+This is one owned project and parameter/sprite editing, not arbitrary Lua
+editing, import, a finished library, persistent undo or production accessibility.

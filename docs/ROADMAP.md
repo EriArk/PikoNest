@@ -88,10 +88,12 @@ Create placeholders/tests that demonstrate the core does not depend directly on 
 
 ## 0.0D — Handheld UI interaction proof
 
-An [interactive UX study](../experiments/ux-study/README.md) proposes a PICO-8
-visual language and a connected workshop/code/sprite flow. Its browser checks
-are not physical-handheld or owner design acceptance. The rejected Android
-runtime lab must not be used as the production UI baseline.
+The owner accepted the [interactive UX study](../experiments/ux-study/README.md)
+as the visual baseline and emphasized controller-first operation. The native
+Android proof now implements workshop/code/sprite tools for one owned cart:
+real byte-scoped changes, semantic input, explicit commit/cancel, undo and
+runtime launch. Physical ergonomics, arbitrary cart editing, the library and
+production framework are still open. See [device results](ANDROID_RUNTIME_POC.md).
 
 Build a tiny mock editor screen to test:
 

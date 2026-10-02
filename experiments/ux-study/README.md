@@ -1,7 +1,10 @@
 # PIKOOS UX study 01
 
-**Review proposal, not accepted product UI.** Created after the owner rejected
-the native runtime lab's visual direction. See [`UX_DIRECTION.md`](../../docs/UX_DIRECTION.md).
+**Accepted visual baseline; browser behavior remains a simulation.** Created
+after the owner rejected the native runtime lab's appearance, then approved
+this direction and its transfer to Android with controller-first operation.
+See [`UX_DIRECTION.md`](../../docs/UX_DIRECTION.md) and the
+[working native slice](../android-host/README.md).
 
 Open `index.html` locally or run with Node (no dependencies):
 
