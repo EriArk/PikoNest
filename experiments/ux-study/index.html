@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PIKOOS — мастерская, UX study 01</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<main class="study">
+  <header class="study-head"><div><span class="eyebrow">PIKOOS / INTERACTION STUDY 01</span><h1>Картридж. Инструмент. Игра.</h1></div><span class="draft">Предложение · 02.10.2026</span></header>
+  <div class="study-controls" aria-label="Размер экрана"><span>Экран</span><button data-size="classic" aria-pressed="true">Близкий к квадрату</button><button data-size="wide" aria-pressed="false">16:9</button><button data-size="portrait" aria-pressed="false">Портрет</button><button id="reset-study">Начать заново</button></div>
+  <div class="stage"><section id="device" class="classic" aria-label="Интерактивный макет PIKOOS"><div id="app"></div></section></div>
+  <div class="study-caption"><p><strong id="screen-name">Мастерская</strong><span id="screen-explanation"></span></p><p>UX-прототип: картридж и запуск демонстрационные. Изменения живут только в макете.</p></div>
+  <details class="study-help"><summary>Как пройти сценарий</summary><p>Поменяйте скорость → посмотрите ту же переменную в коде → нажмите Start → вернитесь. Попробуйте отмену, объяснение и рисование спрайта.</p><p>Клавиатура: стрелки — фокус / значение, Enter — выбрать, Esc — назад, Q/E — инструмент, Space — тест, Z — отмена, X — объяснение / палитра. Есть мышь, касание и стандартный Gamepad API.</p><div><button id="show-error">Показать ошибку запуска</button><button id="show-empty">Пустая полка</button></div></details>
+</main>
+<script src="app.js"></script>
+</body></html>

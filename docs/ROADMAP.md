@@ -88,6 +88,11 @@ Create placeholders/tests that demonstrate the core does not depend directly on 
 
 ## 0.0D — Handheld UI interaction proof
 
+An [interactive UX study](../experiments/ux-study/README.md) proposes a PICO-8
+visual language and a connected workshop/code/sprite flow. Its browser checks
+are not physical-handheld or owner design acceptance. The rejected Android
+runtime lab must not be used as the production UI baseline.
+
 Build a tiny mock editor screen to test:
 
 - controller focus/navigation;

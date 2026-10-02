@@ -224,6 +224,12 @@ The primary action stays obvious: **Play**.
 
 ## 11. Creation workspace
 
+The editor must retain PICO-8's visual identity: its palette, pixel language and
+direct relationship between game material and tools. A generic native Android
+form does not meet this direction. Readability, controller focus and usable
+touch targets must survive the pixel styling. See the
+[current UX proposal](UX_DIRECTION.md), which still needs owner evaluation.
+
 The editor should expose familiar PICO-8 areas in a handheld-friendly form:
 
 - Play/Test
