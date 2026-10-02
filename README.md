@@ -86,6 +86,10 @@ context after exit, including host process recreation. See the
 [device results and remaining limitations](docs/ANDROID_RUNTIME_POC.md) and
 [reproducible host experiment](experiments/android-host/README.md).
 
+A [portable `.p8` reader/writer proof](experiments/p8-roundtrip/README.md)
+now preserves complete source bytes and supports section-scoped edits, tested
+against the official demo corpus and used by the Android lab.
+
 The production framework remains undecided. The first milestone is proving
 three foundations:
 

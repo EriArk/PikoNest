@@ -12,11 +12,13 @@ The experiment has no library dependencies and includes no PICO-8 binary.
 ## Boundaries
 
 - `core/`: JDK-only `LabCartridge` and `PicoRuntimeBackend` contract.
+- `../p8-roundtrip/core/`: shared byte-preserving section reader/writer proof.
 - `src/`: Android activity, atomic persistence, read-only URI provider and
   external-app runtime adapter.
 - `assets/workshop.p8`: owned standard cartridge fixture. The field editor
-  changes one byte and preserves every other byte. It is not a general parser
-  and does not accept arbitrary imported carts.
+  changes one byte through the shared P8 document and preserves every other
+  byte. The speed editor remains fixture-specific and does not accept arbitrary
+  imported carts.
 - `tests/`: executable byte-preservation/validation checks with no Android SDK.
 
 The host requests no storage, network or privileged permissions. A scoped

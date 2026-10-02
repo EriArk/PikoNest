@@ -186,8 +186,28 @@ Returning Home with the runtime still alive can still expose that limitation.
 Additional local evidence: `22-host-launched-cart.png`,
 `24-host-return-settled.png`, `26-speed3-runtime.png`,
 `27-process-restored.png`, `28-final-host-runtime.png` and
-`29-final-host-return.png`. Final lab APK SHA-256:
+`29-final-host-return.png`. Initial host milestone APK SHA-256:
 `3b3de075306c57df5d99b650df4cc538855c54305ba36da84f336241f86ba990`.
+
+### Portable P8 integration follow-up (same date)
+
+The host now uses the separate
+[`p8-roundtrip` proof](../experiments/p8-roundtrip/README.md) for section framing
+and targeted edits. Portable tests passed over all 12 official demos, both
+owned fixtures and synthetic edge cases. A byte-identical round-tripped Jelpi
+copy visibly ran in official PICO-8. The updated host's speed 4 also ran, with
+only the speed byte changed in its canonical file.
+
+An initial host launch soon after exiting Jelpi returned without an observed
+game frame; the following cold attempt displayed the correct cart. The cause
+of that early return is not established. Do not infer reliable launch from
+the host's return counter. The external backend still lacks completion/error
+observation, and rapid relaunch needs further investigation.
+
+Updated lab APK SHA-256:
+`c864f5035932f8775175a215b64b717fb09db6f4c10d9453094977806f93666b`.
+Evidence: `39-jelpi-roundtrip.png`, `42-parser-runtime-settled.png`,
+`43-parser-host-return.png`, `p8-roundtrip-tests.txt` under `.local/evidence/`.
 
 ### Next technical work
 
@@ -195,8 +215,8 @@ Additional local evidence: `22-host-launched-cart.png`,
    while retaining the working cold launch as a reproducible baseline.
 2. Extend the experimental runtime contract with owned start/stop/completion
    and import/validation, based on a backend that can actually implement them.
-3. Build the general lossless `.p8` round-trip proof (0.0B), independently of
-   the Android host and its fixture-specific field editor.
+3. Broaden the portable `.p8` proof's corpus and runtime edge-case probes before
+   using it for arbitrary cartridge import or semantic resource editing.
 
 Source inspection was pinned to upstream commit
 `562662e35727ae7706fe97fed3390db249a35263` (tag 1.6.6). The upstream wrapper's

@@ -350,6 +350,12 @@ Do not store data in `project.json` when it is part of the actual game and belon
 
 ## 10. P8 parser/writer design
 
+The current [section reader/writer proof](../experiments/p8-roundtrip/README.md)
+keeps an immutable byte source plus section spans and rejects targeted edits
+that alter framing. The Android lab consumes the same JDK-only implementation.
+This is an experimental Java toolchain reuse, not a production language choice
+or a complete Lua/resource parser.
+
 The parser/writer must be conservative.
 
 Requirements:

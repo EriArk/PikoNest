@@ -22,6 +22,7 @@ function Invoke-PikoTool([string]$Program, [string[]]$Arguments) {
 New-Item -ItemType Directory -Force -Path $pikoBuild,$pikoArtifacts,
     (Join-Path $pikoBuild 'classes'),(Join-Path $pikoBuild 'tests'),(Join-Path $pikoBuild 'dex') | Out-Null
 $pikoCore = @(Get-ChildItem (Join-Path $PSScriptRoot 'core') -Recurse -Filter '*.java' | ForEach-Object FullName)
+$pikoCore += @(Get-ChildItem (Join-Path $pikoRoot 'experiments\p8-roundtrip\core') -Recurse -Filter '*.java' | ForEach-Object FullName)
 $pikoSources = @(Get-ChildItem (Join-Path $PSScriptRoot 'src') -Recurse -Filter '*.java' | ForEach-Object FullName)
 $pikoTests = @(Get-ChildItem (Join-Path $PSScriptRoot 'tests') -Filter '*.java' | ForEach-Object FullName)
 

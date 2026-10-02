@@ -53,6 +53,12 @@ The only question is: **can PIKOOS reliably treat official PICO-8 as its runtime
 
 ## 0.0B — `.p8` round-trip proof
 
+The [portable section reader/writer experiment](../experiments/p8-roundtrip/README.md)
+now passes byte-preservation tests over 12 official 0.2.7 demos, both owned
+fixtures and synthetic edge cases. It also backs the Android lab's speed edit.
+This establishes a first framing/targeted-edit proof; resource decoding, Lua
+understanding and broader import compatibility remain open.
+
 Create a parser/writer test tool.
 
 Requirements:

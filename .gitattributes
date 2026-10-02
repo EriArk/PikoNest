@@ -1,0 +1,2 @@
+# Editable cartridges are byte-preserved inputs; never convert their line endings.
+*.p8 -text
