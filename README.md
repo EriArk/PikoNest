@@ -82,6 +82,9 @@ with controller-first interaction. The installed
 [Android workshop experiment](experiments/android-host/README.md) now edits
 real speed/jump parameters and a 16×16 sprite in an ordinary `.p8`, with
 controller navigation, explicit commit/cancel, undo and runtime launch.
+Its sprite sheet now supports choosing, drawing a new image, safely copying
+an existing image and explicitly assigning a different hero, using the same
+controller workflow. See [device captures](docs/design/android-sprites-02/README.md).
 The [interactive study](experiments/ux-study/README.md) also illustrates future
 library flows. Physical ergonomics and the complete product remain unaccepted.
 

@@ -287,3 +287,45 @@ Final installed lab APK SHA-256:
 Actual device captures: [workshop evidence](design/android-workshop-01/README.md).
 This is one owned project and parameter/sprite editing, not arbitrary Lua
 editing, import, a finished library, persistent undo or production accessibility.
+
+## Sprite sheet and explicit hero assignment — 2026-10-02
+
+Android lab 0.0.3 connects sprite selection and creation to the existing
+edit/test loop. The first sheet exposes eight non-overlapping 16×16 regions
+in the owned cart's first 16 gfx rows (PICO-8 sprite IDs 0, 2, …, 14). It does
+not imply a complete resource editor, animation support or arbitrary import.
+Existing 0.0.2 projects load without any migration or automatic source rewrite.
+
+Device verification through injected Android controller key events:
+
+1. Entered the sheet using R1, copied the original cat using X. The duplicate
+   opened for editing; the original remained the assigned hero.
+2. Selected blue in the palette and repainted the copy's 16 scarf pixels using
+   D-pad and A. Assigned it through the visible Hero action. The resulting
+   actual Lua calls `spr(2,x,y,2,2)`; original cat pixels are unchanged.
+3. Launched the saved cart. Two attempts reproduced the already documented
+   PulseAudio initialization failure; the third displayed the blue-scarf cat
+   in official PICO-8 0.2.7. Runtime reliability is still unresolved.
+4. Killed the background host, exited PICO-8 with injected Ctrl+Q, and observed
+   the recreated host return to the selected second resource in the sheet.
+5. Navigated to New using D-pad, opened an empty third region, selected yellow
+   and drew a 23-pixel star. Undo/repaint worked. The blue cat remained assigned.
+6. Reinstalled the final build with data preserved. The selected third resource
+   survived. The workshop Hero image link correctly opened the second image,
+   demonstrating that sheet selection and in-game usage are distinct.
+
+Final device bytes were compared against a pre-update backup: same file length,
+122 changed positions, all in the two new gfx regions or the hero binding.
+The original image, speed/jump and other Lua/data were preserved.
+
+Portable validation: original LabCartridgeTest passed, WorkshopTest passed
+799 checks, and SpriteWorkflowTest passed 2804 checks. New tests check actual
+gfx byte addresses across region/tile boundaries, CRLF and unknown data,
+copy isolation and occupancy guards, one-/two-digit sprite-number assignment,
+exact undo, blank/full sheets, failed persistence and controller reachability.
+
+Final installed APK SHA-256:
+`ed1261ff10c7f14e8c6c7be8659e7228d393336c377ddeded48bde771fdca51d`.
+Screenshots: [sprite workflow evidence](design/android-sprites-02/README.md).
+Physical mapping/ergonomics and reliable runtime initialization remain open;
+this slice adds resources, not new-project or background/map creation yet.

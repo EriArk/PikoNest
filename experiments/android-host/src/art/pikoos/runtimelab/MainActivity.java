@@ -85,15 +85,23 @@ public final class MainActivity extends Activity {
             .putInt("line",session.codeLine).putInt("x",session.cursorX).putInt("y",session.cursorY)
             .putInt("color",session.color).putBoolean("eraser",session.eraser).putBoolean("swapAB",session.swapAB)
             .putInt("field",session.field).putInt("draft",session.draft)
+            .putInt("spriteSlot",session.spriteSlot).putInt("sheetFocus",session.sheetFocus)
+            .putBoolean("browsingSprites",session.browsingSprites)
             .putString("mode",session.mode==Mode.CANVAS?"CANVAS":session.mode==Mode.VALUE?"VALUE":"NAVIGATE").apply();
     }
     private int bounded(String key,int fallback,int max){return Math.max(0,Math.min(max,prefs.getInt(key,fallback)));}
     private void restoreUi(){
-        session.tool=bounded("tool",0,2);session.focus=bounded("focus",0,3);
+        session.tool=bounded("tool",0,2);session.focus=bounded("focus",0,4);
         session.codeLine=bounded("line",session.cart().line(0),session.cart().code().split("\n",-1).length-1);
         session.cursorX=bounded("x",7,15);session.cursorY=bounded("y",7,15);session.color=bounded("color",14,15);
         session.eraser=prefs.getBoolean("eraser",false);session.swapAB=prefs.getBoolean("swapAB",false);
-        if(session.tool==2&&prefs.getString("mode","").equals("CANVAS"))session.mode=Mode.CANVAS;
+        session.spriteSlot=bounded("spriteSlot",session.cart().heroSlot(),7);
+        session.sheetFocus=bounded("sheetFocus",session.spriteSlot,10);
+        session.browsingSprites=prefs.getBoolean("browsingSprites",true);
+        if(session.tool==2){
+            if(session.browsingSprites)session.mode=Mode.SHEET;
+            else if(prefs.getString("mode","").equals("CANVAS"))session.mode=Mode.CANVAS;
+        }
         if(session.tool!=2&&prefs.getString("mode","").equals("VALUE")){
             session.mode=Mode.VALUE;session.field=bounded("field",0,1);session.draft=Math.max(1,bounded("draft",2,4));
         }

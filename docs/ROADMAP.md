@@ -142,6 +142,11 @@ A user can install PIKOOS, provide official PICO-8, import carts and comfortably
 
 Make and edit a small real PICO-8 game entirely on a handheld.
 
+Current experimental slice: the owned Moon Garden project has a controller
+sprite sheet, blank-image entry, safe copy and explicit hero assignment. This
+connects resource selection to editing and official-runtime testing; it does
+not complete project creation or arbitrary cartridge editing.
+
 Features:
 
 - project creation;
@@ -180,6 +185,12 @@ A user can build and test a tiny game that remains a normal `.p8` and can be ope
 ---
 
 # 0.3 — Mechanics + Learn by Doing
+
+Owner discussion (2026-10-02): later design genre-specific starting points and
+tools as complete creation journeys. Explore, for example, platformers,
+top-down adventures, shooters and puzzles after the shared resource/create/test
+workflow is usable. These are research examples, not an accepted genre list or
+separate engines. Keep mechanics ordinary editable PICO-8 Lua/data.
 
 ## Goal
 

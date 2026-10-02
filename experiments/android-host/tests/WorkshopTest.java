@@ -50,7 +50,7 @@ public final class WorkshopTest {
         port.fail=false;s.act(Action.CANCEL);s.act(Action.NEXT);
         s.selectCodeLine(s.cart().line(1));s.act(Action.LEFT);s.act(Action.CONFIRM);
         check(s.cart().value(1)==2,"code parameter changes real Lua");
-        s.act(Action.NEXT);s.act(Action.CONFIRM);check(s.mode==Mode.CANVAS,"controller enters canvas");
+        s.act(Action.NEXT);s.act(Action.CONFIRM);s.act(Action.CONFIRM);check(s.mode==Mode.CANVAS,"controller enters canvas through sheet");
         int oldX=s.cursorX,oldY=s.cursorY,original=s.cart().pixel(oldX+1,oldY);
         s.act(Action.RIGHT);s.act(Action.CONTEXT);s.act(Action.DOWN);s.act(Action.CONFIRM);
         check(s.mode==Mode.CANVAS&&s.color==2,"palette returns to canvas");

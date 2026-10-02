@@ -7,8 +7,12 @@ import java.util.regex.Pattern;
 
 /** Byte-scoped edits for our owned Moon Garden template, not a general Lua parser. */
 public final class WorkshopCartridge {
+    /** This owned template exposes eight non-overlapping 16x16 regions in its first two tile rows. */
+    public static final int SPRITE_COUNT = 8;
     private final P8Document document;
     private final int lua, gfx;
+    private final int heroFrom, heroTo, heroSlot;
+    private final byte[] pixels;
     private final int[] fields = new int[2];
     private final int[] rows = new int[16];
     public WorkshopCartridge(byte[] source) {
@@ -24,7 +28,14 @@ public final class WorkshopCartridge {
             fields[i] = m.start(1);
             if (m.find()) throw new IllegalArgumentException("Ambiguous field: " + names[i]);
         }
-        byte[] pixels = document.body(gfx);
+        Matcher hero = Pattern.compile("(?m)^ spr\\(([0-9]{1,2}),x,y,2,2\\)(?=\\r?$)").matcher(code);
+        if (!hero.find()) throw new IllegalArgumentException("Owned hero drawing call missing");
+        heroFrom = hero.start(1); heroTo = hero.end(1);
+        int number = Integer.parseInt(hero.group(1));
+        if (number % 2 != 0 || number >= SPRITE_COUNT * 2 || hero.find())
+            throw new IllegalArgumentException("Ambiguous or unsupported hero sprite");
+        heroSlot = number / 2;
+        pixels = document.body(gfx);
         int start = 0;
         for (int y = 0; y < 16; y++) {
             rows[y] = start;
@@ -39,6 +50,13 @@ public final class WorkshopCartridge {
         }
     }
     public byte[] bytes() { return document.bytes(); }
+    public int heroSlot() { return heroSlot; }
+    public WorkshopCartridge withHero(int slot) {
+        checkSlot(slot);
+        if (empty(slot)) throw new IllegalArgumentException("Сначала нарисуй хотя бы один пиксель");
+        return new WorkshopCartridge(document.edit(lua, heroFrom, heroTo,
+            Integer.toString(slot * 2).getBytes(StandardCharsets.US_ASCII)).bytes());
+    }
     public String code() { return new String(document.body(lua), StandardCharsets.ISO_8859_1); }
     public int value(int field) { return document.body(lua)[fields[field]] - '0'; }
     public int line(int field) {
@@ -51,15 +69,46 @@ public final class WorkshopCartridge {
             new byte[]{(byte)('0' + value)}).bytes());
     }
     public int pixel(int x, int y) {
+        return pixel(0, x, y);
+    }
+    public int pixel(int slot, int x, int y) {
+        checkSlot(slot);
         checkPixel(x, y);
-        return Character.digit((char)document.body(gfx)[rows[y] + x], 16);
+        return Character.digit((char)pixels[rows[y] + slot * 16 + x], 16);
     }
     public WorkshopCartridge withPixel(int x, int y, int color) {
+        return withPixel(0, x, y, color);
+    }
+    public WorkshopCartridge withPixel(int slot, int x, int y, int color) {
+        checkSlot(slot);
         checkPixel(x, y);
         if (color < 0 || color > 15) throw new IllegalArgumentException("Color out of range");
-        int at = rows[y] + x;
+        int at = rows[y] + slot * 16 + x;
         return new WorkshopCartridge(document.edit(gfx, at, at + 1,
             new byte[]{(byte)"0123456789abcdef".charAt(color)}).bytes());
+    }
+    public boolean empty(int slot) {
+        checkSlot(slot);
+        for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) if (pixel(slot, x, y) != 0) return false;
+        return true;
+    }
+    public int firstFreeSlot() {
+        // An erased but still assigned hero is not available for automatic allocation.
+        for (int i = 0; i < SPRITE_COUNT; i++) if (i != heroSlot && empty(i)) return i;
+        return -1;
+    }
+    public WorkshopCartridge copySprite(int source, int destination) {
+        checkSlot(source); checkSlot(destination);
+        if (source == destination || destination == heroSlot || !empty(destination))
+            throw new IllegalArgumentException("Copy destination is occupied");
+        if (empty(source)) throw new IllegalArgumentException("Нечего копировать: рисунок пустой");
+        byte[] changed = pixels.clone();
+        for (int y = 0; y < 16; y++)
+            System.arraycopy(pixels, rows[y] + source * 16, changed, rows[y] + destination * 16, 16);
+        return new WorkshopCartridge(document.edit(gfx, 0, pixels.length, changed).bytes());
+    }
+    private static void checkSlot(int slot) {
+        if (slot < 0 || slot >= SPRITE_COUNT) throw new IllegalArgumentException("Sprite slot out of range");
     }
     private static void checkPixel(int x, int y) {
         if (x < 0 || y < 0 || x > 15 || y > 15) throw new IllegalArgumentException("Pixel out of range");

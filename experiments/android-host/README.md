@@ -2,7 +2,8 @@
 
 An isolated 0.0A/0.0C/0.0D proof: a controller-operated workshop using the
 owner-approved PICO-8 visual baseline. Edit speed/jump or the hero's sprite in
-a real `.p8`, send a read-only snapshot to the installed official-runtime
+a real `.p8`, select/create/copy a sprite and explicitly assign it to the hero,
+send a read-only snapshot to the installed official-runtime
 wrapper, and restore the workshop when the user returns.
 
 The visual direction is approved; this implementation remains an experiment,
@@ -22,6 +23,8 @@ The experiment has no library dependencies and includes no PICO-8 binary.
   external-app runtime adapter.
 - `assets/moon-garden.p8`: original ordinary PICO-8 Lua and a 16×16 hero.
   Each parameter/pixel edit changes exactly one byte via the shared P8 document.
+  Assignment edits only the sprite number in the owned `spr(n,x,y,2,2)` call;
+  copying changes only destination image pixels.
   This deliberately handles the owned template, not arbitrary imported carts.
 - `assets/workshop.p8`: original diagnostic fixture, retained for regression.
 - `assets/Tiny5-Regular.ttf` and `OFL.txt`: Tiny5, SIL Open Font License;
@@ -58,7 +61,7 @@ in ignored `.local/`. Paths can be supplied through build-script parameters.
 | A / B | Confirm / back (exchangeable in Select menu) |
 | Left / Right inside a value | Change the draft; A saves, B cancels |
 | L1 / R1 | Previous / next tool, retaining selection |
-| X | Context explanation, or sprite color palette |
+| X | Context explanation, sprite color palette, or Copy on the sprite sheet |
 | Y | Undo last edit |
 | Start | Save a pending parameter and test in official PICO-8 |
 | Select | Menu, including A/B mapping |
@@ -67,6 +70,33 @@ All implemented editor actions are reachable without touch. Touch uses the
 same session actions: fields, tabs, palette and single-pixel taps. The code
 view displays actual Lua and edits the two owned parameters; arbitrary text
 entry, autocomplete, map and audio editors are not implemented yet.
+
+### Sprite selection and creation (0.0.3)
+
+The sprite tab initially opens a 4×2 sheet of eight 16×16 regions. These are
+ordinary gfx pixels in the first 16 rows of the existing cart; the underlying
+PICO-8 sprite numbers are 0, 2, …, 14. This is a bounded resource slice for the
+owned template, not the entire PICO-8 sprite/map editor. UI names use one-based
+image numbers so users do not need to understand tile addressing to start.
+
+- D-pad selects an image. A opens its editor; A again enters pixel drawing.
+- Below the grid: New, Copy and Assign to hero, all reachable with D-pad.
+- New opens the first empty unassigned region. Leaving it untouched writes
+  nothing. Painting makes it an ordinary sprite in the cartridge.
+- Copy (also X on the sheet) writes one undoable duplicate into an empty
+  region and opens it for editing. It leaves the original and hero binding alone.
+- Assign to hero explicitly changes which image the game draws. The pink
+  Hero marker and workshop preview follow this binding. Merely browsing or
+  editing another image does not assign it. Empty images cannot be assigned.
+- B leaves the canvas for tools, then returns to the sheet. The workshop's
+  Hero image link opens the assigned image directly. Sheet/editor selection
+  and the pixel cursor survive runtime return and process recreation.
+- A full sheet cannot overwrite an occupied region; the UI reports no free
+  cells. An erased but still assigned hero is reserved from automatic allocation.
+
+Existing 0.0.2 Moon Garden files open without migration or normalization,
+including their saved speed/jump/pixel changes. As before, the adapter refuses
+ambiguous or manually changed owned code rather than guessing a binding.
 
 Parameters are drafts until confirmation; switching tools cannot silently
 discard an active draft. Writes use AtomicFile and update the in-memory model
