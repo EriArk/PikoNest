@@ -21,6 +21,7 @@ final class WorkshopView extends View {
         0xffffec27,0xff00e436,0xff29adff,0xff83769c,0xffff77a8,0xffffccaa};
     private final WorkshopSession s;
     private final Runnable changed;
+    private final String projectTitle;
     private final Paint p = new Paint();
     private final Bitmap sceneBitmap=Bitmap.createBitmap(128,128,Bitmap.Config.ARGB_8888);
     private final ArrayList<Hit> hits = new ArrayList<>();
@@ -34,8 +35,8 @@ final class WorkshopView extends View {
         final RectF rect; final Runnable action;
         Hit(float x,float y,float w,float h,Runnable action) { rect=new RectF(x,y,x+w,y+h); this.action=action; }
     }
-    WorkshopView(Context context, WorkshopSession session, Runnable changed) {
-        super(context); s=session; this.changed=changed;
+    WorkshopView(Context context, WorkshopSession session, String projectTitle, Runnable changed) {
+        super(context); s=session; this.changed=changed;this.projectTitle=projectTitle;
         p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));
         p.setAntiAlias(false); p.setFilterBitmap(false);
         setFocusable(true); setFocusableInTouchMode(true);
@@ -73,7 +74,7 @@ final class WorkshopView extends View {
         fitted(status,Math.max(150,w-158),27,16,s.mode==Mode.VALUE?10:7,108);
         rect(w-174,19,6,6,s.mode==Mode.VALUE?10:11);
         text("≡",w-34,29,26,7);hit(w-48,0,48,44,()->action(Action.MENU));
-        text("Лунный сад",16,82,28,7);text("game.p8",w-98,80,18,13);
+        fitted(projectTitle,16,82,28,7,w-130);text("game.p8",w-98,80,18,13);
         rect(0,100,w,2,13);
         String[] tabs={"Мастерская","[ ] Код","Спрайты"};
         for(int i=0;i<3;i++) { final int tab=i;float x=12+i*(w-24)/3,tw=(w-24)/3;
@@ -263,13 +264,13 @@ final class WorkshopView extends View {
     private void dialog() {
         hits.clear(); // Modal controls trap touch as well as controller focus.
         p.setColor(0xcc000000);c.drawRect(0,0,w,h,p);
-        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.MENU?326:280,dy=Math.max(16,(h-dh)/2);
+        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.MENU?380:280,dy=Math.max(16,(h-dh)/2);
         rect(dx+6,dy+6,dw,dh,0);rect(dx,dy,dw,dh,1);outline(dx,dy,dw,dh,s.mode==Mode.ERROR?8:14);
         if(s.mode==Mode.MENU) {
             text("Мастерская",dx+20,dy+36,26,14);
-            String[] labels={"Отменить последнюю правку",s.swapAB?"B выбор / A назад":"A выбор / B назад","Как это работает","Вернуться к проекту"};
-            for(int i=0;i<4;i++){final int n=i;button(labels[i],dx+16,dy+54+i*54,dw-32,46,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
-            text("SELECT: меню · L/R: инструменты",dx+20,dy+302,16,6);
+            String[] labels={"Отменить последнюю правку",s.swapAB?"B выбор / A назад":"A выбор / B назад","Как это работает","Вернуться к проекту","Мои игры"};
+            for(int i=0;i<5;i++){final int n=i;button(labels[i],dx+16,dy+54+i*54,dw-32,46,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
+            text("SELECT: меню · L/R: инструменты",dx+20,dy+356,16,6);
         } else if(s.mode==Mode.HELP) {
             if(s.tool==2){
                 text("Рисунки и герой",dx+20,dy+40,26,14);

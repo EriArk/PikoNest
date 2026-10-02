@@ -11,6 +11,7 @@ public final class WorkshopSession {
     public interface Port {
         void save(byte[] bytes) throws Exception;
         void launch(byte[] bytes) throws Exception;
+        default void library() throws Exception {}
     }
     private final Port port;
     private final ArrayDeque<WorkshopCartridge> undo = new ArrayDeque<>();
@@ -106,14 +107,15 @@ public final class WorkshopSession {
                 return;
             }
             if (mode == Mode.MENU) {
-                if (action == Action.UP) menuItem = clamp(menuItem - 1, 3);
-                if (action == Action.DOWN) menuItem = clamp(menuItem + 1, 3);
+                if (action == Action.UP) menuItem = clamp(menuItem - 1, 4);
+                if (action == Action.DOWN) menuItem = clamp(menuItem + 1, 4);
                 if (action == Action.CANCEL || action == Action.MENU) mode = overlayReturn;
                 if (action == Action.CONFIRM) {
                     if (menuItem == 0) { mode = overlayReturn; act(Action.UNDO); }
                     if (menuItem == 1) { swapAB = !swapAB; notice = "Кнопки изменены"; }
                     if (menuItem == 2) mode = Mode.HELP;
                     if (menuItem == 3) mode = overlayReturn;
+                    if (menuItem == 4) { mode = overlayReturn; port.library(); }
                 }
                 return;
             }

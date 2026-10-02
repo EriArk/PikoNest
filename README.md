@@ -86,8 +86,11 @@ controller navigation, explicit commit/cancel, undo and runtime launch.
 Its sprite sheet now supports choosing, drawing a new image, safely copying
 an existing image and explicitly assigning a different hero, using the same
 controller workflow. See [device captures](docs/design/android-sprites-02/README.md).
-The [interactive study](experiments/ux-study/README.md) also illustrates future
-library flows. Physical ergonomics and the complete product remain unaccepted.
+The native project shelf now opens separate games, creates a fresh small-game
+template and makes independent copies, retaining each project's editing context.
+See [library device captures](docs/design/android-library-03/README.md).
+The [interactive study](experiments/ux-study/README.md) remains the visual
+baseline. Physical ergonomics and the complete product remain unaccepted.
 
 Owner-provided PICO-8 0.2.7 archives for private development are stored in
 [`dev-runtime/`](dev-runtime/README.md). They must stay outside application

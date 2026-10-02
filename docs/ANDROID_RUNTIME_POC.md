@@ -329,3 +329,19 @@ Final installed APK SHA-256:
 Screenshots: [sprite workflow evidence](design/android-sprites-02/README.md).
 Physical mapping/ergonomics and reliable runtime initialization remain open;
 this slice adds resources, not new-project or background/map creation yet.
+
+## Project shelf and independent games — 2026-10-02
+
+Android lab 0.0.4 adds creation from the owned small-game template, byte-exact
+project copies, controller shelf navigation and separate editor state per project.
+The pre-existing Moon Garden cart remained byte-identical throughout validation.
+The new game and copy received independent speed changes; the copy ran in
+official PICO-8 on the first attempt of this check. Killing the background host
+and exiting runtime restored the copied project, selected image and pixel cursor.
+Shelf selection also survived process recreation independently of the active
+editor. Full procedure, hashes and actual screenshots are in
+[library evidence](design/android-library-03/README.md).
+
+The library is limited to the owned template family. Arbitrary import, blank
+projects and production storage/metadata remain future work. Existing wrapper
+reliability and physical controller acceptance limitations still apply.

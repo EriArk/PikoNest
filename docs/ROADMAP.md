@@ -144,8 +144,11 @@ Make and edit a small real PICO-8 game entirely on a handheld.
 
 Current experimental slice: the owned Moon Garden project has a controller
 sprite sheet, blank-image entry, safe copy and explicit hero assignment. This
-connects resource selection to editing and official-runtime testing; it does
-not complete project creation or arbitrary cartridge editing.
+connects resource selection to editing and official-runtime testing. Android
+lab 0.0.4 also adds a controller-operated project shelf, creation from the
+owned small-game template and independent project copies. Each project retains
+its own editing context. Blank-cart creation, naming/import/export and arbitrary
+cartridge editing remain open; this does not complete 0.1 or 0.2.
 
 Features:
 

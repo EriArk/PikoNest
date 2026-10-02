@@ -13,6 +13,7 @@ import android.view.WindowInsetsController;
 import android.view.View;
 import android.widget.TextView;
 import art.pikoos.lab.core.WorkshopCartridge;
+import art.pikoos.lab.core.LibrarySession;
 import art.pikoos.lab.core.WorkshopSession;
 import art.pikoos.lab.core.WorkshopSession.Action;
 import art.pikoos.lab.core.WorkshopSession.Mode;
@@ -21,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.HashMap;
 
 public final class MainActivity extends Activity {
     private static final String TAG="PikoRuntimeLab";
@@ -29,58 +31,109 @@ public final class MainActivity extends Activity {
     private ControllerInput input;
     private PicoRuntimeBackend backend;
     private SharedPreferences prefs;
-    private AtomicFile project;
+    private SharedPreferences libraryPrefs;
+    private ProjectStore store;
+    private LibrarySession library;
+    private LibraryView shelf;
+    private String activeId="moon-garden";
+    private boolean showingLibrary;
+    private final HashMap<String,WorkshopSession> sessions=new HashMap<>();
     private boolean awaitingReturn,leftForRuntime;
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
         prefs=getSharedPreferences("moon-garden-ui",MODE_PRIVATE);
-        awaitingReturn=prefs.getBoolean("awaitingReturn",false);leftForRuntime=awaitingReturn;
+        libraryPrefs=getSharedPreferences("library-ui",MODE_PRIVATE);
+        activeId=libraryPrefs.getString("active","moon-garden");
+        if(!LibrarySession.validId(activeId))activeId="moon-garden";
+        awaitingReturn=libraryPrefs.getBoolean("awaitingReturn",prefs.getBoolean("awaitingReturn",false));leftForRuntime=awaitingReturn;
+        boolean startOnShelf=libraryPrefs.getBoolean("shelf",true);
+        String shelfSelection=libraryPrefs.getString("selected",activeId);
+        int shelfFocus=libraryPrefs.getInt("focus",0);
         backend=new ExternalPicoBackend(this);
         try {
-            File directory=new File(getFilesDir(),"projects/moon-garden");
-            if(!directory.isDirectory()&&!directory.mkdirs())throw new IllegalStateException("Не удалось создать папку проекта");
-            project=new AtomicFile(new File(directory,"game.p8"));
-            WorkshopCartridge cart;
-            if(project.getBaseFile().exists()||new File(directory,"game.p8.bak").exists())cart=new WorkshopCartridge(project.readFully());
-            else {
-                try(InputStream in=getAssets().open("moon-garden.p8")){cart=new WorkshopCartridge(readAll(in));}
-                saveCart(cart.bytes());
-            }
-            session=new WorkshopSession(cart,new WorkshopSession.Port(){
-                public void save(byte[] bytes)throws Exception{saveCart(bytes);Log.i(TAG,"project_saved bytes="+bytes.length);}
-                public void launch(byte[] bytes)throws Exception{launchCart(bytes);}
-            });
-            restoreUi();
-            surface=new WorkshopView(this,session,()->persistUi());
-            input=new ControllerInput(action->{surface.action(action);},()->session.swapAB);
-            setContentView(surface);surface.requestFocus();immersive();
+            store=new ProjectStore(getFilesDir());
+            byte[] template;
+            try(InputStream in=getAssets().open("moon-garden.p8")){template=readAll(in);}
+            if(!store.directory("moon-garden").exists())store.create("moon-garden",template);
+            library=new LibrarySession(new LibrarySession.Port(){
+                public java.util.List<String> ids()throws Exception{return store.ids();}
+                public byte[] read(String id)throws Exception{return store.read(id);}
+                public void create(String id,byte[] bytes)throws Exception{store.create(id,bytes);}
+                public void open(String id,WorkshopCartridge cart)throws Exception{openProject(id,cart);}
+                public void resume(){if(session!=null)showWorkshop();}
+            },template);
+            input=new ControllerInput(action->{if(showingLibrary)shelf.action(action);else if(surface!=null)surface.action(action);},
+                ()->session!=null?session.swapAB:libraryPrefs.getBoolean("swapAB",false));
+            try{openProject(activeId,new WorkshopCartridge(store.read(activeId)));}
+            catch(Exception e){Log.e(TAG,"Last project unavailable; retained",e);showLibrary();library.fail(e);shelf.invalidate();}
+            if(!awaitingReturn&&startOnShelf)showLibrary(shelfSelection,shelfFocus);
         }catch(Exception e){
-            TextView error=new TextView(this);error.setText("Не удалось открыть проект. Исходный файл сохранён.\n"+e.getMessage());
+            TextView error=new TextView(this);error.setText("Не удалось открыть проекты. Исходные файлы сохранены.\n"+e.getMessage());
             error.setTextColor(WorkshopView.COLORS[7]);error.setBackgroundColor(WorkshopView.COLORS[1]);error.setPadding(32,32,32,32);
             setContentView(error);Log.e(TAG,"Project load failed; original retained",e);
         }
+    }
+    private void openProject(final String id,WorkshopCartridge cart)throws Exception {
+        persistUi();
+        store.cart(id); // Validate the target before switching editor state.
+        WorkshopSession next=sessions.get(id);
+        if(next==null||!java.util.Arrays.equals(next.cart().bytes(),cart.bytes())) {
+            next=new WorkshopSession(cart,new WorkshopSession.Port(){
+                public void save(byte[] bytes)throws Exception{saveCart(store.cart(id),bytes);Log.i(TAG,"project_saved id="+id+" bytes="+bytes.length);}
+                public void launch(byte[] bytes)throws Exception{launchCart(bytes);}
+                public void library()throws Exception{showLibrary();}
+            });
+            activeId=id;session=next;
+            prefs=getSharedPreferences(id+"-ui",MODE_PRIVATE);
+            restoreUi();
+            sessions.put(id,next);
+        }else{
+            activeId=id;session=next;prefs=getSharedPreferences(id+"-ui",MODE_PRIVATE);
+        }
+        session.swapAB=libraryPrefs.getBoolean("swapAB",getSharedPreferences("moon-garden-ui",MODE_PRIVATE).getBoolean("swapAB",false));
+        libraryPrefs.edit().putString("active",id).apply();
+        showWorkshop();
+    }
+    private void showWorkshop(){
+        showingLibrary=false;
+        surface=new WorkshopView(this,session,LibrarySession.title(activeId),()->persistUi());
+        setContentView(surface);surface.requestFocus();immersive();persistUi();
+    }
+    private void showLibrary()throws Exception{
+        showLibrary(activeId,0);
+    }
+    private void showLibrary(String preferred,int focus)throws Exception{
+        persistUi();library.refresh(preferred);
+        if(!library.entries().isEmpty())library.focus=Math.max(0,Math.min(2,focus));
+        showingLibrary=true;
+        shelf=new LibraryView(this,library,activeId,session!=null&&session.swapAB,()->persistUi());
+        setContentView(shelf);shelf.requestFocus();immersive();persistUi();
     }
     private static byte[] readAll(InputStream in)throws Exception{
         ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[4096];int count;
         while((count=in.read(buffer))!=-1)out.write(buffer,0,count);return out.toByteArray();
     }
-    private void saveCart(byte[] bytes)throws Exception{
+    private void saveCart(AtomicFile target,byte[] bytes)throws Exception{
         FileOutputStream out=null;
-        try{out=project.startWrite();out.write(bytes);project.finishWrite(out);}
-        catch(Exception e){project.failWrite(out);throw e;}
+        try{out=target.startWrite();out.write(bytes);target.finishWrite(out);}
+        catch(Exception e){target.failWrite(out);throw e;}
     }
     private void launchCart(byte[] bytes)throws Exception{
         if(awaitingReturn)return;
         awaitingReturn=true;leftForRuntime=false;
         try{
             persistUi();
-            if(!prefs.edit().putBoolean("awaitingReturn",true).commit())throw new IllegalStateException("Не удалось сохранить состояние запуска");
+            if(!libraryPrefs.edit().putBoolean("awaitingReturn",true).putBoolean("shelf",false).commit())throw new IllegalStateException("Не удалось сохранить состояние запуска");
             backend.launch(bytes);
             Log.i(TAG,"launch_requested speed="+session.cart().value(0)+" jump="+session.cart().value(1));
-        }catch(Exception e){awaitingReturn=false;prefs.edit().putBoolean("awaitingReturn",false).commit();throw e;}
+        }catch(Exception e){awaitingReturn=false;libraryPrefs.edit().putBoolean("awaitingReturn",false).commit();throw e;}
     }
     private void persistUi(){
+        if(libraryPrefs!=null)libraryPrefs.edit().putBoolean("shelf",showingLibrary).apply();
+        if(showingLibrary&&library!=null&&library.current()!=null)
+            libraryPrefs.edit().putString("selected",library.current().id).putInt("focus",library.focus).apply();
         if(session==null)return;
+        libraryPrefs.edit().putString("active",activeId).putBoolean("swapAB",session.swapAB).apply();
         prefs.edit().putInt("tool",session.tool).putInt("focus",session.focus)
             .putInt("line",session.codeLine).putInt("x",session.cursorX).putInt("y",session.cursorY)
             .putInt("color",session.color).putBoolean("eraser",session.eraser).putBoolean("swapAB",session.swapAB)
@@ -119,12 +172,13 @@ public final class MainActivity extends Activity {
     @Override protected void onResume(){
         super.onResume();immersive();
         if(session!=null&&awaitingReturn&&leftForRuntime){
-            awaitingReturn=false;leftForRuntime=false;prefs.edit().putBoolean("awaitingReturn",false).apply();
+            awaitingReturn=false;leftForRuntime=false;libraryPrefs.edit().putBoolean("awaitingReturn",false).apply();
+            getSharedPreferences("moon-garden-ui",MODE_PRIVATE).edit().putBoolean("awaitingReturn",false).apply();
             session.notice="Сохранено";surface.invalidate();
             Log.i(TAG,"host_resumed tool="+session.tool+" focus="+session.focus+" result=unknown");
         }
     }
     @Override public boolean dispatchKeyEvent(KeyEvent event){return input!=null&&input.key(event)||super.dispatchKeyEvent(event);}
     @Override public boolean onGenericMotionEvent(MotionEvent event){return input!=null&&input.motion(event)||super.onGenericMotionEvent(event);}
-    @Override public void onBackPressed(){if(surface!=null)surface.action(Action.CANCEL);else super.onBackPressed();}
+    @Override public void onBackPressed(){if(showingLibrary&&shelf!=null)shelf.action(Action.CANCEL);else if(surface!=null)surface.action(Action.CANCEL);else super.onBackPressed();}
 }

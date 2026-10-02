@@ -5,6 +5,8 @@ owner-approved PICO-8 visual baseline. Edit speed/jump or the hero's sprite in
 a real `.p8`, select/create/copy a sprite and explicitly assign it to the hero,
 send a read-only snapshot to the installed official-runtime
 wrapper, and restore the workshop when the user returns.
+Version 0.0.4 adds a project shelf, creation from the small-game template and
+independent copies, with separate editing context for each project.
 
 The visual direction is approved; this implementation remains an experiment,
 not a decision to use Java/Android Views for the production application.
@@ -16,7 +18,7 @@ The experiment has no library dependencies and includes no PICO-8 binary.
 
 ## Boundaries
 
-- `core/`: JDK-only `WorkshopCartridge`, `WorkshopSession`, original
+- `core/`: JDK-only `LibrarySession`, `WorkshopCartridge`, `WorkshopSession`, original
   `LabCartridge` regression fixture and `PicoRuntimeBackend` contract.
 - `../p8-roundtrip/core/`: shared byte-preserving section reader/writer proof.
 - `src/`: Android activity, atomic persistence, read-only URI provider and
@@ -33,7 +35,8 @@ The experiment has no library dependencies and includes no PICO-8 binary.
 
 The host requests no storage, network or privileged permissions. A scoped
 `content://` read grant lets the wrapper copy the test cart to its own cache.
-The canonical file is `files/projects/moon-garden/game.p8` in private app storage.
+Canonical files are `files/projects/<id>/game.p8` in private app storage.
+The existing `moon-garden/game.p8` is retained without migration or rewriting.
 The previous `files/game.p8` is preserved. UI preferences are optional app
 metadata and are not needed to run the cartridge elsewhere.
 `files/run.p8` is a launch snapshot; the runtime cannot mutate the original.
@@ -97,6 +100,34 @@ image numbers so users do not need to understand tile addressing to start.
 Existing 0.0.2 Moon Garden files open without migration or normalization,
 including their saved speed/jump/pixel changes. As before, the adapter refuses
 ambiguous or manually changed owned code rather than guessing a binding.
+
+### Project shelf and creation (0.0.4)
+
+- Select menu → **Мои игры** opens the shelf. Left/right selects a cart;
+  down reaches New / Copy, up returns to carts. A opens/activates, B resumes
+  the active workshop, X copies the selected project. A/B mapping is global.
+- **Новая игра** explains the starter (hero, jump, platforms). Confirm creates
+  a clean copy of the bundled original Moon Garden template; cancel writes
+  nothing. Names are automatic (`Новая игра 1`, `Копия 1`), requiring no keyboard.
+- Copy reads the selected project's saved `.p8` again and preserves all bytes,
+  including unknown sections. Browsing does not switch the active workshop.
+- Each project gets its own directory and preferences. New directories are
+  staged, written and synced before publication; existing destinations are
+  refused. Failed/interrupted hidden staging directories are retained, not
+  presented as completed projects. There is no deletion operation.
+- The shelf's selected cart/focus and each project's tool, sprite, cursor and
+  parameter draft survive process recreation. Switching projects within one
+  process also retains their independent undo histories; undo is not durable.
+- A damaged/unsupported project remains visible with an error; other projects
+  remain available. Opening/copying it never replaces it with a template.
+- Covers are illustrations using the actual assigned hero, not game captures.
+  Touch opens cards/buttons; horizontal swipes browse beyond the current page.
+
+This is a library of owned-template projects, not arbitrary cart import or a
+finished launcher. Renaming, blank-cart creation, export, persistent history
+and `.pikoos` metadata are still future work. The sound/music and animation
+requirements do not imply implemented editors. See
+[device evidence](../../docs/design/android-library-03/README.md).
 
 Parameters are drafts until confirmation; switching tools cannot silently
 discard an active draft. Writes use AtomicFile and update the in-memory model
