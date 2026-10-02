@@ -166,6 +166,12 @@ Features:
 
 ### Code editor v1
 
+Sprite/map tool planning must also account for the owner-confirmed future
+requirements for frame animation, background layers, parallax, independent
+scrolling and repeating backgrounds. See the detailed interaction and
+compatibility requirements in [UX direction](UX_DIRECTION.md). These are not
+implemented by the current sprite sheet; release placement remains TBD.
+
 Focus on keyboard-less usability:
 
 - controller cursor movement;
