@@ -152,6 +152,19 @@ A user can install PIKOOS, provide official PICO-8, import carts and comfortably
 
 # 0.2 — First Creator
 
+### Tool availability invariant
+
+All tools and the mechanics catalogue must be available regardless of template,
+genre or hero presence. Template recommendations and contextual bindings do not
+gate the general toolbox. Test every new general tool with blank/custom content
+and a hero-free cart, as well as any owned template. Required target selection
+belongs to the workflow, not a genre restriction.
+
+Android 0.0.10 implements destination-aware copying of rectangular sprite areas
+across all current project types, with replacement preview, cancel and undo.
+This does not complete cross-cart asset reuse, map/audio/effects tools or general
+Lua editing. See [device evidence](design/android-copy-09/README.md).
+
 ### Base requirement: creation without a hero
 
 Owner clarification (2026-10-03): genre templates are later work, but the shared

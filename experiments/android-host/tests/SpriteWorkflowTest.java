@@ -66,6 +66,8 @@ public final class SpriteWorkflowTest {
         s.act(Action.RIGHT);check(s.spriteSlot==1&&s.cart().heroSlot()==0&&port.writes==0,"browsing never assigns or saves");
         s.act(Action.ASSIGN_HERO);check(port.writes==0&&s.mode==Mode.SHEET,"empty assignment stays safely in sheet");
         s.act(Action.LEFT);s.act(Action.CONTEXT);
+        check(s.mode==Mode.COPY_PLACE&&port.writes==0,"copy placement is read only");
+        s.act(Action.CONFIRM);s.act(Action.CONFIRM);
         check(s.spriteSlot==1&&s.mode==Mode.CANVAS&&s.cart().heroSlot()==0,"copy opens new image, original hero retained");
         check(port.writes==1,"copy is one durable undo step");
         s.act(Action.CONFIRM);s.act(Action.CANCEL);s.act(Action.ASSIGN_HERO);s.act(Action.TEST);
@@ -79,16 +81,16 @@ public final class SpriteWorkflowTest {
         int writes=port.writes;s.act(Action.CANCEL);s.act(Action.CANCEL);
         check(s.mode==Mode.SHEET&&port.writes==writes,"leaving an untouched new image performs no write");
         s.act(Action.MENU);s.act(Action.CANCEL);check(s.mode==Mode.SHEET,"menu returns to sheet");
-        s.act(Action.LEFT);s.act(Action.COPY_SPRITE);s.act(Action.CANCEL);port.fail=true;
+        s.act(Action.LEFT);s.act(Action.COPY_SPRITE);s.act(Action.CONFIRM);s.act(Action.CONFIRM);s.act(Action.CANCEL);port.fail=true;
         s.act(Action.ASSIGN_HERO);check(s.mode==Mode.ERROR&&s.cart().heroSlot()==0,"failed assignment preserves canonical binding");
         port.fail=false;s.act(Action.CANCEL);s.act(Action.SPRITE_SHEET);s.spriteSlot=0;
-        port.fail=true;s.act(Action.COPY_SPRITE);check(s.mode==Mode.ERROR&&s.spriteSlot==0&&s.cart().empty(2),"failed copy preserves selection and empty destination");
-        s.act(Action.CANCEL);check(s.mode==Mode.SHEET,"copy error returns to sheet");
+        port.fail=true;s.act(Action.COPY_SPRITE);s.act(Action.CONFIRM);s.act(Action.CONFIRM);check(s.mode==Mode.ERROR&&s.spriteSlot==0&&s.cart().empty(2),"failed copy preserves selection and empty destination");
+        s.act(Action.CANCEL);check(s.mode==Mode.COPY_CONFIRM,"copy error returns to retryable preview");
         WorkshopCartridge full=cart;for(int slot=1;slot<8;slot++)full=full.withPixel(slot,0,0,7);
         check(full.firstFreeSlot()==-1,"full sheet allocation refuses overwrite");
         Port fullPort=new Port();WorkshopSession filled=new WorkshopSession(full,fullPort);filled.switchTool(2);
         filled.act(Action.NEW_SPRITE);filled.act(Action.COPY_SPRITE);
-        check(fullPort.writes==0&&filled.mode==Mode.SHEET,"full sheet gives notice without mutation");
+        check(fullPort.writes==0&&filled.mode==Mode.COPY_PLACE,"copy offers explicit placement even with full shortcut cards");
         // Reach New / Copy / Assign and return to the same resource using only D-pad.
         WorkshopSession navigation=new WorkshopSession(cart,new Port());navigation.switchTool(2);
         navigation.act(Action.DOWN);navigation.act(Action.DOWN);check(navigation.sheetFocus==8,"down reaches New");

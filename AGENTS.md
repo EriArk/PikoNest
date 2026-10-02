@@ -104,6 +104,19 @@ A beginner should be able to create something playable quickly.
 
 Prefer progressive disclosure. Advanced controls should appear when useful rather than occupying the first screen.
 
+### Tools are independent of templates and genres
+
+All general tools must be available in every project, including blank and
+imported cartridges. A template supplies initial content and configured mechanics;
+it must not enable, hide or lock whole tools by genre or by the presence of a hero.
+This applies to sprites, animation, maps/backgrounds, code, SFX/music, effects,
+particles, asset reuse and the mechanics catalogue. Genre filters are suggestions,
+not capability restrictions. Context may require selecting a resource, object,
+event or compatible code binding; explain that prerequisite and offer its setup.
+Never invent a hero or silently rewrite unfamiliar Lua to satisfy an action.
+Keep technical limitations of an unfinished tool explicit and separate from this
+product rule. A template-only parameter adapter is not the general tool itself.
+
 ### Controller-first
 
 Important actions must be possible using handheld controls. Touch should make drawing, selection and editing better but should not become a hard architectural dependency.

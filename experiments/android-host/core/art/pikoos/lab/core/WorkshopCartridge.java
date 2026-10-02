@@ -94,8 +94,15 @@ public final class WorkshopCartridge {
         for (int i = 0; i < SPRITE_COUNT; i++) if (!hero().overlaps(legacyRegion(i)) && empty(i)) return i;
         return -1;
     }
+    /** Explicit replacement of pixels; no allocation or game-role inference. */
+    public WorkshopCartridge copyRegion(SpriteRegion source, SpriteRegion destination) {
+        if(source.x<destination.x+destination.width&&destination.x<source.x+source.width
+            &&source.y<destination.y+destination.height&&destination.y<source.y+source.height)
+            throw new IllegalArgumentException("Выбери место вне исходной области");
+        return edited(graphics.copy(source,destination));
+    }
     public WorkshopCartridge copySprite(int source, int destination) {
-        if(!hasHero())throw new IllegalArgumentException("Для копии нужно явное размещение; инструмент ещё не готов");
+        if(!hasHero())throw new IllegalArgumentException("Automatic allocation requires a known binding; use explicit copyRegion");
         checkSlot(source); checkSlot(destination);
         if (source == destination || hero().overlaps(legacyRegion(destination)) || !empty(destination))
             throw new IllegalArgumentException("Copy destination is occupied");

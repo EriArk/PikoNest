@@ -7,7 +7,7 @@ import java.util.Arrays;
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER }
     public interface Port {
         void save(byte[] bytes) throws Exception;
@@ -32,13 +32,46 @@ public final class WorkshopSession {
     public boolean zoom, choosingEnd;
     public int regionX,regionY,anchorX,anchorY;
     private Mode regionReturn=Mode.SHEET;
+    public SpriteRegion copySource;
+    public int copyX,copyY;
+    private Mode copyReturn=Mode.SHEET;
+    public boolean copying(){return copySource!=null;}
+    public SpriteRegion copyDestination(){return new SpriteRegion(copyX,copyY,copySource.width,copySource.height);}
+    public boolean copyOverlaps(){
+        SpriteRegion a=copySource,b=copyDestination();
+        return a.x<b.x+b.width&&b.x<a.x+a.width&&a.y<b.y+b.height&&b.y<a.y+a.height;
+    }
+    private void beginCopy(){
+        if(selection().sharesMap()){notice="Редактор общей области с картой ещё не готов";return;}
+        if(cart.empty(selection())){notice="Пустая область: пока нечего копировать";return;}
+        copySource=selection();copyReturn=mode;copyX=copySource.x;copyY=copySource.y;
+        // Suggest a visually empty destination, never assume it is unused by Lua.
+        search:for(int y=0;y<=64-copySource.height;y+=8)for(int x=0;x<=128-copySource.width;x+=8){
+            copyX=x;copyY=y;if(!copyOverlaps()&&cart.empty(copyDestination()))break search;
+        }
+        mode=Mode.COPY_PLACE;
+    }
+    public void pointCopy(int x,int y){
+        if(mode!=Mode.COPY_PLACE)return;
+        copyX=clamp(x, (128-copySource.width)/8)*8;copyY=clamp(y,(64-copySource.height)/8)*8;
+    }
+    /** Restore only a validated draft; always re-show the replacement before saving. */
+    public void restoreCopy(int x,int y,String returnMode){
+        if(tool!=2||pendingLine()||cart.empty(selection())||selection().sharesMap())return;
+        Mode origin;
+        try{origin=Mode.valueOf(returnMode);}catch(IllegalArgumentException e){return;}
+        if(origin!=Mode.SHEET&&origin!=Mode.CANVAS&&origin!=Mode.NAVIGATE)return;
+        if(x<0||y<0||x%8!=0||y%8!=0||x+selection().width>128||y+selection().height>64)return;
+        copySource=selection();copyX=x;copyY=y;copyReturn=origin;mode=Mode.COPY_PLACE;
+    }
+    public String copyReturnMode(){return copyReturn.name();}
     public String notice = "Сохранено", error = "";
     private Mode paletteReturn = Mode.NAVIGATE;
     private Mode overlayReturn = Mode.NAVIGATE;
     public WorkshopSession(WorkshopCartridge cart, Port port) { this.cart = cart; this.port = port; }
     public WorkshopCartridge cart() { return cart; }
     public boolean canUndo() { return !undo.isEmpty(); }
-    public int maxFocus(){return tool==2?(region==null||!cart.hasHero()?5:6):cart.hasHero()?4:2;}
+    public int maxFocus(){return tool==2?(cart.hasHero()?7:6):cart.hasHero()?4:2;}
     public boolean pendingLine(){return drawTool==DrawTool.LINE&&lineX>=0&&lineY>=0;}
     public SpriteRegion selection(){return region==null?new SpriteRegion(spriteSlot*16,0,16,16):region;}
     public WorkshopCartridge canvasPreview(){return pendingLine()?cart.withLine(selection(),lineX,lineY,cursorX,cursorY,color):cart;}
@@ -67,7 +100,7 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = mode==Mode.HERO?Mode.HERO:pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = mode==Mode.COPY_CONFIRM?mode:mode==Mode.HERO?Mode.HERO:pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
         if(pendingLine())return;
@@ -122,18 +155,16 @@ public final class WorkshopSession {
         notice = "Герой: спрайт " + (spriteSlot + 1);
     }
     private void createSprite(boolean copy) throws Exception {
+        if(copy){beginCopy();return;}
         if(!cart.hasHero()){
-            if(copy){notice="Копия с выбором места появится позже";return;}
             chooseRegion();notice="Выбери место на листе";return;
         }
-        if(region!=null&&!browsingSprites){notice="Новый спрайт и копия пока доступны в карточках";return;}
-        if (copy && cart.empty(spriteSlot)) { notice = "Пустой спрайт: пока нечего копировать"; return; }
+        if(region!=null&&!browsingSprites){chooseRegion();return;}
         int destination = cart.firstFreeSlot();
         if (destination < 0) { notice = "Лист заполнен — свободных ячеек нет"; return; }
-        if (copy) save(cart.copySprite(spriteSlot, destination), true);
         openSprite(destination);
         mode = Mode.CANVAS;
-        notice = copy ? "Копия готова. Оригинал сохранён" : "Новый спрайт: выбери цвет и рисуй";
+        notice = "Новый спрайт: выбери цвет и рисуй";
     }
     public void selectCodeLine(int line) {
         if (mode != Mode.NAVIGATE) return;
@@ -172,6 +203,28 @@ public final class WorkshopSession {
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if(mode==Mode.COPY_PLACE||mode==Mode.COPY_CONFIRM){
+                if(action==Action.CANCEL){
+                    if(mode==Mode.COPY_CONFIRM)mode=Mode.COPY_PLACE;
+                    else{mode=copyReturn;copySource=null;notice="Копирование отменено";}
+                    return;
+                }
+                if(mode==Mode.COPY_PLACE){
+                    if(action==Action.LEFT)pointCopy(copyX/8-1,copyY/8);
+                    if(action==Action.RIGHT)pointCopy(copyX/8+1,copyY/8);
+                    if(action==Action.UP)pointCopy(copyX/8,copyY/8-1);
+                    if(action==Action.DOWN)pointCopy(copyX/8,copyY/8+1);
+                    if(action==Action.CONFIRM&&!copyOverlaps())mode=Mode.COPY_CONFIRM;
+                }else if(action==Action.CONFIRM){
+                    SpriteRegion target=copyDestination();
+                    save(cart.copyRegion(copySource,target),true);
+                    copySource=null;
+                    if(target.y==0&&target.width==16&&target.height==16&&target.x%16==0)openSprite(target.x/16);
+                    else{region=target;tool=2;focus=0;browsingSprites=false;cursorX=cursorY=0;zoom=false;}
+                    mode=Mode.CANVAS;notice="Копия готова. Исходные пиксели сохранены";
+                }
+                return; // No launch, tab switching, undo or implicit commit during placement.
+            }
             if(mode==Mode.HERO){
                 if(action==Action.CANCEL){mode=heroReturn;heroDraft=null;notice="Без изменений";}
                 if(action==Action.CONFIRM||action==Action.TEST){
@@ -285,7 +338,7 @@ public final class WorkshopSession {
                 if (action == Action.CONFIRM) {
                     if (sheetFocus < 8) openSprite(spriteSlot);
                     else if (sheetFocus == 8) createSprite(false);
-                    else if (sheetFocus == 9) {if(cart.hasHero())createSprite(true);else switchTool(1);}
+                    else if (sheetFocus == 9) createSprite(true);
                     else if(sheetFocus==10){if(cart.hasHero())assignHero();else{overlayReturn=mode;mode=Mode.HELP;}}
                     else chooseRegion();
                 }
@@ -339,9 +392,10 @@ public final class WorkshopSession {
                     if (focus == 1) act(Action.DRAW_TOOLS);
                     if (focus == 2) act(Action.CONTEXT);
                     if (focus == 3) showSheet();
-                    if (focus == 4) { if(region!=null||!cart.hasHero())chooseRegion();else assignHero(); }
+                    if (focus == 4) chooseRegion();
                     if (focus == 5) act(Action.ZOOM);
-                    if (focus == 6) assignHero();
+                    if (focus == 6) createSprite(true);
+                    if (focus == 7) assignHero();
                 }
             }
         } catch (Exception e) { fail(e); }

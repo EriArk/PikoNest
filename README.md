@@ -18,6 +18,7 @@ A beginner should be able to make something move almost immediately, then gradua
 - **Learn by doing.** Lua/PICO-8 concepts are taught contextually while the user creates and modifies games.
 - **Controller-first.** Everything important should be usable with handheld controls; touch is an enhancement, not a hard dependency.
 - **Portable architecture.** Android is the first target, but core logic must not depend on Android or on any one device.
+- **Tools for every game.** Templates supply initial content; they do not restrict tools by genre or require a hero.
 - **No custom PICO-8 dialect.** Standard projects should remain understandable and runnable in ordinary PICO-8.
 
 ## What PIKOOS aims to include
@@ -81,6 +82,11 @@ my-game/
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — staged implementation plan
 
 ## Status
+
+Android 0.0.10 adds sprite/rectangle copying in every project, with explicit
+placement, replacement preview, cancel and exact undo. The product rule requires
+general tools to remain available independently of genre/template.
+[Device evidence](docs/design/android-copy-09/README.md).
 
 Android 0.0.9 separates Moon Garden bindings from basic cart/resource editing.
 New projects can also start with a blank cart or the hero-free Lights puzzle;

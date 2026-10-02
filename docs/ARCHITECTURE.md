@@ -102,6 +102,21 @@ hero-free path, not a complete generic project model, Lua editor or importer.
 Automatic free-slot allocation remains restricted to the owned platformer;
 arbitrary code may use visually empty pixels. Other carts use explicit selection.
 
+Android lab 0.0.10 adds a template-independent explicit `copyRegion` operation
+and placement/preview/commit states in portable `WorkshopSession`. It copies
+pixels only; no role assignment, reference rewrite or claim of free allocation.
+The UI currently covers the upper 128×64 with an 8-pixel placement grid. Occupied
+destinations require a before/after preview; overlapping source/destination is
+rejected to retain the original (an editor policy, not a PICO-8 limitation).
+Durable save precedes publishing state/history. Cancel writes nothing; undo
+restores exact bytes. Restored placement always requires reviewing the preview
+again, even when the app was closed on the confirmation screen.
+
+Tool registration/availability must not depend on template ID, genre or hero
+binding. Bindings provide optional contextual parameter panels. General tools
+and the mechanics catalogue remain discoverable for blank/imported projects;
+resource/target/binding prerequisites are resolved inside the operation.
+
 ### `core/mechanics`
 
 Responsibilities:

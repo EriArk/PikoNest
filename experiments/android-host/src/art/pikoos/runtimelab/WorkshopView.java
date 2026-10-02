@@ -77,7 +77,7 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine();
+        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine()||s.copying();
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -92,7 +92,7 @@ final class WorkshopView extends View {
         }
         rect(0,140,w,4,0);
         c.save();c.clipRect(0,144,w,bodyBottom);
-        if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
+        if(s.copying()&&s.mode!=Mode.ERROR)copyChooser();else if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
         c.restore();
         footer();
         if(!previousNotice.equals(s.notice)){previousNotice=s.notice;noticeUntil=SystemClock.uptimeMillis()+2200;}
@@ -109,6 +109,12 @@ final class WorkshopView extends View {
     }
     private void footer() {
         rect(0,bodyBottom,w,44,0);
+        if(s.copying()&&s.mode!=Mode.ERROR){
+            key(ok()+(s.mode==Mode.COPY_CONFIRM?" копировать":" просмотр"),12,bodyBottom,10,()->action(Action.CONFIRM));
+            key(back()+" назад",w<500?190:220,bodyBottom,6,()->action(Action.CANCEL));
+            if(w>=540&&s.mode==Mode.COPY_PLACE)text("↑ ↓ ← → место",360,bodyBottom+28,18,6);
+            return;
+        }
         String confirm=s.swapAB?"B":"A",cancel=s.swapAB?"A":"B";
         String[] drawVerbs={"пиксель","стереть","залить",s.pendingLine()?"линия":"начало","цвет"};
         String verb=s.mode==Mode.REGION?(s.choosingEnd?"рисовать":"угол"):s.mode==Mode.VALUE?"готово":s.mode==Mode.CANVAS?drawVerbs[s.drawTool.ordinal()]:s.mode==Mode.PALETTE?"цвет":s.mode==Mode.SHEET&&s.sheetFocus<8?"рисовать":"выбор";
@@ -286,16 +292,15 @@ final class WorkshopView extends View {
         }
         float by=246+step*4;
         button("Лист",right,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==3,()->action(Action.SPRITE_SHEET));
-        button(s.region==null&&s.cart().hasHero()?"Герою":"Рамка",right+(rw+8)/2,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==4,()->action(s.region==null&&s.cart().hasHero()?Action.ASSIGN_HERO:Action.REGION));
-        if(s.region==null||!s.cart().hasHero())button(s.zoom?"Весь спрайт":"Приблизить",right,by+52,rw,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
-        else{
-            button(s.zoom?"Целиком":"Крупно",right,by+52,(rw-8)/2,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
-            button("Герою",right+(rw+8)/2,by+52,(rw-8)/2,40,s.mode==Mode.NAVIGATE&&s.focus==6,()->action(Action.ASSIGN_HERO));
-        }
+        button("Рамка",right+(rw+8)/2,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==4,()->action(Action.REGION));
+        int count=s.cart().hasHero()&&w>=500?3:2;float bw=(rw-8*(count-1))/count;
+        button(s.zoom?"Целиком":"Крупно",right,by+52,bw,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
+        button("Копия",right+bw+8,by+52,bw,40,s.mode==Mode.NAVIGATE&&s.focus==6,()->action(Action.COPY_SPRITE));
+        if(s.cart().hasHero())button("Герою",w>=500?right+2*(bw+8):16,by+52,w>=500?bw:size,40,s.mode==Mode.NAVIGATE&&s.focus==7,()->action(Action.ASSIGN_HERO));
     }
     private void spriteSheet() {
         text("СПРАЙТЫ ПРОЕКТА",16,169,18,14);
-        if(w>=500)text(s.cart().hasHero()?"16 × 16 · X копия":"Участки 16 × 16",w-186,169,16,6);
+        if(w>=500)text("16 × 16 · X копия",w-186,169,16,6);
         float gap=10,cw=(w-32-gap*3)/4;
         float ch=Math.min(112,(bodyBottom-180-104-gap)/2);
         for(int i=0;i<8;i++) {
@@ -311,11 +316,52 @@ final class WorkshopView extends View {
             hit(x,y,cw,ch,()->{s.selectSheet(slot);changed.run();invalidate();});
         }
         float by=180+2*(ch+gap)+2,bw=(w-48)/3;
-        String[] labels=s.cart().hasHero()?new String[]{"+ Новый","Копировать","Назначить герою"}:new String[]{"Выбрать область","Посмотреть код","О спрайтах"};
+        String[] labels=s.cart().hasHero()?new String[]{"+ Новый","Копировать","Назначить герою"}:new String[]{"Выбрать область","Копировать","О спрайтах"};
         for(int i=0;i<3;i++){final int choice=8+i;
             button(labels[i],16+i*(bw+8),by,bw,44,s.sheetFocus==choice,()->{s.selectSheet(choice);changed.run();invalidate();});
         }
         button("Область листа · другой размер",16,by+48,w-32,36,s.sheetFocus==11,()->{s.selectSheet(11);changed.run();invalidate();});
+    }
+    private void copyChooser(){
+        SpriteRegion source=s.copySource,target=s.copyDestination();
+        boolean confirm=s.mode==Mode.COPY_CONFIRM;
+        text("КОПИЯ / "+source.width+" × "+source.height,16,169,18,14);
+        fitted(confirm?"2 / Проверь замену пикселей":"1 / Выбери место на листе",16,198,24,7,w-32);
+        if(confirm){
+            float size=Math.min(160,bodyBottom-330),gap=32,total=size*2+gap,left=(w-total)/2;
+            text("БЫЛО",left,232,18,6);text("БУДЕТ",left+size+gap,232,18,10);
+            copyPicture(target,left,246,size);copyPicture(source,left+size+gap,246,size);
+            float by=246+size;
+            fitted(s.cart().empty(target)?"Нулевые пиксели тоже могут использоваться игрой.":"Пиксели в этом месте будут заменены.",16,by+29,18,10,w-32);
+            fitted("Код и ссылки на спрайты остаются прежними.",16,by+54,18,6,w-32);
+        }else{
+            float cell=Math.max(1,(int)Math.min((w-32)/128,(bodyBottom-306)/64));
+            float x=(w-cell*128)/2,y=218;
+            for(int py=0;py<64;py++)for(int px=0;px<128;px++){
+                int color=s.cart().sheetPixel(px,py);
+                rect(x+px*cell,y+py*cell,cell,cell,color==0?((px/8+py/8)%2==0?0:1):color);
+            }
+            outline(x-2,y-2,128*cell+4,64*cell+4,13);
+            outline(x+source.x*cell,y+source.y*cell,source.width*cell,source.height*cell,14);
+            outline(x+target.x*cell,y+target.y*cell,target.width*cell,target.height*cell,s.copyOverlaps()?8:10);
+            for(int ty=0;ty<8;ty++)for(int tx=0;tx<16;tx++){
+                final int px=tx,py=ty;hit(x+tx*8*cell,y+ty*8*cell,8*cell,8*cell,()->{s.pointCopy(px,py);changed.run();invalidate();});
+            }
+            float by=y+64*cell;
+            fitted(s.copyOverlaps()?"Рамки пересекаются — выбери другое место.":"Розовая: источник · жёлтая: место копии",16,by+29,18,s.copyOverlaps()?8:7,w-32);
+            fitted("Место: "+target.x+", "+target.y+" · шаг 8 пикселей",16,by+55,18,6,w-32);
+            fitted("Выбор места ничего не меняет в картридже.",16,by+80,16,13,w-32);
+        }
+    }
+    private void copyPicture(SpriteRegion r,float x,float y,float size){
+        rect(x,y,size,size,0);
+        float cell=Math.max(1,(int)(size/Math.max(r.width,r.height)));
+        float sx=x+(size-r.width*cell)/2,sy=y+(size-r.height*cell)/2;
+        for(int py=0;py<r.height;py++)for(int px=0;px<r.width;px++){
+            int color=s.cart().pixel(r,px,py);
+            rect(sx+px*cell,sy+py*cell,cell,cell,color==0?((px+py)%2==0?0:1):color);
+        }
+        outline(x,y,size,size,13);
     }
     private void regionChooser(){
         text("ОБЛАСТЬ ЛИСТА",16,169,18,14);

@@ -148,6 +148,8 @@ public final class MainActivity extends Activity {
             .putInt("regionX",session.selection().x).putInt("regionY",session.selection().y)
             .putInt("regionWidth",session.selection().width).putInt("regionHeight",session.selection().height)
             .putBoolean("browsingSprites",session.browsingSprites)
+            .putBoolean("copying",session.copying()).putInt("copyX",session.copyX).putInt("copyY",session.copyY)
+            .putString("copyReturn",session.copyReturnMode())
             .putString("mode",session.heroDraft!=null?"HERO":session.mode==Mode.CANVAS||session.pendingLine()?"CANVAS":session.mode==Mode.VALUE?"VALUE":"NAVIGATE").apply();
     }
     private int bounded(String key,int fallback,int max){return Math.max(0,Math.min(max,prefs.getInt(key,fallback)));}
@@ -183,6 +185,7 @@ public final class MainActivity extends Activity {
             session.mode=Mode.VALUE;session.field=bounded("field",0,1);session.draft=Math.max(1,bounded("draft",2,4));
         }
         if(session.tool==2&&prefs.getString("mode","").equals("HERO"))session.previewHero();
+        if(prefs.getBoolean("copying",false))session.restoreCopy(prefs.getInt("copyX",-1),prefs.getInt("copyY",-1),prefs.getString("copyReturn",""));
     }
     private void immersive(){
         if(Build.VERSION.SDK_INT>=30){

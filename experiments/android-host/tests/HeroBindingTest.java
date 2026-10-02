@@ -76,6 +76,7 @@ public final class HeroBindingTest {
         s.act(Action.ASSIGN_HERO);s.act(Action.CONFIRM);s.switchTool(0);s.select(2);
         check(s.tool==2&&s.region!=null&&s.selection().width==32&&s.selection().x==64,"workshop opens actual assigned large image");
         s.act(Action.DOWN);s.act(Action.DOWN);s.act(Action.DOWN);s.act(Action.DOWN);s.act(Action.DOWN);s.act(Action.DOWN);s.act(Action.CONFIRM);
+        check(s.mode==Mode.COPY_PLACE,"controller reaches common copy action before role binding");s.act(Action.CANCEL);s.act(Action.DOWN);s.act(Action.CONFIRM);
         check(s.mode==Mode.HERO,"controller reaches assignment from large canvas navigation");
         int writes=port.writes;s.act(Action.CONFIRM);check(port.writes==writes,"identical confirmation adds no undo or storage write");
         s.act(Action.SPRITE_SHEET);s.openSprite(0);s.act(Action.ASSIGN_HERO);s.act(Action.CONFIRM);

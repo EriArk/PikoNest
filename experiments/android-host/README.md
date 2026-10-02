@@ -1,13 +1,22 @@
 # PIKOOS Android host experiment
 
+Version 0.0.10 makes sprite/rectangle copying available in every supported cart.
+Choose destination → review before/after → confirm, using controller or touch.
+Occupied areas can be explicitly replaced; source overlap is blocked. No Lua
+or role bindings are rewritten. Failed saves retain the preview for retry;
+cancel writes nothing and undo is exact. Process recreation restores placement
+and requires reviewing the preview again. Current placement covers upper 128×64
+in 8-pixel steps; shared map-half editing remains pending.
+See [device evidence](../../docs/design/android-copy-09/README.md).
+
 Version 0.0.9 adds blank and Lights puzzle creation, plus a generic resource
 workshop without required hero/speed/jump fields. Moon Garden parameters and
 hero assignment are conditional on its optional binding. Missing gfx is created
 only by an effective edit and undo restores the original cart exactly.
 See [hero-free creation/runtime evidence](../../docs/design/android-herofree-08/README.md).
 The general path has sprite editing and code viewing; free-form Lua editing,
-arbitrary file import and general destination-aware resource copying are still
-unimplemented. A new blank cart does not automatically display its sprites.
+arbitrary file import and cross-cart resource reuse are still unimplemented.
+A new blank cart does not automatically display its sprites.
 
 Version 0.0.8 aligns resource names with PICO-8: sprite labels replace generic
 "drawing" labels in the existing editor. See [device capture and checks](../../docs/design/android-terminology-07/README.md).
