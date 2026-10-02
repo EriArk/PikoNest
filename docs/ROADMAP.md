@@ -18,6 +18,17 @@ Prove that the core idea is technically sane before committing to a large applic
 
 ## 0.0A — Official PICO-8 on Android proof
 
+The first physical-device investigation is tracked in
+[`ANDROID_RUNTIME_POC.md`](ANDROID_RUNTIME_POC.md), including its execution
+plan, evidence and remaining acceptance gates.
+
+Current proof: an [isolated Android host](../experiments/android-host/README.md)
+can edit its fixture, launch official PICO-8 and restore its context after
+exit/process recreation. Basic controls and sound have owner confirmation.
+Warm restart and production runtime ownership remain unresolved; 0.0A is not
+complete. The single-field fixture editor exists only to exercise the runtime
+handoff and is not the product editor.
+
 Build the smallest possible Android proof that can:
 
 - import/select the user's official ARM64/Raspberry Pi PICO-8 files;

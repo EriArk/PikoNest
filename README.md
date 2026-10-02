@@ -80,7 +80,14 @@ Owner-provided PICO-8 0.2.7 archives for private development are stored in
 [`dev-runtime/`](dev-runtime/README.md). They must stay outside application
 packages and public releases; end users still import their own runtime.
 
-Very early concept / architecture stage. The first milestone is not a polished UI; it is proving the three foundations:
+Early foundation experiments. An installed Android host has demonstrated
+editing a real `.p8`, launching it in official PICO-8 and restoring its saved
+context after exit, including host process recreation. See the
+[device results and remaining limitations](docs/ANDROID_RUNTIME_POC.md) and
+[reproducible host experiment](experiments/android-host/README.md).
+
+The production framework remains undecided. The first milestone is proving
+three foundations:
 
 1. reliably launching the user's official PICO-8 runtime from Android and returning to PIKOOS;
 2. loss-safe parsing and writing of real `.p8` projects;
