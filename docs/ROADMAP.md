@@ -8,6 +8,13 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
+Latest bounded lab step (0.0.13): single external text `.p8` → explicit preview
+→ independent byte-preserved project → existing sprite tools/library → official
+runtime test. Preview survives process recreation; source files stay untouched.
+This does not complete folder setup, `.p8.png`/Splore import, dependency import,
+general Lua editing or controller navigation across Android document providers.
+[Device evidence](design/android-import-12/README.md).
+
 ## Added owner requirements: setup and reusable assets
 
 - Phase 0.1 must include the [first-run wizard](FIRST_RUN_SETUP.md): existing

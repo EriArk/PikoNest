@@ -216,7 +216,8 @@ Android lab 0.0.9 keeps Moon Garden's speed/jump/hero data behind the optional
 `MoonGardenBinding` adapter. Shared cart/resource workflows also accept carts
 without it, including the blank and Lights samples. `HeroCode` and `HeroBinding`
 remain platformer-specific; do not turn them into a universal object model.
-Arbitrary import, full Lua editing and general resource allocation remain open.
+Android lab 0.0.13 adds single text `.p8` import with byte-preserving copies.
+PNG carts, linked-file import, full Lua editing and general resource allocation remain open.
 
 A normal project should conceptually look like:
 
@@ -399,7 +400,8 @@ See `docs/ASSET_LIBRARY.md` and `docs/FIRST_RUN_SETUP.md` for scope, dependencie
 storage ownership, backend-specific archive guidance and acceptance gates.
 These are required product workflows. Android lab 0.0.11 implements a bounded
 sprite-only cross-project library with independent pixels and explicit insertion.
-Other asset types, arbitrary cart import and first-run folder/runtime setup remain
+Lab 0.0.13 also imports single text `.p8` files for resource extraction.
+Other asset types, `.p8.png`/linked-file import and first-run folder/runtime setup remain
 unfinished. App-private experimental storage is not the final user-folder model.
 
 Use accurate user-facing names: sprite, animation frame, tile, map, background,

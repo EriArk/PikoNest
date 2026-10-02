@@ -4,6 +4,10 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Build;
 import android.content.SharedPreferences;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.OpenableColumns;
 import android.util.AtomicFile;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -18,6 +22,7 @@ import art.pikoos.lab.core.SpriteAsset;
 import art.pikoos.lab.core.NameEditor;
 import android.util.Base64;
 import art.pikoos.lab.core.LibrarySession;
+import art.pikoos.lab.core.CartridgeImport;
 import art.pikoos.lab.core.WorkshopSession;
 import art.pikoos.lab.core.WorkshopSession.Action;
 import art.pikoos.lab.core.WorkshopSession.Mode;
@@ -42,6 +47,10 @@ public final class MainActivity extends Activity {
     private LibrarySession library;
     private LibraryView shelf;
     private String activeId="moon-garden";
+    private String activeTitle="Лунный сад";
+    private static final int PICK_CART=41;
+    private AtomicFile importDraft;
+    private int importGeneration;
     private boolean showingLibrary;
     private final HashMap<String,WorkshopSession> sessions=new HashMap<>();
     private boolean awaitingReturn,leftForRuntime;
@@ -59,6 +68,7 @@ public final class MainActivity extends Activity {
         try {
             store=new ProjectStore(getFilesDir());
             assetStore=new SpriteAssetStore(getFilesDir());
+            importDraft=new AtomicFile(new File(getFilesDir(),"pending-import.bin"));
             byte[] template;
             try(InputStream in=getAssets().open("moon-garden.p8")){template=readAll(in);}
             if(!store.directory("moon-garden").exists())store.create("moon-garden",template);
@@ -68,12 +78,27 @@ public final class MainActivity extends Activity {
                 public void create(String id,byte[] bytes)throws Exception{store.create(id,bytes);}
                 public void open(String id,WorkshopCartridge cart)throws Exception{openProject(id,cart);}
                 public void resume(){if(session!=null)showWorkshop();}
+                public String title(String id)throws Exception{return store.title(id);}
+                public void pickImport(){
+                    importGeneration++;
+                    Intent pick=new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");
+                    pick.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivityForResult(pick,PICK_CART);
+                }
+                public void importProject(CartridgeImport draft)throws Exception{store.importProject(draft);}
+                public void clearImport()throws Exception{saveCart(importDraft,new byte[0]);}
             },template,asset("blank.p8"),asset("lights.p8"));
             input=new ControllerInput(action->{if(showingLibrary)shelf.action(action);else if(surface!=null)surface.action(action);},
                 ()->session!=null?session.swapAB:libraryPrefs.getBoolean("swapAB",false));
             try{openProject(activeId,new WorkshopCartridge(store.read(activeId)));}
             catch(Exception e){Log.e(TAG,"Last project unavailable; retained",e);showLibrary();library.fail(e);shelf.invalidate();}
             if(!awaitingReturn&&startOnShelf)showLibrary(shelfSelection,shelfFocus);
+            if(!awaitingReturn&&importDraft.getBaseFile().exists()){
+                try{
+                    byte[] pending=importDraft.readFully();
+                    if(pending.length>0){showLibrary(shelfSelection,3);library.stageImport(CartridgeImport.decode(pending));shelf.invalidate();}
+                }catch(Exception e){showLibrary(shelfSelection,3);library.fail(e);shelf.invalidate();}
+            }
         }catch(Exception e){
             TextView error=new TextView(this);error.setText("Не удалось открыть проекты. Исходные файлы сохранены.\n"+e.getMessage());
             error.setTextColor(WorkshopView.COLORS[7]);error.setBackgroundColor(WorkshopView.COLORS[1]);error.setPadding(32,32,32,32);
@@ -83,6 +108,7 @@ public final class MainActivity extends Activity {
     private void openProject(final String id,WorkshopCartridge cart)throws Exception {
         persistUi();
         store.cart(id); // Validate the target before switching editor state.
+        final String projectTitle=store.title(id);activeTitle=projectTitle;
         WorkshopSession next=sessions.get(id);
         if(next==null||!java.util.Arrays.equals(next.cart().bytes(),cart.bytes())) {
             next=new WorkshopSession(cart,new WorkshopSession.Port(){
@@ -92,7 +118,7 @@ public final class MainActivity extends Activity {
                 public java.util.List<SpriteAsset> assets()throws Exception{return assetStore.list();}
                 public void storeAsset(SpriteAsset asset)throws Exception{assetStore.create(asset);}
                 public void renameAsset(SpriteAsset expected,String title)throws Exception{assetStore.rename(expected,title);}
-                public String projectOrigin(){return LibrarySession.title(id)+" · "+id;}
+                public String projectOrigin(){return projectTitle;}
             });
             activeId=id;session=next;
             prefs=getSharedPreferences(id+"-ui",MODE_PRIVATE);
@@ -107,7 +133,7 @@ public final class MainActivity extends Activity {
     }
     private void showWorkshop(){
         showingLibrary=false;
-        surface=new WorkshopView(this,session,LibrarySession.title(activeId),()->persistUi());
+        surface=new WorkshopView(this,session,activeTitle,()->persistUi());
         setContentView(surface);surface.requestFocus();immersive();persistUi();
     }
     private void showLibrary()throws Exception{
@@ -115,7 +141,7 @@ public final class MainActivity extends Activity {
     }
     private void showLibrary(String preferred,int focus)throws Exception{
         persistUi();library.refresh(preferred);
-        if(!library.entries().isEmpty())library.focus=Math.max(0,Math.min(2,focus));
+        if(!library.entries().isEmpty())library.focus=Math.max(0,Math.min(3,focus));
         showingLibrary=true;
         shelf=new LibraryView(this,library,activeId,session!=null&&session.swapAB,()->persistUi());
         setContentView(shelf);shelf.requestFocus();immersive();persistUi();
@@ -125,6 +151,34 @@ public final class MainActivity extends Activity {
         while((count=in.read(buffer))!=-1)out.write(buffer,0,count);return out.toByteArray();
     }
     private byte[] asset(String name)throws Exception{try(InputStream in=getAssets().open(name)){return readAll(in);}}
+    @Override protected void onActivityResult(int request,int result,Intent data){
+        super.onActivityResult(request,result,data);
+        if(request!=PICK_CART||library==null)return;
+        if(result!=RESULT_OK||data==null||data.getData()==null)return;
+        final Uri uri=data.getData();final int generation=++importGeneration;
+        library.mode=LibrarySession.Mode.READING;shelf.invalidate();
+        // Document providers may be remote; never block controller/UI dispatch while reading.
+        new Thread(()->{
+            CartridgeImport candidate=null;Exception problem=null;
+            try{
+                String name="selected.p8";
+                try(Cursor cursor=getContentResolver().query(uri,new String[]{OpenableColumns.DISPLAY_NAME},null,null,null)){
+                    if(cursor!=null&&cursor.moveToFirst()&&!cursor.isNull(0))name=cursor.getString(0);
+                }
+                try(InputStream in=getContentResolver().openInputStream(uri)){candidate=new CartridgeImport(name,CartridgeImport.readBounded(in));}
+            }catch(Exception e){problem=e;}
+            final CartridgeImport ready=candidate;final Exception failure=problem;
+            runOnUiThread(()->{
+                // An interrupted read has no project side effects; select again after recreation.
+                if(isDestroyed()||isFinishing()||generation!=importGeneration||library.mode!=LibrarySession.Mode.READING)return;
+                try{
+                    if(failure!=null)throw failure;
+                    saveCart(importDraft,ready.encode());library.stageImport(ready);
+                }catch(Exception e){library.fail(e);}
+                shelf.invalidate();persistUi();
+            });
+        },"pikoos-cart-import").start();
+    }
     private void saveCart(AtomicFile target,byte[] bytes)throws Exception{
         FileOutputStream out=null;
         try{out=target.startWrite();out.write(bytes);target.finishWrite(out);}

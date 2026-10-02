@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="art.pikoos.runtimelab" android:versionCode="12" android:versionName="0.0.12">
+    package="art.pikoos.runtimelab" android:versionCode="13" android:versionName="0.0.13">
     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
     <queries><package android:name="io.wip.pico8" /></queries>
     <application android:label="PIKOOS Runtime Lab" android:debuggable="true"

@@ -32,7 +32,7 @@ final class LibraryView extends View {
         super(context);s=session;this.active=active;this.swap=swap;this.changed=changed;
         p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
-        setContentDescription("Мои игры. Влево и вправо: картридж, вниз: новая игра или копия, подтвердить: открыть.");
+        setContentDescription("Мои игры. Влево и вправо: картридж. Вниз: новая игра или копия, ещё вниз: импорт .p8.");
     }
     void action(Action a){s.act(a);changed.run();invalidate();}
     private void rect(float x,float y,float w,float h,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+w,y+h,p);}
@@ -50,7 +50,7 @@ final class LibraryView extends View {
         text("Мои игры",16,85,30,7);
         text(s.entries().isEmpty()?"Пока ни одной":(s.selected+1)+" / "+s.entries().size(),w-88,83,18,6);
         int columns=w>=550?3:2,start=s.selected/columns*columns;
-        float gap=14,cw=(w-32-gap*(columns-1))/columns,top=112,bottom=h-154,ch=bottom-top;
+        float gap=14,cw=(w-32-gap*(columns-1))/columns,top=112,bottom=h-210,ch=bottom-top;
         for(int col=0;col<columns;col++){
             final int index=start+col;if(index>=s.entries().size())break;
             LibrarySession.Entry entry=s.entries().get(index);float x=16+col*(cw+gap);
@@ -65,11 +65,12 @@ final class LibraryView extends View {
             hits.add(new Hit(x,top,cw,ch,()->{s.choose(index);changed.run();invalidate();}));
         }
         if(s.entries().isEmpty()){text("Здесь будут твои картриджи",24,185,22,14);text("Начни с маленькой игры ниже",24,219,18,6);}
-        fit("← → выбрать игру · ↓ новая игра или копия",16,h-133,16,6,w-32);
-        button("+ Новая игра",16,h-112,(w-44)/2,s.focus==1,()->{s.command(1);changed.run();invalidate();});
-        button("Копия выбранной",28+(w-44)/2,h-112,(w-44)/2,s.focus==2,()->{s.command(2);changed.run();invalidate();});
+        fit("← → выбрать игру · ↓ действия",16,h-189,16,6,w-32);
+        button("+ Новая игра",16,h-168,(w-44)/2,s.focus==1,()->{s.command(1);changed.run();invalidate();});
+        button("Копия выбранной",28+(w-44)/2,h-168,(w-44)/2,s.focus==2,()->{s.command(2);changed.run();invalidate();});
+        button("↓ Импорт .p8 из файлов",16,h-112,w-32,s.focus==3,()->{s.command(3);changed.run();invalidate();});
         rect(0,h-44,w,44,0);
-        text(ok()+(s.focus==0?" открыть":s.focus==1?" создать":" копия"),12,h-16,18,10);text(back()+" мастерская",w<500?120:168,h-16,18,6);
+        text(ok()+(s.focus==0?" открыть":s.focus==1?" создать":s.focus==2?" копия":" выбрать"),12,h-16,18,10);text(back()+" мастерская",w<500?120:168,h-16,18,6);
         if(w>=500)text("X копия",w-105,h-16,18,14);
         hits.add(new Hit(0,h-44,116,44,()->action(Action.CONFIRM)));
         hits.add(new Hit(w<500?120:168,h-44,155,44,()->action(Action.CANCEL)));
@@ -100,6 +101,7 @@ final class LibraryView extends View {
     }
     private void dialog(){
         hits.clear();p.setColor(0xdd000000);c.drawRect(0,0,w,h,p);
+        if(s.mode==LibrarySession.Mode.IMPORT||s.mode==LibrarySession.Mode.READING){importDialog();return;}
         float dw=Math.min(w-32,460),x=(w-dw)/2,y=(h-300)/2;
         rect(x,y,dw,300,1);outline(x,y,dw,300,14);
         boolean create=s.mode==LibrarySession.Mode.CREATE;
@@ -124,11 +126,32 @@ final class LibraryView extends View {
         button(ok()+(create?" Создать":" Назад"),x+16,y+238,create?(dw-44)/2:dw-32,true,()->action(Action.CONFIRM));
         if(create)button(back()+" Отмена",x+28+(dw-44)/2,y+238,(dw-44)/2,false,()->action(Action.CANCEL));
     }
+    private void importDialog(){
+        float dw=Math.min(w-32,480),x=(w-dw)/2,y=(h-400)/2;
+        rect(x,y,dw,400,1);outline(x,y,dw,400,14);
+        text("Картридж в мастерскую",x+18,y+38,24,14);
+        if(s.mode==LibrarySession.Mode.READING){
+            text("Читаем выбранный файл…",x+18,y+120,22,10);
+            fit("Большой файл может занять немного времени.",x+18,y+158,16,6,dw-36);
+            button(back()+" Отмена",x+16,y+340,dw-32,true,()->action(Action.CANCEL));return;
+        }
+        artwork(s.importing.cart,x+18,y+62,96);
+        fit(s.importing.filename,x+128,y+85,22,10,dw-146);
+        fit("Спрайты картриджа",x+128,y+114,16,6,dw-146);
+        text((s.importing.cart.bytes().length+1023)/1024+" КиБ · .p8",x+128,y+143,18,7);
+        text("Добавим отдельную копию.",x+18,y+196,20,7);
+        text("Исходный файл останется как есть.",x+18,y+224,18,11);
+        fit("Только этот файл. Связанные файлы",x+18,y+266,17,6,dw-36);
+        fit("и другие части игры пока не переносятся.",x+18,y+290,17,6,dw-36);
+        fit("Запуск в PICO-8 — после импорта, кнопкой Start.",x+18,y+320,16,6,dw-36);
+        button(ok()+" Добавить",x+16,y+340,(dw-44)/2,true,()->action(Action.CONFIRM));
+        button(back()+" Отмена",x+28+(dw-44)/2,y+340,(dw-44)/2,false,()->action(Action.CANCEL));
+    }
     @Override public boolean onTouchEvent(MotionEvent e){
         float x=e.getX()/scale,y=e.getY()/scale;
         if(e.getActionMasked()==MotionEvent.ACTION_DOWN){downX=x;downY=y;return true;}
         if(e.getActionMasked()==MotionEvent.ACTION_UP){
-            if(s.mode==LibrarySession.Mode.SHELF&&downY>105&&downY<h-154&&Math.abs(x-downX)>40){action(x<downX?Action.RIGHT:Action.LEFT);return true;}
+            if(s.mode==LibrarySession.Mode.SHELF&&downY>105&&downY<h-210&&Math.abs(x-downX)>40){action(x<downX?Action.RIGHT:Action.LEFT);return true;}
             if(Math.abs(x-downX)>20||Math.abs(y-downY)>20)return true;
             for(int i=hits.size()-1;i>=0;i--)if(hits.get(i).rect.contains(x,y)){hits.get(i).run.run();break;}
             performClick();return true;

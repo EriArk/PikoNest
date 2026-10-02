@@ -83,6 +83,12 @@ my-game/
 
 ## Status
 
+Android 0.0.13 adds single text `.p8` import: read-only source, preview, explicit
+confirmation and an independent byte-preserved project. Imported sprites can use
+the same shared library. PNG carts, dependencies and folder setup remain pending;
+Android's system picker still has controller-navigation limitations.
+[Device evidence](docs/design/android-import-12/README.md).
+
 Android 0.0.12 adds controller-operated sprite names, both before saving and for
 existing library records. Draft recovery and title-only persistence keep pixels
 and carts unchanged. [Device evidence](docs/design/android-names-11/README.md).

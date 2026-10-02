@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import art.pikoos.lab.core.WorkshopSession.Action;
 
-/** Portable, bounded owned-template library. Storage and view/lifecycle live behind Port. */
+/** Portable project shelf. Storage, file selection and view/lifecycle live behind Port. */
 public final class LibrarySession {
     public interface Port {
         List<String> ids() throws Exception;
@@ -14,21 +14,28 @@ public final class LibrarySession {
         void create(String id, byte[] bytes) throws Exception;
         void open(String id, WorkshopCartridge cart) throws Exception;
         void resume();
+        default String title(String id)throws Exception{return LibrarySession.title(id);}
+        default void pickImport()throws Exception{throw new Exception("Выбор файла не подключён");}
+        // Exclusive publication; retrying the same snapshot must be idempotent.
+        default void importProject(CartridgeImport draft)throws Exception{throw new Exception("Импорт не подключён");}
+        default void clearImport()throws Exception{}
     }
     public static final class Entry {
         public final String id, title, error;
         public final WorkshopCartridge cart;
-        Entry(String id, WorkshopCartridge cart, String error) {
-            this.id=id;this.title=title(id);this.cart=cart;this.error=error;
+        Entry(String id, String title, WorkshopCartridge cart, String error) {
+            this.id=id;this.title=title;this.cart=cart;this.error=error;
         }
     }
-    public enum Mode { SHELF, CREATE, ERROR }
+    public enum Mode { SHELF, CREATE, READING, IMPORT, ERROR }
+    public CartridgeImport importing;
+    private Mode errorReturn=Mode.SHELF;
     private final Port port;
     private final byte[][] templates;
     public int templateChoice;
     public int templateCount(){return templates.length;}
     private final ArrayList<Entry> entries=new ArrayList<>();
-    public int selected, focus; // focus: 0 cards, 1 new, 2 copy
+    public int selected, focus; // focus: 0 cards, 1 new, 2 copy, 3 import
     public Mode mode=Mode.SHELF;
     public String error="";
     public LibrarySession(Port port, byte[]... templates) {
@@ -37,11 +44,12 @@ public final class LibrarySession {
         for(int i=0;i<templates.length;i++)this.templates[i]=new WorkshopCartridge(templates[i]).bytes();
     }
     public static boolean validId(String id) {
-        return id!=null&&(id.equals("moon-garden")||id.matches("(?:garden|remix|blank|puzzle)-[0-9]{4,8}"));
+        return id!=null&&(id.equals("moon-garden")||CartridgeImport.validId(id)||id.matches("(?:garden|remix|blank|puzzle)-[0-9]{4,8}"));
     }
     public static String title(String id) {
         if(!validId(id))throw new IllegalArgumentException("Invalid project ID");
         if(id.equals("moon-garden"))return "Лунный сад";
+        if(CartridgeImport.validId(id))return "Импорт";
         return (id.startsWith("garden-")?"Новая игра ":id.startsWith("blank-")?"Чистый лист ":id.startsWith("puzzle-")?"Огоньки ":"Копия ")+Integer.parseInt(id.substring(id.indexOf('-')+1));
     }
     public List<Entry> entries(){return Collections.unmodifiableList(entries);}
@@ -52,8 +60,8 @@ public final class LibrarySession {
         ArrayList<Entry> next=new ArrayList<>();
         for(String id:ids) {
             if(!validId(id))continue;
-            try{next.add(new Entry(id,new WorkshopCartridge(port.read(id)),""));}
-            catch(Exception e){next.add(new Entry(id,null,message(e)));}
+            try{next.add(new Entry(id,port.title(id),new WorkshopCartridge(port.read(id)),""));}
+            catch(Exception e){next.add(new Entry(id,title(id),null,message(e)));}
         }
         entries.clear();entries.addAll(next);
         selected=Math.min(selected,Math.max(0,entries.size()-1));
@@ -61,9 +69,10 @@ public final class LibrarySession {
         focus=entries.isEmpty()?1:0;mode=Mode.SHELF;
     }
     private static String message(Exception e){return e.getMessage()==null?e.getClass().getSimpleName():e.getMessage();}
-    public void fail(Exception e){error=message(e);mode=Mode.ERROR;}
+    public void fail(Exception e){error=message(e);errorReturn=importing!=null?Mode.IMPORT:Mode.SHELF;mode=Mode.ERROR;}
+    public void stageImport(CartridgeImport draft){importing=draft;mode=Mode.IMPORT;}
     public void choose(int index){if(mode!=Mode.SHELF||index<0||index>=entries.size())return;selected=index;focus=0;act(Action.CONFIRM);}
-    public void command(int item){if(mode!=Mode.SHELF)return;focus=item;act(Action.CONFIRM);}
+    public void command(int item){if(mode!=Mode.SHELF||item<1||item>3)return;focus=item;act(Action.CONFIRM);}
     private void create(boolean copy)throws Exception {
         Entry from=current();
         if(copy&&from==null)return;
@@ -78,7 +87,17 @@ public final class LibrarySession {
     }
     public void act(Action a) {
         try {
-            if(mode==Mode.ERROR){if(a==Action.CANCEL||a==Action.CONFIRM)mode=Mode.SHELF;return;}
+            if(mode==Mode.ERROR){if(a==Action.CANCEL||a==Action.CONFIRM)mode=errorReturn;return;}
+            if(mode==Mode.READING){if(a==Action.CANCEL){mode=Mode.SHELF;focus=3;}return;}
+            if(mode==Mode.IMPORT){
+                if(a==Action.CANCEL){port.clearImport();importing=null;mode=Mode.SHELF;focus=3;}
+                if(a==Action.CONFIRM){
+                    CartridgeImport draft=importing;
+                    port.importProject(draft);port.clearImport();importing=null;
+                    refresh(draft.id);port.open(draft.id,draft.cart);
+                }
+                return;
+            }
             if(mode==Mode.CREATE){
                 if(a==Action.LEFT||a==Action.UP)templateChoice=Math.max(0,templateChoice-1);
                 if(a==Action.RIGHT||a==Action.DOWN)templateChoice=Math.min(templates.length-1,templateChoice+1);
@@ -87,14 +106,15 @@ public final class LibrarySession {
                 return;
             }
             if(a==Action.CANCEL){port.resume();return;}
-            if(a==Action.UP)focus=entries.isEmpty()?1:0;
-            if(a==Action.DOWN)focus=1;
-            if(a==Action.LEFT){if(focus==0)selected=Math.max(0,selected-1);else focus=1;}
-            if(a==Action.RIGHT){if(focus==0)selected=Math.min(Math.max(0,entries.size()-1),selected+1);else focus=2;}
+            if(a==Action.UP)focus=focus==3?1:entries.isEmpty()?1:0;
+            if(a==Action.DOWN)focus=focus==0?1:3;
+            if(a==Action.LEFT){if(focus==0)selected=Math.max(0,selected-1);else if(focus!=3)focus=1;}
+            if(a==Action.RIGHT){if(focus==0)selected=Math.min(Math.max(0,entries.size()-1),selected+1);else if(focus!=3)focus=2;}
             if(a==Action.CONTEXT&&current()!=null){create(true);return;}
             if(a==Action.CONFIRM){
                 if(focus==1)mode=Mode.CREATE;
                 else if(focus==2)create(true);
+                else if(focus==3)port.pickImport();
                 else if(current()!=null)port.open(current().id,new WorkshopCartridge(port.read(current().id)));
             }
         }catch(Exception e){fail(e);}

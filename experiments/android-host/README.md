@@ -1,5 +1,21 @@
 # PIKOOS Android host experiment
 
+Version 0.0.13 imports a single text `.p8` through Android's document picker.
+My games → Down → Down → Confirm opens file selection. Preview shows source
+sprites and filename; Confirm adds an independent project, Cancel adds nothing.
+Start cannot bypass the preview. The original URI is opened read-only; imported
+bytes are preserved exactly, including unknown sections. A durable preview and
+stable destination ID survive process death; publication retries are idempotent.
+The filename supplies the shelf/workshop title via optional `.pikoos/import-name`.
+Import does not certify Lua or runtime compatibility and never executes the cart.
+All existing generic sprite/library tools remain available after opening it.
+The lab intake budget is 2 MiB, not a PICO-8 format limit. `.p8.png`, archives,
+includes/multicart dependencies, folder setup and project export remain pending.
+Android's picker is system UI; on Retroid, changing its root required a touch
+during this check. Its file list and the host confirmation work with injected
+controller buttons. This is not full physical-controller acceptance.
+[Evidence and limitations](../../docs/design/android-import-12/README.md).
+
 Version 0.0.12 adds names for sprite-library records. Y in the library renames
 the selected record; X on the export preview names the pending resource.
 The controller alphabet grid supports Russian/Latin, case, digits and symbols.
@@ -17,7 +33,7 @@ in another project, place and preview it, then confirm insertion. Cancel and
 whole-operation undo preserve the target exactly. The library and insertion
 draft survive process recreation; inserted carts run without library access.
 Storage is currently app-private, separate from project folders. Folder selection,
-deletion, external import, flags/animation/audio dependencies and other
+deletion, `.p8.png` import, flags/animation/audio dependencies and other
 resource types remain pending. [Evidence](../../docs/design/android-assets-10/README.md).
 
 Version 0.0.10 makes sprite/rectangle copying available in every supported cart.

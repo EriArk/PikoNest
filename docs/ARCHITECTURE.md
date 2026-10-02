@@ -6,6 +6,32 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+### Android lab 0.0.13: single-file import boundary
+
+Portable `CartridgeImport` holds a read-only cart snapshot, display filename and
+stable random destination ID. Its bounded versioned record persists a preview;
+it is editor metadata, never an alternate cartridge format. `LibrarySession`
+owns confirm/cancel/error/retry states and delegates selection/publication through
+ports. Successful parsing proves editor readability, not valid Lua or runtime
+compatibility. A 2 MiB intake budget protects the lab reader; it is not a console
+limit. No dependency resolver or `.p8.png` decoder is implied.
+
+Android uses `ACTION_OPEN_DOCUMENT`, reads the selected URI on a worker thread
+without a write grant or persistent source dependency, and saves the preview via
+AtomicFile. Cancellation ignores late provider results. Killing/recreating the
+activity during an unfinished provider read requires selecting again; a completed
+preview survives process death and never confirms itself. New projects publish
+from a staged directory after `game.p8` and optional `.pikoos/import-name` are
+complete. Retries compare bytes and title at the same destination; they cannot
+overwrite an edited project. Clearing a completed/cancelled preview writes an
+empty atomic record. Interrupted staging files are retained, hidden from the shelf.
+
+User-facing source labels use project names; asset provenance still includes
+the source-cart SHA256 and coordinates. Previously saved asset records are not
+rewritten. Sources: [Android SAF](https://developer.android.com/training/data-storage/shared/documents-files),
+[PICO-8 formats and includes](https://www.lexaloffle.com/dl/docs/pico-8_manual.html).
+[Evidence](design/android-import-12/README.md).
+
 ## 1. Architectural goals
 
 PIKOOS must satisfy several constraints that pull in different directions:
