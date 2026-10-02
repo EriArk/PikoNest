@@ -83,6 +83,12 @@ my-game/
 
 ## Status
 
+Android 0.0.14 adds saving a selected project as an ordinary external `.p8`.
+Y on the shelf opens a recoverable preview; the Android save dialog selects a
+new file. A saved result requires closing, reopening and byte-comparing that file.
+Unconfirmed writes are reported honestly and never retried automatically.
+[Device evidence](docs/design/android-export-13/README.md).
+
 Android 0.0.13 adds single text `.p8` import: read-only source, preview, explicit
 confirmation and an independent byte-preserved project. Imported sprites can use
 the same shared library. PNG carts, dependencies and folder setup remain pending;

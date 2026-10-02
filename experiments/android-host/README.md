@@ -1,5 +1,20 @@
 # PIKOOS Android host experiment
 
+Version 0.0.14 adds external `.p8` export. On My games, choose a cart and press Y,
+or navigate to Save .p8. The preview captures that project's current saved bytes;
+Confirm opens Android's create-document dialog, Cancel discards the preview.
+Cancelling the system dialog returns to the preview. The worker closes its output,
+reopens it and compares every byte before reporting success. Neither the project
+nor an existing chosen source URI is rewritten. A partial/unverified destination
+may remain after failure; retry explicitly chooses a new document.
+Preview/result state survives process death. An interrupted write restores an
+uncertain result, never an automatic rewrite or success. An in-process worker is
+retained across Activity recreation. Export is one text cart, not a project archive,
+dependency bundle, library backup or account-token-cleaning operation. 2 MiB is
+the lab snapshot budget, not a PICO-8 limit. System picker navigation can require
+touch; host preview/result actions use controller or touch.
+[Evidence](../../docs/design/android-export-13/README.md).
+
 Version 0.0.13 imports a single text `.p8` through Android's document picker.
 My games → Down → Down → Confirm opens file selection. Preview shows source
 sprites and filename; Confirm adds an independent project, Cancel adds nothing.
@@ -10,7 +25,8 @@ The filename supplies the shelf/workshop title via optional `.pikoos/import-name
 Import does not certify Lua or runtime compatibility and never executes the cart.
 All existing generic sprite/library tools remain available after opening it.
 The lab intake budget is 2 MiB, not a PICO-8 format limit. `.p8.png`, archives,
-includes/multicart dependencies, folder setup and project export remain pending.
+includes/multicart dependencies and folder setup remain pending. Single-file
+project export was added in 0.0.14.
 Android's picker is system UI; on Retroid, changing its root required a touch
 during this check. Its file list and the host confirmation work with injected
 controller buttons. This is not full physical-controller acceptance.

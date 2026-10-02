@@ -401,6 +401,9 @@ storage ownership, backend-specific archive guidance and acceptance gates.
 These are required product workflows. Android lab 0.0.11 implements a bounded
 sprite-only cross-project library with independent pixels and explicit insertion.
 Lab 0.0.13 also imports single text `.p8` files for resource extraction.
+Lab 0.0.14 exports a selected saved cart byte-for-byte to a new external `.p8`,
+with readback verification. This is not folder setup, dependency/library backup,
+or Share Clean Cartridge; raw export preserves any source bindings unchanged.
 Other asset types, `.p8.png`/linked-file import and first-run folder/runtime setup remain
 unfinished. App-private experimental storage is not the final user-folder model.
 

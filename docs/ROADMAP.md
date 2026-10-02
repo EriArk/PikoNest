@@ -8,7 +8,13 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded lab step (0.0.13): single external text `.p8` → explicit preview
+Latest bounded lab step (0.0.14): selected saved project → preview → external
+`.p8` → byte verification → reimport and official-runtime test. Cancel and
+process recovery preserve the project; uncertain writes require an explicit
+retry. This is one-cart export, not dependencies/metadata or asset-library backup.
+[Device evidence](design/android-export-13/README.md).
+
+Previous step (0.0.13): single external text `.p8` → explicit preview
 → independent byte-preserved project → existing sprite tools/library → official
 runtime test. Preview survives process recreation; source files stay untouched.
 This does not complete folder setup, `.p8.png`/Splore import, dependency import,

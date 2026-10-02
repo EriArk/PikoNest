@@ -6,6 +6,34 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+### Android lab 0.0.14: export with verified persistence
+
+Portable `CartridgeExport` holds the selected project's saved bytes, display
+title and source ID. Its versioned PKE1 journal records preview/writing/saved/
+uncertain states. `LibrarySession` controls preview, file selection, explicit
+retry and acknowledgement through ports. It reads the canonical cart again at
+preview creation, not a thumbnail or the active project's editor draft. Bytes
+remain fixed after preview; export never normalizes data or edits the project.
+
+Android `ACTION_CREATE_DOCUMENT` selects a new document. `ExportJob` writes on
+a worker, closes the output, reopens the URI and compares bytes, then journals
+the result atomically. It reports saved only after verification and journal
+completion. I/O/verification failure retains an uncertain snapshot; the external
+document may be partial and is not automatically deleted or overwritten.
+Retry invokes a fresh system selection. No persistable URI grants are needed.
+The worker owns the journal while running; Activity recreation retains it and
+reattaches the result listener without reading AtomicFile concurrently. After
+process death, a writing journal restores as uncertain and never restarts a write.
+Preview and verified results also restore without side effects. The 2 MiB budget
+is experimental host policy. Includes, multicart siblings, editor metadata and
+library records are not packed into the exported `.p8`.
+
+The UI does not call this Share Clean Cartridge: personalized-cart binding
+removal is a separate future workflow, and byte-exact export cannot remove it.
+Sources: [Android create-document behavior](https://developer.android.com/training/data-storage/shared/documents-files),
+[ordinary PICO-8 carts](https://www.lexaloffle.com/dl/docs/pico-8_manual.html).
+[Device evidence](design/android-export-13/README.md).
+
 ### Android lab 0.0.13: single-file import boundary
 
 Portable `CartridgeImport` holds a read-only cart snapshot, display filename and

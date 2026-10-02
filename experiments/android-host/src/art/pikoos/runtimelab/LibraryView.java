@@ -32,7 +32,7 @@ final class LibraryView extends View {
         super(context);s=session;this.active=active;this.swap=swap;this.changed=changed;
         p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
-        setContentDescription("Мои игры. Влево и вправо: картридж. Вниз: новая игра или копия, ещё вниз: импорт .p8.");
+        setContentDescription("Мои игры. Влево и вправо: картридж. Вниз: действия. Y: сохранить выбранную игру в файл .p8.");
     }
     void action(Action a){s.act(a);changed.run();invalidate();}
     private void rect(float x,float y,float w,float h,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+w,y+h,p);}
@@ -68,12 +68,14 @@ final class LibraryView extends View {
         fit("← → выбрать игру · ↓ действия",16,h-189,16,6,w-32);
         button("+ Новая игра",16,h-168,(w-44)/2,s.focus==1,()->{s.command(1);changed.run();invalidate();});
         button("Копия выбранной",28+(w-44)/2,h-168,(w-44)/2,s.focus==2,()->{s.command(2);changed.run();invalidate();});
-        button("↓ Импорт .p8 из файлов",16,h-112,w-32,s.focus==3,()->{s.command(3);changed.run();invalidate();});
+        button("Импорт .p8",16,h-112,(w-44)/2,s.focus==3,()->{s.command(3);changed.run();invalidate();});
+        button("Сохранить .p8",28+(w-44)/2,h-112,(w-44)/2,s.focus==4,()->{s.command(4);changed.run();invalidate();});
         rect(0,h-44,w,44,0);
         text(ok()+(s.focus==0?" открыть":s.focus==1?" создать":s.focus==2?" копия":" выбрать"),12,h-16,18,10);text(back()+" мастерская",w<500?120:168,h-16,18,6);
-        if(w>=500)text("X копия",w-105,h-16,18,14);
+        if(w>=500)text("Y в файл",w-108,h-16,18,14);
         hits.add(new Hit(0,h-44,116,44,()->action(Action.CONFIRM)));
         hits.add(new Hit(w<500?120:168,h-44,155,44,()->action(Action.CANCEL)));
+        if(w>=500)hits.add(new Hit(w-116,h-44,116,44,()->action(Action.UNDO)));
         if(s.mode!=LibrarySession.Mode.SHELF)dialog();
         c.restore();
     }
@@ -101,6 +103,7 @@ final class LibraryView extends View {
     }
     private void dialog(){
         hits.clear();p.setColor(0xdd000000);c.drawRect(0,0,w,h,p);
+        if(s.exporting!=null&&s.mode!=LibrarySession.Mode.ERROR){exportDialog();return;}
         if(s.mode==LibrarySession.Mode.IMPORT||s.mode==LibrarySession.Mode.READING){importDialog();return;}
         float dw=Math.min(w-32,460),x=(w-dw)/2,y=(h-300)/2;
         rect(x,y,dw,300,1);outline(x,y,dw,300,14);
@@ -125,6 +128,41 @@ final class LibraryView extends View {
         }
         button(ok()+(create?" Создать":" Назад"),x+16,y+238,create?(dw-44)/2:dw-32,true,()->action(Action.CONFIRM));
         if(create)button(back()+" Отмена",x+28+(dw-44)/2,y+238,(dw-44)/2,false,()->action(Action.CANCEL));
+    }
+    private void exportDialog(){
+        float dw=Math.min(w-32,480),x=(w-dw)/2,y=(h-400)/2;
+        boolean saved=s.mode==LibrarySession.Mode.EXPORT_SAVED,writing=s.mode==LibrarySession.Mode.EXPORT_WRITING||s.mode==LibrarySession.Mode.EXPORT_PICKER;
+        boolean uncertain=s.mode==LibrarySession.Mode.EXPORT_UNCERTAIN;
+        rect(x,y,dw,400,1);outline(x,y,dw,400,saved?11:14);
+        text(saved?"Картридж сохранён":uncertain?"Проверь выбранный файл":"Картридж с собой",x+18,y+38,24,saved?11:uncertain?9:14);
+        artwork(s.exporting.cart,x+18,y+62,96);
+        fit(saved?s.exporting.resultName:s.exporting.filename,x+128,y+85,22,10,dw-146);
+        fit(s.exporting.title,x+128,y+115,18,7,dw-146);
+        text((s.exporting.cart.bytes().length+1023)/1024+" КиБ · .p8",x+128,y+144,18,6);
+        if(writing){
+            text(s.mode==LibrarySession.Mode.EXPORT_PICKER?"Выбери папку в окне Android…":"Записываем и проверяем…",x+18,y+205,20,10);
+            fit("Проект в мастерской остаётся на месте.",x+18,y+245,18,6,dw-36);return;
+        }
+        if(saved){
+            text("Копия совпадает с проектом.",x+18,y+198,20,11);
+            fit("Файл прочитан обратно после записи.",x+18,y+229,18,7,dw-36);
+            fit("Его можно открыть отдельно в PICO-8.",x+18,y+277,18,6,dw-36);
+            fit("Проверка файла не заменяет проверку игры.",x+18,y+307,16,6,dw-36);
+            button(ok()+" На полку",x+16,y+340,dw-32,true,()->action(Action.CONFIRM));return;
+        }
+        if(uncertain){
+            text("Запись не удалось подтвердить.",x+18,y+198,18,9);
+            fit("В папке мог остаться неполный файл.",x+18,y+229,18,7,dw-36);
+            fit("Проект в мастерской сохранён.",x+18,y+266,18,11,dw-36);
+            fit("Повтор создаст новую копию через Android.",x+18,y+302,16,6,dw-36);
+        }else{
+            text("Сохранённая версия проекта.",x+18,y+198,20,7);
+            fit("Копия в выбранную папку, обычный .p8.",x+18,y+229,18,11,dw-36);
+            fit("Переносим только этот картридж.",x+18,y+267,18,6,dw-36);
+            fit("Связанные файлы и история — отдельно.",x+18,y+296,17,6,dw-36);
+        }
+        button(ok()+(uncertain?" Ещё раз":" В папку"),x+16,y+340,(dw-44)/2,true,()->action(Action.CONFIRM));
+        button(back()+" Назад",x+28+(dw-44)/2,y+340,(dw-44)/2,false,()->action(Action.CANCEL));
     }
     private void importDialog(){
         float dw=Math.min(w-32,480),x=(w-dw)/2,y=(h-400)/2;

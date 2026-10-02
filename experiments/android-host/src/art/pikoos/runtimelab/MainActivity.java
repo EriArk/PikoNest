@@ -23,6 +23,7 @@ import art.pikoos.lab.core.NameEditor;
 import android.util.Base64;
 import art.pikoos.lab.core.LibrarySession;
 import art.pikoos.lab.core.CartridgeImport;
+import art.pikoos.lab.core.CartridgeExport;
 import art.pikoos.lab.core.WorkshopSession;
 import art.pikoos.lab.core.WorkshopSession.Action;
 import art.pikoos.lab.core.WorkshopSession.Mode;
@@ -50,6 +51,12 @@ public final class MainActivity extends Activity {
     private String activeTitle="Лунный сад";
     private static final int PICK_CART=41;
     private AtomicFile importDraft;
+    private static final int SAVE_CART=42;
+    private AtomicFile exportDraft;
+    private ExportJob exportJob;
+    private final ExportJob.Listener exportListener=result->{
+        if(library!=null){library.stageExport(result);if(shelf!=null)shelf.invalidate();persistUi();}
+    };
     private int importGeneration;
     private boolean showingLibrary;
     private final HashMap<String,WorkshopSession> sessions=new HashMap<>();
@@ -69,6 +76,7 @@ public final class MainActivity extends Activity {
             store=new ProjectStore(getFilesDir());
             assetStore=new SpriteAssetStore(getFilesDir());
             importDraft=new AtomicFile(new File(getFilesDir(),"pending-import.bin"));
+            exportDraft=new AtomicFile(new File(getFilesDir(),"pending-export.bin"));
             byte[] template;
             try(InputStream in=getAssets().open("moon-garden.p8")){template=readAll(in);}
             if(!store.directory("moon-garden").exists())store.create("moon-garden",template);
@@ -87,6 +95,14 @@ public final class MainActivity extends Activity {
                 }
                 public void importProject(CartridgeImport draft)throws Exception{store.importProject(draft);}
                 public void clearImport()throws Exception{saveCart(importDraft,new byte[0]);}
+                public void saveExport(CartridgeExport draft)throws Exception{saveCart(exportDraft,draft.encode());}
+                public void clearExport()throws Exception{saveCart(exportDraft,new byte[0]);if(exportJob!=null)exportJob.detach(exportListener);exportJob=null;}
+                public void pickExport(CartridgeExport draft){
+                    Intent save=new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/octet-stream");
+                    save.putExtra(Intent.EXTRA_TITLE,draft.filename);
+                    save.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    startActivityForResult(save,SAVE_CART);
+                }
             },template,asset("blank.p8"),asset("lights.p8"));
             input=new ControllerInput(action->{if(showingLibrary)shelf.action(action);else if(surface!=null)surface.action(action);},
                 ()->session!=null?session.swapAB:libraryPrefs.getBoolean("swapAB",false));
@@ -99,6 +115,22 @@ public final class MainActivity extends Activity {
                     if(pending.length>0){showLibrary(shelfSelection,3);library.stageImport(CartridgeImport.decode(pending));shelf.invalidate();}
                 }catch(Exception e){showLibrary(shelfSelection,3);library.fail(e);shelf.invalidate();}
             }
+            exportJob=(ExportJob)getLastNonConfigurationInstance();
+            if(!awaitingReturn&&exportJob!=null){
+                // Retained worker owns the journal until completion; do not read its AtomicFile concurrently.
+                showLibrary(exportJob.draft.sourceId,4);library.stageExport(exportJob.draft);shelf.invalidate();
+            }else if(!awaitingReturn&&exportDraft.getBaseFile().exists()){
+                try{
+                    byte[] pending=exportDraft.readFully();
+                    if(pending.length>0){
+                        CartridgeExport draft=CartridgeExport.decode(pending);
+                        // Process loss does not prove whether the provider finished its write.
+                        if(draft.state==CartridgeExport.State.WRITING&&exportJob==null)draft=draft.withState(CartridgeExport.State.UNCERTAIN,draft.filename);
+                        showLibrary(draft.sourceId,4);library.stageExport(draft);shelf.invalidate();
+                    }
+                }catch(Exception e){showLibrary(shelfSelection,4);library.fail(e);shelf.invalidate();}
+            }
+            if(exportJob!=null)exportJob.attach(exportListener);
         }catch(Exception e){
             TextView error=new TextView(this);error.setText("Не удалось открыть проекты. Исходные файлы сохранены.\n"+e.getMessage());
             error.setTextColor(WorkshopView.COLORS[7]);error.setBackgroundColor(WorkshopView.COLORS[1]);error.setPadding(32,32,32,32);
@@ -141,7 +173,7 @@ public final class MainActivity extends Activity {
     }
     private void showLibrary(String preferred,int focus)throws Exception{
         persistUi();library.refresh(preferred);
-        if(!library.entries().isEmpty())library.focus=Math.max(0,Math.min(3,focus));
+        if(!library.entries().isEmpty())library.focus=Math.max(0,Math.min(4,focus));
         showingLibrary=true;
         shelf=new LibraryView(this,library,activeId,session!=null&&session.swapAB,()->persistUi());
         setContentView(shelf);shelf.requestFocus();immersive();persistUi();
@@ -153,6 +185,7 @@ public final class MainActivity extends Activity {
     private byte[] asset(String name)throws Exception{try(InputStream in=getAssets().open(name)){return readAll(in);}}
     @Override protected void onActivityResult(int request,int result,Intent data){
         super.onActivityResult(request,result,data);
+        if(request==SAVE_CART){exportResult(result,data);return;}
         if(request!=PICK_CART||library==null)return;
         if(result!=RESULT_OK||data==null||data.getData()==null)return;
         final Uri uri=data.getData();final int generation=++importGeneration;
@@ -179,6 +212,20 @@ public final class MainActivity extends Activity {
             });
         },"pikoos-cart-import").start();
     }
+    private void exportResult(int result,Intent data){
+        if(library==null||library.exporting==null)return;
+        if(result!=RESULT_OK||data==null||data.getData()==null){library.exportPickerCancelled();shelf.invalidate();return;}
+        CartridgeExport draft=library.exporting.withState(CartridgeExport.State.WRITING,library.exporting.filename);
+        try{
+            saveCart(exportDraft,draft.encode());library.stageExport(draft);
+            if(exportJob!=null)exportJob.detach(exportListener);
+            exportJob=new ExportJob(getApplicationContext().getContentResolver(),data.getData(),exportDraft,draft);
+            exportJob.attach(exportListener);exportJob.start();
+        }catch(Exception e){library.stageExport(draft.withState(CartridgeExport.State.UNCERTAIN,draft.filename));Log.e(TAG,"Export could not start",e);}
+        shelf.invalidate();
+    }
+    @Override public Object onRetainNonConfigurationInstance(){return exportJob;}
+    @Override protected void onDestroy(){if(exportJob!=null)exportJob.detach(exportListener);super.onDestroy();}
     private void saveCart(AtomicFile target,byte[] bytes)throws Exception{
         FileOutputStream out=null;
         try{out=target.startWrite();out.write(bytes);target.finishWrite(out);}
