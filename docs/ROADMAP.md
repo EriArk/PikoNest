@@ -154,9 +154,14 @@ and a picker. Whole-operation undo and recovery of a pending line are verified;
 held brush strokes and a full sprite/map editor remain open.
 Android lab 0.0.6 adds rectangular selection on the upper sheet, drawing beyond
 16×16 and a cursor-following zoom window. Portable gfx addressing covers the
-full 128×128 sheet; current UI limits are explicit. Large-image hero binding,
-resource copy placement and shared-map editing remain separate next steps.
+full 128×128 sheet; current UI limits are explicit. Resource copy placement
+and shared-map editing remain separate next steps.
 See [region evidence](design/android-regions-05/README.md).
+Android lab 0.0.7 adds previewed large-image hero assignment, with an initial
+rectangular body derived from visible pixels. The owned template's spawn,
+landing and screen bounds use that body; ordinary Lua stores all dimensions.
+Manual body editing, animation anchors and arbitrary-game inference remain open.
+See [hero/physics evidence](design/android-hero-06/README.md).
 
 Features:
 

@@ -81,7 +81,7 @@ The owner accepted the [PICO-8-style visual baseline](docs/UX_DIRECTION.md)
 after rejecting the original Android form, and authorized its implementation
 with controller-first interaction. The installed
 [Android workshop experiment](experiments/android-host/README.md) now edits
-real speed/jump parameters and a 16×16 sprite in an ordinary `.p8`, with
+real speed/jump parameters and sprite pixels in an ordinary `.p8`, with
 controller navigation, explicit commit/cancel, undo and runtime launch.
 Its sprite sheet now supports choosing, drawing a new image, safely copying
 an existing image and explicitly assigning a different hero, using the same
@@ -91,8 +91,12 @@ line preview/confirmation and a picker, with whole-operation undo. See
 [drawing captures](docs/design/android-drawing-04/README.md).
 Rectangular sheet areas now support images beyond 16×16, the same drawing tools
 and cursor-following zoom. The current selector covers the upper half of the
-standard sheet; large-image hero binding and shared-map editing are next steps.
+standard sheet; shared-map editing remains a next step.
 See [region editing and runtime evidence](docs/design/android-regions-05/README.md).
+Large images can now be assigned as the owned template's hero after previewing
+their collision rectangle. Image placement, platform landing and screen bounds
+use the same saved body dimensions in ordinary Lua, with one-step undo.
+See [hero assignment and physics checks](docs/design/android-hero-06/README.md).
 The native project shelf now opens separate games, creates a fresh small-game
 template and makes independent copies, retaining each project's editing context.
 See [library device captures](docs/design/android-library-03/README.md).

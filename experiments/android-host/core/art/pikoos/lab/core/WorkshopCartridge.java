@@ -12,7 +12,7 @@ public final class WorkshopCartridge {
     private final P8Document document;
     private final P8Graphics graphics;
     private final int lua, gfx;
-    private final int heroFrom, heroTo, heroSlot;
+    private final HeroCode heroCode;
     private final byte[] pixels;
     private final int[] fields = new int[2];
     private final int[] rows = new int[16];
@@ -30,13 +30,7 @@ public final class WorkshopCartridge {
             fields[i] = m.start(1);
             if (m.find()) throw new IllegalArgumentException("Ambiguous field: " + names[i]);
         }
-        Matcher hero = Pattern.compile("(?m)^ spr\\(([0-9]{1,2}),x,y,2,2\\)(?=\\r?$)").matcher(code);
-        if (!hero.find()) throw new IllegalArgumentException("Owned hero drawing call missing");
-        heroFrom = hero.start(1); heroTo = hero.end(1);
-        int number = Integer.parseInt(hero.group(1));
-        if (number % 2 != 0 || number >= SPRITE_COUNT * 2 || hero.find())
-            throw new IllegalArgumentException("Ambiguous or unsupported hero sprite");
-        heroSlot = number / 2;
+        heroCode=new HeroCode(code);
         pixels = document.body(gfx);
         int start = 0;
         for (int y = 0; y < 16; y++) {
@@ -58,12 +52,21 @@ public final class WorkshopCartridge {
     public WorkshopCartridge withPixel(SpriteRegion r,int x,int y,int color){return edited(graphics.withPixel(r,x,y,color));}
     public WorkshopCartridge withFill(SpriteRegion r,int x,int y,int color){return edited(graphics.withFill(r,x,y,color));}
     public WorkshopCartridge withLine(SpriteRegion r,int x0,int y0,int x1,int y1,int color){return edited(graphics.withLine(r,x0,y0,x1,y1,color));}
-    public int heroSlot() { return heroSlot; }
+    public int heroSlot() { return hero().card(); }
+    public HeroBinding hero(){return heroCode.binding;}
+    public boolean legacyHero(){return heroCode.legacy;}
+    public HeroBinding proposeHero(SpriteRegion r){return HeroBinding.fromPixels(this,r);}
+    public WorkshopCartridge withHero(HeroBinding binding){
+        proposeHero(binding.image); // Refuse assigning an empty area; keep explicit body dimensions.
+        String changed=heroCode.withBinding(code(),binding);
+        return edited(document.edit(lua,0,document.body(lua).length,changed.getBytes(StandardCharsets.ISO_8859_1)));
+    }
     public WorkshopCartridge withHero(int slot) {
         checkSlot(slot);
         if (empty(slot)) throw new IllegalArgumentException("Сначала нарисуй хотя бы один пиксель");
-        return new WorkshopCartridge(document.edit(lua, heroFrom, heroTo,
-            Integer.toString(slot * 2).getBytes(StandardCharsets.US_ASCII)).bytes());
+        if(!legacyHero())return withHero(proposeHero(legacyRegion(slot)));
+        String changed=heroCode.withLegacyCard(code(),slot);
+        return edited(document.edit(lua,0,document.body(lua).length,changed.getBytes(StandardCharsets.ISO_8859_1)));
     }
     public String code() { return new String(document.body(lua), StandardCharsets.ISO_8859_1); }
     public int value(int field) { return document.body(lua)[fields[field]] - '0'; }
@@ -92,7 +95,10 @@ public final class WorkshopCartridge {
     }
     public boolean empty(int slot) {
         checkSlot(slot);
-        for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) if (pixel(slot, x, y) != 0) return false;
+        return empty(legacyRegion(slot));
+    }
+    public boolean empty(SpriteRegion r){
+        for (int y=0;y<r.height;y++)for(int x=0;x<r.width;x++)if(pixel(r,x,y)!=0)return false;
         return true;
     }
     /** Four-connected fill restricted to one 16x16 region, preserving all other bytes. */
@@ -106,12 +112,12 @@ public final class WorkshopCartridge {
     private static SpriteRegion legacyRegion(int slot){return new SpriteRegion(slot*16,0,16,16);}
     public int firstFreeSlot() {
         // An erased but still assigned hero is not available for automatic allocation.
-        for (int i = 0; i < SPRITE_COUNT; i++) if (i != heroSlot && empty(i)) return i;
+        for (int i = 0; i < SPRITE_COUNT; i++) if (!hero().overlaps(legacyRegion(i)) && empty(i)) return i;
         return -1;
     }
     public WorkshopCartridge copySprite(int source, int destination) {
         checkSlot(source); checkSlot(destination);
-        if (source == destination || destination == heroSlot || !empty(destination))
+        if (source == destination || hero().overlaps(legacyRegion(destination)) || !empty(destination))
             throw new IllegalArgumentException("Copy destination is occupied");
         if (empty(source)) throw new IllegalArgumentException("Нечего копировать: рисунок пустой");
         byte[] changed = pixels.clone();

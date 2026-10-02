@@ -14,6 +14,7 @@ import art.pikoos.lab.core.WorkshopSession.Action;
 import art.pikoos.lab.core.WorkshopSession.Mode;
 import art.pikoos.lab.core.WorkshopCartridge;
 import art.pikoos.lab.core.SpriteRegion;
+import art.pikoos.lab.core.HeroBinding;
 import art.pikoos.lab.core.WorkshopSession.DrawTool;
 import java.util.ArrayList;
 
@@ -76,7 +77,7 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        boolean draft=s.mode==Mode.VALUE||s.pendingLine();
+        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine();
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -103,7 +104,7 @@ final class WorkshopView extends View {
                 fitted(s.notice,tx+14,bodyBottom-18,18,7,tw-28);postInvalidateDelayed(remaining);
             }
         }
-        if(s.mode==Mode.HELP || s.mode==Mode.MENU || s.mode==Mode.ERROR || s.mode==Mode.DRAW_TOOLS) dialog();
+        if(s.mode==Mode.HELP || s.mode==Mode.MENU || s.mode==Mode.ERROR || s.mode==Mode.DRAW_TOOLS || s.mode==Mode.HERO) dialog();
         c.restore();
     }
     private void footer() {
@@ -150,7 +151,8 @@ final class WorkshopView extends View {
             button("+",right+rw-48,infoY+4,44,44,false,()->action(Action.RIGHT));
             fitted("← → изменить · "+(s.swapAB?"A":"B")+" отмена",right+8,infoY+68,16,6,rw-16);
         } else {
-            link("Рисунок героя  "+(s.cart().heroSlot()+1),2,right,infoY-8,rw);
+            SpriteRegion hero=s.cart().hero().image;
+            link("Герой · "+hero.width+" × "+hero.height,2,right,infoY-8,rw);
             link("[ ] Посмотреть код",3,right,infoY+40,rw);
             link("? Как это работает",4,right,infoY+88,rw);
         }
@@ -172,8 +174,14 @@ final class WorkshopView extends View {
         for(int[] a:platforms){rect(a[0],a[1],a[2],9,2);rect(a[0],a[1],a[2],3,3);rect(a[0]+2,a[1],a[2]-4,1,11);for(int bx=a[0];bx<a[0]+a[2];bx+=8)rect(bx,a[1]+4,3,2,4);}
         rect(109,85,10,16,4);rect(111,87,6,14,2);rect(112,88,4,2,9);
         rect(68,48,1,7,10);rect(65,51,7,1,10);
-        sprite(s.cart().heroSlot(),46,85,16,false);c=target;
+        HeroBinding hero=s.cart().hero();
+        regionSprite(hero.image,hero.spawnX()-hero.left,hero.spawnY()-hero.top,1);c=target;
         c.drawBitmap(sceneBitmap,null,new RectF(x,y,x+size,y+size),p);
+    }
+    private void regionSprite(SpriteRegion r,float x,float y,float cell){
+        for(int py=0;py<r.height;py++)for(int px=0;px<r.width;px++){
+            int color=s.cart().pixel(r,px,py);if(color!=0)rect(x+px*cell,y+py*cell,cell,cell,color);
+        }
     }
     private void sprite(int slot,float x,float y,float size,boolean grid) {
         float cell=size/16;
@@ -226,7 +234,7 @@ final class WorkshopView extends View {
         float size=Math.min(256,Math.min((w-56)*.46f,bodyBottom-232));size=Math.max(128,((int)size/16)*16);
         float x=16,y=180,right=size+32,rw=w-right-16;
         SpriteRegion region=s.selection();
-        text((s.region==null?"РИСУНОК "+(s.spriteSlot+1):"ОБЛАСТЬ")+" / "+region.width+" × "+region.height,16,169,18,14);
+        text((s.cart().hero().sameImage(region)?"ГЕРОЙ":s.region==null?"РИСУНОК "+(s.spriteSlot+1):"ОБЛАСТЬ")+" / "+region.width+" × "+region.height,16,169,18,14);
         viewWidth=s.zoom?Math.min(16,region.width):region.width;viewHeight=s.zoom?Math.min(16,region.height):region.height;
         viewX=s.zoom?Math.max(0,Math.min(region.width-viewWidth,s.cursorX-viewWidth/2)):0;
         viewY=s.zoom?Math.max(0,Math.min(region.height-viewHeight,s.cursorY-viewHeight/2)):0;
@@ -265,7 +273,11 @@ final class WorkshopView extends View {
         float by=246+step*4;
         button("Лист",right,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==3,()->action(Action.SPRITE_SHEET));
         button(s.region==null?"Герою":"Рамка",right+(rw+8)/2,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==4,()->action(s.region==null?Action.ASSIGN_HERO:Action.REGION));
-        button(s.zoom?"Весь рисунок":"Приблизить",right,by+52,rw,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
+        if(s.region==null)button(s.zoom?"Весь рисунок":"Приблизить",right,by+52,rw,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
+        else{
+            button(s.zoom?"Целиком":"Крупно",right,by+52,(rw-8)/2,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
+            button("Герою",right+(rw+8)/2,by+52,(rw-8)/2,40,s.mode==Mode.NAVIGATE&&s.focus==6,()->action(Action.ASSIGN_HERO));
+        }
     }
     private void spriteSheet() {
         text("РИСУНКИ ПРОЕКТА",16,169,18,14);
@@ -274,13 +286,13 @@ final class WorkshopView extends View {
         float ch=Math.min(112,(bodyBottom-180-104-gap)/2);
         for(int i=0;i<8;i++) {
             final int slot=i;float x=16+(i%4)*(cw+gap),y=180+(i/4)*(ch+gap);
-            boolean chosen=s.sheetFocus==i,used=s.cart().heroSlot()==i;
-            rect(x,y,cw,ch,0);outline(x,y,cw,ch,chosen?10:used?14:13);
+            boolean chosen=s.sheetFocus==i,used=s.cart().heroSlot()==i,part=s.cart().hero().overlaps(new SpriteRegion(i*16,0,16,16));
+            rect(x,y,cw,ch,0);outline(x,y,cw,ch,chosen?10:part?14:13);
             float size=Math.max(32,((int)(ch-38)/16)*16);
             if(s.cart().empty(i))text("+",x+cw/2-8,y+ch/2+1,28,13);
             else sprite(i,x+(cw-size)/2,y+8,size,false);
-            if(used){rect(x+cw-14,y+6,8,8,14);}
-            String label=used?"Герой":s.cart().empty(i)?"Пусто":"Рисунок "+(i+1);
+            if(part){rect(x+cw-14,y+6,8,8,14);}
+            String label=used?"Герой":part?"Часть героя":s.cart().empty(i)?"Пусто":"Рисунок "+(i+1);
             fitted(label,x+8,y+ch-10,16,chosen?10:used?14:6,cw-16);
             hit(x,y,cw,ch,()->{s.selectSheet(slot);changed.run();invalidate();});
         }
@@ -316,9 +328,25 @@ final class WorkshopView extends View {
     private void dialog() {
         hits.clear(); // Modal controls trap touch as well as controller focus.
         p.setColor(0xcc000000);c.drawRect(0,0,w,h,p);
-        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.DRAW_TOOLS?392:s.mode==Mode.MENU?380:280,dy=Math.max(16,(h-dh)/2);
+        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.HERO?400:s.mode==Mode.DRAW_TOOLS?392:s.mode==Mode.MENU?380:280,dy=Math.max(16,(h-dh)/2);
         rect(dx+6,dy+6,dw,dh,0);rect(dx,dy,dw,dh,1);outline(dx,dy,dw,dh,s.mode==Mode.ERROR?8:14);
-        if(s.mode==Mode.DRAW_TOOLS){
+        if(s.mode==Mode.HERO){
+            HeroBinding hero=s.heroDraft;SpriteRegion r=hero.image;
+            text("Новый рисунок героя",dx+20,dy+36,26,14);
+            text("Рисунок "+r.width+" × "+r.height+" · тело "+hero.width+" × "+hero.height,dx+20,dy+67,18,7);
+            rect(dx+16,dy+82,dw-32,146,0);
+            float cell=Math.max(1,(int)Math.min((dw-64)/r.width,128f/r.height));
+            float sx=dx+(dw-r.width*cell)/2,sy=dy+88+(128-r.height*cell)/2;
+            float floor=sy+(hero.top+hero.height)*cell;
+            rect(dx+24,floor,dw-48,4,11);
+            regionSprite(r,sx,sy,cell);
+            outline(sx+hero.left*cell,sy+hero.top*cell,hero.width*cell,hero.height*cell,10);
+            fitted("Жёлтая рамка — столкновения.",dx+20,dy+256,18,10,dw-40);
+            fitted("Пустые поля не держат героя над землёй.",dx+20,dy+282,18,7,dw-40);
+            fitted("Рамка обновится при назначении рисунка.",dx+20,dy+308,16,6,dw-40);
+            button(ok()+" Назначить",dx+16,dy+336,(dw-44)/2,48,true,()->action(Action.CONFIRM));
+            button(back()+" Отмена",dx+28+(dw-44)/2,dy+336,(dw-44)/2,48,false,()->action(Action.CANCEL));
+        }else if(s.mode==Mode.DRAW_TOOLS){
             text("Чем рисуем?",dx+20,dy+36,26,14);
             for(int i=0;i<DRAW_NAMES.length;i++){final int item=i;
                 button(DRAW_NAMES[i],dx+16,dy+54+i*50,dw-32,44,s.drawToolCursor==i,()->{s.chooseDrawTool(item);changed.run();invalidate();});

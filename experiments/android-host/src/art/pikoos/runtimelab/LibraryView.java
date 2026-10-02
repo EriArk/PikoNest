@@ -9,6 +9,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import art.pikoos.lab.core.LibrarySession;
 import art.pikoos.lab.core.WorkshopCartridge;
+import art.pikoos.lab.core.HeroBinding;
+import art.pikoos.lab.core.SpriteRegion;
 import art.pikoos.lab.core.WorkshopSession.Action;
 import java.util.ArrayList;
 
@@ -80,7 +82,12 @@ final class LibraryView extends View {
         for(int i=0;i<13;i++)rect((i*19+3)%64,(i*11+2)%32,1,1,i%3==0?7:13);
         rect(47,6,7,9,15);rect(50,4,6,8,1);rect(0,49,64,15,2);rect(0,49,64,3,3);
         for(int i=0;i<5;i++){rect(3+i*13,54,4,2,4);rect(5+i*13,45,1,4,3);rect(4+i*13,44,3,2,14);}
-        if(cart!=null){for(int py=0;py<16;py++)for(int px=0;px<16;px++){int color=cart.pixel(cart.heroSlot(),px,py);if(color!=0)rect(24+px,33+py,1,1,color);}}
+        if(cart!=null){
+            HeroBinding hero=cart.hero();SpriteRegion r=hero.image;
+            float cell=Math.min(1,Math.min(48f/r.width,38f/r.height));
+            float hx=32-(hero.left+hero.width/2f)*cell,hy=49-(hero.top+hero.height)*cell;
+            for(int py=0;py<r.height;py++)for(int px=0;px<r.width;px++){int color=cart.pixel(r,px,py);if(color!=0)rect(hx+px*cell,hy+py*cell,cell,cell,color);}
+        }
         else {rect(28,22,7,15,9);rect(28,40,7,4,9);}
         c.restore();
     }

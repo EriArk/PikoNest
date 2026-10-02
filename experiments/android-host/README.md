@@ -11,6 +11,8 @@ Version 0.0.5 adds a drawing-tool chooser, connected fill, previewed lines and
 a color picker, all reachable through the same semantic controller actions.
 Version 0.0.6 adds rectangular sheet selection, drawing beyond 16×16 and a
 16-pixel zoom window that follows the controller cursor.
+Version 0.0.7 adds large-image hero assignment with a collision-body preview,
+ordinary Lua dimensions and coordinated placement/platform/screen bounds.
 
 The visual direction is approved; this implementation remains an experiment,
 not a decision to use Java/Android Views for the production application.
@@ -29,8 +31,10 @@ The experiment has no library dependencies and includes no PICO-8 binary.
   external-app runtime adapter.
 - `assets/moon-garden.p8`: original ordinary PICO-8 Lua and a 16×16 hero.
   Each parameter/pixel edit changes exactly one byte via the shared P8 document.
-  Assignment edits only the sprite number in the owned `spr(n,x,y,2,2)` call;
-  copying changes only destination image pixels.
+  Legacy card assignment edits only the sprite number in the owned
+  `spr(n,x,y,2,2)` call; large-image binding also explicitly updates the known
+  movement functions and adds ordinary Lua dimensions. Copying changes only
+  destination image pixels.
   This deliberately handles the owned template, not arbitrary imported carts.
 - `assets/workshop.p8`: original diagnostic fixture, retained for regression.
 - `assets/Tiny5-Regular.ttf` and `OFL.txt`: Tiny5, SIL Open Font License;
@@ -185,8 +189,9 @@ remain future work. [Device captures and checks](../../docs/design/android-drawi
 - A rectangle is a view of existing sheet pixels, not a new owned resource or
   reservation. Overlapping selections see the same pixels. Blank margins are
   not automatically allocated. The legacy New/Copy/Assign operations remain
-  confined to the eight 16×16 shortcuts. Large-region hero binding, hitboxes,
-  resource naming/copy placement and a shared map workflow are still future work.
+  confined to the eight 16×16 shortcuts in 0.0.6. Version 0.0.7 adds the large
+  binding below. Resource naming/copy placement and shared-map editing remain
+  future work.
 - The gfx decoder currently accepts complete 128-hex-character rows with LF
   or CRLF (and an optional final newline); unsupported row layouts are refused
   without rewriting the source. This is still an owned-template workshop,
@@ -197,6 +202,43 @@ Checked against the [official 0.2.7 manual](https://www.lexaloffle.com/dl/docs/p
 tile units and `sspr` pixel rectangles. The separate ordinary-cart
 [`sprite_regions.p8`](../runtime-smoke/sprite_regions.p8) exercises a 32×24
 image through both APIs. See [device evidence](../../docs/design/android-regions-05/README.md).
+
+### Hero image and collision body (0.0.7)
+
+- On a rectangular area, **Герою** is the last control reachable with D-pad.
+  It previews the chosen image, its source size, a yellow collision rectangle
+  and the ground line. The initial body encloses all nonzero pixels; an empty
+  image cannot be assigned. It is a rectangle, not per-pixel collision.
+- A commits image and body in one durable save/undo entry. B cancels without
+  writing. Start commits then launches the exact saved snapshot. Other actions
+  are trapped while previewing. Failed writes retain the preview for retry.
+  Process recreation rebuilds that uncommitted preview from the selected area.
+- The first region assignment converts only the exact owned `_init` /
+  `_update60` functions and draw call. It adds `hero_sx`, `hero_sy`, `hero_sw`,
+  `hero_sh`, `hero_left`, `hero_top`, `hero_w`, `hero_h` to a marked block of
+  ordinary Lua. The block is source code, not a sidecar requirement or syntax
+  extension. All resource bytes and unrelated Lua text are retained.
+- In this version of the template, `x,y` locate the collision body's top left.
+  `sspr` draws the image at `x-hero_left,y-hero_top`. Spawn preserves the old
+  horizontal centre where possible and places the body on the ground at 101.
+  The visible/body edges constrain horizontal movement; platform overlap and
+  landing use the saved body width/height. The template still has one-way
+  platforms, not solid-wall or arbitrary-shape physics.
+- Painting an assigned image changes its pixels but leaves the saved body
+  fixed. Reassigning explicitly proposes a fresh box. A small image can be
+  assigned again after a large one, using the same preview. Existing carts
+  open byte-for-byte unchanged; the older card-to-card assignment retains its
+  original behavior until the user enters this new binding workflow.
+- The workshop opens the actual assigned region; scene illustrations and shelf
+  covers show it with its saved offset. Shortcut cells intersecting an assigned
+  region (including empty margins) are unavailable to automatic New/Copy.
+- This remains a narrow owned-template adapter. Modified movement functions,
+  ambiguous bindings and initial collisions with generated variable names are
+  rejected. It does not infer custom palettes, arbitrary Lua, other physics,
+  animation anchors or manually adjustable bodies. Color-0 transparency is the
+  template convention, checked against the official manual's `palt`/`sspr` API.
+
+See [device captures, portable tests and runtime physics checks](../../docs/design/android-hero-06/README.md).
 
 Parameters are drafts until confirmation; switching tools cannot silently
 discard an active draft. Writes use AtomicFile and update the in-memory model

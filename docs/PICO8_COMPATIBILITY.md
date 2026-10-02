@@ -78,6 +78,15 @@ step and exclusion of shared-map rows are temporary editing scope. The selected
 rectangle is a view of ordinary pixels, not a custom cartridge resource format.
 See [implementation and observed runtime evidence](design/android-regions-05/README.md).
 
+The 0.0.7 owned-template hero binding stores source rectangle, drawing offset
+and rectangular body dimensions as ordinary Lua variables. `sspr` reads the
+selected pixels; ordinary platformer code handles collisions. PICO-8 does not
+gain a custom physics/resource API. Deriving an initial box from nonzero pixels
+is a workshop convenience for the template's default palette, not a console
+rule or pixel-perfect collision promise. The box stays fixed during subsequent
+drawing edits until explicitly reassigned. Changed owned movement functions are
+refused by the binding adapter rather than rewritten speculatively.
+
 An operation may remain unsupported while the editor grows. Label that as a
 PIKOOS editing limitation, preserve the cartridge and avoid destructive fallback
 or conversion. Lack of editor support alone does not make a valid cart

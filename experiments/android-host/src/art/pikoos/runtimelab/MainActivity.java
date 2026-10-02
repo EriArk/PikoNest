@@ -147,11 +147,11 @@ public final class MainActivity extends Activity {
             .putInt("regionX",session.selection().x).putInt("regionY",session.selection().y)
             .putInt("regionWidth",session.selection().width).putInt("regionHeight",session.selection().height)
             .putBoolean("browsingSprites",session.browsingSprites)
-            .putString("mode",session.mode==Mode.CANVAS||session.pendingLine()?"CANVAS":session.mode==Mode.VALUE?"VALUE":"NAVIGATE").apply();
+            .putString("mode",session.heroDraft!=null?"HERO":session.mode==Mode.CANVAS||session.pendingLine()?"CANVAS":session.mode==Mode.VALUE?"VALUE":"NAVIGATE").apply();
     }
     private int bounded(String key,int fallback,int max){return Math.max(0,Math.min(max,prefs.getInt(key,fallback)));}
     private void restoreUi(){
-        session.tool=bounded("tool",0,2);session.focus=bounded("focus",0,session.tool==2?5:4);
+        session.tool=bounded("tool",0,2);
         session.codeLine=bounded("line",session.cart().line(0),session.cart().code().split("\n",-1).length-1);
         session.color=bounded("color",14,15);
         try{session.drawTool=DrawTool.valueOf(prefs.getString("drawTool",prefs.getBoolean("eraser",false)?"ERASER":"BRUSH"));}
@@ -170,6 +170,7 @@ public final class MainActivity extends Activity {
             }catch(IllegalArgumentException ignored){/* Invalid optional view state cannot damage a cartridge. */}
         }
         session.cursorX=bounded("x",7,session.selection().width-1);session.cursorY=bounded("y",7,session.selection().height-1);
+        session.focus=bounded("focus",0,session.maxFocus());
         session.zoom=prefs.getBoolean("zoom",false);
         if(session.tool==2){
             if(session.browsingSprites)session.mode=Mode.SHEET;
@@ -180,6 +181,7 @@ public final class MainActivity extends Activity {
         if(session.tool!=2&&prefs.getString("mode","").equals("VALUE")){
             session.mode=Mode.VALUE;session.field=bounded("field",0,1);session.draft=Math.max(1,bounded("draft",2,4));
         }
+        if(session.tool==2&&prefs.getString("mode","").equals("HERO"))session.previewHero();
     }
     private void immersive(){
         if(Build.VERSION.SDK_INT>=30){

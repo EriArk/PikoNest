@@ -7,7 +7,7 @@ import java.util.Arrays;
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER }
     public interface Port {
         void save(byte[] bytes) throws Exception;
@@ -27,6 +27,8 @@ public final class WorkshopSession {
     public DrawTool pickerReturn=DrawTool.BRUSH;
     public int drawToolCursor, lineX=-1, lineY=-1;
     public SpriteRegion region;
+    public HeroBinding heroDraft;
+    private Mode heroReturn=Mode.NAVIGATE;
     public boolean zoom, choosingEnd;
     public int regionX,regionY,anchorX,anchorY;
     private Mode regionReturn=Mode.SHEET;
@@ -36,6 +38,7 @@ public final class WorkshopSession {
     public WorkshopSession(WorkshopCartridge cart, Port port) { this.cart = cart; this.port = port; }
     public WorkshopCartridge cart() { return cart; }
     public boolean canUndo() { return !undo.isEmpty(); }
+    public int maxFocus(){return tool==2?(region==null?5:6):4;}
     public boolean pendingLine(){return drawTool==DrawTool.LINE&&lineX>=0&&lineY>=0;}
     public SpriteRegion selection(){return region==null?new SpriteRegion(spriteSlot*16,0,16,16):region;}
     public WorkshopCartridge canvasPreview(){return pendingLine()?cart.withLine(selection(),lineX,lineY,cursorX,cursorY,color):cart;}
@@ -64,7 +67,7 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = mode==Mode.HERO?Mode.HERO:pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
         if(pendingLine())return;
@@ -75,7 +78,7 @@ public final class WorkshopSession {
     }
     public void select(int target) {
         if (mode != Mode.NAVIGATE) return;
-        focus = clamp(target, tool==2?5:4); act(Action.CONFIRM);
+        focus = clamp(target, maxFocus()); act(Action.CONFIRM);
     }
     public void openSprite(int slot) {
         if(pendingLine())return;
@@ -90,9 +93,27 @@ public final class WorkshopSession {
         if (sheetFocus < 8) spriteSlot = sheetFocus;
         act(Action.CONFIRM);
     }
+    public void openHero(){
+        if(pendingLine())return;
+        HeroBinding h=cart.hero();
+        if(h.image.sharesMap()){notice="Редактор общей области с картой ещё не готов";return;}
+        if(h.card()>=0){openSprite(h.card());return;}
+        region=h.image;cursorX=cursorY=0;browsingSprites=false;tool=2;focus=0;zoom=false;mode=Mode.NAVIGATE;
+    }
     private void showSheet() { browsingSprites = true; sheetFocus = spriteSlot; region=null;cursorX=clamp(cursorX,15);cursorY=clamp(cursorY,15);mode = Mode.SHEET; }
+    /** Read-only even if optional UI preferences outlive a restored/older cartridge. */
+    public void previewHero(){
+        if(tool!=2||(mode!=Mode.NAVIGATE&&mode!=Mode.CANVAS&&mode!=Mode.SHEET))return;
+        try{
+            if(cart.empty(selection())){notice="Сначала нарисуй хотя бы один пиксель";return;}
+            HeroBinding candidate=cart.proposeHero(selection());
+            heroDraft=candidate;heroReturn=mode;mode=Mode.HERO;
+        }catch(Exception e){fail(e);}
+    }
     private void assignHero() throws Exception {
-        if(region!=null){notice="Привязка героя пока доступна в карточках 16 × 16";return;}
+        if(region!=null||!cart.legacyHero()){
+            previewHero();return;
+        }
         if (cart.empty(spriteSlot)) { notice = "Сначала нарисуй хотя бы один пиксель"; return; }
         save(cart.withHero(spriteSlot), true);
         notice = "Герой: рисунок " + (spriteSlot + 1);
@@ -144,6 +165,14 @@ public final class WorkshopSession {
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if(mode==Mode.HERO){
+                if(action==Action.CANCEL){mode=heroReturn;heroDraft=null;notice="Без изменений";}
+                if(action==Action.CONFIRM||action==Action.TEST){
+                    save(cart.withHero(heroDraft),true);mode=heroReturn;heroDraft=null;notice="Рисунок и столкновения героя сохранены";
+                    if(action==Action.TEST)port.launch(cart.bytes());
+                }
+                return;
+            }
             if(mode==Mode.REGION){
                 if(action==Action.LEFT)regionX=clamp(regionX-1,15);
                 if(action==Action.RIGHT)regionX=clamp(regionX+1,15);
@@ -284,12 +313,12 @@ public final class WorkshopSession {
                 }
                 return;
             }
-            if (action == Action.UP || action == Action.LEFT) focus = clamp(focus - 1, tool==2?5:4);
-            if (action == Action.DOWN || action == Action.RIGHT) focus = clamp(focus + 1, tool==2?5:4);
+            if (action == Action.UP || action == Action.LEFT) focus = clamp(focus - 1, maxFocus());
+            if (action == Action.DOWN || action == Action.RIGHT) focus = clamp(focus + 1, maxFocus());
             if (action == Action.CONFIRM) {
                 if (tool == 0) {
                     if (focus < 2) edit(focus);
-                    if (focus == 2) { toolFocus[0] = focus; openSprite(cart.heroSlot()); }
+                    if (focus == 2) { toolFocus[0] = focus; openHero(); }
                     else if (focus == 3) { switchTool(1); codeLine = cart.line(0); }
                     else if (focus == 4) { overlayReturn = mode; field = 0; mode = Mode.HELP; }
                 } else {
@@ -299,6 +328,7 @@ public final class WorkshopSession {
                     if (focus == 3) showSheet();
                     if (focus == 4) { if(region!=null)chooseRegion();else assignHero(); }
                     if (focus == 5) act(Action.ZOOM);
+                    if (focus == 6) assignHero();
                 }
             }
         } catch (Exception e) { fail(e); }

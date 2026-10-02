@@ -71,6 +71,7 @@ public final class RegionWorkflowTest {
         check(s.cart().pixel(s.selection(),31,23)==12&&!s.pendingLine(),"touch endpoints beyond 16 pixels are retained");
         int writes=p.writes;s.act(Action.ASSIGN_HERO);s.act(Action.COPY_SPRITE);
         check(p.writes==writes&&s.cart().heroSlot()==0,"region editing cannot silently rebind hero or copy a different region");
+        check(s.mode==Mode.HERO,"assignment offers a preview without changing bytes");s.act(Action.CANCEL);
         s.act(Action.CANCEL);for(int i=0;i<5;i++)s.act(Action.DOWN);s.act(Action.CONFIRM);
         check(s.zoom,"zoom reachable with D-pad and confirm");
         s.act(Action.REGION);s.act(Action.CONFIRM);s.act(Action.RIGHT);s.act(Action.CANCEL);s.act(Action.CANCEL);
