@@ -124,6 +124,15 @@ Responsibilities:
 - metadata/cache;
 - relationship between an original cart and local remixes/projects.
 
+### `core/assets`
+
+The separate proposed `core/assets` module owns reusable asset snapshots,
+dependencies, provenance, revisions and insertion plans across projects/carts.
+The application owns save/extract/preview/insert/update workflows and transactions;
+storage adapters persist the library. Keep this distinct from `core/library`'s
+cartridge catalogue. See [asset requirements](ASSET_LIBRARY.md). Exact package
+formats and revision/update implementation are TBD.
+
 ### `core/compatibility`
 
 Responsibilities:
@@ -246,13 +255,22 @@ Additional abstractions should exist where platform differences are expected.
 StorageProvider
   appDataRoot()
   projectsRoot()
-  cartsRoot()
+  gameSourceRoots()
+  sploreDownloadsRoot()
+  userDataRoot() // persistent asset library and metadata
   runtimeRoot()
   importFile(...)
   exportFile(...)
 ```
 
 Android scoped storage and Linux filesystem access are different; core logic should not know the details.
+
+These roots are logical storage handles, not necessarily native filesystem paths.
+The platform/runtime adapter resolves runtime-visible paths and any required
+working-copy synchronization. Persistent user data is separate from disposable
+caches and executable/runtime storage. First-run setup and settings use the same
+workflow to select/reconnect roots, validate access and prepare a runtime.
+See [first-run requirements and unresolved Splore mapping](FIRST_RUN_SETUP.md).
 
 ### Input
 

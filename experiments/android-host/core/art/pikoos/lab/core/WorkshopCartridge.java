@@ -119,7 +119,7 @@ public final class WorkshopCartridge {
         checkSlot(source); checkSlot(destination);
         if (source == destination || hero().overlaps(legacyRegion(destination)) || !empty(destination))
             throw new IllegalArgumentException("Copy destination is occupied");
-        if (empty(source)) throw new IllegalArgumentException("Нечего копировать: рисунок пустой");
+        if (empty(source)) throw new IllegalArgumentException("Нечего копировать: спрайт пустой");
         byte[] changed = pixels.clone();
         for (int y = 0; y < 16; y++)
             System.arraycopy(pixels, rows[y] + source * 16, changed, rows[y] + destination * 16, 16);

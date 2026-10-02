@@ -23,6 +23,8 @@ A beginner should be able to make something move almost immediately, then gradua
 ## What PIKOOS aims to include
 
 - Cartridge library and launcher
+- Reusable asset library across projects and chapters
+- First-run folder selection and automatic preparation of the user's runtime
 - Import of the user's official PICO-8 runtime
 - Source viewing and remixing
 - Handheld-friendly code, sprite, map, SFX and music tools
@@ -71,11 +73,18 @@ my-game/
 - [`docs/PRODUCT_VISION.md`](docs/PRODUCT_VISION.md) — product and UX vision
 - [`docs/PICO8_LEARNING_RESOURCES.md`](docs/PICO8_LEARNING_RESOURCES.md) — PICO-8 reference, guide requirements and source catalogue
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — technical boundaries and proposed architecture
+- [`docs/ASSET_LIBRARY.md`](docs/ASSET_LIBRARY.md) — reusable sprites, backgrounds, SFX and music
+- [`docs/FIRST_RUN_SETUP.md`](docs/FIRST_RUN_SETUP.md) — folders, archive choice and automatic runtime preparation
 - [`docs/PICO8_COMPATIBILITY.md`](docs/PICO8_COMPATIBILITY.md) — compatibility invariants
 - [`docs/ONLINE_CARTRIDGES.md`](docs/ONLINE_CARTRIDGES.md) — personalized online-cart concept
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — staged implementation plan
 
 ## Status
+
+Android 0.0.8 uses precise sprite terminology in the existing editor; see
+[device capture](docs/design/android-terminology-07/README.md). The reusable asset
+library and first-run folder/runtime wizard are accepted requirements for future
+implementation, described in the documents above.
 
 The owner accepted the [PICO-8-style visual baseline](docs/UX_DIRECTION.md)
 after rejecting the original Android form, and authorized its implementation

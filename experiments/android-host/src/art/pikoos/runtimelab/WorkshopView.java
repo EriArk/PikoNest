@@ -37,7 +37,7 @@ final class WorkshopView extends View {
     private RectF spriteArea;
     private int viewX,viewY,viewWidth,viewHeight;
     private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка"};
-    private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из рисунка","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из рисунка"};
+    private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из спрайта","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из спрайта"};
     private static final class Hit {
         final RectF rect; final Runnable action;
         Hit(float x,float y,float w,float h,Runnable action) { rect=new RectF(x,y,x+w,y+h); this.action=action; }
@@ -234,7 +234,7 @@ final class WorkshopView extends View {
         float size=Math.min(256,Math.min((w-56)*.46f,bodyBottom-232));size=Math.max(128,((int)size/16)*16);
         float x=16,y=180,right=size+32,rw=w-right-16;
         SpriteRegion region=s.selection();
-        text((s.cart().hero().sameImage(region)?"ГЕРОЙ":s.region==null?"РИСУНОК "+(s.spriteSlot+1):"ОБЛАСТЬ")+" / "+region.width+" × "+region.height,16,169,18,14);
+        text((s.cart().hero().sameImage(region)?"ГЕРОЙ":s.region==null?"СПРАЙТ "+(s.spriteSlot+1):"ОБЛАСТЬ")+" / "+region.width+" × "+region.height,16,169,18,14);
         viewWidth=s.zoom?Math.min(16,region.width):region.width;viewHeight=s.zoom?Math.min(16,region.height):region.height;
         viewX=s.zoom?Math.max(0,Math.min(region.width-viewWidth,s.cursorX-viewWidth/2)):0;
         viewY=s.zoom?Math.max(0,Math.min(region.height-viewHeight,s.cursorY-viewHeight/2)):0;
@@ -256,7 +256,7 @@ final class WorkshopView extends View {
             float cx=x+(s.cursorX-viewX)*cell,cy=y+(s.cursorY-viewY)*cell;
             outline(cx-1,cy-1,cell+2,cell+2,0);outline(cx,cy,cell,cell,7);
         }
-        fitted(s.pendingLine()?"Линия: "+ok()+" готово · "+back()+" отмена":s.mode==Mode.CANVAS?DRAW_NAMES[s.drawTool.ordinal()]+" · "+s.cursorX+", "+s.cursorY:ok()+": войти в рисунок",16,180+size+24,16,s.pendingLine()?10:6,size);
+        fitted(s.pendingLine()?"Линия: "+ok()+" готово · "+back()+" отмена":s.mode==Mode.CANVAS?DRAW_NAMES[s.drawTool.ordinal()]+" · "+s.cursorX+", "+s.cursorY:ok()+": войти в спрайт",16,180+size+24,16,s.pendingLine()?10:6,size);
         if(180+size+48<bodyBottom)fitted(s.zoom?"Крупно · окно следует за курсором":s.pendingLine()?"Начало: "+s.lineX+", "+s.lineY:"X цвет · Y отмена",16,180+size+48,16,6,size);
         text("ИНСТРУМЕНТЫ",right,169,18,14);
         button(DRAW_NAMES[s.drawTool.ordinal()]+"  >",right,180,rw,44,s.mode==Mode.NAVIGATE&&s.focus==1,()->action(Action.DRAW_TOOLS));
@@ -273,14 +273,14 @@ final class WorkshopView extends View {
         float by=246+step*4;
         button("Лист",right,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==3,()->action(Action.SPRITE_SHEET));
         button(s.region==null?"Герою":"Рамка",right+(rw+8)/2,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==4,()->action(s.region==null?Action.ASSIGN_HERO:Action.REGION));
-        if(s.region==null)button(s.zoom?"Весь рисунок":"Приблизить",right,by+52,rw,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
+        if(s.region==null)button(s.zoom?"Весь спрайт":"Приблизить",right,by+52,rw,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
         else{
             button(s.zoom?"Целиком":"Крупно",right,by+52,(rw-8)/2,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
             button("Герою",right+(rw+8)/2,by+52,(rw-8)/2,40,s.mode==Mode.NAVIGATE&&s.focus==6,()->action(Action.ASSIGN_HERO));
         }
     }
     private void spriteSheet() {
-        text("РИСУНКИ ПРОЕКТА",16,169,18,14);
+        text("СПРАЙТЫ ПРОЕКТА",16,169,18,14);
         if(w>=500)text("16 × 16 · X копия",w-186,169,16,6);
         float gap=10,cw=(w-32-gap*3)/4;
         float ch=Math.min(112,(bodyBottom-180-104-gap)/2);
@@ -292,7 +292,7 @@ final class WorkshopView extends View {
             if(s.cart().empty(i))text("+",x+cw/2-8,y+ch/2+1,28,13);
             else sprite(i,x+(cw-size)/2,y+8,size,false);
             if(part){rect(x+cw-14,y+6,8,8,14);}
-            String label=used?"Герой":part?"Часть героя":s.cart().empty(i)?"Пусто":"Рисунок "+(i+1);
+            String label=used?"Герой":part?"Часть героя":s.cart().empty(i)?"Пусто":"Спрайт "+(i+1);
             fitted(label,x+8,y+ch-10,16,chosen?10:used?14:6,cw-16);
             hit(x,y,cw,ch,()->{s.selectSheet(slot);changed.run();invalidate();});
         }
@@ -332,8 +332,8 @@ final class WorkshopView extends View {
         rect(dx+6,dy+6,dw,dh,0);rect(dx,dy,dw,dh,1);outline(dx,dy,dw,dh,s.mode==Mode.ERROR?8:14);
         if(s.mode==Mode.HERO){
             HeroBinding hero=s.heroDraft;SpriteRegion r=hero.image;
-            text("Новый рисунок героя",dx+20,dy+36,26,14);
-            text("Рисунок "+r.width+" × "+r.height+" · тело "+hero.width+" × "+hero.height,dx+20,dy+67,18,7);
+            text("Новый спрайт героя",dx+20,dy+36,26,14);
+            text("Спрайт "+r.width+" × "+r.height+" · тело "+hero.width+" × "+hero.height,dx+20,dy+67,18,7);
             rect(dx+16,dy+82,dw-32,146,0);
             float cell=Math.max(1,(int)Math.min((dw-64)/r.width,128f/r.height));
             float sx=dx+(dw-r.width*cell)/2,sy=dy+88+(128-r.height*cell)/2;
@@ -343,7 +343,7 @@ final class WorkshopView extends View {
             outline(sx+hero.left*cell,sy+hero.top*cell,hero.width*cell,hero.height*cell,10);
             fitted("Жёлтая рамка — столкновения.",dx+20,dy+256,18,10,dw-40);
             fitted("Пустые поля не держат героя над землёй.",dx+20,dy+282,18,7,dw-40);
-            fitted("Рамка обновится при назначении рисунка.",dx+20,dy+308,16,6,dw-40);
+            fitted("Рамка обновится при назначении спрайта.",dx+20,dy+308,16,6,dw-40);
             button(ok()+" Назначить",dx+16,dy+336,(dw-44)/2,48,true,()->action(Action.CONFIRM));
             button(back()+" Отмена",dx+28+(dw-44)/2,dy+336,(dw-44)/2,48,false,()->action(Action.CANCEL));
         }else if(s.mode==Mode.DRAW_TOOLS){
@@ -362,12 +362,12 @@ final class WorkshopView extends View {
             text("SELECT: меню · L/R: инструменты",dx+20,dy+356,16,6);
         } else if(s.mode==Mode.HELP) {
             if(s.tool==2){
-                text("Рисунки и герой",dx+20,dy+40,26,14);
-                text("Рисунок можно открыть и изменить.",dx+20,dy+80,20,7);
+                text("Спрайты и герой",dx+20,dy+40,26,14);
+                text("Спрайт можно открыть и изменить.",dx+20,dy+80,20,7);
                 text("Метка «Герой» показывает, какой",dx+20,dy+108,20,7);
                 text("из них сейчас используется в игре.",dx+20,dy+136,20,7);
-                text("Копия сохраняет исходный рисунок.",dx+20,dy+177,18,6);
-                button(ok()+" К рисункам",dx+16,dy+210,(dw-44)/2,48,true,()->action(Action.CONFIRM));
+                text("Копия сохраняет исходный спрайт.",dx+20,dy+177,18,6);
+                button(ok()+" К спрайтам",dx+16,dy+210,(dw-44)/2,48,true,()->action(Action.CONFIRM));
                 button(back()+" Назад",dx+28+(dw-44)/2,dy+210,(dw-44)/2,48,false,()->action(Action.CANCEL));
                 return;
             }

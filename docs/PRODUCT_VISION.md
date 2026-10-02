@@ -1,5 +1,12 @@
 # PIKOOS Product Vision
 
+Owner additions: a persistent [asset library](ASSET_LIBRARY.md) for user-created
+and extracted sprites, backgrounds, SFX and music reusable across projects and
+chapters; a [first-run wizard](FIRST_RUN_SETUP.md) for folders and automatic setup
+of the user's official runtime. Use precise resource names in the interface.
+These are accepted needs; detailed workflows remain proposed until implemented
+and checked with the owner.
+
 ## 1. Product idea
 
 PIKOOS is a handheld-first environment for the full PICO-8 creative loop:

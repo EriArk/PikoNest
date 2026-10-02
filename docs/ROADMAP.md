@@ -8,6 +8,20 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
+## Added owner requirements: setup and reusable assets
+
+- Phase 0.1 must include the [first-run wizard](FIRST_RUN_SETUP.md): existing
+  game folders, Splore download destination, own projects, persistent library/data,
+  backend-specific archive guidance and automatic preparation of the user's runtime.
+  Prove storage permissions and real Splore download/offline behavior before
+  calling this complete; the external-wrapper POC alone does not satisfy it.
+- Phase 0.2 starts the [asset library](ASSET_LIBRARY.md) with saving and inserting
+  sprites across projects, dependency-aware placement, preview and undo. Extend
+  extraction, animation/tile sets, SFX and music as their editors/parsers become
+  available. `.p8.png` decoding is a prerequisite for extracting Splore cart assets.
+- Use precise resource names throughout UI and documentation. The setup wizard
+  and asset library remain requirements, not implemented Android 0.0.7 features.
+
 ---
 
 # Phase 0 — Foundations / proofs

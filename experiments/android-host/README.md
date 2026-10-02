@@ -1,5 +1,11 @@
 # PIKOOS Android host experiment
 
+Version 0.0.8 aligns resource names with PICO-8: sprite labels replace generic
+"drawing" labels in the existing editor. See [device capture and checks](../../docs/design/android-terminology-07/README.md).
+The [cross-project asset library](../../docs/ASSET_LIBRARY.md) and
+[first-run setup wizard](../../docs/FIRST_RUN_SETUP.md) are documented requirements,
+not implemented features of this experiment.
+
 An isolated 0.0A/0.0C/0.0D proof: a controller-operated workshop using the
 owner-approved PICO-8 visual baseline. Edit speed/jump or the hero's sprite in
 a real `.p8`, select/create/copy a sprite and explicitly assign it to the hero,
@@ -176,7 +182,7 @@ remain future work. [Device captures and checks](../../docs/design/android-drawi
   rows. Omitted trailing rows read as zero and are added only when a nonzero
   pixel needs them. Original row bytes, line endings and other sections survive.
 - **Приблизить** shows up to 16×16 pixels; the viewport follows the cursor.
-  **Весь рисунок** fits the complete rectangle without changing its aspect ratio.
+  **Весь спрайт** fits the complete rectangle without changing its aspect ratio.
   Both are reachable in normal D-pad tool navigation. **Рамка** selects another
   rectangle; **Лист** returns to the eight existing shortcuts. Region, cursor,
   zoom and a pending line survive process recreation as optional UI preferences.

@@ -356,6 +356,22 @@ The exact framework/language for the app has not been frozen by this document. D
 
 ## 14. Documentation discipline
 
+### Asset library, first-run setup and terminology
+
+Owner requirements: reusable user-created and extracted cartridge assets belong
+in a persistent cross-project library; first-run setup chooses existing games,
+Splore downloads, own projects and library/data locations, then imports and
+automatically prepares the user's correct official PICO-8 archive.
+See `docs/ASSET_LIBRARY.md` and `docs/FIRST_RUN_SETUP.md` for scope, dependencies,
+storage ownership, backend-specific archive guidance and acceptance gates.
+These are required product workflows, not completed features of the runtime lab.
+
+Use accurate user-facing names: sprite, animation frame, tile, map, background,
+SFX and music. Do not call every visual resource a generic "drawing". Background
+describes a role; retain its actual sprite/map/layer representation underneath.
+Library insertion must materialize ordinary PICO-8 data/code in the target cart;
+standard carts must not require the external PIKOOS asset library at runtime.
+
 When a major decision is made:
 
 - update the relevant file in `docs/`;

@@ -116,17 +116,17 @@ public final class WorkshopSession {
         }
         if (cart.empty(spriteSlot)) { notice = "Сначала нарисуй хотя бы один пиксель"; return; }
         save(cart.withHero(spriteSlot), true);
-        notice = "Герой: рисунок " + (spriteSlot + 1);
+        notice = "Герой: спрайт " + (spriteSlot + 1);
     }
     private void createSprite(boolean copy) throws Exception {
-        if(region!=null&&!browsingSprites){notice="Новый рисунок и копия пока доступны в карточках";return;}
-        if (copy && cart.empty(spriteSlot)) { notice = "Пустой рисунок: пока нечего копировать"; return; }
+        if(region!=null&&!browsingSprites){notice="Новый спрайт и копия пока доступны в карточках";return;}
+        if (copy && cart.empty(spriteSlot)) { notice = "Пустой спрайт: пока нечего копировать"; return; }
         int destination = cart.firstFreeSlot();
         if (destination < 0) { notice = "Лист заполнен — свободных ячеек нет"; return; }
         if (copy) save(cart.copySprite(spriteSlot, destination), true);
         openSprite(destination);
         mode = Mode.CANVAS;
-        notice = copy ? "Копия готова. Оригинал сохранён" : "Новый рисунок: выбери цвет и рисуй";
+        notice = copy ? "Копия готова. Оригинал сохранён" : "Новый спрайт: выбери цвет и рисуй";
     }
     public void selectCodeLine(int line) {
         if (mode != Mode.NAVIGATE) return;
@@ -168,7 +168,7 @@ public final class WorkshopSession {
             if(mode==Mode.HERO){
                 if(action==Action.CANCEL){mode=heroReturn;heroDraft=null;notice="Без изменений";}
                 if(action==Action.CONFIRM||action==Action.TEST){
-                    save(cart.withHero(heroDraft),true);mode=heroReturn;heroDraft=null;notice="Рисунок и столкновения героя сохранены";
+                    save(cart.withHero(heroDraft),true);mode=heroReturn;heroDraft=null;notice="Спрайт и столкновения героя сохранены";
                     if(action==Action.TEST)port.launch(cart.bytes());
                 }
                 return;
