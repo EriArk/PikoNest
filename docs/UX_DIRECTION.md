@@ -284,6 +284,7 @@ UI не ограничен framebuffer 128 × 128. Эти 128 пикселей �
 
 ## 11. Материалы
 
+- [Справка и практические руководства PICO-8: требования и источники](PICO8_LEARNING_RESOURCES.md)
 - [Кликабельное исследование](../experiments/ux-study/index.html)
 - [Запуск, ограничения и происхождение ассетов](../experiments/ux-study/README.md)
 - Снимки предложения: [мастерская](design/ux-study-01/workshop.png),

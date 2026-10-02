@@ -239,8 +239,16 @@ Features:
 - tiny optional challenges;
 - concept tracking;
 - simple Skill Book;
+- contextual and independently browsable PICO-8 API reference;
+- optional task-based guides, from a first game to animation, maps and sound;
+- controller-first reading and return to the original editor context;
 - friendly translation of a small set of common errors;
 - raw technical error always available.
+
+Reference and guide requirements, offline direction, version checks and the
+initial source catalogue are recorded in
+[PICO-8 learning resources](PICO8_LEARNING_RESOURCES.md). These are planned
+capabilities; the current workshop does not yet provide this library.
 
 ### Definition of done
 

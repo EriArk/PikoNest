@@ -69,6 +69,7 @@ my-game/
 
 - [`AGENTS.md`](AGENTS.md) — rules and context for Codex/AI contributors
 - [`docs/PRODUCT_VISION.md`](docs/PRODUCT_VISION.md) — product and UX vision
+- [`docs/PICO8_LEARNING_RESOURCES.md`](docs/PICO8_LEARNING_RESOURCES.md) — PICO-8 reference, guide requirements and source catalogue
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — technical boundaries and proposed architecture
 - [`docs/PICO8_COMPATIBILITY.md`](docs/PICO8_COMPATIBILITY.md) — compatibility invariants
 - [`docs/ONLINE_CARTRIDGES.md`](docs/ONLINE_CARTRIDGES.md) — personalized online-cart concept

@@ -369,6 +369,13 @@ The mechanic library therefore acts as:
 
 ## 15. Real code remains visible
 
+Learning also includes a browsable PICO-8 reference and optional task-based
+guides, available both from the current editor context and independently.
+Controller navigation, readable explanations, version-aware examples and a
+return to the same working context are required. See
+[PICO-8 learning resources](PICO8_LEARNING_RESOURCES.md) for the owner-requested
+direction, initial sources and future acceptance scenario.
+
 PIKOOS should never trap users inside generated blocks.
 
 If a mechanic generates:
