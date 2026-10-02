@@ -165,6 +165,12 @@ across all current project types, with replacement preview, cancel and undo.
 This does not complete cross-cart asset reuse, map/audio/effects tools or general
 Lua editing. See [device evidence](design/android-copy-09/README.md).
 
+Android 0.0.11 adds sprite-only cross-project reuse through a shared asset library:
+extract a selected region, preview/save an independent record, select in another
+project, place/preview/insert, undo and test. Storage is app-private pending the
+folder wizard; other asset types and arbitrary external cart import are not done.
+See [asset-library evidence](design/android-assets-10/README.md).
+
 ### Base requirement: creation without a hero
 
 Owner clarification (2026-10-03): genre templates are later work, but the shared

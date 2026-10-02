@@ -397,7 +397,10 @@ Splore downloads, own projects and library/data locations, then imports and
 automatically prepares the user's correct official PICO-8 archive.
 See `docs/ASSET_LIBRARY.md` and `docs/FIRST_RUN_SETUP.md` for scope, dependencies,
 storage ownership, backend-specific archive guidance and acceptance gates.
-These are required product workflows, not completed features of the runtime lab.
+These are required product workflows. Android lab 0.0.11 implements a bounded
+sprite-only cross-project library with independent pixels and explicit insertion.
+Other asset types, arbitrary cart import and first-run folder/runtime setup remain
+unfinished. App-private experimental storage is not the final user-folder model.
 
 Use accurate user-facing names: sprite, animation frame, tile, map, background,
 SFX and music. Do not call every visual resource a generic "drawing". Background

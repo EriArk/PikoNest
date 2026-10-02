@@ -23,6 +23,7 @@ public final class WorkshopCartridge {
     public byte[] bytes() { return document.bytes(); }
     public int pixel(SpriteRegion region,int x,int y){return graphics.pixel(region,x,y);}
     public int sheetPixel(int x,int y){return graphics.pixel(x,y);}
+    public WorkshopCartridge insert(SpriteAsset asset,SpriteRegion target){return edited(graphics.insert(asset,target));}
     private WorkshopCartridge edited(P8Document next){return next==document?this:new WorkshopCartridge(next.bytes());}
     public WorkshopCartridge withPixel(SpriteRegion r,int x,int y,int color){return edited(graphics.withPixel(r,x,y,color));}
     public WorkshopCartridge withFill(SpriteRegion r,int x,int y,int color){return edited(graphics.withFill(r,x,y,color));}

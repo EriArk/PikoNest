@@ -6,13 +6,16 @@ import java.util.Arrays;
 /** Portable interaction state. Input devices and Android persistence remain outside. */
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, CONTEXT, MENU,
-        SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM }
+        SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER }
     public interface Port {
         void save(byte[] bytes) throws Exception;
         void launch(byte[] bytes) throws Exception;
         default void library() throws Exception {}
+        default java.util.List<SpriteAsset> assets()throws Exception{return java.util.Collections.emptyList();}
+        default void storeAsset(SpriteAsset asset)throws Exception{throw new Exception("Хранилище ресурсов не подключено");}
+        default String projectOrigin(){return "Проект";}
     }
     private final Port port;
     private final ArrayDeque<WorkshopCartridge> undo = new ArrayDeque<>();
@@ -35,9 +38,39 @@ public final class WorkshopSession {
     public SpriteRegion copySource;
     public int copyX,copyY;
     private Mode copyReturn=Mode.SHEET;
+    private Mode assetsReturn=Mode.NAVIGATE;
+    private final java.util.ArrayList<SpriteAsset> assets=new java.util.ArrayList<>();
+    public int assetIndex;
+    public SpriteAsset assetDraft,copyAsset;
+    public java.util.List<SpriteAsset> assets(){return java.util.Collections.unmodifiableList(assets);}
+    public SpriteAsset currentAsset(){return assets.isEmpty()?null:assets.get(clamp(assetIndex,assets.size()-1));}
+    public String assetsReturnMode(){return assetsReturn.name();}
+    private void showAssets()throws Exception{
+        assetsReturn=mode;mode=Mode.ASSETS;
+        java.util.List<SpriteAsset> loaded=port.assets();assets.clear();assets.addAll(loaded);assetIndex=clamp(assetIndex,assets.size()-1);
+    }
+    public void selectAsset(int index){if(mode!=Mode.ASSETS)return;assetIndex=clamp(index,assets.size()-1);act(Action.CONFIRM);}
+    public void restoreAssets(String returnMode,int index)throws Exception{
+        Mode origin;
+        try{origin=Mode.valueOf(returnMode);}catch(IllegalArgumentException e){return;}
+        if(origin!=Mode.SHEET&&origin!=Mode.NAVIGATE&&origin!=Mode.CANVAS)return;
+        mode=origin;showAssets();assetIndex=clamp(index,assets.size()-1);
+    }
+    public void restoreInsertion(SpriteAsset asset,int x,int y){
+        if(mode!=Mode.ASSETS||asset.height>64||asset.width%8!=0||asset.height%8!=0
+            ||x<0||y<0||x%8!=0||y%8!=0||x+asset.width>128||y+asset.height>64)return;
+        copyAsset=asset;copySource=new SpriteRegion(0,0,asset.width,asset.height);
+        copyX=x;copyY=y;copyReturn=Mode.ASSETS;mode=Mode.COPY_PLACE;
+    }
+    private void beginInsertion(SpriteAsset asset){
+        if(asset.height>64||asset.width%8!=0||asset.height%8!=0){notice="Размещение этого размера пока не поддерживается";return;}
+        copyAsset=asset;copySource=new SpriteRegion(0,0,asset.width,asset.height);copyReturn=Mode.ASSETS;
+        suggestCopyPlace();
+    }
     public boolean copying(){return copySource!=null;}
     public SpriteRegion copyDestination(){return new SpriteRegion(copyX,copyY,copySource.width,copySource.height);}
     public boolean copyOverlaps(){
+        if(copyAsset!=null)return false;
         SpriteRegion a=copySource,b=copyDestination();
         return a.x<b.x+b.width&&b.x<a.x+a.width&&a.y<b.y+b.height&&b.y<a.y+a.height;
     }
@@ -45,6 +78,9 @@ public final class WorkshopSession {
         if(selection().sharesMap()){notice="Редактор общей области с картой ещё не готов";return;}
         if(cart.empty(selection())){notice="Пустая область: пока нечего копировать";return;}
         copySource=selection();copyReturn=mode;copyX=copySource.x;copyY=copySource.y;
+        suggestCopyPlace();
+    }
+    private void suggestCopyPlace(){
         // Suggest a visually empty destination, never assume it is unused by Lua.
         search:for(int y=0;y<=64-copySource.height;y+=8)for(int x=0;x<=128-copySource.width;x+=8){
             copyX=x;copyY=y;if(!copyOverlaps()&&cart.empty(copyDestination()))break search;
@@ -100,7 +136,7 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = mode==Mode.COPY_CONFIRM?mode:mode==Mode.HERO?Mode.HERO:pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
         if(pendingLine())return;
@@ -203,10 +239,34 @@ public final class WorkshopSession {
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if(mode==Mode.ASSET_SAVE){
+                if(action==Action.CANCEL){assetDraft=null;mode=Mode.ASSETS;notice="Сохранение ресурса отменено";}
+                if(action==Action.CONFIRM){
+                    port.storeAsset(assetDraft);
+                    assets.add(assetDraft);assetIndex=assets.size()-1;assetDraft=null;mode=Mode.ASSETS;notice="Спрайт в библиотеке";
+                }
+                return;
+            }
+            if(mode==Mode.ASSETS){
+                if(action==Action.CANCEL){mode=assetsReturn;return;}
+                if(action==Action.LEFT||action==Action.UP)assetIndex=clamp(assetIndex-1,assets.size()-1);
+                if(action==Action.RIGHT||action==Action.DOWN)assetIndex=clamp(assetIndex+1,assets.size()-1);
+                if(action==Action.CONFIRM){
+                    if(currentAsset()!=null)beginInsertion(currentAsset());
+                    else if(tool==2)act(Action.CONTEXT);
+                    else{mode=assetsReturn;switchTool(2);}
+                }
+                if(action==Action.CONTEXT){
+                    if(tool!=2){notice="Сначала выбери спрайт во вкладке «Спрайты»";return;}
+                    if(cart.empty(selection())){notice="В выделении пока нет пикселей";return;}
+                    assetDraft=SpriteAsset.capture(cart,selection(),"Спрайт "+(assets.size()+1),port.projectOrigin());mode=Mode.ASSET_SAVE;
+                }
+                return;
+            }
             if(mode==Mode.COPY_PLACE||mode==Mode.COPY_CONFIRM){
                 if(action==Action.CANCEL){
                     if(mode==Mode.COPY_CONFIRM)mode=Mode.COPY_PLACE;
-                    else{mode=copyReturn;copySource=null;notice="Копирование отменено";}
+                    else{mode=copyReturn;copySource=null;copyAsset=null;notice="Размещение отменено";}
                     return;
                 }
                 if(mode==Mode.COPY_PLACE){
@@ -217,11 +277,12 @@ public final class WorkshopSession {
                     if(action==Action.CONFIRM&&!copyOverlaps())mode=Mode.COPY_CONFIRM;
                 }else if(action==Action.CONFIRM){
                     SpriteRegion target=copyDestination();
-                    save(cart.copyRegion(copySource,target),true);
-                    copySource=null;
+                    boolean insertion=copyAsset!=null;
+                    save(insertion?cart.insert(copyAsset,target):cart.copyRegion(copySource,target),true);
+                    copySource=null;copyAsset=null;
                     if(target.y==0&&target.width==16&&target.height==16&&target.x%16==0)openSprite(target.x/16);
                     else{region=target;tool=2;focus=0;browsingSprites=false;cursorX=cursorY=0;zoom=false;}
-                    mode=Mode.CANVAS;notice="Копия готова. Исходные пиксели сохранены";
+                    mode=Mode.CANVAS;notice=insertion?"Спрайт вставлен. Можно редактировать":"Копия готова. Исходные пиксели сохранены";
                 }
                 return; // No launch, tab switching, undo or implicit commit during placement.
             }
@@ -274,8 +335,8 @@ public final class WorkshopSession {
                 return;
             }
             if (mode == Mode.MENU) {
-                if (action == Action.UP) menuItem = clamp(menuItem - 1, 4);
-                if (action == Action.DOWN) menuItem = clamp(menuItem + 1, 4);
+                if (action == Action.UP) menuItem = clamp(menuItem - 1, 5);
+                if (action == Action.DOWN) menuItem = clamp(menuItem + 1, 5);
                 if (action == Action.CANCEL || action == Action.MENU) mode = overlayReturn;
                 if (action == Action.CONFIRM) {
                     if (menuItem == 0) { mode = overlayReturn; act(Action.UNDO); }
@@ -283,6 +344,7 @@ public final class WorkshopSession {
                     if (menuItem == 2) mode = Mode.HELP;
                     if (menuItem == 3) mode = overlayReturn;
                     if (menuItem == 4) { mode = overlayReturn; port.library(); }
+                    if (menuItem == 5) { mode = overlayReturn; showAssets(); }
                 }
                 return;
             }
@@ -306,6 +368,7 @@ public final class WorkshopSession {
                 return;
             }
             if (action == Action.MENU) { overlayReturn = mode; mode = Mode.MENU; menuItem = 0; return; }
+            if (action == Action.ASSETS) { showAssets();return; }
             if (action == Action.TEST) { port.launch(cart.bytes()); return; }
             if (action == Action.UNDO) {
                 if (!undo.isEmpty()) { save(undo.peek(), false); undo.pop(); notice = "Изменение отменено"; }

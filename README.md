@@ -83,6 +83,10 @@ my-game/
 
 ## Status
 
+Android 0.0.11 adds a shared sprite library: extract selected pixels, keep an
+independent record, and insert into another project with placement, preview and
+undo. [Device evidence](docs/design/android-assets-10/README.md).
+
 Android 0.0.10 adds sprite/rectangle copying in every project, with explicit
 placement, replacement preview, cancel and exact undo. The product rule requires
 general tools to remain available independently of genre/template.

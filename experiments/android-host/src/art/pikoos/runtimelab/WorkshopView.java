@@ -14,6 +14,7 @@ import art.pikoos.lab.core.WorkshopSession.Action;
 import art.pikoos.lab.core.WorkshopSession.Mode;
 import art.pikoos.lab.core.WorkshopCartridge;
 import art.pikoos.lab.core.SpriteRegion;
+import art.pikoos.lab.core.SpriteAsset;
 import art.pikoos.lab.core.HeroBinding;
 import art.pikoos.lab.core.WorkshopSession.DrawTool;
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine()||s.copying();
+        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine()||s.copying()||s.assetDraft!=null;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -92,11 +93,11 @@ final class WorkshopView extends View {
         }
         rect(0,140,w,4,0);
         c.save();c.clipRect(0,144,w,bodyBottom);
-        if(s.copying()&&s.mode!=Mode.ERROR)copyChooser();else if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
+        if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE)assetLibrary();else if(s.copying()&&s.mode!=Mode.ERROR)copyChooser();else if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
         c.restore();
         footer();
         if(!previousNotice.equals(s.notice)){previousNotice=s.notice;noticeUntil=SystemClock.uptimeMillis()+2200;}
-        if(s.mode==Mode.NAVIGATE||s.mode==Mode.CANVAS||s.mode==Mode.SHEET){
+        if(s.mode==Mode.NAVIGATE||s.mode==Mode.CANVAS||s.mode==Mode.SHEET||s.mode==Mode.ASSETS){
             long remaining=noticeUntil-SystemClock.uptimeMillis();
             if(remaining>0&&!s.notice.equals("Сохранено")){
                 float tw=Math.min(w-32,width(s.notice,18)+28),tx=(w-tw)/2;
@@ -109,8 +110,14 @@ final class WorkshopView extends View {
     }
     private void footer() {
         rect(0,bodyBottom,w,44,0);
+        if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE){
+            key(ok()+(s.mode==Mode.ASSET_SAVE||s.currentAsset()==null&&s.tool==2?" сохранить":s.currentAsset()==null?" спрайты":" вставить"),12,bodyBottom,10,()->action(Action.CONFIRM));
+            key(back()+" назад",w<500?136:200,bodyBottom,6,()->action(Action.CANCEL));
+            if(s.mode==Mode.ASSETS&&s.tool==2)key("X сохранить",w-132,bodyBottom,14,()->action(Action.CONTEXT));
+            return;
+        }
         if(s.copying()&&s.mode!=Mode.ERROR){
-            key(ok()+(s.mode==Mode.COPY_CONFIRM?" копировать":" просмотр"),12,bodyBottom,10,()->action(Action.CONFIRM));
+            key(ok()+(s.mode==Mode.COPY_CONFIRM?(s.copyAsset!=null?" вставить":" копировать"):" просмотр"),12,bodyBottom,10,()->action(Action.CONFIRM));
             key(back()+" назад",w<500?190:220,bodyBottom,6,()->action(Action.CANCEL));
             if(w>=540&&s.mode==Mode.COPY_PLACE)text("↑ ↓ ← → место",360,bodyBottom+28,18,6);
             return;
@@ -322,15 +329,54 @@ final class WorkshopView extends View {
         }
         button("Область листа · другой размер",16,by+48,w-32,36,s.sheetFocus==11,()->{s.selectSheet(11);changed.run();invalidate();});
     }
+    private void assetLibrary(){
+        boolean saving=s.mode==Mode.ASSET_SAVE;
+        text(saving?"СОХРАНИТЬ СПРАЙТ":"БИБЛИОТЕКА / СПРАЙТЫ",16,169,18,14);
+        if(saving){
+            SpriteAsset a=s.assetDraft;float size=Math.min(160,bodyBottom-334);
+            fitted(a.title+" · "+a.width+" × "+a.height,16,202,24,7,w-32);
+            assetPicture(a,(w-size)/2,218,size);
+            fitted("Источник: "+a.origin,16,244+size,18,6,w-32);
+            fitted("Самостоятельная копия пикселей.",16,272+size,20,7,w-32);
+            fitted("Код, флаги и настройки палитры не переносятся.",16,300+size,16,13,w-32);
+            return;
+        }
+        SpriteAsset chosen=s.currentAsset();
+        if(chosen==null){
+            text("Здесь будут твои спрайты",16,218,26,7);
+            fitted("Выбери область во вкладке «Спрайты».",16,258,20,6,w-32);
+            fitted("Затем: меню → Ресурсы → X в библиотеку.",16,290,18,6,w-32);
+        }else{
+            fitted("Общая для всех проектов",16,199,18,6,w-110);
+            text((s.assetIndex+1)+" / "+s.assets().size(),w-84,199,18,10);
+            int perPage=w>=500?3:2,first=(s.assetIndex/perPage)*perPage;
+            float gap=12,cw=(w-32-gap*(perPage-1))/perPage,ch=Math.min(176,bodyBottom-304);
+            for(int i=0;i<perPage&&first+i<s.assets().size();i++){
+                final int index=first+i;SpriteAsset a=s.assets().get(index);float x=16+i*(cw+gap),size=Math.min(cw-16,ch-48);
+                rect(x,214,cw,ch,0);assetPicture(a,x+(cw-size)/2,222,size);
+                outline(x,214,cw,ch,index==s.assetIndex?10:13);
+                fitted(a.title,x+8,214+ch-14,18,index==s.assetIndex?10:7,cw-16);
+                hit(x,214,cw,ch,()->{s.selectAsset(index);changed.run();invalidate();});
+            }
+            float by=214+ch;
+            fitted(chosen.width+" × "+chosen.height+" · "+chosen.origin,16,by+28,18,7,w-32);
+            fitted("Автор и лицензия: не указаны",16,by+52,16,13,w-32);
+            fitted("← → выбрать · "+ok()+" разместить в проекте",16,by+78,18,6,w-32);
+        }
+    }
+    private void assetPicture(SpriteAsset a,float x,float y,float size){
+        picture(new SpriteRegion(0,0,a.width,a.height),a,x,y,size);
+    }
     private void copyChooser(){
         SpriteRegion source=s.copySource,target=s.copyDestination();
         boolean confirm=s.mode==Mode.COPY_CONFIRM;
-        text("КОПИЯ / "+source.width+" × "+source.height,16,169,18,14);
+        text((s.copyAsset!=null?"ИЗ БИБЛИОТЕКИ / ":"КОПИЯ / ")+source.width+" × "+source.height,16,169,18,14);
         fitted(confirm?"2 / Проверь замену пикселей":"1 / Выбери место на листе",16,198,24,7,w-32);
         if(confirm){
             float size=Math.min(160,bodyBottom-330),gap=32,total=size*2+gap,left=(w-total)/2;
             text("БЫЛО",left,232,18,6);text("БУДЕТ",left+size+gap,232,18,10);
-            copyPicture(target,left,246,size);copyPicture(source,left+size+gap,246,size);
+            copyPicture(target,left,246,size);
+            if(s.copyAsset!=null)assetPicture(s.copyAsset,left+size+gap,246,size);else copyPicture(source,left+size+gap,246,size);
             float by=246+size;
             fitted(s.cart().empty(target)?"Нулевые пиксели тоже могут использоваться игрой.":"Пиксели в этом месте будут заменены.",16,by+29,18,10,w-32);
             fitted("Код и ссылки на спрайты остаются прежними.",16,by+54,18,6,w-32);
@@ -342,23 +388,27 @@ final class WorkshopView extends View {
                 rect(x+px*cell,y+py*cell,cell,cell,color==0?((px/8+py/8)%2==0?0:1):color);
             }
             outline(x-2,y-2,128*cell+4,64*cell+4,13);
-            outline(x+source.x*cell,y+source.y*cell,source.width*cell,source.height*cell,14);
+            if(s.copyAsset==null)outline(x+source.x*cell,y+source.y*cell,source.width*cell,source.height*cell,14);
             outline(x+target.x*cell,y+target.y*cell,target.width*cell,target.height*cell,s.copyOverlaps()?8:10);
             for(int ty=0;ty<8;ty++)for(int tx=0;tx<16;tx++){
                 final int px=tx,py=ty;hit(x+tx*8*cell,y+ty*8*cell,8*cell,8*cell,()->{s.pointCopy(px,py);changed.run();invalidate();});
             }
             float by=y+64*cell;
-            fitted(s.copyOverlaps()?"Рамки пересекаются — выбери другое место.":"Розовая: источник · жёлтая: место копии",16,by+29,18,s.copyOverlaps()?8:7,w-32);
+            fitted(s.copyOverlaps()?"Рамки пересекаются — выбери другое место.":s.copyAsset!=null?s.copyAsset.title+" · жёлтая рамка: место вставки":"Розовая: источник · жёлтая: место копии",16,by+29,18,s.copyOverlaps()?8:7,w-32);
             fitted("Место: "+target.x+", "+target.y+" · шаг 8 пикселей",16,by+55,18,6,w-32);
             fitted("Выбор места ничего не меняет в картридже.",16,by+80,16,13,w-32);
         }
     }
     private void copyPicture(SpriteRegion r,float x,float y,float size){
+        picture(r,null,x,y,size);
+    }
+    private void picture(SpriteRegion r,SpriteAsset asset,float x,float y,float size){
         rect(x,y,size,size,0);
-        float cell=Math.max(1,(int)(size/Math.max(r.width,r.height)));
+        float cell=size/Math.max(r.width,r.height);
+        if(cell>=1)cell=(int)cell;
         float sx=x+(size-r.width*cell)/2,sy=y+(size-r.height*cell)/2;
         for(int py=0;py<r.height;py++)for(int px=0;px<r.width;px++){
-            int color=s.cart().pixel(r,px,py);
+            int color=asset==null?s.cart().pixel(r,px,py):asset.pixel(px,py);
             rect(sx+px*cell,sy+py*cell,cell,cell,color==0?((px+py)%2==0?0:1):color);
         }
         outline(x,y,size,size,13);
@@ -388,7 +438,7 @@ final class WorkshopView extends View {
     private void dialog() {
         hits.clear(); // Modal controls trap touch as well as controller focus.
         p.setColor(0xcc000000);c.drawRect(0,0,w,h,p);
-        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.HERO?400:s.mode==Mode.DRAW_TOOLS?392:s.mode==Mode.MENU?380:280,dy=Math.max(16,(h-dh)/2);
+        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.HERO?400:s.mode==Mode.DRAW_TOOLS?392:s.mode==Mode.MENU?404:280,dy=Math.max(16,(h-dh)/2);
         rect(dx+6,dy+6,dw,dh,0);rect(dx,dy,dw,dh,1);outline(dx,dy,dw,dh,s.mode==Mode.ERROR?8:14);
         if(s.mode==Mode.HERO){
             HeroBinding hero=s.heroDraft;SpriteRegion r=hero.image;
@@ -417,9 +467,9 @@ final class WorkshopView extends View {
             hit(dx+20+(dw-32)/2,dy+346,(dw-32)/2,44,()->action(Action.CANCEL));
         }else if(s.mode==Mode.MENU) {
             text("Мастерская",dx+20,dy+36,26,14);
-            String[] labels={"Отменить последнюю правку",s.swapAB?"B выбор / A назад":"A выбор / B назад","Как это работает","Вернуться к проекту","Мои игры"};
-            for(int i=0;i<5;i++){final int n=i;button(labels[i],dx+16,dy+54+i*54,dw-32,46,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
-            text("SELECT: меню · L/R: инструменты",dx+20,dy+356,16,6);
+            String[] labels={"Отменить последнюю правку",s.swapAB?"B выбор / A назад":"A выбор / B назад","Как это работает","Вернуться к проекту","Мои игры","Ресурсы · библиотека"};
+            for(int i=0;i<6;i++){final int n=i;button(labels[i],dx+16,dy+54+i*48,dw-32,44,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
+            text("SELECT: меню · L/R: инструменты",dx+20,dy+380,16,6);
         } else if(s.mode==Mode.HELP) {
             if(!s.cart().hasHero()){
                 text("Ресурсы и игра",dx+20,dy+40,26,14);

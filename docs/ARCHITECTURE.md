@@ -163,6 +163,21 @@ storage adapters persist the library. Keep this distinct from `core/library`'s
 cartridge catalogue. See [asset requirements](ASSET_LIBRARY.md). Exact package
 formats and revision/update implementation are TBD.
 
+Android lab 0.0.11 proves a sprite-only slice with immutable portable `SpriteAsset`
+snapshots and the existing placement transaction in `WorkshopSession`. Export
+uses a storage port and never writes the source cart. Insert materializes color
+indexes through `P8Graphics`; canonical state/history advance only after durable
+cart save. Import drafts persist their own snapshot, rather than just an asset ID.
+Neither the source cart nor the library record is needed to finish that draft or
+run the inserted cart. Errors retain the candidate and return to preview for retry.
+
+`SpriteAssetStore` is an Android adapter using atomic app-private files outside
+individual projects. Its temporary v1 `.pksp` record format and limits are
+documented in [the slice evidence](design/android-assets-10/README.md). Listing
+records reconstructs the catalogue; there is no separately authoritative index.
+Replacing this adapter with user-selected storage remains required by first-run
+setup. The binary library record never becomes a cartridge/runtime dependency.
+
 ### `core/compatibility`
 
 Responsibilities:

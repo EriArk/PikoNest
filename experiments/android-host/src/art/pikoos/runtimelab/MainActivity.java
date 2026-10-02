@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.TextView;
 import art.pikoos.lab.core.WorkshopCartridge;
 import art.pikoos.lab.core.SpriteRegion;
+import art.pikoos.lab.core.SpriteAsset;
+import android.util.Base64;
 import art.pikoos.lab.core.LibrarySession;
 import art.pikoos.lab.core.WorkshopSession;
 import art.pikoos.lab.core.WorkshopSession.Action;
@@ -35,6 +37,7 @@ public final class MainActivity extends Activity {
     private SharedPreferences prefs;
     private SharedPreferences libraryPrefs;
     private ProjectStore store;
+    private SpriteAssetStore assetStore;
     private LibrarySession library;
     private LibraryView shelf;
     private String activeId="moon-garden";
@@ -54,6 +57,7 @@ public final class MainActivity extends Activity {
         backend=new ExternalPicoBackend(this);
         try {
             store=new ProjectStore(getFilesDir());
+            assetStore=new SpriteAssetStore(getFilesDir());
             byte[] template;
             try(InputStream in=getAssets().open("moon-garden.p8")){template=readAll(in);}
             if(!store.directory("moon-garden").exists())store.create("moon-garden",template);
@@ -84,6 +88,9 @@ public final class MainActivity extends Activity {
                 public void save(byte[] bytes)throws Exception{saveCart(store.cart(id),bytes);Log.i(TAG,"project_saved id="+id+" bytes="+bytes.length);}
                 public void launch(byte[] bytes)throws Exception{launchCart(bytes);}
                 public void library()throws Exception{showLibrary();}
+                public java.util.List<SpriteAsset> assets()throws Exception{return assetStore.list();}
+                public void storeAsset(SpriteAsset asset)throws Exception{assetStore.create(asset);}
+                public String projectOrigin(){return LibrarySession.title(id)+" · "+id;}
             });
             activeId=id;session=next;
             prefs=getSharedPreferences(id+"-ui",MODE_PRIVATE);
@@ -150,6 +157,10 @@ public final class MainActivity extends Activity {
             .putBoolean("browsingSprites",session.browsingSprites)
             .putBoolean("copying",session.copying()).putInt("copyX",session.copyX).putInt("copyY",session.copyY)
             .putString("copyReturn",session.copyReturnMode())
+            .putBoolean("assets",session.mode==Mode.ASSETS||session.assetDraft!=null||session.copyAsset!=null)
+            .putInt("assetIndex",session.assetIndex).putString("assetsReturn",session.assetsReturnMode())
+            .putString("assetDraft",session.assetDraft==null?"":Base64.encodeToString(session.assetDraft.encode(),Base64.NO_WRAP))
+            .putString("copyAsset",session.copyAsset==null?"":Base64.encodeToString(session.copyAsset.encode(),Base64.NO_WRAP))
             .putString("mode",session.heroDraft!=null?"HERO":session.mode==Mode.CANVAS||session.pendingLine()?"CANVAS":session.mode==Mode.VALUE?"VALUE":"NAVIGATE").apply();
     }
     private int bounded(String key,int fallback,int max){return Math.max(0,Math.min(max,prefs.getInt(key,fallback)));}
@@ -186,6 +197,14 @@ public final class MainActivity extends Activity {
         }
         if(session.tool==2&&prefs.getString("mode","").equals("HERO"))session.previewHero();
         if(prefs.getBoolean("copying",false))session.restoreCopy(prefs.getInt("copyX",-1),prefs.getInt("copyY",-1),prefs.getString("copyReturn",""));
+        if(prefs.getBoolean("assets",false)){
+            try{
+                session.restoreAssets(prefs.getString("assetsReturn","NAVIGATE"),prefs.getInt("assetIndex",0));
+                String saved=prefs.getString("assetDraft",""),copy=prefs.getString("copyAsset","");
+                if(!saved.isEmpty()&&session.mode==Mode.ASSETS){session.assetDraft=SpriteAsset.decode(Base64.decode(saved,Base64.NO_WRAP));session.mode=Mode.ASSET_SAVE;}
+                if(!copy.isEmpty()&&session.mode==Mode.ASSETS)session.restoreInsertion(SpriteAsset.decode(Base64.decode(copy,Base64.NO_WRAP)),prefs.getInt("copyX",-1),prefs.getInt("copyY",-1));
+            }catch(Exception e){session.fail(e);}
+        }
     }
     private void immersive(){
         if(Build.VERSION.SDK_INT>=30){

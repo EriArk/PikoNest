@@ -86,6 +86,10 @@ public final class P8Graphics {
         if(source.width!=destination.width||source.height!=destination.height)throw new IllegalArgumentException("Copy dimensions differ");
         return write(destination,read(source));
     }
+    public P8Document insert(SpriteAsset asset,SpriteRegion destination){
+        if(asset.width!=destination.width||asset.height!=destination.height)throw new IllegalArgumentException("Asset dimensions differ");
+        return write(destination,asset.colors());
+    }
     public P8Document withFill(SpriteRegion r,int x,int y,int value){
         r.checkPixel(x,y);color(value);int[] values=read(r);int old=values[y*r.width+x];
         if(old==value)return document;

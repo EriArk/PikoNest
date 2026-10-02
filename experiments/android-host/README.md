@@ -1,5 +1,15 @@
 # PIKOOS Android host experiment
 
+Version 0.0.11 adds the first shared sprite library. In any project, open the
+menu's Resources entry; with a sprite/region selected, X previews saving it.
+Confirm stores independent indexed pixels and source metadata. Select a record
+in another project, place and preview it, then confirm insertion. Cancel and
+whole-operation undo preserve the target exactly. The library and insertion
+draft survive process recreation; inserted carts run without library access.
+Storage is currently app-private, separate from project folders. Folder selection,
+renaming/deletion, external import, flags/animation/audio dependencies and other
+resource types remain pending. [Evidence](../../docs/design/android-assets-10/README.md).
+
 Version 0.0.10 makes sprite/rectangle copying available in every supported cart.
 Choose destination → review before/after → confirm, using controller or touch.
 Occupied areas can be explicitly replaced; source overlap is blocked. No Lua
@@ -15,14 +25,14 @@ hero assignment are conditional on its optional binding. Missing gfx is created
 only by an effective edit and undo restores the original cart exactly.
 See [hero-free creation/runtime evidence](../../docs/design/android-herofree-08/README.md).
 The general path has sprite editing and code viewing; free-form Lua editing,
-arbitrary file import and cross-cart resource reuse are still unimplemented.
+arbitrary file import and resource types beyond sprites are still unimplemented.
 A new blank cart does not automatically display its sprites.
 
 Version 0.0.8 aligns resource names with PICO-8: sprite labels replace generic
 "drawing" labels in the existing editor. See [device capture and checks](../../docs/design/android-terminology-07/README.md).
-The [cross-project asset library](../../docs/ASSET_LIBRARY.md) and
-[first-run setup wizard](../../docs/FIRST_RUN_SETUP.md) are documented requirements,
-not implemented features of this experiment.
+The [cross-project asset library](../../docs/ASSET_LIBRARY.md) now has the bounded
+sprite workflow above. The [first-run setup wizard](../../docs/FIRST_RUN_SETUP.md)
+remains a documented requirement, not an implemented feature of this experiment.
 
 An isolated 0.0A/0.0C/0.0D proof: a controller-operated workshop using the
 owner-approved PICO-8 visual baseline. Edit speed/jump or the hero's sprite in
