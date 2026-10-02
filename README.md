@@ -86,6 +86,9 @@ controller navigation, explicit commit/cancel, undo and runtime launch.
 Its sprite sheet now supports choosing, drawing a new image, safely copying
 an existing image and explicitly assigning a different hero, using the same
 controller workflow. See [device captures](docs/design/android-sprites-02/README.md).
+Drawing now includes a controller-operated tool chooser, connected fill,
+line preview/confirmation and a picker, with whole-operation undo. See
+[drawing captures](docs/design/android-drawing-04/README.md).
 The native project shelf now opens separate games, creates a fresh small-game
 template and makes independent copies, retaining each project's editing context.
 See [library device captures](docs/design/android-library-03/README.md).

@@ -7,6 +7,8 @@ send a read-only snapshot to the installed official-runtime
 wrapper, and restore the workshop when the user returns.
 Version 0.0.4 adds a project shelf, creation from the small-game template and
 independent copies, with separate editing context for each project.
+Version 0.0.5 adds a drawing-tool chooser, connected fill, previewed lines and
+a color picker, all reachable through the same semantic controller actions.
 
 The visual direction is approved; this implementation remains an experiment,
 not a decision to use Java/Android Views for the production application.
@@ -128,6 +130,32 @@ finished launcher. Renaming, blank-cart creation, export, persistent history
 and `.pikoos` metadata are still future work. The sound/music and animation
 requirements do not imply implemented editors. See
 [device evidence](../../docs/design/android-library-03/README.md).
+
+### Drawing tools (0.0.5)
+
+- From the canvas, B returns to tool navigation. Select the current tool name
+  (the first control to the right) and A opens the chooser. Up/down and A choose
+  Brush, Eraser, Fill, Line or Picker; B leaves the old tool selected.
+  Touch can open the chooser directly. A/B hints respect the configured mapping.
+- Fill changes only the four-connected area containing the cursor, bounded by
+  the current 16×16 image. Diagonally touching areas remain separate.
+- Line: A anchors the start; D-pad moves the other endpoint with a live preview.
+  A commits the whole line. B or Y cancels the preview without changing the file
+  or earlier undo history. Start commits it before passing saved bytes to runtime.
+  Two touch taps choose the same endpoints. Tabs, palette, menus and resource
+  actions cannot discard a pending line; complete or cancel it first.
+- Picker reads the cursor's color without saving and returns to the prior
+  drawing tool (Brush when coming from Eraser). X still opens the palette.
+- Each fill or completed line is one undo entry and one atomic save. A no-op
+  fill/line creates no history entry. Write failure retains the line draft for
+  retry. Line endpoints, color and tool survive process recreation in optional
+  UI preferences; only confirmed pixels belong to `game.p8`.
+- All drawing operations use the portable cartridge/session core and preserve
+  unrelated gfx, Lua, line endings and unknown sections. This still edits the
+  eight owned-template regions, not arbitrary sprite/map layouts.
+
+Held-button brush strokes, touch drags, zoom/pan, shapes and persistent undo
+remain future work. [Device captures and checks](../../docs/design/android-drawing-04/README.md).
 
 Parameters are drafts until confirmation; switching tools cannot silently
 discard an active draft. Writes use AtomicFile and update the in-memory model

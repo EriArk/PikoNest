@@ -92,6 +92,39 @@ public final class WorkshopCartridge {
         for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) if (pixel(slot, x, y) != 0) return false;
         return true;
     }
+    /** Four-connected fill restricted to one 16x16 region, preserving all other bytes. */
+    public WorkshopCartridge withFill(int slot, int x, int y, int color) {
+        checkSlot(slot);checkPixel(x,y);checkColor(color);
+        int old=pixel(slot,x,y);if(old==color)return this;
+        byte[] changed=pixels.clone();int[] queue=new int[256];int head=0,tail=0;
+        queue[tail++]=y*16+x;changed[rows[y]+slot*16+x]=hex(color);
+        while(head<tail){
+            int at=queue[head++],px=at%16,py=at/16;
+            int[] neighbors={px>0?at-1:-1,px<15?at+1:-1,py>0?at-16:-1,py<15?at+16:-1};
+            for(int next:neighbors)if(next>=0){
+                int offset=rows[next/16]+slot*16+next%16;
+                if(Character.digit((char)changed[offset],16)==old){changed[offset]=hex(color);queue[tail++]=next;}
+            }
+        }
+        return new WorkshopCartridge(document.edit(gfx,0,pixels.length,changed).bytes());
+    }
+    /** Inclusive Bresenham line. Canonical endpoint order makes reversal identical. */
+    public WorkshopCartridge withLine(int slot, int x0, int y0, int x1, int y1, int color) {
+        checkSlot(slot);checkPixel(x0,y0);checkPixel(x1,y1);checkColor(color);
+        if(x0>x1||(x0==x1&&y0>y1)){int swap=x0;x0=x1;x1=swap;swap=y0;y0=y1;y1=swap;}
+        byte[] changed=pixels.clone();int dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0);
+        int sx=x0<x1?1:-1,sy=y0<y1?1:-1,error=dx+dy;
+        while(true){
+            int offset=rows[y0]+slot*16+x0;
+            if(Character.digit((char)changed[offset],16)!=color)changed[offset]=hex(color);
+            if(x0==x1&&y0==y1)break;
+            int twice=2*error;if(twice>=dy){error+=dy;x0+=sx;}if(twice<=dx){error+=dx;y0+=sy;}
+        }
+        if(java.util.Arrays.equals(changed,pixels))return this;
+        return new WorkshopCartridge(document.edit(gfx,0,pixels.length,changed).bytes());
+    }
+    private static byte hex(int color){return (byte)"0123456789abcdef".charAt(color);}
+    private static void checkColor(int color){if(color<0||color>15)throw new IllegalArgumentException("Color out of range");}
     public int firstFreeSlot() {
         // An erased but still assigned hero is not available for automatic allocation.
         for (int i = 0; i < SPRITE_COUNT; i++) if (i != heroSlot && empty(i)) return i;

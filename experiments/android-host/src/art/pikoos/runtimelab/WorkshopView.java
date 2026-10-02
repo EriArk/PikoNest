@@ -12,6 +12,8 @@ import android.os.SystemClock;
 import art.pikoos.lab.core.WorkshopSession;
 import art.pikoos.lab.core.WorkshopSession.Action;
 import art.pikoos.lab.core.WorkshopSession.Mode;
+import art.pikoos.lab.core.WorkshopCartridge;
+import art.pikoos.lab.core.WorkshopSession.DrawTool;
 import java.util.ArrayList;
 
 /** Native pixel surface; all mutations go through the portable session. */
@@ -31,6 +33,8 @@ final class WorkshopView extends View {
     private String previousNotice="Сохранено";
     private long noticeUntil;
     private RectF spriteArea;
+    private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка"};
+    private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из рисунка","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из рисунка"};
     private static final class Hit {
         final RectF rect; final Runnable action;
         Hit(float x,float y,float w,float h,Runnable action) { rect=new RectF(x,y,x+w,y+h); this.action=action; }
@@ -70,9 +74,10 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        String status=s.mode==Mode.VALUE?"Правка":s.mode==Mode.ERROR?"Ошибка":"Сохранено";
-        fitted(status,Math.max(150,w-158),27,16,s.mode==Mode.VALUE?10:7,108);
-        rect(w-174,19,6,6,s.mode==Mode.VALUE?10:11);
+        boolean draft=s.mode==Mode.VALUE||s.pendingLine();
+        String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
+        fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
+        rect(w-174,19,6,6,draft?10:11);
         text("≡",w-34,29,26,7);hit(w-48,0,48,44,()->action(Action.MENU));
         fitted(projectTitle,16,82,28,7,w-130);text("game.p8",w-98,80,18,13);
         rect(0,100,w,2,13);
@@ -96,17 +101,19 @@ final class WorkshopView extends View {
                 fitted(s.notice,tx+14,bodyBottom-18,18,7,tw-28);postInvalidateDelayed(remaining);
             }
         }
-        if(s.mode==Mode.HELP || s.mode==Mode.MENU || s.mode==Mode.ERROR) dialog();
+        if(s.mode==Mode.HELP || s.mode==Mode.MENU || s.mode==Mode.ERROR || s.mode==Mode.DRAW_TOOLS) dialog();
         c.restore();
     }
     private void footer() {
         rect(0,bodyBottom,w,44,0);
         String confirm=s.swapAB?"B":"A",cancel=s.swapAB?"A":"B";
-        String verb=s.mode==Mode.VALUE?"готово":s.mode==Mode.CANVAS?"пиксель":s.mode==Mode.PALETTE?"цвет":s.mode==Mode.SHEET&&s.sheetFocus<8?"рисовать":"выбор";
+        String[] drawVerbs={"пиксель","стереть","залить",s.pendingLine()?"линия":"начало","цвет"};
+        String verb=s.mode==Mode.VALUE?"готово":s.mode==Mode.CANVAS?drawVerbs[s.drawTool.ordinal()]:s.mode==Mode.PALETTE?"цвет":s.mode==Mode.SHEET&&s.sheetFocus<8?"рисовать":"выбор";
         key(confirm+" "+verb,12,bodyBottom,10,()->action(Action.CONFIRM));
-        key(cancel+" назад",w<500?142:156,bodyBottom,6,()->action(Action.CANCEL));
+        key(cancel+(s.pendingLine()?" отмена":" назад"),w<500?142:156,bodyBottom,6,()->action(Action.CANCEL));
         if(w>=540){
-            if(s.mode==Mode.VALUE)text("← → число",260,bodyBottom+28,18,6);
+            if(s.pendingLine())text("Конец линии",260,bodyBottom+28,18,6);
+            else if(s.mode==Mode.VALUE)text("← → число",260,bodyBottom+28,18,6);
             else if(s.mode==Mode.PALETTE)text("↑ ↓ ← → цвет",260,bodyBottom+28,18,6);
             else key("L/R инструм.",260,bodyBottom,6,()->action(Action.NEXT));
         }
@@ -167,8 +174,9 @@ final class WorkshopView extends View {
     }
     private void sprite(int slot,float x,float y,float size,boolean grid) {
         float cell=size/16;
+        WorkshopCartridge picture=grid?s.canvasPreview():s.cart();
         for(int py=0;py<16;py++)for(int px=0;px<16;px++) {
-            int color=s.cart().pixel(slot,px,py);
+            int color=picture.pixel(slot,px,py);
             if(grid || color!=0) rect(x+px*cell,y+py*cell,cell,cell,color==0&&grid?((px+py)%2==0?0:1):color);
         }
     }
@@ -217,13 +225,17 @@ final class WorkshopView extends View {
         text("РИСУНОК "+(s.spriteSlot+1)+" / 16 × 16",16,169,18,14);
         outline(x-4,y-4,size+8,size+8,s.focus==0||s.mode==Mode.CANVAS?10:0);
         sprite(s.spriteSlot,x,y,size,true);spriteArea=new RectF(x,y,x+size,y+size);
+        if(s.pendingLine()){
+            float cell=size/16;outline(x+s.lineX*cell,y+s.lineY*cell,cell,cell,10);
+        }
         if(s.mode==Mode.CANVAS) {
             float cell=size/16;outline(x+s.cursorX*cell,y+s.cursorY*cell,cell,cell,0);
             outline(x+s.cursorX*cell+2,y+s.cursorY*cell+2,cell-4,cell-4,7);
         }
-        text(s.mode==Mode.CANVAS?"Курсор "+s.cursorX+", "+s.cursorY:ok()+": войти в рисунок",16,y+size+24,16,6);
+        fitted(s.pendingLine()?"Линия: "+ok()+" готово · "+back()+" отмена":s.mode==Mode.CANVAS?DRAW_NAMES[s.drawTool.ordinal()]+" · "+s.cursorX+", "+s.cursorY:ok()+": войти в рисунок",16,y+size+24,16,s.pendingLine()?10:6,size);
+        if(y+size+48<bodyBottom)fitted(s.pendingLine()?"Начало: "+s.lineX+", "+s.lineY:s.drawTool==DrawTool.LINE?ok()+": начало, затем конец":"X цвет · Y отмена",16,y+size+48,16,6,size);
         text("ИНСТРУМЕНТЫ",right,169,18,14);
-        button(s.eraser?"Ластик":"Кисть",right,180,rw,44,s.mode==Mode.NAVIGATE&&s.focus==1,()->{s.select(1);changed.run();invalidate();});
+        button(DRAW_NAMES[s.drawTool.ordinal()]+"  >",right,180,rw,44,s.mode==Mode.NAVIGATE&&s.focus==1,()->action(Action.DRAW_TOOLS));
         boolean paletteActive=s.mode==Mode.PALETTE;
         if(s.mode==Mode.NAVIGATE&&s.focus==2)outline(right-2,232,rw+4,142,10);
         float cw=rw/4;
@@ -264,9 +276,18 @@ final class WorkshopView extends View {
     private void dialog() {
         hits.clear(); // Modal controls trap touch as well as controller focus.
         p.setColor(0xcc000000);c.drawRect(0,0,w,h,p);
-        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.MENU?380:280,dy=Math.max(16,(h-dh)/2);
+        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.DRAW_TOOLS?392:s.mode==Mode.MENU?380:280,dy=Math.max(16,(h-dh)/2);
         rect(dx+6,dy+6,dw,dh,0);rect(dx,dy,dw,dh,1);outline(dx,dy,dw,dh,s.mode==Mode.ERROR?8:14);
-        if(s.mode==Mode.MENU) {
+        if(s.mode==Mode.DRAW_TOOLS){
+            text("Чем рисуем?",dx+20,dy+36,26,14);
+            for(int i=0;i<DRAW_NAMES.length;i++){final int item=i;
+                button(DRAW_NAMES[i],dx+16,dy+54+i*50,dw-32,44,s.drawToolCursor==i,()->{s.chooseDrawTool(item);changed.run();invalidate();});
+            }
+            fitted(DRAW_HELP[s.drawToolCursor],dx+20,dy+337,18,7,dw-40);
+            text(ok()+" выбрать · "+back()+" назад",dx+20,dy+374,18,6);
+            hit(dx+12,dy+346,(dw-32)/2,44,()->action(Action.CONFIRM));
+            hit(dx+20+(dw-32)/2,dy+346,(dw-32)/2,44,()->action(Action.CANCEL));
+        }else if(s.mode==Mode.MENU) {
             text("Мастерская",dx+20,dy+36,26,14);
             String[] labels={"Отменить последнюю правку",s.swapAB?"B выбор / A назад":"A выбор / B назад","Как это работает","Вернуться к проекту","Мои игры"};
             for(int i=0;i<5;i++){final int n=i;button(labels[i],dx+16,dy+54+i*54,dw-32,46,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}

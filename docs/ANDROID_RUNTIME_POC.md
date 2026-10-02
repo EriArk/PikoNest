@@ -345,3 +345,15 @@ editor. Full procedure, hashes and actual screenshots are in
 The library is limited to the owned template family. Arbitrary import, blank
 projects and production storage/metadata remain future work. Existing wrapper
 reliability and physical controller acceptance limitations still apply.
+
+## Drawing tools — 2026-10-02
+
+Android lab 0.0.5 adds connected fill, previewed lines and a color picker to
+the controller-operated sprite editor. A draft line survived host process
+recreation without altering the cart; fill, line and eraser undo restored
+the expected exact bytes. A test copy's edited star was assigned as its hero
+and displayed in official PICO-8. First launch returned before an observed
+game frame; a second attempt worked. This does not fix the external wrapper.
+The original and the separate new game remained unchanged. See
+[drawing evidence](design/android-drawing-04/README.md) for screenshots, byte
+comparison, final APK hash and remaining limitations.

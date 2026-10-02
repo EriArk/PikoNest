@@ -6,8 +6,9 @@ import java.util.Arrays;
 /** Portable interaction state. Input devices and Android persistence remain outside. */
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, CONTEXT, MENU,
-        SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR }
+        SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS }
+    public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER }
     public interface Port {
         void save(byte[] bytes) throws Exception;
         void launch(byte[] bytes) throws Exception;
@@ -21,13 +22,18 @@ public final class WorkshopSession {
     public int tool, focus, codeLine, cursorX = 7, cursorY = 7, color = 14, paletteCursor = 14;
     public int field, draft, menuItem;
     public int spriteSlot, sheetFocus;
-    public boolean eraser, swapAB, browsingSprites = true;
+    public boolean swapAB, browsingSprites = true;
+    public DrawTool drawTool=DrawTool.BRUSH;
+    public DrawTool pickerReturn=DrawTool.BRUSH;
+    public int drawToolCursor, lineX=-1, lineY=-1;
     public String notice = "Сохранено", error = "";
     private Mode paletteReturn = Mode.NAVIGATE;
     private Mode overlayReturn = Mode.NAVIGATE;
     public WorkshopSession(WorkshopCartridge cart, Port port) { this.cart = cart; this.port = port; }
     public WorkshopCartridge cart() { return cart; }
     public boolean canUndo() { return !undo.isEmpty(); }
+    public boolean pendingLine(){return drawTool==DrawTool.LINE&&lineX>=0&&lineY>=0;}
+    public WorkshopCartridge canvasPreview(){return pendingLine()?cart.withLine(spriteSlot,lineX,lineY,cursorX,cursorY,color):cart;}
     public int displayedValue(int which) { return mode == Mode.VALUE && field == which ? draft : cart.value(which); }
     private static int clamp(int n, int max) { return Math.max(0, Math.min(max, n)); }
     private void save(WorkshopCartridge next, boolean remember) throws Exception {
@@ -42,9 +48,10 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
+        if(pendingLine())return;
         if (mode != Mode.NAVIGATE && mode != Mode.CANVAS && mode != Mode.SHEET) return;
         if (tool == (next + 3) % 3) return;
         toolFocus[tool] = focus;
@@ -55,6 +62,7 @@ public final class WorkshopSession {
         focus = clamp(target, 4); act(Action.CONFIRM);
     }
     public void openSprite(int slot) {
+        if(pendingLine())return;
         if (slot < 0 || slot >= WorkshopCartridge.SPRITE_COUNT) throw new IllegalArgumentException("Sprite slot out of range");
         spriteSlot = slot; sheetFocus = slot; browsingSprites = false;
         tool = 2; focus = 0; mode = Mode.NAVIGATE;
@@ -94,10 +102,49 @@ public final class WorkshopSession {
         if (mode != Mode.PALETTE) return;
         paletteCursor = clamp(value, 15); act(Action.CONFIRM);
     }
+    public void chooseDrawTool(int value){
+        if(mode!=Mode.DRAW_TOOLS||value<0||value>=DrawTool.values().length)return;
+        drawToolCursor=value;act(Action.CONFIRM);
+    }
+    private void draw()throws Exception {
+        switch(drawTool){
+            case BRUSH:save(cart.withPixel(spriteSlot,cursorX,cursorY,color),true);break;
+            case ERASER:save(cart.withPixel(spriteSlot,cursorX,cursorY,0),true);break;
+            case FILL:save(cart.withFill(spriteSlot,cursorX,cursorY,color),true);break;
+            case LINE:lineX=cursorX;lineY=cursorY;notice="Выбери конец линии";break;
+            case PICKER:color=cart.pixel(spriteSlot,cursorX,cursorY);drawTool=pickerReturn;notice="Цвет взят";break;
+        }
+    }
+    private void moveCursor(Action action){
+        if(action==Action.UP)cursorY=clamp(cursorY-1,15);
+        if(action==Action.DOWN)cursorY=clamp(cursorY+1,15);
+        if(action==Action.LEFT)cursorX=clamp(cursorX-1,15);
+        if(action==Action.RIGHT)cursorX=clamp(cursorX+1,15);
+    }
     private void edit(int which) { field = which; draft = cart.value(which); mode = Mode.VALUE; }
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if(pendingLine()){
+                moveCursor(action);
+                if(action==Action.CANCEL||action==Action.UNDO){lineX=lineY=-1;notice="Линия отменена";}
+                if(action==Action.CONFIRM||action==Action.TEST){
+                    save(canvasPreview(),true);lineX=lineY=-1;
+                    if(action==Action.TEST)port.launch(cart.bytes());
+                }
+                return; // A draft cannot leak into other resources, tabs or runtime snapshots.
+            }
+            if(mode==Mode.DRAW_TOOLS){
+                if(action==Action.UP)drawToolCursor=clamp(drawToolCursor-1,4);
+                if(action==Action.DOWN)drawToolCursor=clamp(drawToolCursor+1,4);
+                if(action==Action.CONFIRM){
+                    DrawTool chosen=DrawTool.values()[drawToolCursor];
+                    if(chosen==DrawTool.PICKER&&drawTool!=DrawTool.PICKER)pickerReturn=drawTool==DrawTool.ERASER?DrawTool.BRUSH:drawTool;
+                    drawTool=chosen;mode=Mode.CANVAS;
+                }
+                if(action==Action.CANCEL)mode=overlayReturn;
+                return;
+            }
             if (mode == Mode.HELP) {
                 if (action == Action.CONFIRM) {
                     if (tool == 2) showSheet();
@@ -134,7 +181,7 @@ public final class WorkshopSession {
                 if (action == Action.RIGHT) paletteCursor = (paletteCursor / 4) * 4 + (paletteCursor + 1) % 4;
                 if (action == Action.UP) paletteCursor = (paletteCursor + 12) % 16;
                 if (action == Action.DOWN) paletteCursor = (paletteCursor + 4) % 16;
-                if (action == Action.CONFIRM) { color = paletteCursor; eraser = false; mode = paletteReturn; }
+                if (action == Action.CONFIRM) { color = paletteCursor; if(drawTool==DrawTool.ERASER)drawTool=DrawTool.BRUSH; mode = paletteReturn; }
                 if (action == Action.CANCEL) mode = paletteReturn;
                 return;
             }
@@ -148,6 +195,7 @@ public final class WorkshopSession {
             if (action == Action.PREVIOUS) { switchTool(tool - 1); return; }
             if (action == Action.NEXT) { switchTool(tool + 1); return; }
             if (tool == 2) {
+                if(action==Action.DRAW_TOOLS&&!browsingSprites){overlayReturn=mode;drawToolCursor=drawTool.ordinal();mode=Mode.DRAW_TOOLS;return;}
                 if (action == Action.SPRITE_SHEET) { showSheet(); return; }
                 if (action == Action.NEW_SPRITE) { createSprite(false); return; }
                 if (action == Action.COPY_SPRITE) { createSprite(true); return; }
@@ -179,11 +227,8 @@ public final class WorkshopSession {
                 return;
             }
             if (mode == Mode.CANVAS) {
-                if (action == Action.UP) cursorY = clamp(cursorY - 1, 15);
-                if (action == Action.DOWN) cursorY = clamp(cursorY + 1, 15);
-                if (action == Action.LEFT) cursorX = clamp(cursorX - 1, 15);
-                if (action == Action.RIGHT) cursorX = clamp(cursorX + 1, 15);
-                if (action == Action.CONFIRM) save(cart.withPixel(spriteSlot, cursorX, cursorY, eraser ? 0 : color), true);
+                moveCursor(action);
+                if (action == Action.CONFIRM) draw();
                 if (action == Action.CANCEL) mode = Mode.NAVIGATE;
                 return;
             }
@@ -215,7 +260,7 @@ public final class WorkshopSession {
                     else if (focus == 4) { overlayReturn = mode; field = 0; mode = Mode.HELP; }
                 } else {
                     if (focus == 0) mode = Mode.CANVAS;
-                    if (focus == 1) eraser = !eraser;
+                    if (focus == 1) act(Action.DRAW_TOOLS);
                     if (focus == 2) act(Action.CONTEXT);
                     if (focus == 3) showSheet();
                     if (focus == 4) assignHero();

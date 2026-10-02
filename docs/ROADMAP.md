@@ -149,6 +149,9 @@ lab 0.0.4 also adds a controller-operated project shelf, creation from the
 owned small-game template and independent project copies. Each project retains
 its own editing context. Blank-cart creation, naming/import/export and arbitrary
 cartridge editing remain open; this does not complete 0.1 or 0.2.
+Android lab 0.0.5 extends drawing with connected fill, two-endpoint line preview
+and a picker. Whole-operation undo and recovery of a pending line are verified;
+held brush strokes, zoom/pan and a full sprite/map editor remain open.
 
 Features:
 
@@ -200,6 +203,9 @@ tools as complete creation journeys. Explore, for example, platformers,
 top-down adventures, shooters and puzzles after the shared resource/create/test
 workflow is usable. These are research examples, not an accepted genre list or
 separate engines. Keep mechanics ordinary editable PICO-8 Lua/data.
+The owner subsequently confirmed genre templates as a later addition. Build
+the shared creation tools first; template contents and genre-specific journeys
+still require design and validation.
 
 ## Goal
 

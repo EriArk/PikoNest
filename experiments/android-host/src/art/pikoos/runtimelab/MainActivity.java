@@ -17,6 +17,7 @@ import art.pikoos.lab.core.LibrarySession;
 import art.pikoos.lab.core.WorkshopSession;
 import art.pikoos.lab.core.WorkshopSession.Action;
 import art.pikoos.lab.core.WorkshopSession.Mode;
+import art.pikoos.lab.core.WorkshopSession.DrawTool;
 import art.pikoos.lab.core.PicoRuntimeBackend;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -136,18 +137,25 @@ public final class MainActivity extends Activity {
         libraryPrefs.edit().putString("active",activeId).putBoolean("swapAB",session.swapAB).apply();
         prefs.edit().putInt("tool",session.tool).putInt("focus",session.focus)
             .putInt("line",session.codeLine).putInt("x",session.cursorX).putInt("y",session.cursorY)
-            .putInt("color",session.color).putBoolean("eraser",session.eraser).putBoolean("swapAB",session.swapAB)
+            .putInt("color",session.color).putString("drawTool",session.drawTool.name()).putBoolean("swapAB",session.swapAB)
+            .putString("pickerReturn",session.pickerReturn.name())
+            .putInt("lineX",session.pendingLine()?session.lineX:-1).putInt("lineY",session.pendingLine()?session.lineY:-1)
             .putInt("field",session.field).putInt("draft",session.draft)
             .putInt("spriteSlot",session.spriteSlot).putInt("sheetFocus",session.sheetFocus)
             .putBoolean("browsingSprites",session.browsingSprites)
-            .putString("mode",session.mode==Mode.CANVAS?"CANVAS":session.mode==Mode.VALUE?"VALUE":"NAVIGATE").apply();
+            .putString("mode",session.mode==Mode.CANVAS||session.pendingLine()?"CANVAS":session.mode==Mode.VALUE?"VALUE":"NAVIGATE").apply();
     }
     private int bounded(String key,int fallback,int max){return Math.max(0,Math.min(max,prefs.getInt(key,fallback)));}
     private void restoreUi(){
         session.tool=bounded("tool",0,2);session.focus=bounded("focus",0,4);
         session.codeLine=bounded("line",session.cart().line(0),session.cart().code().split("\n",-1).length-1);
         session.cursorX=bounded("x",7,15);session.cursorY=bounded("y",7,15);session.color=bounded("color",14,15);
-        session.eraser=prefs.getBoolean("eraser",false);session.swapAB=prefs.getBoolean("swapAB",false);
+        try{session.drawTool=DrawTool.valueOf(prefs.getString("drawTool",prefs.getBoolean("eraser",false)?"ERASER":"BRUSH"));}
+        catch(IllegalArgumentException e){session.drawTool=DrawTool.BRUSH;}
+        try{session.pickerReturn=DrawTool.valueOf(prefs.getString("pickerReturn","BRUSH"));}
+        catch(IllegalArgumentException e){session.pickerReturn=DrawTool.BRUSH;}
+        if(session.pickerReturn==DrawTool.PICKER)session.pickerReturn=DrawTool.BRUSH;
+        session.swapAB=prefs.getBoolean("swapAB",false);
         session.spriteSlot=bounded("spriteSlot",session.cart().heroSlot(),7);
         session.sheetFocus=bounded("sheetFocus",session.spriteSlot,10);
         session.browsingSprites=prefs.getBoolean("browsingSprites",true);
@@ -155,6 +163,8 @@ public final class MainActivity extends Activity {
             if(session.browsingSprites)session.mode=Mode.SHEET;
             else if(prefs.getString("mode","").equals("CANVAS"))session.mode=Mode.CANVAS;
         }
+        int lineX=prefs.getInt("lineX",-1),lineY=prefs.getInt("lineY",-1);
+        if(session.mode==Mode.CANVAS&&session.drawTool==DrawTool.LINE&&lineX>=0&&lineX<16&&lineY>=0&&lineY<16){session.lineX=lineX;session.lineY=lineY;}
         if(session.tool!=2&&prefs.getString("mode","").equals("VALUE")){
             session.mode=Mode.VALUE;session.field=bounded("field",0,1);session.draft=Math.max(1,bounded("draft",2,4));
         }
