@@ -23,6 +23,20 @@ The key promise is simple:
 
 ## 2. What makes PIKOOS different
 
+### Games with and without characters
+
+Owner clarification (2026-10-03): PIKOOS must support games without a hero,
+including puzzles and falling-block games. Sprites can depict enemies, items,
+environment pieces, puzzle pieces or interface elements. A resource's role is
+contextual, not a fixed type inferred from its pixels or position on the sheet.
+One resource may have several uses; a game can also draw without sprites.
+
+The shared creation path is cart → relevant resources/code → edit → test.
+Templates add suitable concepts: a platformer may expose a character and jump;
+a puzzle may expose a board, pieces and rules. These are examples for tool
+design, not a requirement to introduce objects, physics or a scene graph into
+every game. Genre templates remain later work; genre independence is a base rule.
+
 PIKOOS is not only a launcher and not only an editor.
 
 The useful distinction is that the same object — a PICO-8 cartridge — can move smoothly between different modes of interaction:
@@ -81,7 +95,7 @@ The product should respect both a complete beginner and an experienced PICO-8 de
 
 A beginner should not need to study before making anything.
 
-A good first-session flow is:
+One first-session example using the platformer template is:
 
 1. choose `Create`;
 2. choose something like `Tiny Platformer`;
@@ -482,12 +496,10 @@ A useful flow:
 1. play an interesting cart;
 2. press `Remix`;
 3. PIKOOS creates a working copy;
-4. offer easy entry points:
-   - change hero;
-   - make movement faster;
-   - change music;
-   - add dash;
-   - change a room;
+4. offer entry points supported by this cart's resources and known bindings:
+   - edit a sprite, tile or music;
+   - change a board or piece where the puzzle binding is known;
+   - change a character or movement only where those concepts exist;
 5. user eventually sees how each change maps to real code/data.
 
 Remix should feel like opening a toy to see what is inside.

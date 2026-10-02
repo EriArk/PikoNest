@@ -87,6 +87,19 @@ Responsibilities:
 - manage project identity without changing the cart unnecessarily;
 - create remix/project copies.
 
+The generic project/cart contract has no mandatory hero, character, movement
+fields, collision body or scene graph. Resources and gameplay uses are separate:
+a sprite may serve multiple objects or no object at all. Role-specific bindings
+belong to optional template/mechanic adapters over ordinary Lua/data; unsupported
+bindings do not make an otherwise valid cart invalid.
+
+Current limitation: the experimental Android `WorkshopCartridge` constructor
+requires owned `speed`/`jump` fields and `HeroCode`; its `HeroBinding` exposes the
+Moon Garden character. It is not a generic project model. General resource and
+library workflows must be separated from that dependency before reusing them
+for arbitrary projects. Do not rename the hero model to "object" and assume it
+now represents puzzles, enemies or environment pieces.
+
 ### `core/mechanics`
 
 Responsibilities:

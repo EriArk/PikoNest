@@ -152,6 +152,22 @@ A user can install PIKOOS, provide official PICO-8, import carts and comfortably
 
 # 0.2 — First Creator
 
+### Base requirement: creation without a hero
+
+Owner clarification (2026-10-03): genre templates are later work, but the shared
+project/resource/editor model must already allow games without a hero. Before
+building general import or cross-project asset insertion on the current lab,
+separate ordinary cart/resource operations from Moon Garden's mandatory
+`speed`, `jump`, `HeroCode` and `HeroBinding`. Keep its working hero workflow as
+a template-specific capability. This refactoring is pending, not delivered by
+the terminology update in 0.0.8.
+
+Acceptance must include a hero-free puzzle/falling-block-style fixture as well
+as Moon Garden: open/create, edit and reuse a sprite, save, undo and run in
+official PICO-8 without injecting a hero, movement code or collision body.
+An empty cart must also open without adding those concepts. Fixture coverage
+does not imply a complete puzzle template or general object editor is ready.
+
 ## Goal
 
 Make and edit a small real PICO-8 game entirely on a handheld.

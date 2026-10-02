@@ -185,6 +185,26 @@ Do not create a closed visual language or opaque runtime component system.
 
 ## 7. Project model
 
+### Genre-neutral core; no mandatory hero
+
+Owner clarification (2026-10-03): games may contain enemies, items, environment
+pieces, puzzle pieces, boards or UI elements, and may have no hero at all.
+Creation, resource editing, library reuse and test/run must not require a hero,
+player controller, movement/jump fields, collision body or sprite assignment.
+
+A sprite is a graphics resource, not a game object or a mandatory character.
+Its uses can be multiple and optional. Gameplay roles and behavior belong to
+the particular game/template/mechanic; do not impose a universal entity/component
+system, scene graph or fixed hero/enemy/environment taxonomy on ordinary carts.
+Offer role-specific actions only for a known applicable binding. Generic tools
+must also work for hero-free puzzles and falling-block games.
+
+The Android lab's `WorkshopCartridge`, `HeroCode` and `HeroBinding` currently
+serve the owned Moon Garden platformer. Their mandatory speed/jump/hero data is
+an experiment limitation, not the portable project contract. Before extending
+this into general creation/import or the asset library, separate template
+bindings from generic cart/resource workflows and verify a hero-free cart.
+
 A normal project should conceptually look like:
 
 ```text
