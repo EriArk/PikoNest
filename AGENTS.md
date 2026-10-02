@@ -46,6 +46,31 @@ Use a replaceable platform/runtime boundary from the beginning.
 7. A project that passes normal verification should continue to run when opened outside PIKOOS in ordinary PICO-8.
 8. Optional PIKOOS extensions (network bridge, achievements, etc.) must be explicit and separable from standard compatibility.
 9. PIKOOS must never bundle proprietary PICO-8 binaries. The user imports their own purchased runtime.
+10. **The base product follows the real PICO-8 rules.** Its resource model,
+    editing operations, generated code and validation must respect the official
+    PICO-8 semantics and limits for the targeted runtime version.
+
+### Real console rules vs prototype scope
+
+Owner-confirmed requirement (2026-10-02): design the base around PICO-8 itself.
+
+- Before designing or extending a tool, check the relevant official manual/API,
+  resource layout and limits. Verify implemented behavior with focused data tests
+  and the user's official runtime where applicable; document remaining uncertainty.
+- Do not turn a temporary PIKOOS restriction into a claimed PICO-8 restriction
+  or a permanent domain-model invariant. For example, the experiment's eight
+  16×16 images are a bounded editor slice, not PICO-8's sprite size or capacity.
+  Larger and rectangular images must fit the standard sprite-sheet model.
+- Partial implementation is allowed. Identify unsupported editing operations
+  as PIKOOS limitations, preserve their source data, and refuse unsafe edits.
+  A valid PICO-8 feature missing from our editor is not an incompatible cartridge.
+- Do not silently expand or shrink console limits, change API behavior, or invent
+  a different graphics, map, audio or execution model for standard projects.
+- Improve the controller-first interface freely within that contract. Friendly
+  objects, templates and tools must map to ordinary PICO-8 Lua/data; matching the
+  original desktop editor's layout or keyboard workflow is not required.
+- PIKOOS-only behavior remains an explicit, separable extension, never an
+  accidental requirement of the base creation workflow.
 
 See `docs/PICO8_COMPATIBILITY.md`.
 

@@ -52,6 +52,36 @@ A future alternative preview engine must never redefine compatibility.
 
 `Verify in PICO-8` should always mean testing with the official runtime.
 
+### The base follows PICO-8's actual model
+
+Owner-confirmed rule, 2026-10-02: the base tools follow the real PICO-8 rules,
+including resource organization, API semantics and version-specific limits.
+This applies to graphics, maps, sound/music, Lua, timing and cartridge handling,
+not just whether the resulting file has a `.p8` extension.
+
+Before implementing a tool, use the relevant sections of the
+[official manual](https://www.lexaloffle.com/dl/docs/pico-8_manual.html), matched
+to the targeted runtime version. Document how friendly editing operations map
+to ordinary PICO-8 data/code. Test the affected data and behavior, including
+official-runtime checks where applicable; do not claim unobserved verification.
+
+Temporary prototype restrictions are implementation scope, not console rules.
+For example, the current editor exposes eight 16×16 images. PICO-8 uses 8×8
+sprite cells and supports drawing larger or rectangular regions with `spr()`
+or pixel-addressed regions with `sspr()`. Future editor sizes must use that
+underlying model and account for occupied sheet regions and shared map memory.
+Do not bake the experiment's fixed image slots into the production resource model.
+
+An operation may remain unsupported while the editor grows. Label that as a
+PIKOOS editing limitation, preserve the cartridge and avoid destructive fallback
+or conversion. Lack of editor support alone does not make a valid cart
+`Incompatible / Error`. Conversely, do not hide extra resources or altered
+runtime behavior behind a standard-project label.
+
+The interface may offer different layouts, controller workflows, names and
+high-level tools. Their game output must retain ordinary PICO-8 semantics;
+optional PIKOOS extensions remain explicit and separable.
+
 ## 4. No custom Lua dialect for standard carts
 
 Standard carts must use ordinary PICO-8 Lua syntax and APIs.
