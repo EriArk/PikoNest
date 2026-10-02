@@ -127,6 +127,7 @@ final class WorkshopView extends View {
         text(label,x,y+28,18,color);hit(x,y,width(label,18)+8,44,run);
     }
     private void workshop() {
+        if(!s.cart().hasHero()){resources();return;}
         boolean narrow=w<500;
         float size=narrow?128:Math.min(256,Math.min((w-56)*.46f,bodyBottom-220));
         size=Math.max(96,((int)size/16)*16);
@@ -156,6 +157,19 @@ final class WorkshopView extends View {
             link("[ ] Посмотреть код",3,right,infoY+40,rw);
             link("? Как это работает",4,right,infoY+88,rw);
         }
+    }
+    private void resources(){
+        text("ТВОЙ КАРТРИДЖ",16,169,18,14);
+        fitted("Спрайты для фигур, предметов и окружения",16,204,20,7,w-32);
+        float gap=12,size=Math.max(24,Math.min(64,Math.min((w-68)/4,bodyBottom-404))),y=218;
+        for(int i=0;i<4;i++){
+            float x=16+i*(size+gap);rect(x,y,size,size,0);sprite(i,x,y,size,false);outline(x,y,size,size,13);
+        }
+        text("Ресурсы проекта · не кадр игры",16,y+size+25,16,6);
+        float by=y+size+32;
+        link("Спрайты · выбрать и рисовать",0,16,by,w-32);
+        link("[ ] Посмотреть код",1,16,by+48,w-32);
+        link("? Ресурсы и игра",2,16,by+96,w-32);
     }
     private void link(String title,int target,float x,float y,float bw) {
         if(s.focus==target) {rect(x,y,bw,40,2);outline(x,y,bw,40,10);}
@@ -217,7 +231,7 @@ final class WorkshopView extends View {
             button("+",w-64,bottom+14,44,44,false,()->action(Action.RIGHT));
         } else {
             text("Настоящий Lua из картриджа",16,bottom+30,20,7);
-            fitted(ok()+": изменить speed / jump · X: объяснение",16,bottom+57,16,6,w-32);
+            fitted(s.cart().hasHero()?ok()+": изменить speed / jump · X: объяснение":"Просмотр кода · L/R инструменты · START тест",16,bottom+57,16,6,w-32);
         }
     }
     private void syntax(String source,float x,float y) {
@@ -234,7 +248,7 @@ final class WorkshopView extends View {
         float size=Math.min(256,Math.min((w-56)*.46f,bodyBottom-232));size=Math.max(128,((int)size/16)*16);
         float x=16,y=180,right=size+32,rw=w-right-16;
         SpriteRegion region=s.selection();
-        text((s.cart().hero().sameImage(region)?"ГЕРОЙ":s.region==null?"СПРАЙТ "+(s.spriteSlot+1):"ОБЛАСТЬ")+" / "+region.width+" × "+region.height,16,169,18,14);
+        text((s.cart().hasHero()&&s.cart().hero().sameImage(region)?"ГЕРОЙ":s.region==null?"СПРАЙТ "+(s.spriteSlot+1):"ОБЛАСТЬ")+" / "+region.width+" × "+region.height,16,169,18,14);
         viewWidth=s.zoom?Math.min(16,region.width):region.width;viewHeight=s.zoom?Math.min(16,region.height):region.height;
         viewX=s.zoom?Math.max(0,Math.min(region.width-viewWidth,s.cursorX-viewWidth/2)):0;
         viewY=s.zoom?Math.max(0,Math.min(region.height-viewHeight,s.cursorY-viewHeight/2)):0;
@@ -272,8 +286,8 @@ final class WorkshopView extends View {
         }
         float by=246+step*4;
         button("Лист",right,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==3,()->action(Action.SPRITE_SHEET));
-        button(s.region==null?"Герою":"Рамка",right+(rw+8)/2,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==4,()->action(s.region==null?Action.ASSIGN_HERO:Action.REGION));
-        if(s.region==null)button(s.zoom?"Весь спрайт":"Приблизить",right,by+52,rw,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
+        button(s.region==null&&s.cart().hasHero()?"Герою":"Рамка",right+(rw+8)/2,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==4,()->action(s.region==null&&s.cart().hasHero()?Action.ASSIGN_HERO:Action.REGION));
+        if(s.region==null||!s.cart().hasHero())button(s.zoom?"Весь спрайт":"Приблизить",right,by+52,rw,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
         else{
             button(s.zoom?"Целиком":"Крупно",right,by+52,(rw-8)/2,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
             button("Герою",right+(rw+8)/2,by+52,(rw-8)/2,40,s.mode==Mode.NAVIGATE&&s.focus==6,()->action(Action.ASSIGN_HERO));
@@ -281,12 +295,12 @@ final class WorkshopView extends View {
     }
     private void spriteSheet() {
         text("СПРАЙТЫ ПРОЕКТА",16,169,18,14);
-        if(w>=500)text("16 × 16 · X копия",w-186,169,16,6);
+        if(w>=500)text(s.cart().hasHero()?"16 × 16 · X копия":"Участки 16 × 16",w-186,169,16,6);
         float gap=10,cw=(w-32-gap*3)/4;
         float ch=Math.min(112,(bodyBottom-180-104-gap)/2);
         for(int i=0;i<8;i++) {
             final int slot=i;float x=16+(i%4)*(cw+gap),y=180+(i/4)*(ch+gap);
-            boolean chosen=s.sheetFocus==i,used=s.cart().heroSlot()==i,part=s.cart().hero().overlaps(new SpriteRegion(i*16,0,16,16));
+            boolean chosen=s.sheetFocus==i,used=s.cart().heroSlot()==i,part=s.cart().hasHero()&&s.cart().hero().overlaps(new SpriteRegion(i*16,0,16,16));
             rect(x,y,cw,ch,0);outline(x,y,cw,ch,chosen?10:part?14:13);
             float size=Math.max(32,((int)(ch-38)/16)*16);
             if(s.cart().empty(i))text("+",x+cw/2-8,y+ch/2+1,28,13);
@@ -297,7 +311,7 @@ final class WorkshopView extends View {
             hit(x,y,cw,ch,()->{s.selectSheet(slot);changed.run();invalidate();});
         }
         float by=180+2*(ch+gap)+2,bw=(w-48)/3;
-        String[] labels={"+ Новый","Копировать","Назначить герою"};
+        String[] labels=s.cart().hasHero()?new String[]{"+ Новый","Копировать","Назначить герою"}:new String[]{"Выбрать область","Посмотреть код","О спрайтах"};
         for(int i=0;i<3;i++){final int choice=8+i;
             button(labels[i],16+i*(bw+8),by,bw,44,s.sheetFocus==choice,()->{s.selectSheet(choice);changed.run();invalidate();});
         }
@@ -361,6 +375,16 @@ final class WorkshopView extends View {
             for(int i=0;i<5;i++){final int n=i;button(labels[i],dx+16,dy+54+i*54,dw-32,46,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
             text("SELECT: меню · L/R: инструменты",dx+20,dy+356,16,6);
         } else if(s.mode==Mode.HELP) {
+            if(!s.cart().hasHero()){
+                text("Ресурсы и игра",dx+20,dy+40,26,14);
+                fitted("Спрайт хранит пиксели.",dx+20,dy+80,20,7,dw-40);
+                fitted("Код решает, где и как их показать.",dx+20,dy+108,20,7,dw-40);
+                fitted("Один спрайт можно рисовать много раз.",dx+20,dy+136,18,7,dw-40);
+                fitted("START: проверь изменения в игре.",dx+20,dy+177,18,6,dw-40);
+                button(ok()+(s.tool==2?" К спрайтам":" К коду"),dx+16,dy+210,(dw-44)/2,48,true,()->action(Action.CONFIRM));
+                button(back()+" Назад",dx+28+(dw-44)/2,dy+210,(dw-44)/2,48,false,()->action(Action.CANCEL));
+                return;
+            }
             if(s.tool==2){
                 text("Спрайты и герой",dx+20,dy+40,26,14);
                 text("Спрайт можно открыть и изменить.",dx+20,dy+80,20,7);

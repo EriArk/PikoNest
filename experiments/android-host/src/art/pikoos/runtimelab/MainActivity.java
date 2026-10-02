@@ -63,7 +63,7 @@ public final class MainActivity extends Activity {
                 public void create(String id,byte[] bytes)throws Exception{store.create(id,bytes);}
                 public void open(String id,WorkshopCartridge cart)throws Exception{openProject(id,cart);}
                 public void resume(){if(session!=null)showWorkshop();}
-            },template);
+            },template,asset("blank.p8"),asset("lights.p8"));
             input=new ControllerInput(action->{if(showingLibrary)shelf.action(action);else if(surface!=null)surface.action(action);},
                 ()->session!=null?session.swapAB:libraryPrefs.getBoolean("swapAB",false));
             try{openProject(activeId,new WorkshopCartridge(store.read(activeId)));}
@@ -115,6 +115,7 @@ public final class MainActivity extends Activity {
         ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[4096];int count;
         while((count=in.read(buffer))!=-1)out.write(buffer,0,count);return out.toByteArray();
     }
+    private byte[] asset(String name)throws Exception{try(InputStream in=getAssets().open(name)){return readAll(in);}}
     private void saveCart(AtomicFile target,byte[] bytes)throws Exception{
         FileOutputStream out=null;
         try{out=target.startWrite();out.write(bytes);target.finishWrite(out);}
@@ -127,7 +128,7 @@ public final class MainActivity extends Activity {
             persistUi();
             if(!libraryPrefs.edit().putBoolean("awaitingReturn",true).putBoolean("shelf",false).commit())throw new IllegalStateException("Не удалось сохранить состояние запуска");
             backend.launch(bytes);
-            Log.i(TAG,"launch_requested speed="+session.cart().value(0)+" jump="+session.cart().value(1));
+            Log.i(TAG,"launch_requested project="+activeId);
         }catch(Exception e){awaitingReturn=false;libraryPrefs.edit().putBoolean("awaitingReturn",false).commit();throw e;}
     }
     private void persistUi(){
@@ -178,7 +179,7 @@ public final class MainActivity extends Activity {
         }
         int lineX=prefs.getInt("lineX",-1),lineY=prefs.getInt("lineY",-1);
         if(session.mode==Mode.CANVAS&&session.drawTool==DrawTool.LINE&&lineX>=0&&lineX<session.selection().width&&lineY>=0&&lineY<session.selection().height){session.lineX=lineX;session.lineY=lineY;}
-        if(session.tool!=2&&prefs.getString("mode","").equals("VALUE")){
+        if(session.cart().hasHero()&&session.tool!=2&&prefs.getString("mode","").equals("VALUE")){
             session.mode=Mode.VALUE;session.field=bounded("field",0,1);session.draft=Math.max(1,bounded("draft",2,4));
         }
         if(session.tool==2&&prefs.getString("mode","").equals("HERO"))session.previewHero();

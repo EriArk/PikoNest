@@ -1,5 +1,14 @@
 # PIKOOS Android host experiment
 
+Version 0.0.9 adds blank and Lights puzzle creation, plus a generic resource
+workshop without required hero/speed/jump fields. Moon Garden parameters and
+hero assignment are conditional on its optional binding. Missing gfx is created
+only by an effective edit and undo restores the original cart exactly.
+See [hero-free creation/runtime evidence](../../docs/design/android-herofree-08/README.md).
+The general path has sprite editing and code viewing; free-form Lua editing,
+arbitrary file import and general destination-aware resource copying are still
+unimplemented. A new blank cart does not automatically display its sprites.
+
 Version 0.0.8 aligns resource names with PICO-8: sprite labels replace generic
 "drawing" labels in the existing editor. See [device capture and checks](../../docs/design/android-terminology-07/README.md).
 The [cross-project asset library](../../docs/ASSET_LIBRARY.md) and
@@ -137,9 +146,9 @@ ambiguous or manually changed owned code rather than guessing a binding.
 - Covers are illustrations using the actual assigned hero, not game captures.
   Touch opens cards/buttons; horizontal swipes browse beyond the current page.
 
-This is a library of owned-template projects, not arbitrary cart import or a
-finished launcher. Renaming, blank-cart creation, export, persistent history
-and `.pikoos` metadata are still future work. The sound/music and animation
+This 0.0.4 slice was a library of owned-template projects. Version 0.0.9 also
+creates blank and hero-free projects; arbitrary cart import, renaming, export,
+persistent history and `.pikoos` metadata remain future work. Sound/music and animation
 requirements do not imply implemented editors. See
 [device evidence](../../docs/design/android-library-03/README.md).
 
@@ -200,8 +209,8 @@ remain future work. [Device captures and checks](../../docs/design/android-drawi
   future work.
 - The gfx decoder currently accepts complete 128-hex-character rows with LF
   or CRLF (and an optional final newline); unsupported row layouts are refused
-  without rewriting the source. This is still an owned-template workshop,
-  not general cart import.
+  without rewriting the source. Version 0.0.9 also accepts absent/empty gfx and
+  hero-free projects; general cart import remains pending.
 
 Checked against the [official 0.2.7 manual](https://www.lexaloffle.com/dl/docs/pico-8_manual.html):
 128×128 sheet, 8×8 tile addressing, lower-half map sharing, `spr` dimensions in

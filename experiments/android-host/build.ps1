@@ -35,6 +35,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LibraryWorkflo
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'DrawingWorkflowTest',(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RegionWorkflowTest',(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'HeroBindingTest',(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'HeroFreeTest',(Join-Path $PSScriptRoot 'assets\blank.p8'),(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 
 Invoke-PikoTool $pikoJavac (@('--release','8','-encoding','UTF-8','-classpath',$pikoAndroid,'-d',(Join-Path $pikoBuild 'classes')) + $pikoCore + $pikoSources)
 Invoke-PikoTool $pikoJar @('--create','--file',(Join-Path $pikoBuild 'classes.jar'),'-C',(Join-Path $pikoBuild 'classes'),'.')

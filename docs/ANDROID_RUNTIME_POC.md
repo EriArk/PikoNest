@@ -348,6 +348,12 @@ reliability and physical controller acceptance limitations still apply.
 
 ## Drawing tools — 2026-10-02
 
+Later update: [Android 0.0.9 hero-free evidence](design/android-herofree-08/README.md)
+proves sprite editing and official-runtime launch of a puzzle without the Moon
+Garden binding, plus blank-cart creation and return after host process recreation.
+The earlier owned-template-only restrictions below describe their historical
+slices. General file import and production storage remain pending.
+
 Android lab 0.0.5 adds connected fill, previewed lines and a color picker to
 the controller-operated sprite editor. A draft line survived host process
 recreation without altering the cart; fill, line and eraser undo restored

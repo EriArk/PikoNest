@@ -16,7 +16,9 @@ public final class P8Graphics {
     private final int count;
     private final byte[] newline;
     public P8Graphics(P8Document document){
-        this.document=document;section=document.uniqueSection("gfx");body=document.body(section);
+        this.document=document;int found=-1;
+        for(P8Document.Section s:document.sections())if(s.name.equals("gfx"))found=document.uniqueSection("gfx");
+        section=found;body=section<0?new byte[0]:document.body(section);
         Arrays.fill(rows,-1);int at=0,n=0;byte[] ending=null;
         while(at<body.length){
             if(n==128||body.length-at<128)throw new IllegalArgumentException("Unsupported gfx row layout; source retained");
@@ -69,10 +71,20 @@ public final class P8Graphics {
             int value=values[y*r.width+x];
             if(value!=pixel(r,x,y))changed[offsets[r.y+y]+r.x+x]=(byte)"0123456789abcdef".charAt(value);
         }
-        return document.edit(section,0,body.length,changed);
+        if(section>=0)return document.edit(section,0,body.length,changed);
+        byte[] source=document.bytes();ByteArrayOutputStream appended=new ByteArrayOutputStream();
+        appended.write(source,0,source.length);
+        if(source.length>0&&source[source.length-1]!='\n'&&source[source.length-1]!='\r')appended.write(newline,0,newline.length);
+        byte[] marker="__gfx__".getBytes(java.nio.charset.StandardCharsets.US_ASCII);
+        appended.write(marker,0,marker.length);appended.write(newline,0,newline.length);appended.write(changed,0,changed.length);
+        return P8Document.parse(appended.toByteArray());
     }
     public P8Document withPixel(SpriteRegion r,int x,int y,int value){
         r.checkPixel(x,y);color(value);int[] values=read(r);values[y*r.width+x]=value;return write(r,values);
+    }
+    public P8Document copy(SpriteRegion source,SpriteRegion destination){
+        if(source.width!=destination.width||source.height!=destination.height)throw new IllegalArgumentException("Copy dimensions differ");
+        return write(destination,read(source));
     }
     public P8Document withFill(SpriteRegion r,int x,int y,int value){
         r.checkPixel(x,y);color(value);int[] values=read(r);int old=values[y*r.width+x];

@@ -93,12 +93,14 @@ a sprite may serve multiple objects or no object at all. Role-specific bindings
 belong to optional template/mechanic adapters over ordinary Lua/data; unsupported
 bindings do not make an otherwise valid cart invalid.
 
-Current limitation: the experimental Android `WorkshopCartridge` constructor
-requires owned `speed`/`jump` fields and `HeroCode`; its `HeroBinding` exposes the
-Moon Garden character. It is not a generic project model. General resource and
-library workflows must be separated from that dependency before reusing them
-for arbitrary projects. Do not rename the hero model to "object" and assume it
-now represents puzzles, enemies or environment pieces.
+Android lab 0.0.9 separates those bindings into optional `MoonGardenBinding`.
+`WorkshopCartridge` opens/edits ordinary supported gfx independently and retains
+unrecognized Lua; missing gfx is materialized on the first effective pixel edit.
+`HeroBinding` still describes only the Moon Garden character. The generic view
+offers resources and code without guessing gameplay roles. This proves a small
+hero-free path, not a complete generic project model, Lua editor or importer.
+Automatic free-slot allocation remains restricted to the owned platformer;
+arbitrary code may use visually empty pixels. Other carts use explicit selection.
 
 ### `core/mechanics`
 

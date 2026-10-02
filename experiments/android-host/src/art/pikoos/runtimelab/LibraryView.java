@@ -79,6 +79,13 @@ final class LibraryView extends View {
     private void artwork(WorkshopCartridge cart,float x,float y,float size){
         float unit=size/64;c.save();c.translate(x,y);c.scale(unit,unit);
         rect(0,0,64,64,1);
+        if(cart!=null&&!cart.hasHero()){
+            rect(8,6,48,52,2);outline(8,6,48,52,13);
+            for(int i=0;i<4;i++)for(int py=0;py<16;py++)for(int px=0;px<16;px++){
+                int color=cart.pixel(i,px,py);if(color!=0)rect(14+(i%2)*20+px,12+(i/2)*20+py,1,1,color);
+            }
+            c.restore();return;
+        }
         for(int i=0;i<13;i++)rect((i*19+3)%64,(i*11+2)%32,1,1,i%3==0?7:13);
         rect(47,6,7,9,15);rect(50,4,6,8,1);rect(0,49,64,15,2);rect(0,49,64,3,3);
         for(int i=0;i<5;i++){rect(3+i*13,54,4,2,4);rect(5+i*13,45,1,4,3);rect(4+i*13,44,3,2,14);}
@@ -98,11 +105,14 @@ final class LibraryView extends View {
         boolean create=s.mode==LibrarySession.Mode.CREATE;
         text(create?"Новая маленькая игра":"Не получилось",x+18,y+40,26,create?14:9);
         if(create){
-            text("Начнём с лунного сада:",x+18,y+86,20,7);
-            text("герой, прыжок и платформы.",x+18,y+115,20,7);
-            text("Рисуй и меняй всё, что уже",x+18,y+158,18,6);
-            text("умеют инструменты мастерской.",x+18,y+183,18,6);
-            text("Это будет отдельный проект.",x+18,y+213,18,11);
+            String[] titles={"Лунный сад","Чистый лист","Огоньки"};
+            String[] descriptions={"Персонаж, прыжок и платформы.","Пустой картридж для своих ресурсов.","Зажги всё поле. Меняй спрайты клеток."};
+            button("<",x+16,y+58,44,false,()->action(Action.LEFT));
+            button(">",x+dw-60,y+58,44,false,()->action(Action.RIGHT));
+            fit(titles[s.templateChoice],x+74,y+88,24,10,dw-148);
+            fit(descriptions[s.templateChoice],x+18,y+136,18,7,dw-36);
+            text((s.templateChoice+1)+" / "+s.templateCount()+"  ·  ← → выбрать",x+18,y+170,18,6);
+            fit(s.templateChoice==1?"Спрайты — рисование, код — просмотр.":"Это будет отдельный проект.",x+18,y+208,18,11,dw-36);
         }else{
             text("Исходные проекты сохранены.",x+18,y+82,18,7);
             String message=s.error;

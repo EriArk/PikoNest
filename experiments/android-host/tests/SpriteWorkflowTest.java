@@ -53,9 +53,13 @@ public final class SpriteWorkflowTest {
             check(Arrays.equals(copy.bytes(),assigned.withHero(0).bytes()),"assignment and reversal exact, including two-digit numbers");
         }
         String ambiguous=ascii(original).replace(" spr(0,x,y,2,2)"," spr(0,x,y,2,2)\n spr(0,x,y,2,2)");
-        rejects(()->new WorkshopCartridge(bytes(ambiguous)));
+        WorkshopCartridge ambiguousCart=new WorkshopCartridge(bytes(ambiguous));
+        check(!ambiguousCart.hasHero()&&Arrays.equals(ambiguousCart.bytes(),bytes(ambiguous)),"ambiguous binding leaves cart readable and unchanged");
+        rejects(()->ambiguousCart.withHero(1));
         String custom=ascii(original).replace(" spr(0,x,y,2,2)"," spr(other,x,y,2,2)");
-        rejects(()->new WorkshopCartridge(bytes(custom)));
+        WorkshopCartridge customCart=new WorkshopCartridge(bytes(custom));
+        check(!customCart.hasHero()&&Arrays.equals(customCart.bytes(),bytes(custom)),"custom code leaves resources available");
+        rejects(()->customCart.withHero(1));
 
         Port port=new Port();WorkshopSession s=new WorkshopSession(cart,port);
         s.switchTool(2);check(s.mode==Mode.SHEET,"first entry is resource sheet");

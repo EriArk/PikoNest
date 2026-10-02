@@ -199,11 +199,11 @@ system, scene graph or fixed hero/enemy/environment taxonomy on ordinary carts.
 Offer role-specific actions only for a known applicable binding. Generic tools
 must also work for hero-free puzzles and falling-block games.
 
-The Android lab's `WorkshopCartridge`, `HeroCode` and `HeroBinding` currently
-serve the owned Moon Garden platformer. Their mandatory speed/jump/hero data is
-an experiment limitation, not the portable project contract. Before extending
-this into general creation/import or the asset library, separate template
-bindings from generic cart/resource workflows and verify a hero-free cart.
+Android lab 0.0.9 keeps Moon Garden's speed/jump/hero data behind the optional
+`MoonGardenBinding` adapter. Shared cart/resource workflows also accept carts
+without it, including the blank and Lights samples. `HeroCode` and `HeroBinding`
+remain platformer-specific; do not turn them into a universal object model.
+Arbitrary import, full Lua editing and general resource allocation remain open.
 
 A normal project should conceptually look like:
 

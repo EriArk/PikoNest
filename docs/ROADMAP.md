@@ -158,9 +158,10 @@ Owner clarification (2026-10-03): genre templates are later work, but the shared
 project/resource/editor model must already allow games without a hero. Before
 building general import or cross-project asset insertion on the current lab,
 separate ordinary cart/resource operations from Moon Garden's mandatory
-`speed`, `jump`, `HeroCode` and `HeroBinding`. Keep its working hero workflow as
-a template-specific capability. This refactoring is pending, not delivered by
-the terminology update in 0.0.8.
+`speed`, `jump`, `HeroCode` and `HeroBinding`. Android 0.0.9 delivers the first
+bounded separation through optional `MoonGardenBinding`, blank creation and
+the hero-free Lights sample. General import, allocation and library reuse remain
+pending; see [implementation evidence](design/android-herofree-08/README.md).
 
 Acceptance must include a hero-free puzzle/falling-block-style fixture as well
 as Moon Garden: open/create, edit and reuse a sprite, save, undo and run in

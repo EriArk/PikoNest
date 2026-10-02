@@ -74,12 +74,18 @@ my-game/
 - [`docs/PICO8_LEARNING_RESOURCES.md`](docs/PICO8_LEARNING_RESOURCES.md) — PICO-8 reference, guide requirements and source catalogue
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — technical boundaries and proposed architecture
 - [`docs/ASSET_LIBRARY.md`](docs/ASSET_LIBRARY.md) — reusable sprites, backgrounds, SFX and music
+- [`docs/VISUAL_EFFECTS.md`](docs/VISUAL_EFFECTS.md) — particle/VFX research and proposed tool requirements
 - [`docs/FIRST_RUN_SETUP.md`](docs/FIRST_RUN_SETUP.md) — folders, archive choice and automatic runtime preparation
 - [`docs/PICO8_COMPATIBILITY.md`](docs/PICO8_COMPATIBILITY.md) — compatibility invariants
 - [`docs/ONLINE_CARTRIDGES.md`](docs/ONLINE_CARTRIDGES.md) — personalized online-cart concept
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — staged implementation plan
 
 ## Status
+
+Android 0.0.9 separates Moon Garden bindings from basic cart/resource editing.
+New projects can also start with a blank cart or the hero-free Lights puzzle;
+their workshop offers sprite editing and Lua viewing without character controls.
+See [device/runtime evidence and limitations](docs/design/android-herofree-08/README.md).
 
 Android 0.0.8 uses precise sprite terminology in the existing editor; see
 [device capture](docs/design/android-terminology-07/README.md). The reusable asset
