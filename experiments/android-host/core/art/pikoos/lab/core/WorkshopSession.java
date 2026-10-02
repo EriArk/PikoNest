@@ -7,7 +7,7 @@ import java.util.Arrays;
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER }
     public interface Port {
         void save(byte[] bytes) throws Exception;
@@ -15,6 +15,7 @@ public final class WorkshopSession {
         default void library() throws Exception {}
         default java.util.List<SpriteAsset> assets()throws Exception{return java.util.Collections.emptyList();}
         default void storeAsset(SpriteAsset asset)throws Exception{throw new Exception("Хранилище ресурсов не подключено");}
+        default void renameAsset(SpriteAsset expected,String title)throws Exception{throw new Exception("Переименование не подключено");}
         default String projectOrigin(){return "Проект";}
     }
     private final Port port;
@@ -42,12 +43,45 @@ public final class WorkshopSession {
     private final java.util.ArrayList<SpriteAsset> assets=new java.util.ArrayList<>();
     public int assetIndex;
     public SpriteAsset assetDraft,copyAsset;
+    public SpriteAsset nameTarget;
+    public NameEditor nameEditor;
+    public boolean namingNewAsset;
     public java.util.List<SpriteAsset> assets(){return java.util.Collections.unmodifiableList(assets);}
     public SpriteAsset currentAsset(){return assets.isEmpty()?null:assets.get(clamp(assetIndex,assets.size()-1));}
     public String assetsReturnMode(){return assetsReturn.name();}
     private void showAssets()throws Exception{
+        String selected=currentAsset()==null?"":currentAsset().id;
         assetsReturn=mode;mode=Mode.ASSETS;
         java.util.List<SpriteAsset> loaded=port.assets();assets.clear();assets.addAll(loaded);assetIndex=clamp(assetIndex,assets.size()-1);
+        selectAssetId(selected);
+    }
+    public void selectAssetId(String id){for(int i=0;i<assets.size();i++)if(assets.get(i).id.equals(id)){assetIndex=i;return;}}
+    private void publishAsset(SpriteAsset asset){
+        boolean found=false;
+        for(int i=0;i<assets.size();i++)if(assets.get(i).id.equals(asset.id)){assets.set(i,asset);found=true;break;}
+        if(!found)assets.add(asset);
+        assets.sort((a,b)->{int c=a.title.compareTo(b.title);return c==0?a.id.compareTo(b.id):c;});
+        selectAssetId(asset.id);
+    }
+    private void beginName(){
+        namingNewAsset=mode==Mode.ASSET_SAVE;nameTarget=namingNewAsset?assetDraft:currentAsset();
+        if(nameTarget==null)return;nameEditor=new NameEditor(nameTarget.title);mode=Mode.NAME;
+    }
+    public void typeName(int index){if(mode==Mode.NAME)nameEditor.type(index);}
+    public void restoreName(SpriteAsset target,boolean isNew,NameEditor editor){
+        if(mode!=Mode.ASSETS&&mode!=Mode.ASSET_SAVE)return;
+        nameTarget=target;namingNewAsset=isNew;nameEditor=editor;
+        if(isNew)assetDraft=target;mode=Mode.NAME;
+    }
+    private void finishName()throws Exception{
+        String title=nameEditor.value();if(title==null)return;
+        SpriteAsset renamed=nameTarget.withTitle(title);
+        if(namingNewAsset)assetDraft=renamed;
+        else if(!title.equals(nameTarget.title)){
+            port.renameAsset(nameTarget,title);
+            publishAsset(renamed);
+        }
+        mode=namingNewAsset?Mode.ASSET_SAVE:Mode.ASSETS;nameEditor=null;nameTarget=null;notice="Название сохранено";
     }
     public void selectAsset(int index){if(mode!=Mode.ASSETS)return;assetIndex=clamp(index,assets.size()-1);act(Action.CONFIRM);}
     public void restoreAssets(String returnMode,int index)throws Exception{
@@ -136,7 +170,7 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
         if(pendingLine())return;
@@ -239,15 +273,31 @@ public final class WorkshopSession {
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if(mode==Mode.NAME){
+                if(action==Action.CANCEL){mode=namingNewAsset?Mode.ASSET_SAVE:Mode.ASSETS;nameEditor=null;nameTarget=null;notice="Название не изменено";return;}
+                if(action==Action.LEFT)nameEditor.move(-1,0);
+                if(action==Action.RIGHT)nameEditor.move(1,0);
+                if(action==Action.UP)nameEditor.move(0,-1);
+                if(action==Action.DOWN)nameEditor.move(0,1);
+                if(action==Action.CONFIRM)nameEditor.type(nameEditor.key);
+                if(action==Action.CONTEXT)nameEditor.erase();
+                if(action==Action.UNDO)nameEditor.uppercase=!nameEditor.uppercase;
+                if(action==Action.MENU)nameEditor.replaceAll=!nameEditor.replaceAll;
+                if(action==Action.PREVIOUS||action==Action.NEXT)nameEditor.language();
+                if(action==Action.TEST)finishName();
+                return;
+            }
             if(mode==Mode.ASSET_SAVE){
+                if(action==Action.CONTEXT)beginName();
                 if(action==Action.CANCEL){assetDraft=null;mode=Mode.ASSETS;notice="Сохранение ресурса отменено";}
                 if(action==Action.CONFIRM){
                     port.storeAsset(assetDraft);
-                    assets.add(assetDraft);assetIndex=assets.size()-1;assetDraft=null;mode=Mode.ASSETS;notice="Спрайт в библиотеке";
+                    publishAsset(assetDraft);assetDraft=null;mode=Mode.ASSETS;notice="Спрайт в библиотеке";
                 }
                 return;
             }
             if(mode==Mode.ASSETS){
+                if(action==Action.UNDO){beginName();return;}
                 if(action==Action.CANCEL){mode=assetsReturn;return;}
                 if(action==Action.LEFT||action==Action.UP)assetIndex=clamp(assetIndex-1,assets.size()-1);
                 if(action==Action.RIGHT||action==Action.DOWN)assetIndex=clamp(assetIndex+1,assets.size()-1);

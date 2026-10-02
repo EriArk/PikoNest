@@ -43,4 +43,13 @@ final class SpriteAssetStore {
         try{out=target.startWrite();out.write(asset.encode());target.finishWrite(out);}
         catch(IOException e){target.failWrite(out);throw e;}
     }
+    synchronized void rename(SpriteAsset expected,String title)throws IOException{
+        SpriteAsset next=expected.withTitle(title);AtomicFile target=new AtomicFile(file(expected.id));
+        byte[] actual=target.readFully();
+        if(Arrays.equals(actual,next.encode()))return;
+        if(!Arrays.equals(actual,expected.encode()))throw new IOException("Ресурс изменился. Закрой и заново открой библиотеку.");
+        FileOutputStream out=null;
+        try{out=target.startWrite();out.write(next.encode());target.finishWrite(out);}
+        catch(IOException e){target.failWrite(out);throw e;}
+    }
 }

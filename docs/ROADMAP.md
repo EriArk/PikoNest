@@ -171,6 +171,10 @@ project, place/preview/insert, undo and test. Storage is app-private pending the
 folder wizard; other asset types and arbitrary external cart import are not done.
 See [asset-library evidence](design/android-assets-10/README.md).
 
+Android 0.0.12 adds naming/renaming sprite-library records with a controller
+alphabet grid, draft recovery and title-only writes. This is metadata text input,
+not a general Lua or project-name editor. See [name-editor evidence](design/android-names-11/README.md).
+
 ### Base requirement: creation without a hero
 
 Owner clarification (2026-10-03): genre templates are later work, but the shared

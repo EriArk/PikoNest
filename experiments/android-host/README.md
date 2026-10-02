@@ -1,5 +1,15 @@
 # PIKOOS Android host experiment
 
+Version 0.0.12 adds names for sprite-library records. Y in the library renames
+the selected record; X on the export preview names the pending resource.
+The controller alphabet grid supports Russian/Latin, case, digits and symbols.
+Confirm types, X erases, Y changes case, L/R changes alphabet, Select toggles
+select-all/end editing, Start finishes, Cancel discards. Touch uses the same
+keys. The complete draft restores after process death without an automatic write.
+Rename atomically changes only the title and rejects a stale source record.
+Catalogue focus follows the resource ID through sorting and reopening.
+[Evidence](../../docs/design/android-names-11/README.md).
+
 Version 0.0.11 adds the first shared sprite library. In any project, open the
 menu's Resources entry; with a sprite/region selected, X previews saving it.
 Confirm stores independent indexed pixels and source metadata. Select a record
@@ -7,7 +17,7 @@ in another project, place and preview it, then confirm insertion. Cancel and
 whole-operation undo preserve the target exactly. The library and insertion
 draft survive process recreation; inserted carts run without library access.
 Storage is currently app-private, separate from project folders. Folder selection,
-renaming/deletion, external import, flags/animation/audio dependencies and other
+deletion, external import, flags/animation/audio dependencies and other
 resource types remain pending. [Evidence](../../docs/design/android-assets-10/README.md).
 
 Version 0.0.10 makes sprite/rectangle copying available in every supported cart.

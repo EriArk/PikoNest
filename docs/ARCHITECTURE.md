@@ -178,6 +178,15 @@ records reconstructs the catalogue; there is no separately authoritative index.
 Replacing this adapter with user-selected storage remains required by first-run
 setup. The binary library record never becomes a cartridge/runtime dependency.
 
+Lab 0.0.12 adds portable `NameEditor` drafts and metadata-only rename transactions.
+Display titles are not Lua identifiers or filenames; record UUIDs stay stable.
+The Android adapter compares the stored record with the expected snapshot before
+an atomic title replacement, rejecting stale edits. Identical completed retries
+are accepted. Catalogue selection follows UUID through sorting/reopening.
+Pending text, alphabet, case, key focus and selection state are optional UI
+preferences. Restoring them never commits a name. New-export naming returns to
+the export preview for a separate save. Cart bytes and cart undo stay untouched.
+
 ### `core/compatibility`
 
 Responsibilities:

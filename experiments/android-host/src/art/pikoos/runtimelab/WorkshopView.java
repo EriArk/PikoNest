@@ -15,6 +15,7 @@ import art.pikoos.lab.core.WorkshopSession.Mode;
 import art.pikoos.lab.core.WorkshopCartridge;
 import art.pikoos.lab.core.SpriteRegion;
 import art.pikoos.lab.core.SpriteAsset;
+import art.pikoos.lab.core.NameEditor;
 import art.pikoos.lab.core.HeroBinding;
 import art.pikoos.lab.core.WorkshopSession.DrawTool;
 import java.util.ArrayList;
@@ -78,11 +79,12 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine()||s.copying()||s.assetDraft!=null;
+        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine()||s.copying()||s.assetDraft!=null||s.nameEditor!=null;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
-        text("≡",w-34,29,26,7);hit(w-48,0,48,44,()->action(Action.MENU));
+        if(s.mode!=Mode.NAME){text("≡",w-34,29,26,7);hit(w-48,0,48,44,()->action(Action.MENU));}
+        if(s.mode==Mode.NAME){nameEditor();c.restore();return;}
         fitted(projectTitle,16,82,28,7,w-130);text("game.p8",w-98,80,18,13);
         rect(0,100,w,2,13);
         String[] tabs={"Мастерская","[ ] Код","Спрайты"};
@@ -114,6 +116,7 @@ final class WorkshopView extends View {
             key(ok()+(s.mode==Mode.ASSET_SAVE||s.currentAsset()==null&&s.tool==2?" сохранить":s.currentAsset()==null?" спрайты":" вставить"),12,bodyBottom,10,()->action(Action.CONFIRM));
             key(back()+" назад",w<500?136:200,bodyBottom,6,()->action(Action.CANCEL));
             if(s.mode==Mode.ASSETS&&s.tool==2)key("X сохранить",w-132,bodyBottom,14,()->action(Action.CONTEXT));
+            if(s.mode==Mode.ASSET_SAVE)key("X имя",w-88,bodyBottom,14,()->action(Action.CONTEXT));
             return;
         }
         if(s.copying()&&s.mode!=Mode.ERROR){
@@ -361,8 +364,38 @@ final class WorkshopView extends View {
             float by=214+ch;
             fitted(chosen.width+" × "+chosen.height+" · "+chosen.origin,16,by+28,18,7,w-32);
             fitted("Автор и лицензия: не указаны",16,by+52,16,13,w-32);
-            fitted("← → выбрать · "+ok()+" разместить в проекте",16,by+78,18,6,w-32);
+            fitted("← → выбрать · Y название",16,by+78,18,6,w-32);
+            hit(16,by+56,w-32,34,()->action(Action.UNDO));
         }
+    }
+    private void nameEditor(){
+        NameEditor e=s.nameEditor;
+        text("Название спрайта",16,78,26,14);
+        text(e.text().length()+" / 80",w-92,78,18,6);
+        rect(16,96,w-32,48,e.replaceAll?10:0);outline(16,96,w-32,48,10);
+        String shown=e.text();p.setTextSize(26);
+        while(shown.length()>1&&width(shown+(e.replaceAll?"":"_"),26)>w-58)shown=shown.substring(shown.offsetByCodePoints(0,1));
+        text(shown+(e.replaceAll?"":"_"),26,129,26,e.replaceAll?1:7);
+        fitted(e.warning.isEmpty()?(e.replaceAll?"Выделено всё · новая буква заменит название":"Ввод в конец · символ «·» вводит пробел"):e.warning,16,165,16,e.warning.isEmpty()?6:8,w-32);
+        text("L/R "+(e.latin?"ABC":"АБВ"),16,192,18,12);
+        hit(12,170,w-24,30,()->action(Action.NEXT));
+        fitted("SELECT "+(e.replaceAll?"в конец":"выделить всё"),150,192,18,6,w-168);
+        float step=(bodyBottom-62-204)/5,cw=(w-32)/10;
+        for(int i=0;i<e.count();i++){
+            final int k=i;float x=16+(i%10)*cw,y=204+(i/10)*step;boolean focused=e.key==i;
+            rect(x+1,y+1,cw-3,step-3,focused?10:0);
+            char letter=e.character(i);String label=letter==' '?"·":String.valueOf(letter);
+            text(label,x+(cw-width(label,24))/2,y+step/2+8,24,focused?1:7);
+            hit(x,y,cw,step,()->{s.typeName(k);changed.run();invalidate();});
+        }
+        float y=bodyBottom-54,bw=(w-48)/3;
+        button("X стереть",16,y,bw,42,false,()->action(Action.CONTEXT));
+        button("Y Аа",24+bw,y,bw,42,false,()->action(Action.UNDO));
+        button(e.replaceAll?"В конец":"Всё",32+bw*2,y,bw,42,false,()->action(Action.MENU));
+        rect(0,bodyBottom,w,44,0);
+        key(ok()+" буква",12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" отмена",w<500?124:180,bodyBottom,6,()->action(Action.CANCEL));
+        key("START готово",w-144,bodyBottom,14,()->action(Action.TEST));
     }
     private void assetPicture(SpriteAsset a,float x,float y,float size){
         picture(new SpriteRegion(0,0,a.width,a.height),a,x,y,size);

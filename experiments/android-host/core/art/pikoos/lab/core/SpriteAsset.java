@@ -32,6 +32,10 @@ public final class SpriteAsset {
         }catch(java.security.NoSuchAlgorithmException e){throw new IllegalStateException(e);}
     }
     public int pixel(int x,int y){if(x<0||y<0||x>=width||y>=height)throw new IllegalArgumentException("Pixel outside asset");return pixels[y*width+x];}
+    public SpriteAsset withTitle(String title){
+        if(title==null||title.trim().isEmpty())throw new IllegalArgumentException("Название не должно быть пустым");
+        return new SpriteAsset(id,title.trim(),origin,sourceHash,sourceX,sourceY,width,height,pixels);
+    }
     public int[] colors(){int[] result=new int[pixels.length];for(int i=0;i<result.length;i++)result[i]=pixels[i];return result;}
     public byte[] encode(){
         try{

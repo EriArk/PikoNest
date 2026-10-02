@@ -38,6 +38,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'HeroBindingTes
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'HeroFreeTest',(Join-Path $PSScriptRoot 'assets\blank.p8'),(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'CopyWorkflowTest',(Join-Path $PSScriptRoot 'assets\blank.p8'),(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'AssetLibraryTest',(Join-Path $PSScriptRoot 'assets\moon-garden.p8'),(Join-Path $PSScriptRoot 'assets\blank.p8'),(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'AssetNamingTest',(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 
 Invoke-PikoTool $pikoJavac (@('--release','8','-encoding','UTF-8','-classpath',$pikoAndroid,'-d',(Join-Path $pikoBuild 'classes')) + $pikoCore + $pikoSources)
 Invoke-PikoTool $pikoJar @('--create','--file',(Join-Path $pikoBuild 'classes.jar'),'-C',(Join-Path $pikoBuild 'classes'),'.')

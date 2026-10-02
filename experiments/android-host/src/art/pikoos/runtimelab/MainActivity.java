@@ -15,6 +15,7 @@ import android.widget.TextView;
 import art.pikoos.lab.core.WorkshopCartridge;
 import art.pikoos.lab.core.SpriteRegion;
 import art.pikoos.lab.core.SpriteAsset;
+import art.pikoos.lab.core.NameEditor;
 import android.util.Base64;
 import art.pikoos.lab.core.LibrarySession;
 import art.pikoos.lab.core.WorkshopSession;
@@ -90,6 +91,7 @@ public final class MainActivity extends Activity {
                 public void library()throws Exception{showLibrary();}
                 public java.util.List<SpriteAsset> assets()throws Exception{return assetStore.list();}
                 public void storeAsset(SpriteAsset asset)throws Exception{assetStore.create(asset);}
+                public void renameAsset(SpriteAsset expected,String title)throws Exception{assetStore.rename(expected,title);}
                 public String projectOrigin(){return LibrarySession.title(id)+" · "+id;}
             });
             activeId=id;session=next;
@@ -157,10 +159,18 @@ public final class MainActivity extends Activity {
             .putBoolean("browsingSprites",session.browsingSprites)
             .putBoolean("copying",session.copying()).putInt("copyX",session.copyX).putInt("copyY",session.copyY)
             .putString("copyReturn",session.copyReturnMode())
-            .putBoolean("assets",session.mode==Mode.ASSETS||session.assetDraft!=null||session.copyAsset!=null)
+            .putBoolean("assets",session.mode==Mode.ASSETS||session.assetDraft!=null||session.copyAsset!=null||session.nameEditor!=null)
             .putInt("assetIndex",session.assetIndex).putString("assetsReturn",session.assetsReturnMode())
+            .putString("assetId",session.currentAsset()==null?"":session.currentAsset().id)
             .putString("assetDraft",session.assetDraft==null?"":Base64.encodeToString(session.assetDraft.encode(),Base64.NO_WRAP))
             .putString("copyAsset",session.copyAsset==null?"":Base64.encodeToString(session.copyAsset.encode(),Base64.NO_WRAP))
+            .putString("nameTarget",session.nameTarget==null?"":Base64.encodeToString(session.nameTarget.encode(),Base64.NO_WRAP))
+            .putString("nameText",session.nameEditor==null?"":session.nameEditor.text())
+            .putBoolean("nameNew",session.namingNewAsset)
+            .putInt("nameKey",session.nameEditor==null?0:session.nameEditor.key)
+            .putBoolean("nameLatin",session.nameEditor!=null&&session.nameEditor.latin)
+            .putBoolean("nameUpper",session.nameEditor!=null&&session.nameEditor.uppercase)
+            .putBoolean("nameAll",session.nameEditor!=null&&session.nameEditor.replaceAll)
             .putString("mode",session.heroDraft!=null?"HERO":session.mode==Mode.CANVAS||session.pendingLine()?"CANVAS":session.mode==Mode.VALUE?"VALUE":"NAVIGATE").apply();
     }
     private int bounded(String key,int fallback,int max){return Math.max(0,Math.min(max,prefs.getInt(key,fallback)));}
@@ -200,9 +210,17 @@ public final class MainActivity extends Activity {
         if(prefs.getBoolean("assets",false)){
             try{
                 session.restoreAssets(prefs.getString("assetsReturn","NAVIGATE"),prefs.getInt("assetIndex",0));
+                session.selectAssetId(prefs.getString("assetId",""));
                 String saved=prefs.getString("assetDraft",""),copy=prefs.getString("copyAsset","");
                 if(!saved.isEmpty()&&session.mode==Mode.ASSETS){session.assetDraft=SpriteAsset.decode(Base64.decode(saved,Base64.NO_WRAP));session.mode=Mode.ASSET_SAVE;}
                 if(!copy.isEmpty()&&session.mode==Mode.ASSETS)session.restoreInsertion(SpriteAsset.decode(Base64.decode(copy,Base64.NO_WRAP)),prefs.getInt("copyX",-1),prefs.getInt("copyY",-1));
+                String target=prefs.getString("nameTarget","");
+                if(!target.isEmpty()){
+                    NameEditor editor=new NameEditor(prefs.getString("nameText",""));
+                    editor.latin=prefs.getBoolean("nameLatin",false);editor.uppercase=prefs.getBoolean("nameUpper",true);editor.replaceAll=prefs.getBoolean("nameAll",true);
+                    editor.key=bounded("nameKey",0,editor.count()-1);
+                    session.restoreName(SpriteAsset.decode(Base64.decode(target,Base64.NO_WRAP)),prefs.getBoolean("nameNew",false),editor);
+                }
             }catch(Exception e){session.fail(e);}
         }
     }
