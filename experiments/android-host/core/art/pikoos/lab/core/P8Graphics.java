@@ -94,6 +94,13 @@ public final class P8Graphics {
         }
         return write(r,result);
     }
+    public P8Document replaceColor(SpriteRegion r,int from,int to){
+        color(from);color(to);
+        if(from==to)return document;
+        int[] values=read(r);
+        for(int i=0;i<values.length;i++)if(values[i]==from)values[i]=to;
+        return write(r,values);
+    }
     public P8Document withPixel(SpriteRegion r,int x,int y,int value){
         r.checkPixel(x,y);color(value);int[] values=read(r);values[y*r.width+x]=value;return write(r,values);
     }

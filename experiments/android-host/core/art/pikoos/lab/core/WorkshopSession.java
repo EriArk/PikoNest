@@ -7,7 +7,7 @@ import java.util.Arrays;
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER }
     public interface Port {
         void save(byte[] bytes) throws Exception;
@@ -30,6 +30,37 @@ public final class WorkshopSession {
     public DrawTool drawTool=DrawTool.BRUSH;
     public DrawTool pickerReturn=DrawTool.BRUSH;
     public int drawToolCursor, lineX=-1, lineY=-1;
+    private WorkshopCartridge recolorPreview;
+    private Mode recolorReturn=Mode.CANVAS;
+    private int recolorFrom,recolorTo,recolorField,recolorCount;
+    public boolean recoloring(){return recolorPreview!=null;}
+    public WorkshopCartridge recolorPreview(){return recolorPreview;}
+    public int recolorFrom(){return recolorFrom;}
+    public int recolorTo(){return recolorTo;}
+    public int recolorField(){return recolorField;}
+    public int recolorCount(){return recolorCount;}
+    public String recolorReturnMode(){return recolorReturn.name();}
+    public void selectRecolorField(int field){if(mode==Mode.RECOLOR&&field>=0&&field<=1)recolorField=field;}
+    public void chooseRecolor(int value){
+        if(mode!=Mode.RECOLOR||value<0||value>15)return;
+        if(recolorField==0)recolorFrom=value;else recolorTo=value;
+        refreshRecolor();
+    }
+    private void refreshRecolor(){
+        SpriteRegion r=selection();recolorCount=0;
+        if(recolorFrom!=recolorTo)for(int y=0;y<r.height;y++)for(int x=0;x<r.width;x++)
+            if(cart.pixel(r,x,y)==recolorFrom)recolorCount++;
+        recolorPreview=cart.replaceColor(r,recolorFrom,recolorTo);
+    }
+    /** Restore UI intent against current canonical pixels; never write on restore. */
+    public void restoreRecolor(int from,int to,int field,String origin){
+        if(tool!=2||browsingSprites||pendingLine()||selection().sharesMap()
+            ||(mode!=Mode.CANVAS&&mode!=Mode.NAVIGATE)||from<0||from>15||to<0||to>15||field<0||field>1)return;
+        Mode parsed;try{parsed=Mode.valueOf(origin);}catch(IllegalArgumentException e){return;}
+        if(parsed!=Mode.CANVAS&&parsed!=Mode.NAVIGATE)return;
+        recolorFrom=from;recolorTo=to;recolorField=field;recolorReturn=parsed;
+        refreshRecolor();mode=Mode.RECOLOR;
+    }
     private SpriteTransform transform;
     private WorkshopCartridge transformPreview;
     private Mode transformReturn=Mode.CANVAS;
@@ -193,7 +224,7 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
         if(pendingLine())return;
@@ -207,7 +238,7 @@ public final class WorkshopSession {
         focus = clamp(target, maxFocus()); act(Action.CONFIRM);
     }
     public void openSprite(int slot) {
-        if(pendingLine()||transforming())return;
+        if(pendingLine()||transforming()||recoloring())return;
         if (slot < 0 || slot >= WorkshopCartridge.SPRITE_COUNT) throw new IllegalArgumentException("Sprite slot out of range");
         spriteSlot = slot; sheetFocus = slot; browsingSprites = false;
         region=null;cursorX=clamp(cursorX,15);cursorY=clamp(cursorY,15);zoom=false;
@@ -221,7 +252,7 @@ public final class WorkshopSession {
     }
     public void openHero(){
         if(!cart.hasHero())return;
-        if(pendingLine()||transforming())return;
+        if(pendingLine()||transforming()||recoloring())return;
         HeroBinding h=cart.hero();
         if(h.image.sharesMap()){notice="Редактор общей области с картой ещё не готов";return;}
         if(h.card()>=0){openSprite(h.card());return;}
@@ -274,7 +305,7 @@ public final class WorkshopSession {
         paletteCursor = clamp(value, 15); act(Action.CONFIRM);
     }
     public void chooseDrawTool(int value){
-        if(mode!=Mode.DRAW_TOOLS||value<0||value>DrawTool.values().length)return;
+        if(mode!=Mode.DRAW_TOOLS||value<0||value>DrawTool.values().length+1)return;
         drawToolCursor=value;act(Action.CONFIRM);
     }
     private void draw()throws Exception {
@@ -296,6 +327,19 @@ public final class WorkshopSession {
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if(mode==Mode.RECOLOR){
+                int selected=recolorField==0?recolorFrom:recolorTo;
+                if(action==Action.LEFT)chooseRecolor(selected/8*8+(selected+7)%8);
+                if(action==Action.RIGHT)chooseRecolor(selected/8*8+(selected+1)%8);
+                if(action==Action.UP||action==Action.DOWN)chooseRecolor((selected+8)%16);
+                if(action==Action.CONTEXT)selectRecolorField(1-recolorField);
+                if(action==Action.CONFIRM){
+                    boolean differs=recolorCount>0;save(recolorPreview,true);mode=recolorReturn;recolorPreview=null;
+                    notice=differs?"Цвет заменён · Y отмена":"Пиксели не изменились";
+                }
+                if(action==Action.CANCEL){mode=recolorReturn;recolorPreview=null;notice="Без изменений";}
+                return;
+            }
             if(mode==Mode.TRANSFORM){
                 if(action==Action.LEFT||action==Action.UP)chooseTransform((transform.ordinal()+3)%4);
                 if(action==Action.RIGHT||action==Action.DOWN)chooseTransform((transform.ordinal()+1)%4);
@@ -400,9 +444,13 @@ public final class WorkshopSession {
                 return; // A draft cannot leak into other resources, tabs or runtime snapshots.
             }
             if(mode==Mode.DRAW_TOOLS){
-                if(action==Action.UP)drawToolCursor=clamp(drawToolCursor-1,5);
-                if(action==Action.DOWN)drawToolCursor=clamp(drawToolCursor+1,5);
+                if(action==Action.UP)drawToolCursor=clamp(drawToolCursor-1,6);
+                if(action==Action.DOWN)drawToolCursor=clamp(drawToolCursor+1,6);
                 if(action==Action.CONFIRM){
+                    if(drawToolCursor==6){
+                        Mode origin=overlayReturn;mode=origin;
+                        restoreRecolor(cart.pixel(selection(),cursorX,cursorY),color,1,origin.name());return;
+                    }
                     if(drawToolCursor==5){
                         Mode origin=overlayReturn;mode=origin;
                         restoreTransform(SpriteTransform.FLIP_HORIZONTAL.name(),origin.name());return;

@@ -83,6 +83,11 @@ my-game/
 
 ## Status
 
+Android 0.0.16 adds replacing one color throughout a selected sprite/region,
+with a live before/after preview, affected-pixel count, controller color selection,
+cancel, whole-edit undo and draft recovery. All supported carts use the same tool.
+[Device evidence](docs/design/android-recolor-15/README.md).
+
 Android 0.0.15 adds sprite/region mirrors and quarter/half turns with before/after
 preview, controller confirmation, cancellation and whole-operation undo.
 The tools are available in every supported cart. Quarter turns currently require

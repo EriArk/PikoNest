@@ -8,7 +8,12 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded lab step (0.0.15): sprite/region → mirror/turn preview → confirm
+Latest bounded lab step (0.0.16): sprite/region → source/target color → live
+preview and changed count → ordinary gfx replacement → undo or runtime test.
+Controller selection, transparent index 0, draft recovery, no-ops and failed saves
+are covered. [Device evidence](design/android-recolor-15/README.md).
+
+Previous step (0.0.15): sprite/region → mirror/turn preview → confirm
 → ordinary gfx edit → whole-operation undo or official-runtime test. Controller
 actions, cancelled edits, save failures and preview recovery are checked. Works
 in all supported carts; quarter turns currently need a square selection.

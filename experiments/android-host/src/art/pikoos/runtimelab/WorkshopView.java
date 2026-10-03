@@ -80,7 +80,7 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine()||s.copying()||s.transforming()||s.assetDraft!=null||s.nameEditor!=null;
+        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine()||s.copying()||s.transforming()||s.recoloring()||s.assetDraft!=null||s.nameEditor!=null;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -96,7 +96,7 @@ final class WorkshopView extends View {
         }
         rect(0,140,w,4,0);
         c.save();c.clipRect(0,144,w,bodyBottom);
-        if(s.mode==Mode.TRANSFORM)transformChooser();else if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE)assetLibrary();else if(s.copying()&&s.mode!=Mode.ERROR)copyChooser();else if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
+        if(s.mode==Mode.RECOLOR)recolorChooser();else if(s.mode==Mode.TRANSFORM)transformChooser();else if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE)assetLibrary();else if(s.copying()&&s.mode!=Mode.ERROR)copyChooser();else if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
         c.restore();
         footer();
         if(!previousNotice.equals(s.notice)){previousNotice=s.notice;noticeUntil=SystemClock.uptimeMillis()+2200;}
@@ -113,6 +113,12 @@ final class WorkshopView extends View {
     }
     private void footer() {
         rect(0,bodyBottom,w,44,0);
+        if(s.mode==Mode.RECOLOR){
+            key(ok()+" применить",12,bodyBottom,10,()->action(Action.CONFIRM));
+            key(back()+" отмена",w<500?166:220,bodyBottom,6,()->action(Action.CANCEL));
+            key("X из / в",w-110,bodyBottom,14,()->action(Action.CONTEXT));
+            return;
+        }
         if(s.mode==Mode.TRANSFORM){
             key(ok()+" применить",12,bodyBottom,s.transformAllowed()?10:13,()->action(Action.CONFIRM));
             key(back()+" отмена",w<500?180:228,bodyBottom,6,()->action(Action.CANCEL));
@@ -439,6 +445,29 @@ final class WorkshopView extends View {
             fitted("Выбор места ничего не меняет в картридже.",16,by+80,16,13,w-32);
         }
     }
+    private void recolorChooser(){
+        SpriteRegion r=s.selection();
+        fitted("ЗАМЕНА ЦВЕТА · "+r.width+" × "+r.height,16,169,18,14,w-32);
+        float size=Math.min(Math.min(120,(w-64)/2),bodyBottom-374),gap=32,left=(w-size*2-gap)/2;
+        text("БЫЛО",left,197,18,6);text("БУДЕТ",left+size+gap,197,18,10);
+        picture(r,null,s.cart(),left,208,size);picture(r,null,s.recolorPreview(),left+size+gap,208,size);
+        float by=208+size,bw=(w-44)/2;
+        button("Из #"+s.recolorFrom(),16,by+12,bw,40,s.recolorField()==0,()->{s.selectRecolorField(0);changed.run();invalidate();});
+        button("В #"+s.recolorTo(),28+bw,by+12,bw,40,s.recolorField()==1,()->{s.selectRecolorField(1);changed.run();invalidate();});
+        rect(16+bw-34,by+20,24,24,s.recolorFrom());outline(16+bw-34,by+20,24,24,13);
+        rect(w-50,by+20,24,24,s.recolorTo());outline(w-50,by+20,24,24,13);
+        int selected=s.recolorField()==0?s.recolorFrom():s.recolorTo();float cw=(w-32)/8;
+        for(int i=0;i<16;i++){
+            final int value=i;float x=16+i%8*cw,y=by+62+i/8*36;
+            rect(x+3,y+3,cw-6,30,i);outline(x+3,y+3,cw-6,30,13);
+            if(i==selected){outline(x,y,cw,36,7);outline(x+2,y+2,cw-4,32,0);}
+            text(""+i,x+cw/2-width(""+i,16)/2,y+24,16,i==0||i==1||i==2||i==4||i==5||i==8?7:0);
+            hit(x,y,cw,36,()->{s.chooseRecolor(value);changed.run();invalidate();});
+        }
+        String hint="Изменится пикселей: "+s.recolorCount()+" · ← → ↑ ↓ цвет";
+        if(s.recolorFrom()==0||s.recolorTo()==0)hint="Пикселей: "+s.recolorCount()+" · 0 обычно прозрачный в игре";
+        fitted(hint,16,by+158,16,6,w-32);
+    }
     private void transformChooser(){
         SpriteRegion r=s.selection();
         fitted("ОТРАЗИТЬ / ПОВЕРНУТЬ",16,169,18,14,w-188);
@@ -517,11 +546,13 @@ final class WorkshopView extends View {
             button(ok()+" Назначить",dx+16,dy+336,(dw-44)/2,48,true,()->action(Action.CONFIRM));
             button(back()+" Отмена",dx+28+(dw-44)/2,dy+336,(dw-44)/2,48,false,()->action(Action.CANCEL));
         }else if(s.mode==Mode.DRAW_TOOLS){
-            text("Инструменты спрайта",dx+20,dy+36,26,14);
-            for(int i=0;i<=DRAW_NAMES.length;i++){final int item=i;
-                button(i==5?"Отразить / повернуть":DRAW_NAMES[i],dx+16,dy+54+i*50,dw-32,44,s.drawToolCursor==i,()->{s.chooseDrawTool(item);changed.run();invalidate();});
+            fitted("Инструменты спрайта",dx+20,dy+36,26,14,dw-104);
+            text((s.drawToolCursor+1)+" / 7",dx+dw-70,dy+34,18,6);
+            int first=Math.max(0,s.drawToolCursor-5);
+            for(int row=0;row<6;row++){final int item=first+row;
+                button(item==6?"Заменить цвет":item==5?"Отразить / повернуть":DRAW_NAMES[item],dx+16,dy+54+row*50,dw-32,44,s.drawToolCursor==item,()->{s.chooseDrawTool(item);changed.run();invalidate();});
             }
-            fitted(s.drawToolCursor==5?"Сравнить варианты перед применением":DRAW_HELP[s.drawToolCursor],dx+20,dy+389,18,7,dw-40);
+            fitted(s.drawToolCursor==6?"Заменить цвет во всём выделении":s.drawToolCursor==5?"Сравнить варианты перед применением":DRAW_HELP[s.drawToolCursor],dx+20,dy+389,18,7,dw-40);
             text(ok()+" выбрать · "+back()+" назад",dx+20,dy+426,18,6);
             hit(dx+12,dy+398,(dw-32)/2,44,()->action(Action.CONFIRM));
             hit(dx+20+(dw-32)/2,dy+398,(dw-32)/2,44,()->action(Action.CANCEL));
@@ -573,6 +604,11 @@ final class WorkshopView extends View {
         float x=event.getX()/scale,y=event.getY()/scale;
         if(event.getActionMasked()==MotionEvent.ACTION_DOWN){downX=x;downY=y;return true;}
         if(event.getActionMasked()==MotionEvent.ACTION_UP) {
+            if(s.mode==Mode.DRAW_TOOLS&&Math.abs(y-downY)>24){
+                int steps=Math.max(1,Math.round(Math.abs(downY-y)/50));
+                for(int i=0;i<steps;i++)s.act(downY>y?Action.DOWN:Action.UP);
+                changed.run();invalidate();return true;
+            }
             if(s.tool==1&&s.mode==Mode.NAVIGATE&&Math.abs(y-downY)>24) {
                 int steps=Math.round((downY-y)/24);for(int i=0;i<Math.abs(steps);i++)s.act(steps>0?Action.DOWN:Action.UP);
                 changed.run();invalidate();return true;

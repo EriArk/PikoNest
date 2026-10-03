@@ -263,6 +263,9 @@ public final class MainActivity extends Activity {
             .putBoolean("transforming",session.transforming())
             .putString("transformOperation",session.transforming()?session.transformOperation().name():"")
             .putString("transformReturn",session.transformReturnMode())
+            .putBoolean("recoloring",session.recoloring())
+            .putInt("recolorFrom",session.recolorFrom()).putInt("recolorTo",session.recolorTo())
+            .putInt("recolorField",session.recolorField()).putString("recolorReturn",session.recolorReturnMode())
             .putBoolean("assets",session.mode==Mode.ASSETS||session.assetDraft!=null||session.copyAsset!=null||session.nameEditor!=null)
             .putInt("assetIndex",session.assetIndex).putString("assetsReturn",session.assetsReturnMode())
             .putString("assetId",session.currentAsset()==null?"":session.currentAsset().id)
@@ -312,6 +315,7 @@ public final class MainActivity extends Activity {
         if(session.tool==2&&prefs.getString("mode","").equals("HERO"))session.previewHero();
         if(prefs.getBoolean("copying",false))session.restoreCopy(prefs.getInt("copyX",-1),prefs.getInt("copyY",-1),prefs.getString("copyReturn",""));
         if(prefs.getBoolean("transforming",false))session.restoreTransform(prefs.getString("transformOperation",""),prefs.getString("transformReturn",""));
+        if(prefs.getBoolean("recoloring",false))session.restoreRecolor(prefs.getInt("recolorFrom",-1),prefs.getInt("recolorTo",-1),prefs.getInt("recolorField",-1),prefs.getString("recolorReturn",""));
         if(prefs.getBoolean("assets",false)){
             try{
                 session.restoreAssets(prefs.getString("assetsReturn","NAVIGATE"),prefs.getInt("assetIndex",0));

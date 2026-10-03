@@ -1,5 +1,21 @@
 # PIKOOS Android host experiment
 
+Version 0.0.16 adds Заменить цвет as the seventh sprite-tool entry. The menu
+scrolls with D-pad or touch swipe. In replacement preview, D-pad selects a palette
+index in an 8×2 grid; X switches source/target. Touch selects the field or swatch.
+The initial source is the pixel under the canvas cursor; target is the brush
+color. A applies, B cancels, Y after applying undoes the whole edit. Browsing
+colors always recomputes from saved pixels, and a count shows affected pixels.
+The tool replaces every matching pixel in the selected region, including
+disconnected areas. Index 0 is supported in either field; the UI reminds users
+it is normally transparent in-game. The preview uses the base palette and does
+not interpret game Lua, `pal` or `palt`. Only ordinary gfx bytes change.
+No-op edits write nothing and add no undo entry. Save failure retains the draft;
+process recreation restores the pair, active field and region for confirmation.
+Existing brush, cursor and zoom stay intact. The upper 128×64 lab editing boundary
+remains; this is not a PICO-8 capacity limit. All templates and imported supported
+text carts use the same operation. [Evidence](../../docs/design/android-recolor-15/README.md).
+
 Version 0.0.15 adds sprite transformations. Open a sprite/region, leave the canvas
 with B if drawing, move to the tool selector, then choose Отразить / повернуть.
 Left/right selects horizontal mirror, vertical mirror, clockwise 90° or 180°.

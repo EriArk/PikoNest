@@ -6,6 +6,23 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+### Android lab 0.0.16: selected-region color replacement
+
+Portable `P8Graphics.replaceColor` changes matching palette indices only within
+the selected rectangle through the existing byte-preserving gfx writer.
+`WorkshopSession` owns the source/target pair, active field, changed-pixel count,
+immutable candidate and return context. Color selection recomputes from the
+canonical cart; it never chains temporary replacements. One confirmation uses
+the durable save port and creates one in-memory undo entry. No-ops do neither;
+failed saves retain the candidate. Other resources and code stay byte-exact.
+
+Android persists only optional operation context and recomputes the preview
+against current canonical bytes after process recreation. It never applies the
+restored choice automatically. The base palette/checkerboard preview is an asset
+view, not execution of `pal`/`palt` or game Lua. Index 0 is a real editable color
+index, not an out-of-band alpha channel. Existing lab restrictions on editing
+map-shared sheet rows remain explicit. [Evidence](design/android-recolor-15/README.md).
+
 ### Android lab 0.0.15: sprite transformations
 
 Portable `SpriteTransform` describes permutations within an unchanged selection

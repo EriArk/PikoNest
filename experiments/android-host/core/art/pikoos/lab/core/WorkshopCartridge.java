@@ -24,6 +24,7 @@ public final class WorkshopCartridge {
     public int pixel(SpriteRegion region,int x,int y){return graphics.pixel(region,x,y);}
     public int sheetPixel(int x,int y){return graphics.pixel(x,y);}
     public WorkshopCartridge insert(SpriteAsset asset,SpriteRegion target){return edited(graphics.insert(asset,target));}
+    public WorkshopCartridge replaceColor(SpriteRegion region,int from,int to){return edited(graphics.replaceColor(region,from,to));}
     private WorkshopCartridge edited(P8Document next){return next==document?this:new WorkshopCartridge(next.bytes());}
     public WorkshopCartridge withPixel(SpriteRegion r,int x,int y,int color){return edited(graphics.withPixel(r,x,y,color));}
     public WorkshopCartridge withFill(SpriteRegion r,int x,int y,int color){return edited(graphics.withFill(r,x,y,color));}
