@@ -6,8 +6,8 @@ import java.util.Arrays;
 /** Portable interaction state. Input devices and Android persistence remain outside. */
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, REDO, CONTEXT, MENU,
-        SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE }
+        SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS, CHECK }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE, DIAGNOSTIC }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE, OVAL, FILLED_OVAL }
     // Keep existing operation entries 5/6 stable while adding brushes after them.
     public static int moveMenuIndex(){return DrawTool.values().length+2;}
@@ -21,6 +21,7 @@ public final class WorkshopSession {
         void save(byte[] bytes) throws Exception;
         default void save(byte[] expected,byte[] bytes)throws Exception{save(bytes);}
         void launch(byte[] bytes) throws Exception;
+        default void diagnose(byte[] bytes)throws Exception{throw new Exception("Проверка недоступна в этом runtime");}
         default void library() throws Exception {}
         default java.util.List<SpriteAsset> assets()throws Exception{return java.util.Collections.emptyList();}
         default void storeAsset(SpriteAsset asset)throws Exception{throw new Exception("Хранилище ресурсов не подключено");}
@@ -34,6 +35,36 @@ public final class WorkshopSession {
     private WorkshopCartridge cart;
     public LuaDraft codeDraft;
     public int codeColumn;
+    public RuntimeDiagnostic diagnostic;
+    public boolean diagnosticPending,diagnosticDetails,diagnosticStale;
+    public int diagnosticScroll;
+    private byte[] diagnosticSource;
+    public void diagnosticResult(byte[] checked,String log,boolean cancelled,boolean completed,boolean ended){
+        if(codeDraft==null)return;
+        diagnosticPending=false;diagnosticSource=checked.clone();diagnosticScroll=0;diagnosticDetails=false;
+        String source=new LuaDraft(new WorkshopCartridge(checked),0).text();
+        try{diagnosticStale=!Arrays.equals(checked,codeDraft.edit().candidate(cart).bytes());}catch(Exception e){diagnosticStale=true;}
+        diagnostic=RuntimeDiagnostic.read(log,cancelled,completed,ended,source);mode=Mode.DIAGNOSTIC;
+    }
+    private void diagnosticAction(Action action)throws Exception{
+        if(diagnosticPending)return;
+        if(action==Action.CANCEL){mode=Mode.CODE;return;}
+        if(action==Action.MENU&&diagnostic!=null){diagnosticDetails=!diagnosticDetails;diagnosticScroll=0;return;}
+        if(diagnosticDetails){
+            if(action==Action.UP)diagnosticScroll=Math.max(0,diagnosticScroll-1);
+            if(action==Action.DOWN)diagnosticScroll=Math.min(Math.max(0,diagnostic.log.split("\n",-1).length-1),diagnosticScroll+1);
+            return;
+        }
+        if((action==Action.CONFIRM&&diagnostic==null)||action==Action.CONTEXT){
+            diagnosticSource=codeDraft.edit().candidate(cart).bytes();
+            if(PicoIncludes.needed(diagnosticSource))throw new Exception("Проверка #include пока недоступна. Исходник сохранён.");
+            diagnostic=null;diagnosticPending=true;diagnosticStale=false;
+            try{port.diagnose(diagnosticSource.clone());}catch(Exception e){diagnosticPending=false;throw e;}
+        }else if(action==Action.CONFIRM&&diagnostic!=null&&diagnostic.line>=0&&!diagnosticStale){
+            if(!Arrays.equals(diagnosticSource,codeDraft.edit().candidate(cart).bytes())){diagnosticStale=true;return;}
+            codeDraft.beginNavigation();codeDraft.navigation.tab=1;codeDraft.navigation.target=diagnostic.line+1;codeDraft.jump();mode=Mode.CODE;
+        }
+    }
     public void restoreCode(byte[] bytes){codeDraft=LuaDraft.restore(bytes);tool=1;mode=Mode.CODE;}
     private void beginCode(){codeDraft=new LuaDraft(cart,codeLine);codeDraft.point(codeLine,codeColumn);mode=Mode.CODE;}
     private void finishCode(boolean test)throws Exception{
@@ -73,6 +104,7 @@ public final class WorkshopSession {
                 case 19:d.beginParameters();return;
                 case 20:d.beginNavigation();return;
                 case 21:d.goBack();break;
+                case 22:d.panel=LuaDraft.Panel.CURSOR;diagnostic=null;diagnosticPending=false;diagnosticDetails=false;mode=Mode.DIAGNOSTIC;return;
                 default:return;
             }
             d.panel=LuaDraft.Panel.CURSOR;
@@ -137,6 +169,7 @@ public final class WorkshopSession {
             }
             return;
         }
+        if(action==Action.CHECK&&d.panel==LuaDraft.Panel.CURSOR){codeCommand(22);return;}
         if(action==Action.TEST){finishCode(true);return;}
         if(action==Action.UNDO){d.history(false);return;}
         if(action==Action.REDO){d.history(true);return;}
@@ -504,6 +537,7 @@ public final class WorkshopSession {
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if(mode==Mode.DIAGNOSTIC){diagnosticAction(action);return;}
             if(mode==Mode.CODE){codeAction(action);return;}
             if(mode==Mode.MOVE){
                 if(action==Action.UP)move.step(0,-1);if(action==Action.DOWN)move.step(0,1);

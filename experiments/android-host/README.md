@@ -1,5 +1,13 @@
 # PIKOOS Android host experiment
 
+Version 0.0.36 adds a separate four-second draft trial with Runtime Test revision 5.
+From the code cursor use L2, or Select → Check launch. Confirm runs a copy without
+saving the project. A jumps to an exactly matched tab-0 error line; Select shows
+the original log, X repeats, B returns. Normal Start/Test remains interactive.
+Missing, unfamiliar or truncated evidence is not reported as success. Includes
+are refused in this first slice; other tabs have no automatic jump.
+[Device checks and limits](../../docs/design/android-diagnostics-36/README.md).
+
 Version 0.0.35 adds function/line navigation in the current Lua draft. R opens the
 chooser, L/R switches functions/line number, A jumps, B cancels, X returns to the
 previous location. Select-menu alternatives do not require shoulder buttons.

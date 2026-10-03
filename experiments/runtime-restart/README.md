@@ -5,6 +5,26 @@
 This remains a separate Android research adapter, not a production runtime
 architecture or a new framework choice for PIKOOS.
 
+## Bounded draft diagnostics (adapter revision 5)
+
+`1.6.6-pikoos.5` / host 0.0.36 adds a signature-protected `DiagnosticActivity`
+in classes2.dex. It accepts only the host's fixed read-only diagnostic URI, copies
+at most 2 MiB, and runs the already installed user-supplied ARM64 PICO-8 with `-x`.
+The upstream classes.dex and Godot launch payloads remain intact.
+
+The separate UUID session has private home/work/tmp paths and dummy SDL drivers.
+Android timeout owns the four-second process group, with a one-second kill grace;
+the Activity has a seven-second wait bound. Output is drained with a 32 KiB cap.
+B/Back cancels the result (finishing may take the remaining timeout). Token and
+SHA-256 bind the response to the host request and exact draft snapshot. Results
+are textual observations, not a compiler protocol or whole-game validation.
+
+Only this session tree is removed after process closure; interrupted directories
+are retained and the eight-directory quota stops further trials. Cleanup UI is
+pending. This is not a general sandbox. It requires an already prepared wrapper;
+clean-device runtime activation remains R01/R02. No proprietary binary is bundled.
+[Evidence, official manual and limits](../../docs/design/android-diagnostics-36/README.md).
+
 ## Isolated purchased-runtime probe (adapter revision 4)
 
 `1.6.6-pikoos.4` / host 0.0.30 adds a signature-protected Java import Activity

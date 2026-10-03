@@ -25,6 +25,8 @@ public interface PicoRuntimeBackend {
     Capabilities capabilities();
     /** Launch acceptance is not proof of successful official-runtime execution. */
     void launch(byte[] standardCart) throws Exception;
+    /** Explicit bounded trial of a copy; adapter reports evidence asynchronously, never certifies gameplay. */
+    default void diagnose(byte[] standardCart,boolean swapAB)throws Exception{throw new UnsupportedOperationException("Проверка недоступна в этом runtime");}
     default void launch(RuntimeFileSet files)throws Exception{
         throw new UnsupportedOperationException("Обнови адаптер PICO-8 для запуска нескольких картриджей");
     }

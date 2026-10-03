@@ -20,6 +20,7 @@ import art.pikoos.lab.core.NameEditor;
 import art.pikoos.lab.core.LuaDraft;
 import art.pikoos.lab.core.LuaInsert;
 import art.pikoos.lab.core.LuaNavigation;
+import art.pikoos.lab.core.RuntimeDiagnostic;
 import android.view.KeyEvent;
 import android.view.InputDevice;
 import art.pikoos.lab.core.HeroBinding;
@@ -124,6 +125,7 @@ final class WorkshopView extends View {
         rect(w-174,19,6,6,draft?10:11);
         if(s.mode!=Mode.NAME){text("≡",w-34,29,26,7);hit(w-48,0,48,44,()->action(Action.MENU));}
         if(s.mode==Mode.NAME){nameEditor();c.restore();return;}
+        if(s.mode==Mode.DIAGNOSTIC){diagnostic();c.restore();return;}
         if(s.codeDraft!=null&&(s.mode==Mode.CODE||s.mode==Mode.ERROR)){
             luaEditor();if(s.mode==Mode.ERROR)dialog();c.restore();return;
         }
@@ -358,10 +360,13 @@ final class WorkshopView extends View {
         }else{
             button(ok()+" Ввод",16,bottom+12,(w-40)/2,36,false,()->action(Action.CONFIRM));
             button("X Вставить Lua",24+(w-40)/2,bottom+12,(w-40)/2,36,false,()->action(Action.CONTEXT));
-            fitted("L: параметры",16,bodyBottom-36,16,14,w/2-20);
-            hit(16,bodyBottom-54,w/2-20,26,()->action(Action.PREVIOUS));
-            fitted("R: перейти",w/2,bodyBottom-36,16,12,w/2-16);
-            hit(w/2,bodyBottom-54,w/2-16,26,()->action(Action.NEXT));
+            float hint=(w-32)/3;
+            fitted("L: поля",16,bodyBottom-36,16,14,hint-4);
+            hit(16,bodyBottom-54,hint,26,()->action(Action.PREVIOUS));
+            fitted("R: перейти",16+hint,bodyBottom-36,16,12,hint-4);
+            hit(16+hint,bodyBottom-54,hint,26,()->action(Action.NEXT));
+            fitted("L2: проверка",16+hint*2,bodyBottom-36,16,11,hint-4);
+            hit(16+hint*2,bodyBottom-54,hint,26,()->action(Action.CHECK));
             fitted(d.dirty()?"Черновик · Select: правки · START: тест":"Без изменений · Select: правки · START: тест",16,bodyBottom-13,16,6,w-32);
         }
         rect(0,bodyBottom,w,44,0);
@@ -382,6 +387,38 @@ final class WorkshopView extends View {
             key(ok()+" выбрать",16,bodyBottom,10,()->action(Action.CONFIRM));
             key(back()+" к коду",w/2,bodyBottom,6,()->action(Action.CANCEL));
         }
+    }
+    private void diagnostic(){
+        hits.clear();RuntimeDiagnostic d=s.diagnostic;
+        fitted("Проверка запуска",16,76,26,14,w-32);
+        fitted("Официальный PICO-8 · копия черновика",16,102,16,6,w-32);
+        if(s.diagnosticDetails&&d!=null){
+            String[] rows=d.log.split("\n",-1);int count=Math.max(1,(int)((bodyBottom-177)/22));
+            for(int i=0;i<count&&s.diagnosticScroll+i<rows.length;i++)fitted(rows[s.diagnosticScroll+i],16,142+i*22,16,7,w-32);
+            fitted("↑↓ журнал · Select: результат",16,bodyBottom-18,16,13,w-32);
+        }else{
+            String title=s.diagnosticPending?"Проверяю копию…":d==null?"Попробуем запустить?":d.kind==RuntimeDiagnostic.Kind.ERROR?"PICO-8 сообщил об ошибке":d.kind==RuntimeDiagnostic.Kind.OBSERVED?"Пробный запуск завершён":d.message;
+            wrapped(title,16,145,24,s.diagnosticPending?10:d!=null&&d.kind==RuntimeDiagnostic.Kind.ERROR?8:10,w-32,2);
+            if(d==null){
+                wrapped("До 4 секунд, без нажатий и звука. Код выполняется на отдельной копии; её сохранения не попадут в проект.",16,212,20,7,w-32,4);
+                wrapped("Дальнейшую игру и управление проверяй через обычный Test.",16,bodyBottom-106,18,6,w-32,2);
+            }else if(d.kind==RuntimeDiagnostic.Kind.ERROR){
+                fitted(d.line>=0?"Строка "+(d.line+1):"Место в исходнике пока не сопоставлено",16,211,20,12,w-32);
+                wrapped(d.message,16,244,20,7,w-32,3);
+                if(s.diagnosticStale)wrapped("Черновик изменился. Повтори проверку перед переходом.",16,bodyBottom-111,18,9,w-32,2);
+                else if(d.line>=0){rect(12,bodyBottom-117,w-24,52,0);fitted(s.codeDraft.lineText(d.line),20,bodyBottom-86,18,10,w-40);}
+            }else{
+                wrapped(d.kind==RuntimeDiagnostic.Kind.OBSERVED?"За время проверки сообщений об ошибках не получено. Это ещё не проверка всей игры.":"Черновик на месте. Можно вернуться к коду или повторить проверку.",16,212,20,7,w-32,4);
+            }
+            if(!s.diagnosticPending){
+                if(d==null)button(ok()+" Проверить копию",16,bodyBottom-52,w-32,36,true,()->action(Action.CONFIRM));
+                else if(d.line>=0&&!s.diagnosticStale)button(ok()+" К строке "+(d.line+1),16,bodyBottom-52,w-32,36,true,()->action(Action.CONFIRM));
+                else button("X Проверить ещё",16,bodyBottom-52,w-32,36,false,()->action(Action.CONTEXT));
+            }
+        }
+        rect(0,bodyBottom,w,44,0);
+        key(back()+(s.diagnosticPending?" отменить":" к коду"),12,bodyBottom,6,()->action(Action.CANCEL));
+        if(d!=null)key("Select журнал",w/2,bodyBottom,14,()->action(Action.MENU));
     }
     private void luaNavigation(){
         LuaDraft d=s.codeDraft;LuaNavigation n=d.navigation;hits.clear();

@@ -36,6 +36,20 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         return new Capabilities(detect().launcherPresent, false, false, false);
     }
     @Override public boolean stop() { return false; }
+    public static final int DIAGNOSTIC_REQUEST=44;
+    @Override public void diagnose(byte[] cart,boolean swapAB)throws Exception{
+        checkAvailableForLaunch();PackageInfo selected=runtime();
+        if(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<5)throw new Exception("Для проверки обнови PIKOOS Runtime Test до версии 5");
+        if(activity.getPackageManager().checkSignatures(activity.getPackageName(),selected.packageName)!=PackageManager.SIGNATURE_MATCH)throw new Exception("Подписи приложений не совпадают");
+        AtomicFile snapshot=new AtomicFile(new File(activity.getFilesDir(),"diagnostic.p8"));FileOutputStream out=null;
+        try{out=snapshot.startWrite();out.write(cart);snapshot.finishWrite(out);}catch(Exception e){snapshot.failWrite(out);throw e;}
+        String token=java.util.UUID.randomUUID().toString();
+        if(!activity.getSharedPreferences("library-ui",0).edit().putString("diagnosticToken",token).commit())throw new Exception("Не удалось сохранить состояние проверки");
+        Intent intent=new Intent(Intent.ACTION_SEND).setComponent(new ComponentName(selected.packageName,"art.pikoos.runtimeexperiment.DiagnosticActivity")).putExtra("token",token);
+        intent.setType("text/plain").putExtra(Intent.EXTRA_STREAM,CartProvider.DIAGNOSTIC).putExtra("swapAB",swapAB);
+        intent.setClipData(ClipData.newRawUri("PICO-8 trial copy",CartProvider.DIAGNOSTIC));intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        activity.startActivityForResult(intent,DIAGNOSTIC_REQUEST);
+    }
     void checkAvailableForLaunch() throws Exception {
         if(activity.getSharedPreferences("runtime-setup",0).getBoolean("dispatched",false))throw new Exception("Сначала заверши пробный запуск PICO-8 и вернись в подключение.");
         boolean external=activity instanceof LaunchActivity;

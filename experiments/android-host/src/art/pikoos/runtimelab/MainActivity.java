@@ -168,6 +168,11 @@ public final class MainActivity extends Activity {
                     save(bytes);
                 }
                 public void launch(byte[] bytes)throws Exception{launchCart(bytes);}
+                public void diagnose(byte[] bytes)throws Exception{
+                    persistUi();
+                    if(!libraryPrefs.edit().putString("diagnosticProject",id).commit())throw new Exception("Не удалось сохранить место проверки");
+                    backend.diagnose(bytes,session.swapAB);
+                }
                 public void library()throws Exception{showLibrary();}
                 public java.util.List<SpriteAsset> assets()throws Exception{return assetStore.list();}
                 public void storeAsset(SpriteAsset asset)throws Exception{assetStore.create(asset);}
@@ -357,6 +362,23 @@ public final class MainActivity extends Activity {
     private byte[] asset(String name)throws Exception{try(InputStream in=getAssets().open(name)){return readAll(in);}}
     @Override protected void onActivityResult(int request,int result,Intent data){
         super.onActivityResult(request,result,data);
+        if(request==ExternalPicoBackend.DIAGNOSTIC_REQUEST){
+            try{
+                if(data!=null&&!libraryPrefs.getString("diagnosticToken","").equals(data.getStringExtra("token")))return;
+                String id=libraryPrefs.getString("diagnosticProject","");libraryPrefs.edit().remove("diagnosticProject").remove("diagnosticToken").apply();
+                if(session==null||!activeId.equals(id)||session.codeDraft==null)return;
+                byte[] checked=new AtomicFile(new File(getFilesDir(),"diagnostic.p8")).readFully();
+                boolean cancelled=result!=RESULT_OK||data==null||data.getBooleanExtra("cancelled",false);
+                String log="";boolean completed=false,ended=false;
+                if(!cancelled){
+                    StringBuilder hash=new StringBuilder();for(byte b:java.security.MessageDigest.getInstance("SHA-256").digest(checked))hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
+                    if(!hash.toString().equals(data.getStringExtra("hash")))log="Результат относится к другой копии картриджа";
+                    else{log=data.getStringExtra("log");completed=data.getBooleanExtra("completed",false);ended=data.getBooleanExtra("windowEnded",false);}
+                }
+                session.diagnosticResult(checked,log,cancelled,completed,ended);showWorkshop();persistUi();surface.invalidate();
+            }catch(Exception e){Log.e(TAG,"Diagnostic result unavailable",e);if(session!=null){session.diagnosticPending=false;session.mode=Mode.CODE;session.notice="Результат проверки недоступен";surface.invalidate();}}
+            return;
+        }
         if(request==PICK_FOLDER){folderResult(result,data);return;}
         if(request==SAVE_CART){exportResult(result,data);return;}
         if(request!=PICK_CART||library==null)return;

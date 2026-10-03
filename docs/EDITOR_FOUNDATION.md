@@ -134,3 +134,27 @@ Return history is independent of edit Undo/Redo and lasts for the current draft.
 Recovery format 5 stores navigation and return locations, validates bounds and rebuilds
 the outline. Ordinary drafts without navigation state still encode as format 4;
 formats 1–4 remain readable. See [evidence](design/android-navigation-35/README.md).
+
+## C06.1 continuation — 0.0.36
+
+`RuntimeDiagnostic` is a portable bounded parser for observed official-runtime text.
+`WorkshopSession` owns review, pending, result, raw log, repeat and source jump.
+`PicoRuntimeBackend.diagnose` is an optional asynchronous platform operation; the
+Android adapter binds replies to a request nonce, project identity and snapshot SHA-256.
+An exact candidate comparison also prevents jumping into a changed draft. The
+trial does not call save, alter canonical `.p8` bytes or consume edit history.
+
+The signature-protected adapter executes an independent draft copy with the user's
+official `-x` runtime, separate home/root and a four-second timeout. This is explicit
+execution with possible game callbacks, not a syntax-only validator or automatic
+pre-save hook. Textual output can include user `printh`; it is not a trusted compiler
+protocol. Only tab 0 with an exact source excerpt maps to a cursor position.
+Includes are refused until dependency staging and source mapping are implemented.
+Unknown failures/truncated output stay unknown; no-error observation is limited
+to this trial. Full interactive runtime capabilities remain separately reported.
+
+Diagnostic UI state is transient. The existing draft recovery format stays unchanged;
+after process death the draft reopens and the user can repeat the check. Cancellation
+may finish after the remaining timeout. Interrupted adapter directories are retained
+with a quota of eight; user-facing cleanup is pending. See
+[device evidence and remaining gates](design/android-diagnostics-36/README.md).

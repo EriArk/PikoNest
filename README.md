@@ -83,10 +83,12 @@ my-game/
 
 ## Status
 
-As of 2026-10-03, host 0.0.35 / Runtime Test 4 is a working Android lab, not a
+As of 2026-10-03, host 0.0.36 / Runtime Test 5 is a working Android lab, not a
 complete game creator. It demonstrates Play/external launch, bounded linked-cart
 launch, sprite editing/reuse, controller Lua drafts, function/line navigation, parameterized insertions, existing-call forms and name/API choices, single `.p8` import/export, session undo/redo and an
-isolated test of the user's purchased runtime archive.
+isolated test of the user's purchased runtime archive. A separate four-second
+official-runtime trial checks a draft copy and links recognized errors to source;
+it does not certify the whole game or replace interactive Test.
 
 Structural/API-assisted Lua editing, map/animation/background tools, SFX/music, reusable mechanics,
 complete project recovery, production setup and the full creation loop remain open.
@@ -99,7 +101,7 @@ PIKOOS with handheld controls, then tested and exported as ordinary PICO-8.
 - [End-to-end acceptance](docs/ACCEPTANCE.md)
 - [Historical roadmap and lab milestones](docs/ROADMAP_HISTORY.md)
 - [Reproducible Android host and slice history](experiments/android-host/README.md)
-- [Latest editor device evidence](docs/design/android-navigation-35/README.md)
+- [Latest editor device evidence](docs/design/android-diagnostics-36/README.md)
 
 The owner approved the PICO-8 visual direction, not the completeness of the
 application. APK GitHub releases/prereleases require explicit confirmation that
