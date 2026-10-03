@@ -107,6 +107,8 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         intent.setComponent(new ComponentName(selected.packageName, "com.godot.game.GodotAppLauncher"));
         intent.setType(mime);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.putExtra("pikoos.swapAB",activity.getSharedPreferences("library-ui",0).getBoolean("swapAB",false));
+        intent.putExtra("pikoos.controls",true);
         intent.setClipData(ClipData.newRawUri("PICO-8 cartridge", uri));
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         activity.startActivity(intent);

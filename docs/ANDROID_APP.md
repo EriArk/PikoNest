@@ -179,3 +179,24 @@ R01–R08, Play L01–L03 and platform acceptance Q01–Q06 in [BACKLOG](BACKLOG
 Runtime/storage work proceeds alongside the missing general creator tools;
 device/layout checks accompany each UI slice. These are Android release
 requirements, not optional post-release Linux work.
+
+### Controller return — lab 0.0.37 / adapter 6
+
+For sessions dispatched by this host, Select or Android Back opens the PIKOOS
+game menu. D-pad or vertical hat/stick selects Continue/Finish; A confirms and B
+cancels (following the workshop's A/B preference). Touch buttons and keyboard
+Enter/Escape are alternatives. The initial selection always continues the game.
+
+The adapter sends ordinary Ctrl+Q through the runtime's existing input path,
+then relies on its normal process-exit monitor and Android caller return. It does
+not force-finish the Activity or kill a process on timeout: after four seconds
+without Activity exit it offers Continue/retry. This is not a successful-game
+result or a general stop capability. Home cancels delayed menu work. The menu
+replaces the wrapper's Select shortcut during these sessions; L1 settings and
+normal gameplay forwarding remain upstream behavior. Direct wrapper setup/probe
+and older host launches retain upstream controls. Full remapping is still Q02.
+Known R03.2 gap: Test → Home → direct MAIN resume of the wrapper → exit can show
+the last launcher instead of the workshop. The adapter currently relies on Android
+task ordering, not an explicit persistent return destination. Ordinary Test/Play
+and both external-launcher exits passed. Do not treat background/resume return as accepted.
+[Implementation evidence and limits](design/android-exit-37/README.md).

@@ -1,5 +1,11 @@
 # PIKOOS Android host experiment
 
+Version 0.0.37 pairs with Runtime Test 6 for a native Select/Back game menu.
+Dispatch opts into the menu and passes the existing A/B convention; ordinary
+cart bytes, URI validation and caller-return handling are unchanged. The menu
+requests graceful official-runtime exit, with Continue/retry on timeout.
+[Device checks and limits](../../docs/design/android-exit-37/README.md).
+
 Version 0.0.36 adds a separate four-second draft trial with Runtime Test revision 5.
 From the code cursor use L2, or Select → Check launch. Confirm runs a copy without
 saving the project. A jumps to an exactly matched tab-0 error line; Select shows

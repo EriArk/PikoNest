@@ -5,7 +5,7 @@ import android.net.Uri;
 import java.io.*;
 /** Signature-protected lifecycle observation, never a claim that the game rendered correctly. */
 public final class ProbeStatusProvider extends ContentProvider {
-    public boolean onCreate(){return true;}
+    public boolean onCreate(){RuntimeControls.install((android.app.Application)getContext().getApplicationContext());return true;}
     static void write(Context c,String phase)throws IOException{
         android.util.AtomicFile file=new android.util.AtomicFile(new File(c.getFilesDir(),"probe-status.txt"));FileOutputStream out=null;
         String state=phase;

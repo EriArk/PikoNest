@@ -5,6 +5,26 @@
 This remains a separate Android research adapter, not a production runtime
 architecture or a new framework choice for PIKOOS.
 
+## Controller game menu (adapter revision 6)
+
+`1.6.6-pikoos.6` / host 0.0.37 adds `RuntimeControls` in classes2.dex. The existing
+provider registers public Activity lifecycle callbacks; only the pinned Godot
+Activity receives a delegating `Window.Callback`. Host dispatch explicitly opts
+into the menu and supplies its A/B preference. Unhandled gameplay input and other
+window callbacks retain the upstream route. Direct wrapper setup/probe are unchanged.
+
+Select/Android Back opens a native Canvas menu with the host's Tiny5 font/OFL and
+PICO-8 palette. The portable `RuntimeMenu` owns safe selection and exit intent.
+Native transport sends ordinary Ctrl+Q through Godot after the dialog releases
+focus. It never kills processes or force-finishes the Activity. A four-second
+unconfirmed exit offers Continue/retry; backgrounding clears delayed work and
+held menu keys. The existing process monitor still owns final cleanup and return.
+This does not resolve arbitrary crash/session recovery or prove game completion.
+
+Native font/license assets bypass Godot's resource loader. Upstream classes.dex,
+Godot payloads and the 262-entry sparse resource index retain revision 5's contents.
+Only our Java adapter and native assets change. [Checks and limits](../../docs/design/android-exit-37/README.md).
+
 ## Bounded draft diagnostics (adapter revision 5)
 
 `1.6.6-pikoos.5` / host 0.0.36 adds a signature-protected `DiagnosticActivity`
