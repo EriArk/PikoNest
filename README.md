@@ -83,6 +83,13 @@ my-game/
 
 ## Status
 
+Android 0.0.20 adds pixel-fragment movement inside the opened sprite/region.
+Select two corners, position the fragment with one-pixel steps, preview and apply.
+Overlapping moves, zeros, draft recovery and whole-edit undo/redo are covered.
+[Device evidence](docs/design/android-move-19/README.md). The
+[completion path](docs/ROADMAP.md#completion-path) separates the current lab from
+remaining production foundations, complete tools and release acceptance.
+
 Android 0.0.19 adds outlined/filled oval brushes with controller/touch endpoints,
 live dimensions, draft recovery and whole-operation undo/redo. The portable raster
 matches 5,616 sampled masks from the user's official PICO-8 0.2.7 runtime.

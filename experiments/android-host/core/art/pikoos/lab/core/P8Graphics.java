@@ -94,6 +94,16 @@ public final class P8Graphics {
         }
         return write(r,result);
     }
+    /** Capture before clearing, so overlapping moves preserve every source pixel, including 0. */
+    public P8Document move(SpriteRegion source,SpriteRegion target){
+        if(source.width!=target.width||source.height!=target.height)throw new IllegalArgumentException("Move changes dimensions");
+        int left=Math.min(source.x,target.x),top=Math.min(source.y,target.y);
+        SpriteRegion union=new SpriteRegion(left,top,Math.max(source.x+source.width,target.x+target.width)-left,Math.max(source.y+source.height,target.y+target.height)-top);
+        int[] captured=read(source),result=read(union);
+        for(int y=0;y<source.height;y++)for(int x=0;x<source.width;x++)result[(source.y-top+y)*union.width+source.x-left+x]=0;
+        for(int y=0;y<target.height;y++)for(int x=0;x<target.width;x++)result[(target.y-top+y)*union.width+target.x-left+x]=captured[y*source.width+x];
+        return write(union,result);
+    }
     public P8Document replaceColor(SpriteRegion r,int from,int to){
         color(from);color(to);
         if(from==to)return document;

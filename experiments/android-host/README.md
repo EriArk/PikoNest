@@ -1,5 +1,20 @@
 # PIKOOS Android host experiment
 
+Version 0.0.20 adds Перенести фрагмент as tool entry 12. Inside the opened
+sprite/region, choose first corner → opposite corner → destination. D-pad moves
+one pixel; A advances/applies. Touch sets the pixel position and the visible A
+action confirms. B goes back one stage, Y cancels the entire draft. Start and
+other tools are trapped until applying/cancelling. The preview shows source pink,
+destination yellow, dimensions and displacement. The source clears to index 0;
+all source pixels, including zero, replace the destination. Overlap is safe.
+
+Movement stays inside the opened region without clipping/wrapping. This is an
+explicit cut/place workflow, not PICO-8's separate looping sprite-shift shortcut.
+Code, map references and flags are not reassigned. Byte-identical results
+do not create history; failed saving retains the draft. All stages recover from
+optional UI intent without writing. A saved move is one undo/redo step.
+[Device evidence](../../docs/design/android-move-19/README.md).
+
 Version 0.0.19 adds Овал and Овал с заливкой (entries 10/11). A sets one corner
 of the bounding box; D-pad moves its opposite corner with live width×height and
 pixel preview. A applies; B/Y cancels a draft; Start saves and tests it. Two touch

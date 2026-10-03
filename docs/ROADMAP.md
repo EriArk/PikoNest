@@ -8,7 +8,11 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded lab step (0.0.19): outlined/filled oval → bounding corners →
+Latest bounded lab step (0.0.20): select pixel fragment → place within opened
+sprite/region → preview → one save/undo/redo operation. Overlap, index 0, controller,
+touch and draft recovery are covered. [Device evidence](design/android-move-19/README.md).
+
+Previous step (0.0.19): outlined/filled oval → bounding corners →
 preview → save/undo/redo/test. Portable rasterization passes 5,616 official-runtime
 mask comparisons; controller, touch and recovered drafts are checked on device.
 Circle snapping remains open. [Device evidence](design/android-oval-18/README.md).
@@ -46,6 +50,44 @@ runtime test. Preview survives process recreation; source files stay untouched.
 This does not complete folder setup, `.p8.png`/Splore import, dependency import,
 general Lua editing or controller navigation across Android document providers.
 [Device evidence](design/android-import-12/README.md).
+
+## Completion path
+
+Working execution plan, 2026-10-03, following the owner's request for the whole
+product path. This orders work by dependencies rather than treating historical
+lab version numbers as release milestones. Each stage must close a real user
+workflow and be tested on official PICO-8; adding isolated controls is insufficient.
+
+**Current baseline:** the Android lab demonstrates launch/edit/return, lossless
+targeted `.p8` changes, blank/fixture projects, text-cart import/export, a sprite
+asset shelf, several graphics tools and session undo/redo. The production runtime,
+folder wizard, complete code/map/audio tools and release acceptance remain open.
+The accepted pixel style and controller-first interaction apply throughout.
+
+| Order | Work | Completion gate |
+| --- | --- | --- |
+| 1. Production foundations | Confirm framework/layer tradeoffs; keep domain/workflows portable. Complete runtime import/validation/launch behind the Android backend. First-run setup chooses games, Splore downloads, own projects and data/library folders; explain and automatically prepare the supported purchased PICO-8 archive. | Fresh installation reaches a playable cart and returns reliably, without terminal/manual extraction; folders remain usable after reboot, permission loss has recovery. |
+| 2. Project ownership and safety | Unify create/open/import/remix/save/export; persistent user folders, names, recovery, backups and persistent history. Add `.p8.png` and linked-file/multicart-aware import with lossless preservation. | A project can move between PIKOOS and ordinary PICO-8, survive app updates/interruption, and be restored from a backup with its dependencies. |
+| 3. Graphics and world tools | Finish sprite selection/allocation/flags, animation frames/timing, tile/map editing, backgrounds and camera/parallax tools. Handle shared map/gfx memory explicitly. | Create and animate original resources, construct a scrolling scene and test it; no mandatory hero or template. |
+| 4. Code, mechanics and learning | Controller-oriented Lua editing, completion, structural insertion and parameter panels; ordinary-Lua mechanics for movement, puzzles, objects, enemies, events, effects/particles. Contextual explanations and PICO-8 reference/help. | Build actual behavior from a blank cart without a physical keyboard; generated code stays inspectable/editable and unfamiliar code is preserved. |
+| 5. SFX and music | Sound effects, instruments/envelopes supported by PICO-8, note/pattern editing, audition, sequencing, loop control and game-event bindings. | Compose an effect and short soundtrack on the handheld, hear them in the game and reopen in official PICO-8. |
+| 6. Reuse and larger games | Extend the library to animations, tiles/maps, SFX/music and reusable mechanics; extract/import with provenance, dependencies and safe placement. Add genre starters, multicart chapters and shared resources. All tools remain available in every game. | Reuse resources across independent projects/chapters without missing references or hidden PIKOOS runtime dependencies. |
+| 7. Integrated Android release | Complete several small games of different genres from blank through export. Polish navigation, adaptive layouts, remapping, performance, resource budgets, diagnostics, runtime return, sleep/restart, project recovery and documentation. | A new user completes the whole create/test/share loop; physical-controller acceptance on representative devices and preservation/compatibility checks pass. This is the stable local Android 1.0 gate. |
+| 8. Linux port | Replace runtime/storage/input/platform adapters; package and validate fullscreen, sound, controller and suspend/resume on Linux handhelds. | The same editable projects and core workflows work on both platforms. |
+| 9. Optional online extensions | Independently prove Link Play and the runtime bridge; then personalized carts, server-checked PIN/token binding, revocation, clean sharing/reset, discovery/account services. | Each experiment has demonstrated transport/lifecycle/security behavior and an explicit capability boundary; standard carts keep working without it. |
+
+Stages 3–6 should be built as small complete creation loops, allowing resources,
+code and sound to meet early. Do not finish every graphics polish item before
+starting another essential editor. Online feasibility research may run earlier,
+but unproven bridge tricks must not hold up the stable local creation product.
+The sequence is a working plan, not a delivery-date or feasibility promise for
+experimental online features. Stage acceptance does not follow automatically from
+tests/screenshots: user-facing behavior and physical ergonomics need review.
+
+**Next foundation slice after the current move tool:** establish persistent folder
+selection and access validation for the first-run workflow, preserving existing
+lab data. Follow with an explicit, verified migration path; do not move existing
+projects or retire the experiment before preservation is demonstrated.
 
 ## Added owner requirements: setup and reusable assets
 

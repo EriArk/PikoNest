@@ -7,14 +7,15 @@ import java.util.Arrays;
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, REDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE, OVAL, FILLED_OVAL }
     // Keep existing operation entries 5/6 stable while adding brushes after them.
-    public static int drawMenuCount(){return DrawTool.values().length+2;}
+    public static int moveMenuIndex(){return DrawTool.values().length+2;}
+    public static int drawMenuCount(){return moveMenuIndex()+1;}
     public static int drawMenuIndex(DrawTool tool){return tool.ordinal()<5?tool.ordinal():tool.ordinal()+2;}
     public static DrawTool drawMenuTool(int index){
         if(index<0||index>=drawMenuCount())throw new IllegalArgumentException("Tool outside menu");
-        return index==5||index==6?null:DrawTool.values()[index<5?index:index-2];
+        return index==5||index==6||index==moveMenuIndex()?null:DrawTool.values()[index<5?index:index-2];
     }
     public interface Port {
         void save(byte[] bytes) throws Exception;
@@ -30,6 +31,16 @@ public final class WorkshopSession {
     private final ArrayDeque<WorkshopCartridge> redo = new ArrayDeque<>();
     private final int[] toolFocus = new int[3];
     private WorkshopCartridge cart;
+    public SpriteMove move;
+    private Mode moveReturn=Mode.CANVAS;
+    public String moveReturnMode(){return moveReturn.name();}
+    public void restoreMove(String encoded,String origin){
+        if(tool!=2||browsingSprites||pendingStroke()||selection().sharesMap()||(mode!=Mode.CANVAS&&mode!=Mode.NAVIGATE))return;
+        try{
+            Mode parsed=Mode.valueOf(origin);if(parsed!=Mode.CANVAS&&parsed!=Mode.NAVIGATE)return;
+            SpriteMove restored=SpriteMove.restore(selection(),encoded);move=restored;moveReturn=parsed;mode=Mode.MOVE;
+        }catch(IllegalArgumentException e){/* Invalid optional UI preferences never mutate a cart. */}
+    }
     public Mode mode = Mode.NAVIGATE;
     public int tool, focus, codeLine, cursorX = 7, cursorY = 7, color = 14, paletteCursor = 14;
     public int field, draft, menuItem;
@@ -251,7 +262,7 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
         if(pendingStroke())return;
@@ -265,7 +276,7 @@ public final class WorkshopSession {
         focus = clamp(target, maxFocus()); act(Action.CONFIRM);
     }
     public void openSprite(int slot) {
-        if(pendingStroke()||transforming()||recoloring())return;
+        if(pendingStroke()||transforming()||recoloring()||move!=null)return;
         if (slot < 0 || slot >= WorkshopCartridge.SPRITE_COUNT) throw new IllegalArgumentException("Sprite slot out of range");
         spriteSlot = slot; sheetFocus = slot; browsingSprites = false;
         region=null;cursorX=clamp(cursorX,15);cursorY=clamp(cursorY,15);zoom=false;
@@ -279,7 +290,7 @@ public final class WorkshopSession {
     }
     public void openHero(){
         if(!cart.hasHero())return;
-        if(pendingStroke()||transforming()||recoloring())return;
+        if(pendingStroke()||transforming()||recoloring()||move!=null)return;
         HeroBinding h=cart.hero();
         if(h.image.sharesMap()){notice="Редактор общей области с картой ещё не готов";return;}
         if(h.card()>=0){openSprite(h.card());return;}
@@ -356,6 +367,16 @@ public final class WorkshopSession {
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if(mode==Mode.MOVE){
+                if(action==Action.UP)move.step(0,-1);if(action==Action.DOWN)move.step(0,1);
+                if(action==Action.LEFT)move.step(-1,0);if(action==Action.RIGHT)move.step(1,0);
+                if(action==Action.UNDO||(action==Action.CANCEL&&!move.back())){move=null;mode=moveReturn;notice="Перенос отменён";return;}
+                if(action==Action.CONFIRM){
+                    if(move.phase<2)move.next();
+                    else{save(move.preview(cart),true);move=null;mode=moveReturn;notice="Перенос завершён · Y отмена";}
+                }
+                return;
+            }
             if(mode==Mode.RECOLOR){
                 int selected=recolorField==0?recolorFrom:recolorTo;
                 if(action==Action.LEFT)chooseRecolor(selected/8*8+(selected+7)%8);
@@ -476,6 +497,10 @@ public final class WorkshopSession {
                 if(action==Action.UP)drawToolCursor=clamp(drawToolCursor-1,drawMenuCount()-1);
                 if(action==Action.DOWN)drawToolCursor=clamp(drawToolCursor+1,drawMenuCount()-1);
                 if(action==Action.CONFIRM){
+                    if(drawToolCursor==moveMenuIndex()){
+                        if(selection().sharesMap()){notice="Редактор общей области с картой ещё не готов";return;}
+                        moveReturn=overlayReturn;move=new SpriteMove(selection(),cursorX,cursorY);mode=Mode.MOVE;return;
+                    }
                     if(drawToolCursor==6){
                         Mode origin=overlayReturn;mode=origin;
                         restoreRecolor(cart.pixel(selection(),cursorX,cursorY),color,1,origin.name());return;

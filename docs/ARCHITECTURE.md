@@ -6,6 +6,22 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+### Android lab 0.0.20: pixel-fragment movement
+
+Portable `SpriteMove` owns three-stage selection/placement intent within an
+opened `SpriteRegion`. Endpoints are pixel coordinates; destination clamping keeps
+the entire fragment in scope. It computes a preview against the current cart.
+`P8Graphics.move` captures the original source, clears it to index 0, then writes
+the captured pixels into the destination. It writes the union through the existing
+lossless gfx writer, preserving unrelated data and handling overlap without smear.
+
+`WorkshopSession` traps the workflow in `MOVE`; confirm calls the save port before
+publishing/history. Cancel never writes; failures retain the draft for retry.
+The UI journal stores only validated selection/placement intent and return mode,
+not duplicate cart bytes. Restored state requires explicit confirmation. General
+map-reference relocation, clipboard interoperability and wrapping sprite shifts
+remain separate work. [Device evidence](design/android-move-19/README.md).
+
 ### Android lab 0.0.19: oval rasterization
 
 `P8Graphics.withOval` validates bounds/color, normalizes corner order and builds

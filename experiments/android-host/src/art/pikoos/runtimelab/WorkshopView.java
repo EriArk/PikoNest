@@ -14,6 +14,7 @@ import art.pikoos.lab.core.WorkshopSession.Action;
 import art.pikoos.lab.core.WorkshopSession.Mode;
 import art.pikoos.lab.core.WorkshopCartridge;
 import art.pikoos.lab.core.SpriteRegion;
+import art.pikoos.lab.core.SpriteMove;
 import art.pikoos.lab.core.SpriteAsset;
 import art.pikoos.lab.core.NameEditor;
 import art.pikoos.lab.core.HeroBinding;
@@ -80,7 +81,7 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.assetDraft!=null||s.nameEditor!=null;
+        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -96,7 +97,7 @@ final class WorkshopView extends View {
         }
         rect(0,140,w,4,0);
         c.save();c.clipRect(0,144,w,bodyBottom);
-        if(s.mode==Mode.RECOLOR)recolorChooser();else if(s.mode==Mode.TRANSFORM)transformChooser();else if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE)assetLibrary();else if(s.copying()&&s.mode!=Mode.ERROR)copyChooser();else if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
+        if(s.mode==Mode.RECOLOR)recolorChooser();else if(s.mode==Mode.TRANSFORM)transformChooser();else if(s.mode==Mode.MOVE)moveChooser();else if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE)assetLibrary();else if(s.copying()&&s.mode!=Mode.ERROR)copyChooser();else if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
         c.restore();
         footer();
         if(!previousNotice.equals(s.notice)){previousNotice=s.notice;noticeUntil=SystemClock.uptimeMillis()+2200;}
@@ -113,6 +114,11 @@ final class WorkshopView extends View {
     }
     private void footer() {
         rect(0,bodyBottom,w,44,0);
+        if(s.mode==Mode.MOVE){
+            key(ok()+(s.move.phase==2?" готово":" угол"),12,bodyBottom,10,()->action(Action.CONFIRM));
+            key(back()+" назад",w/3+12,bodyBottom,6,()->action(Action.CANCEL));
+            key("Y отмена",w*2/3+12,bodyBottom,14,()->action(Action.UNDO));return;
+        }
         if(s.mode==Mode.RECOLOR){
             key(ok()+" применить",12,bodyBottom,10,()->action(Action.CONFIRM));
             key(back()+" отмена",w<500?166:220,bodyBottom,6,()->action(Action.CANCEL));
@@ -415,6 +421,26 @@ final class WorkshopView extends View {
     private void assetPicture(SpriteAsset a,float x,float y,float size){
         picture(new SpriteRegion(0,0,a.width,a.height),a,x,y,size);
     }
+    private void moveChooser(){
+        SpriteMove m=s.move;SpriteRegion r=m.scope,source=m.source(),target=m.phase==2?m.destination():source;
+        text("ПЕРЕНЕСТИ ФРАГМЕНТ",16,169,18,14);
+        fitted(m.phase==0?"1 / Выбери первый угол":m.phase==1?"2 / Выбери второй угол":"3 / Выбери новое место",16,198,22,7,w-32);
+        float size=Math.min(w-32,bodyBottom-292),left=(w-size)/2,top=214;
+        picture(r,null,m.preview(s.cart()),left,top,size);
+        float cell=size/Math.max(r.width,r.height);if(cell>=1)cell=(int)cell;
+        float sx=left+(size-r.width*cell)/2,sy=top+(size-r.height*cell)/2;
+        if(m.phase==2)outline(sx+(source.x-r.x)*cell,sy+(source.y-r.y)*cell,source.width*cell,source.height*cell,14);
+        if(m.phase>0)outline(sx+(target.x-r.x)*cell,sy+(target.y-r.y)*cell,target.width*cell,target.height*cell,10);
+        else outline(sx+m.x*cell,sy+m.y*cell,cell,cell,10);
+        final float fx=sx,fy=sy,fc=cell;
+        for(int y=0;y<r.height;y++)for(int x=0;x<r.width;x++){
+            final int px=x,py=y;hit(fx+x*fc,fy+y*fc,fc,fc,()->{m.point(px,py);changed.run();invalidate();});
+        }
+        float by=top+size;
+        fitted(m.phase==2?source.width+" × "+source.height+" · сдвиг "+(target.x-source.x)+", "+(target.y-source.y):"Крестовина: пиксель · касание: позиция",16,by+23,18,10,w-32);
+        fitted(m.phase==2?"Источник → цвет 0. Под рамкой — замена, включая 0.":"Выдели часть внутри открытого спрайта или области.",16,by+46,16,6,w-32);
+        if(m.phase==2)fitted("Розовая: откуда · жёлтая: куда",16,by+67,16,13,w-32);
+    }
     private void copyChooser(){
         SpriteRegion source=s.copySource,target=s.copyDestination();
         boolean confirm=s.mode==Mode.COPY_CONFIRM;
@@ -552,9 +578,9 @@ final class WorkshopView extends View {
             text((s.drawToolCursor+1)+" / "+WorkshopSession.drawMenuCount(),dx+dw-70,dy+34,18,6);
             int first=Math.max(0,s.drawToolCursor-5);
             for(int row=0;row<6;row++){final int item=first+row;
-                button(item==6?"Заменить цвет":item==5?"Отразить / повернуть":DRAW_NAMES[WorkshopSession.drawMenuTool(item).ordinal()],dx+16,dy+54+row*50,dw-32,44,s.drawToolCursor==item,()->{s.chooseDrawTool(item);changed.run();invalidate();});
+                button(item==WorkshopSession.moveMenuIndex()?"Перенести фрагмент":item==6?"Заменить цвет":item==5?"Отразить / повернуть":DRAW_NAMES[WorkshopSession.drawMenuTool(item).ordinal()],dx+16,dy+54+row*50,dw-32,44,s.drawToolCursor==item,()->{s.chooseDrawTool(item);changed.run();invalidate();});
             }
-            fitted(s.drawToolCursor==6?"Заменить цвет во всём выделении":s.drawToolCursor==5?"Сравнить варианты перед применением":DRAW_HELP[WorkshopSession.drawMenuTool(s.drawToolCursor).ordinal()],dx+20,dy+389,18,7,dw-40);
+            fitted(s.drawToolCursor==WorkshopSession.moveMenuIndex()?"Выделить пиксели и выбрать новое место":s.drawToolCursor==6?"Заменить цвет во всём выделении":s.drawToolCursor==5?"Сравнить варианты перед применением":DRAW_HELP[WorkshopSession.drawMenuTool(s.drawToolCursor).ordinal()],dx+20,dy+389,18,7,dw-40);
             text(ok()+" выбрать · "+back()+" назад",dx+20,dy+426,18,6);
             hit(dx+12,dy+398,(dw-32)/2,44,()->action(Action.CONFIRM));
             hit(dx+20+(dw-32)/2,dy+398,(dw-32)/2,44,()->action(Action.CANCEL));
