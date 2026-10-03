@@ -447,7 +447,7 @@ public final class WorkshopSession {
     public void switchTool(int next) {
         if(pendingStroke())return;
         if (mode != Mode.NAVIGATE && mode != Mode.CANVAS && mode != Mode.SHEET) return;
-        if(mapEditor.picking)return;
+        if(mapEditor.modal())return;
         if (tool == Math.floorMod(next,4)) return;
         toolFocus[tool] = focus;
         tool = Math.floorMod(next,4); focus = toolFocus[tool]; mode = tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE;
@@ -717,7 +717,7 @@ public final class WorkshopSession {
                 if (action == Action.CONFIRM) {
                     if (menuItem == 0) { mode = overlayReturn; act(menuRedo ? Action.REDO : Action.UNDO); }
                     if (menuItem == 1) { swapAB = !swapAB; notice = "Кнопки изменены"; }
-                    if (menuItem == 2) mode = Mode.HELP;
+                    if (menuItem == 2) {if(tool==3){mode=overlayReturn;mapEditor.tools();}else mode = Mode.HELP;}
                     if (menuItem == 3) mode = overlayReturn;
                     if (menuItem == 4) { mode = overlayReturn; port.library(); }
                     if (menuItem == 5) { mode = overlayReturn; showAssets(); }
@@ -741,6 +741,26 @@ public final class WorkshopSession {
                 if (action == Action.DOWN) paletteCursor = (paletteCursor + 4) % 16;
                 if (action == Action.CONFIRM) { color = paletteCursor; if(drawTool==DrawTool.ERASER)drawTool=DrawTool.BRUSH; mode = paletteReturn; }
                 if (action == Action.CANCEL) mode = paletteReturn;
+                return;
+            }
+            if(tool==3&&mapEditor.choosingTool){
+                if(action==Action.UP||action==Action.LEFT)mapEditor.toolChoice=clamp(mapEditor.toolChoice-1,2);
+                if(action==Action.DOWN||action==Action.RIGHT)mapEditor.toolChoice=clamp(mapEditor.toolChoice+1,2);
+                if(action==Action.CONFIRM){mapEditor.tool=MapEditor.Tool.values()[mapEditor.toolChoice];mapEditor.choosingTool=false;}
+                if(action==Action.CANCEL)mapEditor.choosingTool=false;
+                return;
+            }
+            if(tool==3&&mapEditor.pending()){
+                if(action==Action.LEFT)mapEditor.move(-1,0);
+                if(action==Action.RIGHT)mapEditor.move(1,0);
+                if(action==Action.UP)mapEditor.move(0,-1);
+                if(action==Action.DOWN)mapEditor.move(0,1);
+                if(action==Action.CANCEL)mapEditor.back();
+                if(action==Action.UNDO){mapEditor.clear();notice="Предложение отменено";}
+                if(action==Action.CONFIRM){
+                    if(mapEditor.phase==1)mapEditor.review();
+                    else{boolean differs=mapEditor.preview(cart).count>0;save(mapEditor.candidate(cart),true);mapEditor.clear();notice=differs?"Карта изменена · Y отмена":"Клетки не изменились";}
+                }
                 return;
             }
             if(tool==3&&mapEditor.picking){
@@ -769,12 +789,13 @@ public final class WorkshopSession {
             if (action == Action.PREVIOUS) { switchTool(tool - 1); return; }
             if (action == Action.NEXT) { switchTool(tool + 1); return; }
             if(tool==3){
+                if(action==Action.DRAW_TOOLS||action==Action.CHECK){mapEditor.tools();return;}
                 if(action==Action.LEFT)mapEditor.move(-1,0);
                 if(action==Action.RIGHT)mapEditor.move(1,0);
                 if(action==Action.UP)mapEditor.move(0,-1);
                 if(action==Action.DOWN)mapEditor.move(0,1);
                 if(action==Action.CONTEXT)mapEditor.begin();
-                if(action==Action.CONFIRM)save(cart.withTile(mapEditor.x,mapEditor.y,mapEditor.tile),true);
+                if(action==Action.CONFIRM){if(mapEditor.tool==MapEditor.Tool.BRUSH)save(cart.withTile(mapEditor.x,mapEditor.y,mapEditor.tile),true);else mapEditor.start(cart);}
                 if(action==Action.CANCEL){overlayReturn=mode;mode=Mode.MENU;menuItem=3;}
                 return;
             }

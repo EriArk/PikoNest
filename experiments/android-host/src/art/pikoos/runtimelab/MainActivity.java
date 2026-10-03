@@ -453,6 +453,7 @@ public final class MainActivity extends Activity {
         libraryPrefs.edit().putString("active",activeId).putBoolean("swapAB",session.swapAB).apply();
         prefs.edit().putInt("tool",session.tool).putInt("focus",session.focus)
             .putInt("mapX",session.mapEditor.x).putInt("mapY",session.mapEditor.y).putInt("mapTile",session.mapEditor.tile)
+            .putString("mapTool",session.mapEditor.tool.name()).putString("mapDraft",session.mapEditor.encode())
             .putString("luaDraft",session.codeDraft==null?(codeRecoveryFailed.contains(activeId)?prefs.getString("luaDraft",""):""):Base64.encodeToString(session.codeDraft.encode(),Base64.NO_WRAP))
             .putInt("line",session.codeLine).putInt("x",session.cursorX).putInt("y",session.cursorY)
             .putInt("codeColumn",session.codeColumn)
@@ -492,6 +493,7 @@ public final class MainActivity extends Activity {
     private void restoreUi(){
         session.tool=bounded("tool",0,3);
         session.mapEditor.x=bounded("mapX",0,127);session.mapEditor.y=bounded("mapY",0,63);session.mapEditor.tile=bounded("mapTile",1,255);
+        try{session.mapEditor.tool=art.pikoos.lab.core.MapEditor.Tool.valueOf(prefs.getString("mapTool","BRUSH"));}catch(IllegalArgumentException ignored){}
         session.codeLine=bounded("line",session.cart().line(0),session.cart().code().split("\n",-1).length-1);
         session.codeColumn=bounded("codeColumn",0,2*1024*1024);
         session.color=bounded("color",14,15);
@@ -523,6 +525,7 @@ public final class MainActivity extends Activity {
             session.mode=Mode.VALUE;session.field=bounded("field",0,1);session.draft=Math.max(1,bounded("draft",2,4));
         }
         if(session.tool==2&&prefs.getString("mode","").equals("HERO"))session.previewHero();
+        if(session.tool==3)try{session.mapEditor.restore(prefs.getString("mapDraft",""),session.cart());}catch(IllegalArgumentException e){session.fail(e);}
         if(prefs.getBoolean("copying",false))session.restoreCopy(prefs.getInt("copyX",-1),prefs.getInt("copyY",-1),prefs.getString("copyReturn",""));
         if(prefs.getBoolean("transforming",false))session.restoreTransform(prefs.getString("transformOperation",""),prefs.getString("transformReturn",""));
         if(prefs.getBoolean("recoloring",false))session.restoreRecolor(prefs.getInt("recolorFrom",-1),prefs.getInt("recolorTo",-1),prefs.getInt("recolorField",-1),prefs.getString("recolorReturn",""));

@@ -42,21 +42,30 @@ public final class P8Map {
         int at=rows[y]+x*2;return Character.digit((char)body[at],16)*16+Character.digit((char)body[at+1],16);
     }
     public P8Document withTile(int x,int y,int value){
-        int old=tile(x,y);
+        tile(x,y);
         if(y>=32)throw new IllegalArgumentException("Нижняя половина карты делит память со спрайтами. Пока доступен только просмотр.");
-        if(value<0||value>255)throw new IllegalArgumentException("Тайл: от 0 до 255");
-        if(old==value)return document;
+        boolean[] mask=new boolean[4096];mask[y*128+x]=true;return withTiles(mask,value);
+    }
+    /** Atomic bulk edit: serialize once, preserve all digits outside changed cells. */
+    public P8Document withTiles(boolean[] mask,int value){
+        if(mask==null||mask.length!=4096||value<0||value>255)throw new IllegalArgumentException("Invalid map edit");
+        int last=-1;
+        for(int i=0;i<4096;i++)if(mask[i]&&tile(i%128,i/128)!=value)last=i/128;
+        if(last<0)return document;
         ByteArrayOutputStream out=new ByteArrayOutputStream();out.write(body,0,body.length);
-        int offset=rows[y];
-        if(y>=count){
+        int[] offsets=rows.clone();
+        if(last>=count){
             if(body.length>0&&body[body.length-1]!='\n')out.write(newline,0,newline.length);
             byte[] blank=new byte[256];Arrays.fill(blank,(byte)'0');
-            for(int row=count;row<=y;row++){
-                if(row==y)offset=out.size();out.write(blank,0,blank.length);out.write(newline,0,newline.length);
+            for(int row=count;row<=last;row++){
+                offsets[row]=out.size();out.write(blank,0,blank.length);out.write(newline,0,newline.length);
             }
         }
         byte[] changed=out.toByteArray();String hex="0123456789abcdef";
-        changed[offset+x*2]=(byte)hex.charAt(value>>4);changed[offset+x*2+1]=(byte)hex.charAt(value&15);
+        for(int i=0;i<4096;i++)if(mask[i]&&tile(i%128,i/128)!=value){
+            int offset=offsets[i/128]+i%128*2;
+            changed[offset]=(byte)hex.charAt(value>>4);changed[offset+1]=(byte)hex.charAt(value&15);
+        }
         if(section>=0)return document.edit(section,0,body.length,changed);
         byte[] source=document.bytes();out.reset();out.write(source,0,source.length);
         if(source.length>0&&source[source.length-1]!='\n'&&source[source.length-1]!='\r')out.write(newline,0,newline.length);
