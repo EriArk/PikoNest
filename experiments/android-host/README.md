@@ -1,5 +1,20 @@
 # PIKOOS Android host experiment
 
+Version 0.0.19 adds Овал and Овал с заливкой (entries 10/11). A sets one corner
+of the bounding box; D-pad moves its opposite corner with live width×height and
+pixel preview. A applies; B/Y cancels a draft; Start saves and tests it. Two touch
+taps use the same corners. Color 0 is supported. Undo/redo restores the whole edit.
+Shape/color/corners/selection survive process recreation as a read-only draft.
+The tools are available in every supported cart and selected region, retaining
+the lab's upper 128×64 editing boundary. Circle snapping is not yet implemented.
+
+`P8Graphics.withOval` samples the two axes of an ellipse using integer radii and
+mirrored centers for even-sized bounds. It materializes ordinary gfx pixels.
+The owned diagnostic `experiments/runtime-smoke/oval_oracle.p8` generated 5,616
+official PICO-8 0.2.7 masks; their hashes are checked by `OvalWorkflowTest` in every
+build. These cover many sizes up to 128×64, thin/degenerate shapes, translated
+bounds and reversed corners. [Evidence](../../docs/design/android-oval-18/README.md).
+
 Version 0.0.18 adds Вернуть (redo) alongside Отменить in the first menu row.
 Select opens the menu on Undo; left/right selects the history action, A confirms.
 Touch either half of the row. Counts show available steps, and empty actions are

@@ -38,8 +38,8 @@ final class WorkshopView extends View {
     private long noticeUntil;
     private RectF spriteArea;
     private int viewX,viewY,viewWidth,viewHeight;
-    private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка","Прямоугольник","Прямоуг. с заливкой"};
-    private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из спрайта","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из спрайта","Контур: выбери два противоположных угла","Закрашенная фигура по двум углам"};
+    private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка","Прямоугольник","Прямоуг. с заливкой","Овал","Овал с заливкой"};
+    private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из спрайта","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из спрайта","Контур: выбери два противоположных угла","Закрашенная фигура по двум углам","Контур овала внутри рамки по двум углам","Закрашенный овал внутри выбранной рамки"};
     private static final String[] TRANSFORM_NAMES={"Зеркало: слева направо","Зеркало: сверху вниз","Поворот на 90° вправо","Разворот на 180°"};
     private static final class Hit {
         final RectF rect; final Runnable action;
@@ -139,7 +139,8 @@ final class WorkshopView extends View {
             return;
         }
         String confirm=s.swapAB?"B":"A",cancel=s.swapAB?"A":"B";
-        String[] drawVerbs={"пиксель","стереть","залить",s.pendingStroke()?"линия":"начало","цвет",s.pendingStroke()?"готово":"угол",s.pendingStroke()?"готово":"угол"};
+        String corner=s.pendingStroke()?"готово":"угол";
+        String[] drawVerbs={"пиксель","стереть","залить",s.pendingStroke()?"линия":"начало","цвет",corner,corner,corner,corner};
         String verb=s.mode==Mode.REGION?(s.choosingEnd?"рисовать":"угол"):s.mode==Mode.VALUE?"готово":s.mode==Mode.CANVAS?drawVerbs[s.drawTool.ordinal()]:s.mode==Mode.PALETTE?"цвет":s.mode==Mode.SHEET&&s.sheetFocus<8?"рисовать":"выбор";
         key(confirm+" "+verb,12,bodyBottom,10,()->action(Action.CONFIRM));
         key(cancel+(s.pendingStroke()?" отмена":" назад"),w<500?142:156,bodyBottom,6,()->action(Action.CANCEL));

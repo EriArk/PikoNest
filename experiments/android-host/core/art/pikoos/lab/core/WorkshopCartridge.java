@@ -30,6 +30,7 @@ public final class WorkshopCartridge {
     public WorkshopCartridge withFill(SpriteRegion r,int x,int y,int color){return edited(graphics.withFill(r,x,y,color));}
     public WorkshopCartridge withLine(SpriteRegion r,int x0,int y0,int x1,int y1,int color){return edited(graphics.withLine(r,x0,y0,x1,y1,color));}
     public WorkshopCartridge withRectangle(SpriteRegion r,int x0,int y0,int x1,int y1,int color,boolean filled){return edited(graphics.withRectangle(r,x0,y0,x1,y1,color,filled));}
+    public WorkshopCartridge withOval(SpriteRegion r,int x0,int y0,int x1,int y1,int color,boolean filled){return edited(graphics.withOval(r,x0,y0,x1,y1,color,filled));}
     public int heroSlot() { return hasHero()?hero().card():-1; }
     public HeroBinding hero(){return binding().hero.binding;}
     public boolean legacyHero(){return binding().hero.legacy;}

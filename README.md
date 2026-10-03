@@ -83,6 +83,11 @@ my-game/
 
 ## Status
 
+Android 0.0.19 adds outlined/filled oval brushes with controller/touch endpoints,
+live dimensions, draft recovery and whole-operation undo/redo. The portable raster
+matches 5,616 sampled masks from the user's official PICO-8 0.2.7 runtime.
+[Device evidence](docs/design/android-oval-18/README.md).
+
 Android 0.0.18 adds redo across workshop cartridge edits. Undo/Redo sit together
 in the controller/touch menu with available-step counts; Y/R2 are shortcuts.
 History keeps up to 32 edits per open project in the current session. Failed

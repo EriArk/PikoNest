@@ -8,7 +8,7 @@ public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, REDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS }
     public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR }
-    public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE }
+    public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE, OVAL, FILLED_OVAL }
     // Keep existing operation entries 5/6 stable while adding brushes after them.
     public static int drawMenuCount(){return DrawTool.values().length+2;}
     public static int drawMenuIndex(DrawTool tool){return tool.ordinal()<5?tool.ordinal():tool.ordinal()+2;}
@@ -208,7 +208,8 @@ public final class WorkshopSession {
     public int undoCount() { return undo.size(); }
     public int redoCount() { return redo.size(); }
     public int maxFocus(){return tool==2?(cart.hasHero()?7:6):cart.hasHero()?4:2;}
-    public boolean twoPointTool(){return drawTool==DrawTool.LINE||drawTool==DrawTool.RECTANGLE||drawTool==DrawTool.FILLED_RECTANGLE;}
+    public boolean ovalTool(){return drawTool==DrawTool.OVAL||drawTool==DrawTool.FILLED_OVAL;}
+    public boolean twoPointTool(){return drawTool==DrawTool.LINE||drawTool==DrawTool.RECTANGLE||drawTool==DrawTool.FILLED_RECTANGLE||ovalTool();}
     public boolean pendingStroke(){return twoPointTool()&&lineX>=0&&lineY>=0;}
     public boolean pendingLine(){return drawTool==DrawTool.LINE&&pendingStroke();}
     /** The legacy lineX/lineY preference keys hold the first point for all two-point tools. */
@@ -221,6 +222,7 @@ public final class WorkshopSession {
     public WorkshopCartridge canvasPreview(){
         if(!pendingStroke())return cart;
         return drawTool==DrawTool.LINE?cart.withLine(selection(),lineX,lineY,cursorX,cursorY,color)
+            :ovalTool()?cart.withOval(selection(),lineX,lineY,cursorX,cursorY,color,drawTool==DrawTool.FILLED_OVAL)
             :cart.withRectangle(selection(),lineX,lineY,cursorX,cursorY,color,drawTool==DrawTool.FILLED_RECTANGLE);
     }
     public SpriteRegion regionDraft(){
@@ -340,6 +342,7 @@ public final class WorkshopSession {
             case FILL:save(cart.withFill(selection(),cursorX,cursorY,color),true);break;
             case LINE:lineX=cursorX;lineY=cursorY;notice="Выбери конец линии";break;
             case RECTANGLE:case FILLED_RECTANGLE:lineX=cursorX;lineY=cursorY;notice="Выбери противоположный угол";break;
+            case OVAL:case FILLED_OVAL:lineX=cursorX;lineY=cursorY;notice="Выбери второй угол рамки овала";break;
             case PICKER:color=cart.pixel(selection(),cursorX,cursorY);drawTool=pickerReturn;notice="Цвет взят";break;
         }
     }
@@ -462,7 +465,7 @@ public final class WorkshopSession {
             }
             if(pendingStroke()){
                 moveCursor(action);
-                if(action==Action.CANCEL||action==Action.UNDO){lineX=lineY=-1;notice=drawTool==DrawTool.LINE?"Линия отменена":"Прямоугольник отменён";}
+                if(action==Action.CANCEL||action==Action.UNDO){lineX=lineY=-1;notice=drawTool==DrawTool.LINE?"Линия отменена":ovalTool()?"Овал отменён":"Прямоугольник отменён";}
                 if(action==Action.CONFIRM||action==Action.TEST){
                     save(canvasPreview(),true);lineX=lineY=-1;
                     if(action==Action.TEST)port.launch(cart.bytes());

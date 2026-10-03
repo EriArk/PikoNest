@@ -6,6 +6,23 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+### Android lab 0.0.19: oval rasterization
+
+`P8Graphics.withOval` validates bounds/color, normalizes corner order and builds
+a local indexed-pixel mask before passing values to the existing lossless gfx
+writer. Radii are integer halves of coordinate spans; mirrored centers preserve
+symmetry and inclusive bounds for even widths/heights. Both axes are sampled to
+cover steep and shallow parts; filled ovals join the extreme pixels of each row.
+Point, one-row and one-column cases use the same path. This portable operation
+does not evaluate Lua, modify palette state or depend on an Android drawing API.
+
+Two appended `DrawTool` values reuse the pending-stroke transaction, recovery,
+touch/controller, failure and history paths. Existing menu indices remain stable.
+The owned runtime diagnostic produces reference masks from official PICO-8 0.2.7;
+their independent SHA-256 corpus guards pixel semantics in the core test suite.
+It is a sampled compatibility check, not a general runtime/API certification.
+[Evidence and fixture provenance](design/android-oval-18/README.md).
+
 ### Android lab 0.0.18: reversible cartridge history
 
 Portable `WorkshopSession` keeps undo/redo deques of immutable whole-cartridge

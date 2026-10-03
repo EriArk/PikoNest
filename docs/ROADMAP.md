@@ -8,7 +8,12 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded lab step (0.0.18): edit → undo → redo → test, with paired menu
+Latest bounded lab step (0.0.19): outlined/filled oval → bounding corners →
+preview → save/undo/redo/test. Portable rasterization passes 5,616 official-runtime
+mask comparisons; controller, touch and recovered drafts are checked on device.
+Circle snapping remains open. [Device evidence](design/android-oval-18/README.md).
+
+Previous step (0.0.18): edit → undo → redo → test, with paired menu
 actions, counts and optional R2 shortcut. Mixed cartridge edits retain exact
 snapshots; failure/no-op/cancel preserve redo. History is capped at 32 edits per
 project in memory, not persisted. [Device evidence](design/android-history-17/README.md).

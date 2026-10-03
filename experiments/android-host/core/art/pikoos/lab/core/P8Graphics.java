@@ -131,6 +131,38 @@ public final class P8Graphics {
             if(filled||x==left||x==right||y==top||y==bottom)values[y*r.width+x]=value;
         return write(r,values);
     }
+    /** Indexed oval pixels. Integer radii and mirrored centers preserve even-sized bounds.
+     * Rasterization is checked against user-supplied official PICO-8 output, not an emulator.
+     */
+    public P8Document withOval(SpriteRegion r,int x0,int y0,int x1,int y1,int value,boolean filled){
+        r.checkPixel(x0,y0);r.checkPixel(x1,y1);color(value);
+        int left=Math.min(x0,x1),top=Math.min(y0,y1),w=Math.abs(x1-x0)+1,h=Math.abs(y1-y0)+1;
+        boolean[] mask=new boolean[w*h];int rx=(w-1)/2,ry=(h-1)/2;
+        // Sample both axes so steep and shallow parts remain connected.
+        for(int y=0;y<=ry;y++){
+            double d=ry==0?0:(double)y/ry;
+            int x=(int)Math.round(rx*StrictMath.sqrt(Math.max(0,1-d*d)));
+            ovalPoints(mask,w,h,w-1-rx+x,h-1-ry+y);
+        }
+        for(int x=0;x<=rx;x++){
+            double d=rx==0?0:(double)x/rx;
+            int y=(int)Math.round(ry*StrictMath.sqrt(Math.max(0,1-d*d)));
+            ovalPoints(mask,w,h,w-1-rx+x,h-1-ry+y);
+        }
+        int[] values=read(r);
+        for(int y=0;y<h;y++){
+            int first=0,last=w-1;
+            if(filled){
+                while(first<w&&!mask[y*w+first])first++;
+                while(last>=0&&!mask[y*w+last])last--;
+            }
+            for(int x=first;x<=last;x++)if(filled||mask[y*w+x])values[(top+y)*r.width+left+x]=value;
+        }
+        return write(r,values);
+    }
+    private static void ovalPoints(boolean[] mask,int w,int h,int x,int y){
+        mask[y*w+x]=mask[y*w+w-1-x]=mask[(h-1-y)*w+x]=mask[(h-1-y)*w+w-1-x]=true;
+    }
     public P8Document withLine(SpriteRegion r,int x0,int y0,int x1,int y1,int value){
         r.checkPixel(x0,y0);r.checkPixel(x1,y1);color(value);int[] values=read(r);
         if(x0>x1||(x0==x1&&y0>y1)){int t=x0;x0=x1;x1=t;t=y0;y0=y1;y1=t;}
