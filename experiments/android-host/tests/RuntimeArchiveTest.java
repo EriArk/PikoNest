@@ -45,10 +45,10 @@ public final class RuntimeArchiveTest {
             reject(()->RuntimeArchive.copy(infinite,new OutputStream(){public void write(int b){}public void write(byte[] b,int o,int n){}},()->false),"provider stream bounded independent of advertised size");
             int[] actions={0,0,0,0};RuntimeSetup s=new RuntimeSetup(new RuntimeSetup.Port(){public void pick(){actions[0]++;}public void recheck(){actions[1]++;}public void cancel(){actions[2]++;}public void leave(){actions[3]++;}});
             s.act(Action.CONFIRM);check(actions[0]==0&&!s.problem.isEmpty(),"unsupported device ABI");s.arm64=true;s.act(Action.CONFIRM);check(actions[0]==1,"semantic archive picker");
-            s.act(Action.CONTEXT);check(actions[1]==0,"no recheck without copy");s.begin("copy");s.act(Action.CONFIRM);s.act(Action.CANCEL);check(actions[0]==1&&actions[2]==1&&actions[3]==0,"busy cancellation instead of duplicate or leave");
+            s.act(Action.UNDO);check(actions[1]==0,"no recheck without copy");s.begin("copy");s.act(Action.CONFIRM);s.act(Action.CANCEL);check(actions[0]==1&&actions[2]==1&&actions[3]==0,"busy cancellation instead of duplicate or leave");
             s.complete("pico.zip",123,null);check(s.verified&&s.hasArchive&&!s.busy&&!s.adapterPresent,"archive validation does not claim adapter readiness");
             s.begin("next");s.complete("wrong.zip",0,"wrong ABI");check(s.filename.equals("pico.zip")&&s.verified&&s.archiveBytes==123,"failed replacement keeps accepted archive");
-            s.cancelled();check(s.hasArchive&&s.verified&&s.problem.isEmpty(),"picker cancellation preserves candidate");s.act(Action.CONTEXT);s.act(Action.CANCEL);check(actions[1]==1&&actions[3]==1,"recheck and leave");
+            s.cancelled();check(s.hasArchive&&s.verified&&s.problem.isEmpty(),"picker cancellation preserves candidate");s.act(Action.UNDO);s.act(Action.CANCEL);check(actions[1]==1&&actions[3]==1,"recheck and leave");
             if(args.length>0){RuntimeArchive.Result real=RuntimeArchive.inspect(new File(args[0]),()->false);System.out.println("User archive: "+real.bytes+" bytes, ARM64, sha256="+real.sha256);}
             if(args.length>1)reject(()->RuntimeArchive.inspect(new File(args[1]),()->false),"user amd64 archive rejected");
             if(args.length>2)reject(()->RuntimeArchive.inspect(new File(args[2]),()->false),"user i386 archive rejected");

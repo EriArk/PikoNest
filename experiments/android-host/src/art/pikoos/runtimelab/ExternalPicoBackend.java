@@ -37,11 +37,29 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
     }
     @Override public boolean stop() { return false; }
     void checkAvailableForLaunch() throws Exception {
+        if(activity.getSharedPreferences("runtime-setup",0).getBoolean("dispatched",false))throw new Exception("Сначала заверши пробный запуск PICO-8 и вернись в подключение.");
         boolean external=activity instanceof LaunchActivity;
         if(external&&activity.getSharedPreferences("library-ui",0).getBoolean("awaitingReturn",false))
             throw new Exception("Игра уже запущена из PIKOOS. Вернись в неё и заверши игру перед новым запуском.");
         if(!external&&activity.getSharedPreferences("external-launch",0).getBoolean("dispatched",false))
             throw new Exception("Игра запущена из другого лаунчера. Сначала заверши её и вернись в лаунчер.");
+    }
+    void checkProbeAvailable()throws Exception{
+        checkAvailableForLaunch();
+        if(activity.getSharedPreferences("library-ui",0).getBoolean("awaitingReturn",false)||activity.getSharedPreferences("external-launch",0).getBoolean("dispatched",false))throw new Exception("Сначала заверши игру и вернись на полку.");
+        PackageInfo selected=runtime();
+        if(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<4)throw new Exception("Для проверки архива обнови PIKOOS Runtime Test до версии 4.");
+        if(activity.getPackageManager().checkSignatures(activity.getPackageName(),selected.packageName)!=PackageManager.SIGNATURE_MATCH)throw new Exception("Подписи тестовых приложений не совпадают.");
+    }
+    void launchProbe()throws Exception{
+        Intent intent=new Intent(Intent.ACTION_SEND).setComponent(new ComponentName(RESTART_TEST_PACKAGE,"art.pikoos.runtimeexperiment.ProbeActivity"));
+        intent.setType("application/octet-stream").putExtra(Intent.EXTRA_STREAM,CartProvider.PROBE);
+        intent.setClipData(ClipData.newRawUri("PICO-8 runtime test",CartProvider.PROBE));intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);activity.startActivity(intent);
+    }
+    String probePhase(){
+        try(android.database.Cursor rows=activity.getContentResolver().query(android.net.Uri.parse("content://art.pikoos.runtimeexperiment.probe/state"),null,null,null,null)){
+            if(rows!=null&&rows.moveToFirst())return rows.getString(0);
+        }catch(Exception ignored){}return "UNKNOWN";
     }
     void resume() throws Exception {
         PackageInfo selected=runtime();

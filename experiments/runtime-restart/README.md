@@ -5,6 +5,34 @@
 This remains a separate Android research adapter, not a production runtime
 architecture or a new framework choice for PIKOOS.
 
+## Isolated purchased-runtime probe (adapter revision 4)
+
+`1.6.6-pikoos.4` / host 0.0.30 adds a signature-protected Java import Activity
+and lifecycle provider in `classes2.dex`; upstream `classes.dex` stays intact.
+Only the host's fixed read-only probe URI is accepted. `PIKORUN1` contains three
+fixed outputs: ARM64 `pico8_64`, `pico8.dat`, and our ordinary `probe.p8`, with
+bounded lengths and SHA-256 digests. It is internal transport, not a project format.
+The portable writer revalidates the saved archive hash before preparing it.
+
+Each candidate gets a fresh private UUID directory. Two individual file binds
+overlay executable/data for this launch; a separate parent-directory bind supplies
+the cart and isolated `-home`/`-desktop`. Binding the whole executable directory
+breaks upstream's relative `../picoshim.so` preload under proot: keep its original
+working directory and bind the two files. Existing runtime/configuration stay intact.
+
+The lifecycle journal records PREPARING/READY/RUNNING/EXITED/FAILED. Active states
+include the responsible process PID/start time to reject stale process identities.
+Monitored exit discards exact binary/cart files and marks diagnostics closed.
+At the eight-session limit, the gate prunes oldest closed app-owned UUID sessions
+without following symlinks; interrupted sessions are preserved and can exhaust
+the quota. A user-facing interrupted-session cleanup flow remains pending.
+Exit is not proof of graphics, audio or user acceptance.
+
+This probe requires an already initialized wrapper/rootfs. It neither replaces
+the working installation nor proves a clean-device onboarding path. The permission
+boundary is specific to executable import, not a full audit/sandbox of the upstream
+wrapper. [Evidence and remaining gates](../../docs/design/android-runtime-probe-30/README.md).
+
 ## Read-only runtime file sets (adapter revision 3)
 
 `1.6.6-pikoos.3` (versionCode 3), paired with host 0.0.28, adds an internal

@@ -8,13 +8,24 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded slice (host 0.0.29): controller-operated runtime archive step from
+**Owner release gate:** APK publication in GitHub Releases requires explicit owner
+confirmation of complete satisfaction and approval to release. Local test builds,
+device installs and source pushes continue during development; they do not imply
+permission to publish a release or prerelease.
+
+Latest bounded slice (host 0.0.30 / adapter revision 4): prepare and run an isolated
+candidate from the user's verified ZIP, with a separate runtime home and a normal
+PICO-8 test cart. Signature-protected handoff, payload hashes, Home/resume and exit
+observation preserve the working installation. This is not permanent activation
+or clean-device bootstrap. [Evidence](design/android-runtime-probe-30/README.md).
+Next: transactional activation/recovery, clean-install environment preparation,
+then complete first-run routing and folder/Splore integration.
+
+Previous slice (host 0.0.29): controller-operated runtime archive step from
 Folders → R PICO-8. Validates the user's Raspberry Pi ZIP and ARM64 header, retains
 a private verified copy across restarts and preserves the prior copy on failure.
 This does not activate/install a new runtime. [Setup scope](FIRST_RUN_SETUP.md) ·
 [Evidence](design/android-runtime-setup-29/README.md).
-Next: isolated runtime preparation, activation with recovery and an official
-test launch; then finish first-run routing and folder/Splore integration.
 
 Previous slice (host 0.0.28 / adapter revision 3): direct literal `load` and
 file-backed `reload` across sibling `.p8` files, staged read-only in a private

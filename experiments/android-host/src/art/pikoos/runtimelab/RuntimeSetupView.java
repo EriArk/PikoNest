@@ -14,7 +14,7 @@ final class RuntimeSetupView extends View {
         super(context);this.state=state;this.swap=swap;
         p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
-        setContentDescription("Подключение PICO-8. A: выбрать ZIP для Raspberry Pi. X: проверить сохранённый архив. B: назад или отменить проверку.");
+        setContentDescription("Подключение PICO-8. A: выбрать архив или проверить запуск. X: другой ZIP. Y: перепроверить архив. B: назад или отменить подготовку.");
     }
     void action(Action a){state.act(a);invalidate();}
     private void rect(float x,float y,float width,float height,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+width,y+height,p);}
@@ -33,7 +33,8 @@ final class RuntimeSetupView extends View {
         float left=Math.max(16,(w-590)/2),width=Math.min(w-32,590);
         text("Твой PICO-8",left,85,32,7);
         float step=width/3;
-        for(int i=0;i<3;i++){rect(left+i*step,104,step-6,4,i==0?10:13);fit(new String[]{"1 Архив","2 Установка","3 Запуск"}[i],left+i*step,130,16,i==0?10:13,step-12);}
+        int stage=state.testing||state.returned?2:state.busy&&state.verified?1:0;
+        for(int i=0;i<3;i++){rect(left+i*step,104,step-6,4,i==stage?10:13);fit(new String[]{"1 Архив","2 Подготовка","3 Проба"}[i],left+i*step,130,16,i==stage?10:13,step-12);}
         float y=wrap("Скачай ZIP для Raspberry Pi со своей страницы покупки PICO-8.",left,164,20,7,width);
         y=wrap("Например: pico-8_0.2.7_raspi.zip",left,y+3,17,14,width);
         y=wrap("Распаковывать вручную не нужно.",left,y+2,17,6,width);
@@ -46,14 +47,14 @@ final class RuntimeSetupView extends View {
         fit(state.hasArchive?state.filename:"PICO-8 · Raspberry Pi ZIP",left+78,panel+59,17,6,width-93);
         fit(state.hasArchive?String.format(java.util.Locale.ROOT,"%.1f МиБ · %s",state.archiveBytes/1048576.0,state.verified?"ARM64":"нужна проверка"):"Архив из твоей покупки",left+78,panel+84,16,13,width-93);
         y=panel+137;
-        String message=state.problem.isEmpty()?(state.busy?"Можно отменить проверку кнопкой "+(swap?"A":"B")+".":state.verified?"Архив сохранён. Автоподключение среды — следующий этап разработки.":"Проверим целостность ZIP и наличие версии ARM64."):state.problem;
+        String message=state.problem.isEmpty()?(state.busy?"Можно отменить подготовку кнопкой "+(swap?"A":"B")+".":state.testing?"Проба ещё открыта. Заверши её через меню PICO-8 и вернись сюда.":state.returned?"Проба закрыта. Изображение и кнопки проверяются на тестовом экране.":state.verified?"Запустим PICO-8 из этого архива отдельно. Рабочая установка сохранится.":"Проверим целостность ZIP и наличие версии ARM64."):state.problem;
         y=wrap(message,left,y,19,state.problem.isEmpty()?6:9,width);
         buttonY=Math.max(y+10,h-147);
         rect(left,buttonY,width,49,state.busy?5:2);rect(left,buttonY,4,49,state.busy?13:10);
-        fit(state.busy?"Проверяем…":(swap?"B":"A")+(state.hasArchive?"  Выбрать другой ZIP":"  Выбрать ZIP"),left+16,buttonY+32,23,state.busy?6:10,width-30);
+        fit(state.busy?"Готовим…":(swap?"B":"A")+(state.testing?"  Вернуться в пробу":state.verified?"  Проверить запуск":"  Выбрать ZIP"),left+16,buttonY+32,23,state.busy?6:10,width-30);
         fit(state.notice.isEmpty()?(state.adapterPresent?"Оболочка найдена · её запуск проверяется отдельно":"Для запуска ещё понадобится подготовка среды"):state.notice,left,buttonY+75,16,13,width);
         rect(0,h-45,w,45,0);text((swap?"A":"B")+(state.busy?" отменить":" назад"),left,h-16,18,6);
-        if(state.hasArchive&&!state.busy)text("X перепроверить",left+width-163,h-16,18,14);
+        if(!state.busy&&!state.testing)text("X другой ZIP",left+width-145,h-16,18,14);
         c.restore();
     }
     @Override public boolean onTouchEvent(MotionEvent event){

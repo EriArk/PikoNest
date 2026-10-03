@@ -8,16 +8,19 @@ import android.view.*;
 import art.pikoos.lab.core.RuntimeSetup;
 import art.pikoos.lab.core.WorkshopSession.Action;
 
-/** First bounded setup slice: purchased archive selection/validation, not activation. */
+/** Purchased archive validation and isolated runtime probe, not permanent activation. */
 public final class RuntimeSetupActivity extends Activity {
     private static final int PICK=71;
     private RuntimeSetup state;private RuntimeSetupView view;private ControllerInput input;private RuntimeArchiveJob job;
+    private boolean resumed;private String probeFailure="";private final android.os.Handler handler=new android.os.Handler();
+    private final Runnable monitor=new Runnable(){public void run(){observeProbe();if(resumed&&state.testing)handler.postDelayed(this,700);}};
     private final RuntimeArchiveJob.Listener listener=next->{
         if(isDestroyed()||isFinishing()||next!=job)return;
         if(!next.done){state.begin(next.phase);}
         else if(next.cancelled)state.cancelled();
-        else if(next.result!=null)state.complete(next.result.name,next.result.bytes,null);
+        else if(next.result!=null){state.complete(next.result.name,next.result.bytes,null);if(next.probe&&!next.dispatched&&resumed)launchPrepared();}
         else{if(next.recheck)state.verified=false;state.complete("",0,next.error);}
+        if(!probeFailure.isEmpty())state.problem=probeFailure;
         view.invalidate();
     };
     @Override public void onCreate(Bundle saved){
@@ -33,6 +36,14 @@ public final class RuntimeSetupActivity extends Activity {
             public void recheck(){attach(RuntimeArchiveJob.start(RuntimeSetupActivity.this,null,""));}
             public void cancel(){if(job!=null)job.cancel();}
             public void leave(){finish();}
+            public void test(){
+                try{
+                    ExternalPicoBackend backend=new ExternalPicoBackend(RuntimeSetupActivity.this);
+                    if(state.testing){backend.resume();return;}
+                    backend.checkProbeAvailable();state.returned=false;probeFailure="";
+                    attach(RuntimeArchiveJob.prepareProbe(RuntimeSetupActivity.this));
+                }catch(Exception error){state.problem=error.getMessage();view.invalidate();}
+            }
         });
         state.arm64=java.util.Arrays.asList(Build.SUPPORTED_ABIS).contains("arm64-v8a");
         state.adapterPresent=new ExternalPicoBackend(this).detect().launcherPresent;
@@ -47,6 +58,22 @@ public final class RuntimeSetupActivity extends Activity {
         }catch(Exception e){state.problem="Не удалось прочитать запись об архиве. Выбери ZIP снова.";}
     }
     private void attach(RuntimeArchiveJob next){if(job!=null)job.detach(listener);job=next;job.attach(listener);}
+    private void launchPrepared(){
+        try{
+            ExternalPicoBackend backend=new ExternalPicoBackend(this);backend.checkProbeAvailable();
+            if(!getSharedPreferences("runtime-setup",0).edit().putBoolean("dispatched",true).commit())throw new Exception("Не удалось сохранить состояние проверки");
+            job.dispatched=true;state.testing=true;handler.removeCallbacks(monitor);backend.launchProbe();
+        }catch(Exception error){getSharedPreferences("runtime-setup",0).edit().putBoolean("dispatched",false).commit();state.testing=false;state.problem=error.getMessage();}
+    }
+    private void observeProbe(){
+        if(!getSharedPreferences("runtime-setup",0).getBoolean("dispatched",false))return;
+        state.testing=true;String phase=new ExternalPicoBackend(this).probePhase();
+        if(phase.equals("EXITED")||phase.equals("FAILED")){
+            getSharedPreferences("runtime-setup",0).edit().putBoolean("dispatched",false).commit();state.testing=false;state.returned=true;
+            state.notice="Рабочая установка сохранена";
+            if(phase.equals("FAILED"))state.problem=probeFailure="Пробный запуск прервался. Можно проверить архив и попробовать снова.";
+        }view.invalidate();
+    }
     @Override protected void onActivityResult(int request,int result,Intent data){
         super.onActivityResult(request,result,data);if(request!=PICK)return;
         if(result!=RESULT_OK||data==null||data.getData()==null){state.cancelled();view.invalidate();return;}
@@ -57,8 +84,9 @@ public final class RuntimeSetupActivity extends Activity {
         else getWindow().getDecorView().setSystemUiVisibility(5894);
     }
     @Override public void onWindowFocusChanged(boolean focus){super.onWindowFocusChanged(focus);if(focus)immersive();else if(input!=null)input.reset();}
-    @Override protected void onPause(){if(input!=null)input.reset();super.onPause();}
-    @Override protected void onDestroy(){if(job!=null)job.detach(listener);super.onDestroy();}
+    @Override protected void onResume(){super.onResume();resumed=true;observeProbe();if(job!=null)listener.changed(job);handler.post(monitor);}
+    @Override protected void onPause(){resumed=false;handler.removeCallbacks(monitor);if(input!=null)input.reset();super.onPause();}
+    @Override protected void onDestroy(){handler.removeCallbacks(monitor);if(job!=null)job.detach(listener);super.onDestroy();}
     @Override public boolean dispatchKeyEvent(KeyEvent e){return input!=null&&input.key(e)||super.dispatchKeyEvent(e);}
     @Override public boolean onGenericMotionEvent(MotionEvent e){return input!=null&&input.motion(e)||super.onGenericMotionEvent(e);}
     @Override public void onBackPressed(){view.action(Action.CANCEL);}

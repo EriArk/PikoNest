@@ -1,5 +1,12 @@
 # PIKOOS Android host experiment
 
+Version 0.0.30 adds an isolated test launch from the verified runtime ZIP. In
+Folders → R PICO-8, A prepares/tests the candidate, X chooses another ZIP and Y
+rechecks it. Runtime Test revision 4 with the same signing identity is required.
+Home/resume returns to the same test; exit returns to setup. The working runtime
+is not replaced. [Scope and evidence](../../docs/design/android-runtime-probe-30/README.md).
+Local development APKs only: GitHub APK release requires explicit owner approval.
+
 Version 0.0.29 adds Folders → R PICO-8: a controller-operated archive setup step.
 It validates the user's Raspberry Pi ZIP/ARM64 header, saves a private verified
 copy and restores/rechecks it after restart. Failed replacement/cancel preserves

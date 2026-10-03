@@ -21,12 +21,17 @@ function Replace-PikoOnce([string]$Needle,[string]$Replacement) {
     $script:pikoScript = $script:pikoScript.Replace($Needle,$Replacement)
 }
 Replace-PikoOnce "func _launch_pico8(target_path: String) -> void:`n" "func _launch_pico8(target_path: String) -> void:`n`tif target_path == PIKOOS_INVALID_SET:`n`t`treturn`n"
+Replace-PikoOnce "`t# Ensure clean slate (in case force kill was needed or cold boot)`n" "`t_pikoos_active_probe = target_path.get_base_dir() if _pikoos_probe_path(target_path) else `"`"`n`t# Ensure clean slate (in case force kill was needed or cold boot)`n"
 Replace-PikoOnce "`t`t`t`t`tget_tree().quit()`n" "`t`t`t`t`t_pikoos_release_set()`n`t`t`t`t`tget_tree().quit()`n"
 Replace-PikoOnce "`tpending_restart_path = await _decode_and_fix_path(data)`n" "`tpending_restart_path = await _decode_and_fix_path(data)`n`tif pending_restart_path == PIKOOS_INVALID_SET:`n`t`treturn`n"
 Replace-PikoOnce "`tprint(`"Final Target Path: `", uri)`n" "`tif uri.ends_with(`".pikoset`"):`n`t`treturn _pikoos_unpack_set(uri)`n`tprint(`"Final Target Path: `", uri)`n"
 Replace-PikoOnce "`t`tif err == OK:`n" "`t`tif err == OK and not target_path.begins_with(PicoBootManager.APPDATA_FOLDER + `"/pikoos-sets/`"):`n"
 Replace-PikoOnce "`t# Finalize export string`n" "`tif target_path.begins_with(PicoBootManager.APPDATA_FOLDER + `"/pikoos-sets/`"):`n`t`trun_arg += `" -root_path /home/custom_mount`"`n`t# Finalize export string`n"
+Replace-PikoOnce "`t# Finalize export string`n" "`tif _pikoos_probe_path(target_path):`n`t`troot_bind_export = `"export PROOT_ROOT_BIND='--bind=`" + target_path.get_base_dir() + `"/pico8_64:/home/pico/pico-8/pico8_64'; `"`n`t`tbbs_bind_export = `"export PROOT_BBS_BIND='--bind=`" + target_path.get_base_dir() + `"/pico8.dat:/home/pico/pico-8/pico8.dat'; `"`n`t`trun_arg = `" -run /home/custom_mount/probe.p8 -root_path /home/custom_mount -home /home/custom_mount/probe-home -desktop /home/custom_mount/probe-home`"`n`t# Finalize export string`n"
+Replace-PikoOnce "`n`tprint(`"executing as pid `" + str(pico_pid) + `"\n`" + cmdline)`n" "`n`tif not _pikoos_active_probe.is_empty():`n`t`t_pikoos_probe_status(`"RUNNING`", pico_pid)`n`tprint(`"executing as pid `" + str(pico_pid) + `"\n`" + cmdline)`n"
+Replace-PikoOnce "`t`t`t`t`t_pikoos_release_set()`n" "`t`t`t`t`t_pikoos_release_set()`n`t`t`t`t`t_pikoos_finish_probe()`n"
 $pikoScript += "`n" + [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'file-set.gd'))
+$pikoScript += "`n" + [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'probe.gd'))
 $pikoRemapPath = Join-Path $Assets 'run_pico_cmd.gd.remap'
 $pikoRemap = [IO.File]::ReadAllText($pikoRemapPath)
 if ($pikoRemap.Trim() -ne "[remap]`n`npath=`"res://run_pico_cmd.gdc`"") { throw 'Unexpected script remap.' }

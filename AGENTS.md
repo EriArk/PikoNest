@@ -18,6 +18,12 @@ Owner clarification (2026-10-03): the current deliverable is an installable Andr
 APK application. Linux handhelds are occupied by TrainerOS work; Linux porting and
 device validation are deferred and must not block Android. Keep portable boundaries.
 
+Owner release gate (2026-10-03): publish an APK as a GitHub Release only after
+the owner explicitly confirms they are 100% satisfied with the result and approves
+that release. Continuing development, passing tests, installing local test APKs,
+or pushing source commits is not release approval. Keep development builds local;
+do not create/upload a GitHub APK release or prerelease before that confirmation.
+
 Support both the PIKOOS Play shelf and game launch from third-party Android
 launchers through PIKOOS. External play must not require editor/project import.
 Adaptive screen/controller support and external-launch acceptance are part of the

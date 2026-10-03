@@ -10,6 +10,16 @@ are occupied by the owner's TrainerOS development: Linux implementation/testing
 is deferred, not an Android completion gate. Portable core and replaceable
 runtime/storage/input boundaries remain required.
 
+APK publication in GitHub Releases, including prereleases, requires the owner's
+explicit confirmation of complete satisfaction and permission to release. Local
+test builds, device updates and source commits are development work, not release
+approval.
+
+Host 0.0.30 / Runtime Test 4 can prepare and launch an isolated runtime candidate
+from the user's verified Raspberry Pi ZIP. Existing games still use the working
+installation. Clean-install bootstrap and permanent activation remain pending.
+See [setup](FIRST_RUN_SETUP.md) and [device evidence](design/android-runtime-probe-30/README.md).
+
 ## Adaptive handheld experience
 
 The same app must accommodate square-ish, 4:3, 16:9 and wider displays, portrait

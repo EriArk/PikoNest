@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.AtomicFile;
 import art.pikoos.lab.core.RuntimeArchive;
+import art.pikoos.lab.core.RuntimeProbe;
 import java.io.*;
 import java.util.UUID;
 import org.json.JSONObject;
@@ -20,7 +21,7 @@ final class RuntimeArchiveJob {
         final String file,name,hash;final long bytes;
         Saved(String file,String name,String hash,long bytes){this.file=file;this.name=name;this.hash=hash;this.bytes=bytes;}
     }
-    private final Context context;private final Uri uri;private final String displayName;final boolean recheck;
+    private final Context context;private final Uri uri;private final String displayName;final boolean recheck;boolean probe,dispatched;
     private final Handler ui=new Handler(Looper.getMainLooper());private Listener listener;
     volatile boolean done,cancelled;volatile String phase="Читаем архив…",error="";volatile Saved result;
     private RuntimeArchiveJob(Context c,Uri uri,String name){context=c.getApplicationContext();this.uri=uri;displayName=name;recheck=uri==null;}
@@ -37,6 +38,11 @@ final class RuntimeArchiveJob {
         if(current!=null&&!current.done)return current;
         RuntimeArchiveJob job=new RuntimeArchiveJob(c,uri,name);current=job;
         new Thread(job::run,"pikoos-runtime-archive").start();return job;
+    }
+    static RuntimeArchiveJob prepareProbe(Context c){
+        if(current!=null&&!current.done)return current;
+        RuntimeArchiveJob job=new RuntimeArchiveJob(c,null,"");job.probe=true;current=job;
+        new Thread(job::run,"pikoos-runtime-prepare").start();return job;
     }
     void attach(Listener next){listener=next;next.changed(this);}
     void detach(Listener old){if(listener==old)listener=null;}
@@ -74,6 +80,16 @@ final class RuntimeArchiveJob {
             phase("Проверяем ZIP и ARM64…");
             RuntimeArchive.Result inspected=RuntimeArchive.inspect(file,()->cancelled);
             if(recheck&&!inspected.sha256.equals(previous.hash))throw new IOException("Сохранённый архив изменился. Выбери исходный ZIP снова.");
+            if(probe){
+                phase("Готовим пробный запуск…");byte[] cart;
+                try(InputStream input=context.getAssets().open("runtime-probe.p8");ByteArrayOutputStream buffer=new ByteArrayOutputStream()){
+                    byte[] bytes=new byte[4096];for(int n;(n=input.read(bytes))!=-1;)buffer.write(bytes,0,n);cart=buffer.toByteArray();
+                }
+                AtomicFile snapshot=new AtomicFile(new File(context.getFilesDir(),"runtime-probe.pikorun"));FileOutputStream stream=null;
+                try{stream=snapshot.startWrite();RuntimeProbe.prepare(file,previous.hash,cart,stream,()->cancelled);
+                    synchronized(this){RuntimeArchive.check(()->cancelled);snapshot.finishWrite(stream);}
+                }catch(Exception error){snapshot.failWrite(stream);throw error;}
+            }
             Saved candidate=recheck?previous:new Saved(file.getName(),name,inspected.sha256,inspected.bytes);
             synchronized(this){
                 RuntimeArchive.check(()->cancelled);
