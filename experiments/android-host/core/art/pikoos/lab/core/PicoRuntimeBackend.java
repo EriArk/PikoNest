@@ -23,6 +23,11 @@ public interface PicoRuntimeBackend {
 
     Availability detect();
     Capabilities capabilities();
+    /** A session journal is distinct from a successful game result. */
+    default boolean hasSession(){return false;}
+    default RuntimeSession.Phase sessionPhase(){return RuntimeSession.Phase.UNKNOWN;}
+    default boolean sessionEnded(){return RuntimeSession.ended(sessionPhase());}
+    default void resume()throws Exception{throw new UnsupportedOperationException("Возврат в runtime недоступен");}
     /** Launch acceptance is not proof of successful official-runtime execution. */
     void launch(byte[] standardCart) throws Exception;
     /** Explicit bounded trial of a copy; adapter reports evidence asynchronously, never certifies gameplay. */

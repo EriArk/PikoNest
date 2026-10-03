@@ -200,3 +200,24 @@ the last launcher instead of the workshop. The adapter currently relies on Andro
 task ordering, not an explicit persistent return destination. Ordinary Test/Play
 and both external-launcher exits passed. Do not treat background/resume return as accepted.
 [Implementation evidence and limits](design/android-exit-37/README.md).
+
+### Observed session and explicit return — lab 0.0.38 / adapter 7
+
+The R03.2 task-order gap above is fixed for the tested Test/Play/Beacon/Retroid paths.
+Before launch, host and signature-protected adapter establish a tokenized session.
+The process monitor records RUNNING/EXITED, with PID/start identity preventing reuse
+of an old PID from appearing to revive a previous game. Host resume alone never
+turns a tracked live/unknown session into a completed one. It presents a controller
+Continue/back surface and preserves journals instead of sending another snapshot.
+
+After observed process exit, the foreground adapter sends an immutable one-shot
+host PendingIntent before Godot quits. MainActivity restores its workshop/Play state.
+LaunchActivity remembers the original `android-app` referrer package and reopens
+its launcher entry; this is a navigation hint, not an authentication or file-access
+authority. Missing/unlaunchable callers fall back to the Android task stack.
+No return callback pulls the user out of another app for a background exit.
+
+Normal dispatch now requires Runtime Test 7; older wrappers get an update message.
+The purchase/import model and canonical `.p8` are unchanged. General startup/crash
+recovery, force-stop handling and other Android versions remain open R03/R04/Q01.
+[Device evidence](design/android-return-38/README.md).

@@ -74,6 +74,14 @@ public final class MainActivity extends Activity {
     private boolean showingLibrary;
     private final HashMap<String,WorkshopSession> sessions=new HashMap<>();
     private boolean awaitingReturn,leftForRuntime;
+    private LaunchView runtimeGate;
+    private void runtimeAction(Action action){
+        if(action==Action.CANCEL){moveTaskToBack(true);return;}
+        if(action==Action.CONFIRM||action==Action.TEST){
+            if(backend.sessionEnded()){onRuntimeResume();return;}
+            try{backend.resume();}catch(Exception e){runtimeGate.message="Не удалось вернуться к игре. Попробуй ещё раз.";runtimeGate.invalidate();}
+        }
+    }
     private final java.util.HashSet<String> codeRecoveryFailed=new java.util.HashSet<>();
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
@@ -120,7 +128,7 @@ public final class MainActivity extends Activity {
                     startActivityForResult(save,SAVE_CART);
                 }
             },template,asset("blank.p8"),asset("lights.p8"));
-            input=new ControllerInput(action->{if(showingFolders)folderView.action(action);else if(showingPlay)playView.action(action);else if(showingLibrary)shelf.action(action);else if(surface!=null)surface.action(action);},
+            input=new ControllerInput(action->{if(runtimeGate!=null)runtimeAction(action);else if(showingFolders)folderView.action(action);else if(showingPlay)playView.action(action);else if(showingLibrary)shelf.action(action);else if(surface!=null)surface.action(action);},
                 ()->session!=null?session.swapAB:libraryPrefs.getBoolean("swapAB",false));
             try{openProject(activeId,new WorkshopCartridge(store.read(activeId)));}
             catch(Exception e){Log.e(TAG,"Last project unavailable; retained",e);showLibrary();library.fail(e);shelf.invalidate();}
@@ -552,6 +560,19 @@ public final class MainActivity extends Activity {
     @Override protected void onStop(){super.onStop();if(awaitingReturn)leftForRuntime=true;}
     @Override protected void onResume(){
         super.onResume();immersive();
+        onRuntimeResume();
+    }
+    private void onRuntimeResume(){
+        if(backend==null||session==null)return;
+        if(backend.hasSession()&&!backend.sessionEnded()){
+            runtimeGate=new LaunchView(this,this::runtimeAction,libraryPrefs.getBoolean("swapAB",false));
+            runtimeGate.busy=false;runtimeGate.active=true;
+            runtimeGate.message="Игра ещё открыта. Вернись в неё, чтобы продолжить или завершить.";
+            if(backend.sessionPhase()==art.pikoos.lab.core.RuntimeSession.Phase.PREPARING)runtimeGate.message="Запуск передан PICO-8. Вернись туда, чтобы проверить, открылась ли игра.";
+            if(backend.sessionPhase()==art.pikoos.lab.core.RuntimeSession.Phase.UNKNOWN)runtimeGate.message="Завершение игры пока не подтверждено. Вернись в PICO-8 и проверь сеанс.";
+            setContentView(runtimeGate);runtimeGate.requestFocus();return;
+        }
+        if(runtimeGate!=null){runtimeGate=null;setContentView(showingFolders?folderView:showingPlay?playView:showingLibrary?shelf:surface);}
         if(session!=null&&awaitingReturn&&leftForRuntime){
             awaitingReturn=false;leftForRuntime=false;libraryPrefs.edit().putBoolean("awaitingReturn",false).apply();
             getSharedPreferences("moon-garden-ui",MODE_PRIVATE).edit().putBoolean("awaitingReturn",false).apply();
@@ -563,9 +584,9 @@ public final class MainActivity extends Activity {
         }
     }
     @Override public boolean dispatchKeyEvent(KeyEvent event){
-        if(!showingPlay&&!showingLibrary&&!showingFolders&&surface!=null&&surface.codeKey(event))return true;
+        if(runtimeGate==null&&!showingPlay&&!showingLibrary&&!showingFolders&&surface!=null&&surface.codeKey(event))return true;
         return input!=null&&input.key(event)||super.dispatchKeyEvent(event);
     }
     @Override public boolean onGenericMotionEvent(MotionEvent event){return input!=null&&input.motion(event)||super.onGenericMotionEvent(event);}
-    @Override public void onBackPressed(){if(showingFolders)folderView.action(Action.CANCEL);else if(showingPlay)playView.action(Action.CANCEL);else if(showingLibrary&&shelf!=null)shelf.action(Action.CANCEL);else if(surface!=null)surface.action(Action.CANCEL);else super.onBackPressed();}
+    @Override public void onBackPressed(){if(runtimeGate!=null)runtimeAction(Action.CANCEL);else if(showingFolders)folderView.action(Action.CANCEL);else if(showingPlay)playView.action(Action.CANCEL);else if(showingLibrary&&shelf!=null)shelf.action(Action.CANCEL);else if(surface!=null)surface.action(Action.CANCEL);else super.onBackPressed();}
 }

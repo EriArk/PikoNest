@@ -32,6 +32,9 @@ Replace-PikoOnce "`n`tprint(`"executing as pid `" + str(pico_pid) + `"\n`" + cmd
 Replace-PikoOnce "`t`t`t`t`t_pikoos_release_set()`n" "`t`t`t`t`t_pikoos_release_set()`n`t`t`t`t`t_pikoos_finish_probe()`n"
 $pikoScript += "`n" + [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'file-set.gd'))
 $pikoScript += "`n" + [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'probe.gd'))
+Replace-PikoOnce "`tprint(`"executing as pid `" + str(pico_pid) + `"\n`" + cmdline)`n`n`nfunc _escape_filename_for_shell" "`t_pikoos_session_started(pico_pid)`n`tprint(`"executing as pid `" + str(pico_pid) + `"\n`" + cmdline)`n`n`nfunc _escape_filename_for_shell"
+Replace-PikoOnce "`t`t`t`t`t_pikoos_finish_probe()`n" "`t`t`t`t`t_pikoos_finish_probe()`n`t`t`t`t`t_pikoos_session_write(`"EXITED`")`n`t`t`t`t`tJavaClassWrapper.wrap(`"art.pikoos.runtimeexperiment.RuntimeControls`").sessionExited()`n"
+$pikoScript += "`n" + [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'session.gd'))
 $pikoRemapPath = Join-Path $Assets 'run_pico_cmd.gd.remap'
 $pikoRemap = [IO.File]::ReadAllText($pikoRemapPath)
 if ($pikoRemap.Trim() -ne "[remap]`n`npath=`"res://run_pico_cmd.gdc`"") { throw 'Unexpected script remap.' }

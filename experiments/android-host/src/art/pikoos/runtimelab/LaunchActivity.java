@@ -17,20 +17,43 @@ public final class LaunchActivity extends Activity {
         view=new LaunchView(this,this::action,getSharedPreferences("library-ui",0).getBoolean("swapAB",false));
         input=new ControllerInput(this::action,()->getSharedPreferences("library-ui",0).getBoolean("swapAB",false));
         setContentView(view);immersive();
+        if(backend.isReturn(getIntent())){dispatched=true;left=true;return;}
+        reconcileEnded();
         if(saved!=null&&saved.getBoolean("dispatched")){dispatched=true;left=true;}
         else if(state.getBoolean("dispatched",false)){
+            dispatched=true;left=true;
             view.busy=false;view.active=true;view.message="Предыдущая игра уже передана PICO-8. Можно вернуться к ней.";view.invalidate();
-        }else read(getIntent());
+        }else{rememberCaller();read(getIntent());}
     }
     @Override protected void onNewIntent(Intent next){
         super.onNewIntent(next);
+        if(backend.isReturn(next)){dispatched=true;left=true;return;}
+        reconcileEnded();
         // A second request must never replace the snapshot underneath a live game.
         if(dispatched||state.getBoolean("dispatched",false)){
             generation++;busy=false;view.busy=false;left=false;dispatched=true;
             try{backend.resume();}catch(Exception e){dispatched=false;view.active=true;view.message="Вернуться к PICO-8 не удалось. Попробуй ещё раз.";view.invalidate();}
             return;
         }
-        setIntent(next);read(next);
+        setIntent(next);rememberCaller();read(next);
+    }
+    private void rememberCaller(){
+        android.net.Uri ref=getReferrer();String name=ref!=null&&"android-app".equals(ref.getScheme())?ref.getHost():null;
+        if(name==null||name.equals(getPackageName())||name.equals(ExternalPicoBackend.RESTART_TEST_PACKAGE))name="";
+        // Navigation hint only, never an authority for file access or authentication.
+        state.edit().putString("caller",name).commit();
+    }
+    private void reconcileEnded(){
+        // A completed background session may not have delivered a foreground return.
+        if(state.getBoolean("dispatched",false)&&backend.sessionEnded()){
+            state.edit().putBoolean("dispatched",false).commit();dispatched=false;left=false;
+        }
+    }
+    private void returnToCaller(){
+        String name=state.getString("caller","");
+        Intent back=name.isEmpty()?null:getPackageManager().getLaunchIntentForPackage(name);
+        if(back!=null){back.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);try{startActivity(back);}catch(Exception e){Log.w("PIKOOS-External","Caller unavailable",e);}}
+        finish();
     }
     private void read(Intent request){
         busy=true;view.busy=true;view.active=false;view.message="Открываем картридж…";view.invalidate();
@@ -92,7 +115,10 @@ public final class LaunchActivity extends Activity {
     @Override protected void onStop(){super.onStop();if(dispatched)left=true;}
     @Override protected void onResume(){
         super.onResume();immersive();
-        if(dispatched&&left){state.edit().putBoolean("dispatched",false).commit();dispatched=false;Log.i("PIKOOS-External","returned_to_caller result=unknown");finish();}
+        if((dispatched||state.getBoolean("dispatched",false))&&left){
+            if(!backend.sessionEnded()){view.busy=false;view.active=true;view.message="Игра ещё открыта. Можно вернуться и продолжить.";view.invalidate();return;}
+            state.edit().putBoolean("dispatched",false).commit();dispatched=false;Log.i("PIKOOS-External","returned_to_caller result=unknown");returnToCaller();
+        }
     }
     @Override protected void onDestroy(){generation++;if(input!=null)input.reset();super.onDestroy();}
     @Override public boolean dispatchKeyEvent(KeyEvent event){return input!=null&&input.key(event)||super.dispatchKeyEvent(event);}

@@ -1,5 +1,12 @@
 # PIKOOS Android host experiment
 
+Version 0.0.38 requires Runtime Test 7 for ordinary game dispatch. A signature-gated
+session handshake, portable phase observation and immutable one-shot return intent
+replace assumptions about Android task ordering. Visiting the host while a game
+is live shows Continue/back; it does not clear launch journals or send another cart.
+The workshop/Play origin survives host process loss, and external launch remembers
+the caller's launchable package as a navigation hint. [Evidence](../../docs/design/android-return-38/README.md).
+
 Version 0.0.37 pairs with Runtime Test 6 for a native Select/Back game menu.
 Dispatch opts into the menu and passes the existing A/B convention; ordinary
 cart bytes, URI validation and caller-return handling are unchanged. The menu

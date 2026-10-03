@@ -12,18 +12,27 @@ import java.util.*;
 
 /** Android-only input boundary around the pinned Godot Activity, using public window APIs. */
 public final class RuntimeControls implements Application.ActivityLifecycleCallbacks {
+    private static RuntimeControls installed;
     private final Map<Activity,Controls> active=new HashMap<>();
-    public static void install(Application app){app.registerActivityLifecycleCallbacks(new RuntimeControls());}
+    public static void install(Application app){installed=new RuntimeControls();app.registerActivityLifecycleCallbacks(installed);}
+    /** Called by the pinned Godot process monitor after its EXITED journal write, before quitting. */
+    public static void sessionExited(){
+        final java.util.concurrent.CountDownLatch done=new java.util.concurrent.CountDownLatch(1);
+        Runnable finish=()->{try{if(installed!=null)for(Controls c:installed.active.values())c.returnToCaller();}finally{done.countDown();}};
+        if(Looper.myLooper()==Looper.getMainLooper())finish.run();
+        else{new Handler(Looper.getMainLooper()).post(finish);try{done.await(1,java.util.concurrent.TimeUnit.SECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();}}
+    }
     public void onActivityCreated(Activity a,Bundle b){}
     public void onActivityStarted(Activity a){}
     public void onActivityResumed(Activity a){
         if(!a.getClass().getName().equals("com.godot.game.GodotApp"))return;
         Controls c=active.get(a);if(c==null){c=new Controls(a);active.put(a,c);}
         if(a.getIntent().getBooleanExtra("pikoos.controls",false)){c.enabled=true;c.swapAB=a.getIntent().getBooleanExtra("pikoos.swapAB",false);}
+        c.captureReturn();
         c.resumed=true;c.attach();
         if(c.model.state==State.OPEN&&c.dialog==null)c.show();
     }
-    public void onActivityPaused(Activity a){Controls c=active.get(a);if(c!=null)c.resumed=false;}
+    public void onActivityPaused(Activity a){Controls c=active.get(a);if(c!=null){if(a.isFinishing())c.returnToCaller();c.resumed=false;}}
     public void onActivityStopped(Activity a){Controls c=active.get(a);if(c!=null)c.background();}
     public void onActivitySaveInstanceState(Activity a,Bundle b){}
     public void onActivityDestroyed(Activity a){Controls c=active.remove(a);if(c!=null)c.background();}
@@ -33,7 +42,21 @@ public final class RuntimeControls implements Application.ActivityLifecycleCallb
         final RuntimeMenu model=new RuntimeMenu();
         Window.Callback delegate,proxy;Dialog dialog;MenuView view,progress;boolean resumed,enabled,swapAB;int generation;float axis;
         final Set<Integer> swallowed=new HashSet<>();
+        PendingIntent returnTo;String token="";boolean returned;
         Controls(Activity a){activity=a;}
+        void captureReturn(){
+            PendingIntent candidate=activity.getIntent().getParcelableExtra("pikoos.return");
+            String next=activity.getIntent().getStringExtra("pikoos.session");
+            if(candidate!=null&&"art.pikoos.runtimelab".equals(candidate.getCreatorPackage())&&art.pikoos.lab.core.RuntimeSession.validToken(next)){
+                returnTo=candidate;token=next;
+            }
+        }
+        void returnToCaller(){
+            if(returned||returnTo==null||!resumed)return;
+            if(SessionStatus.phase(activity,token)!=art.pikoos.lab.core.RuntimeSession.Phase.EXITED)return;
+            try{returnTo.send();returned=true;android.util.Log.i("PIKOOS.Exit","Returning to session origin");}
+            catch(PendingIntent.CanceledException e){android.util.Log.w("PIKOOS.Exit","Origin no longer available");}
+        }
         boolean swap(){return swapAB;}
         void attach(){
             Window w=activity.getWindow();if(w.getCallback()==proxy)return;

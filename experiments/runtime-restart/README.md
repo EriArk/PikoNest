@@ -5,6 +5,25 @@
 This remains a separate Android research adapter, not a production runtime
 architecture or a new framework choice for PIKOOS.
 
+## Session return (adapter revision 7)
+
+`1.6.6-pikoos.7` / host 0.0.38 adds a signature-gated `beginSession` provider call
+before dispatch. The private journal identifies one snapshot by a random token,
+phase and PID/start-time identity. The pinned Godot launch/exit monitor writes
+RUNNING/EXITED atomically. Missing or mismatched records remain UNKNOWN; confirmed
+process disappearance is INTERRUPTED, never a successful game result.
+
+Before Godot quits, `JavaClassWrapper` calls our Java return hook. On the Android
+UI thread it sends the host's immutable one-shot PendingIntent only for matching
+EXITED evidence while the game Activity is resumed. This is necessary because
+Godot can terminate before normal Activity pause/destroy callbacks run. The bridge
+waits at most one second for dispatch; it does not kill or relaunch processes.
+Direct probe/setup has no host return intent. Full runtime crash/boot recovery and
+unavailable caller handling remain bounded by the experiment, not production-complete.
+
+Upstream classes.dex remains untouched. Revision 7 changes our appended Godot
+adapter script and sparse index as well as classes2.dex. [Checks and limits](../../docs/design/android-return-38/README.md).
+
 ## Controller game menu (adapter revision 6)
 
 `1.6.6-pikoos.6` / host 0.0.37 adds `RuntimeControls` in classes2.dex. The existing

@@ -1,6 +1,10 @@
 package art.pikoos.runtimelab;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Bundle;
 import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -14,6 +18,8 @@ import java.io.FileOutputStream;
 
 /** An external-app research adapter, not the production runtime implementation. */
 public final class ExternalPicoBackend implements PicoRuntimeBackend {
+    static final String RETURN="art.pikoos.RETURN";
+    private static final Uri SESSION=Uri.parse("content://art.pikoos.runtimeexperiment.probe/session");
     public static final String PACKAGE = "io.wip.pico8";
     public static final String RESTART_TEST_PACKAGE = "art.pikoos.runtimeexperiment";
     private final Activity activity;
@@ -36,6 +42,15 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         return new Capabilities(detect().launcherPresent, false, false, false);
     }
     @Override public boolean stop() { return false; }
+    SharedPreferences sessionPrefs(){return activity.getSharedPreferences("runtime-session",0);}
+    @Override public boolean hasSession(){return !sessionPrefs().getString("token","").isEmpty();}
+    @Override public art.pikoos.lab.core.RuntimeSession.Phase sessionPhase(){
+        String token=sessionPrefs().getString("token","");
+        try(android.database.Cursor rows=activity.getContentResolver().query(SESSION.buildUpon().appendQueryParameter("token",token).build(),null,null,null,null)){
+            if(rows!=null&&rows.moveToFirst())return art.pikoos.lab.core.RuntimeSession.Phase.valueOf(rows.getString(0));
+        }catch(Exception ignored){}return art.pikoos.lab.core.RuntimeSession.Phase.UNKNOWN;
+    }
+    boolean isReturn(Intent intent){return RETURN.equals(intent.getAction())&&intent.getData()!=null&&sessionPrefs().getString("token","").equals(intent.getData().getLastPathSegment())&&sessionEnded();}
     public static final int DIAGNOSTIC_REQUEST=44;
     @Override public void diagnose(byte[] cart,boolean swapAB)throws Exception{
         checkAvailableForLaunch();PackageInfo selected=runtime();
@@ -51,6 +66,8 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         activity.startActivityForResult(intent,DIAGNOSTIC_REQUEST);
     }
     void checkAvailableForLaunch() throws Exception {
+        String token=sessionPrefs().getString("token","");
+        if(!token.isEmpty()&&!sessionEnded())throw new Exception("Игра ещё открыта. Сначала вернись в неё и заверши сеанс.");
         if(activity.getSharedPreferences("runtime-setup",0).getBoolean("dispatched",false))throw new Exception("Сначала заверши пробный запуск PICO-8 и вернись в подключение.");
         boolean external=activity instanceof LaunchActivity;
         if(external&&activity.getSharedPreferences("library-ui",0).getBoolean("awaitingReturn",false))
@@ -75,7 +92,7 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
             if(rows!=null&&rows.moveToFirst())return rows.getString(0);
         }catch(Exception ignored){}return "UNKNOWN";
     }
-    void resume() throws Exception {
+    @Override public void resume() throws Exception {
         PackageInfo selected=runtime();
         activity.startActivity(new Intent(Intent.ACTION_MAIN).setComponent(new ComponentName(selected.packageName,"com.godot.game.GodotAppLauncher")));
     }
@@ -91,6 +108,7 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
     private void dispatch(byte[] cart,String filename,android.net.Uri uri,String mime,boolean fileSet)throws Exception{
         checkAvailableForLaunch();
         PackageInfo selected = runtime();
+        if(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<7)throw new Exception("Для надёжного возврата обнови PIKOOS Runtime Test до версии 7");
         if(fileSet&&(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<3))
             throw new Exception("Обнови PIKOOS Runtime Test до версии 3 для запуска частей игры");
         AtomicFile snapshot = new AtomicFile(new File(activity.getFilesDir(),filename));
@@ -111,6 +129,20 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         intent.putExtra("pikoos.controls",true);
         intent.setClipData(ClipData.newRawUri("PICO-8 cartridge", uri));
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        activity.startActivity(intent);
+        String token=java.util.UUID.randomUUID().toString();
+        Intent back=new Intent(activity,activity instanceof LaunchActivity?LaunchActivity.class:MainActivity.class).setAction(RETURN)
+            .setData(Uri.parse("pikoos-return://session/"+token))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_REORDER_TO_FRONT|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent callback=PendingIntent.getActivity(activity,0,back,PendingIntent.FLAG_IMMUTABLE|PendingIntent.FLAG_ONE_SHOT);
+        if(!sessionPrefs().edit().putString("token",token).commit()){callback.cancel();throw new Exception("Не удалось сохранить сеанс");}
+        try{
+            Bundle result=activity.getContentResolver().call(SESSION,"beginSession",token,null);
+            if(result==null||!result.getBoolean("ok"))throw new Exception("Не удалось подготовить сеанс PICO-8");
+            intent.putExtra("pikoos.session",token).putExtra("pikoos.return",callback);
+            activity.startActivity(intent);
+        }catch(Exception e){
+            try{activity.getContentResolver().call(SESSION,"cancelSession",token,null);}catch(Exception ignored){}
+            sessionPrefs().edit().remove("token").commit();callback.cancel();throw e;
+        }
     }
 }
