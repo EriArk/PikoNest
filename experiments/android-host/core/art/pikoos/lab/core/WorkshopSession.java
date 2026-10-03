@@ -78,7 +78,7 @@ public final class WorkshopSession {
     }
     public void codeCommand(int command){
         if(mode!=Mode.CODE||codeDraft==null)return;
-        if(codeDraft.proposal()||codeDraft.panel==LuaDraft.Panel.NAVIGATION)return;
+        if(codeDraft.proposal()||codeDraft.panel==LuaDraft.Panel.NAVIGATION||codeDraft.panel==LuaDraft.Panel.SPRITE)return;
         try{
             LuaDraft d=codeDraft;
             switch(command){
@@ -134,7 +134,7 @@ public final class WorkshopSession {
         if(i.screen==LuaInsert.Screen.CATALOG){
             if(action==Action.UP)i.choose(Math.max(0,i.selected-1));
             if(action==Action.DOWN)i.choose(Math.min(LuaInsert.ITEMS.length-1,i.selected+1));
-            if(action==Action.CONFIRM)i.screen=LuaInsert.Screen.FIELDS;
+            if(action==Action.CONFIRM){if(i.item().id.equals("sspr"))d.beginSprite(selection());else i.screen=LuaInsert.Screen.FIELDS;}
             if(action==Action.CANCEL)d.cancelInsert();
             return;
         }
@@ -148,6 +148,15 @@ public final class WorkshopSession {
     }
     private void codeAction(Action action)throws Exception{
         LuaDraft d=codeDraft;
+        if(d.panel==LuaDraft.Panel.SPRITE){
+            SpritePlacement p=d.placement;
+            if(action==Action.LEFT)p.move(-1,0);if(action==Action.RIGHT)p.move(1,0);
+            if(action==Action.UP)p.move(0,-1);if(action==Action.DOWN)p.move(0,1);
+            if(action==Action.PREVIOUS||action==Action.NEXT||action==Action.CONTEXT)p.toggleStep();
+            if(action==Action.CONFIRM){if(p.phase==3)d.applySprite();else p.next();}
+            if(action==Action.CANCEL&&p.back())d.cancelSprite();
+            return;
+        }
         if(d.proposal()){insertAction(action);return;}
         if(d.panel==LuaDraft.Panel.NAVIGATION){
             LuaNavigation n=d.navigation;

@@ -25,7 +25,7 @@ public final class LuaCall {
             if(depth!=0)throw unsupported();
             return rule;
         }
-        Matcher head=Pattern.compile("^[ \\t]*(cls|print|circfill|rectfill|spr)[ \\t]*\\(").matcher(mask);
+        Matcher head=Pattern.compile("^[ \\t]*(cls|print|circfill|rectfill|spr|sspr)[ \\t]*\\(").matcher(mask);
         if(!head.find())throw unsupported();
         String name=head.group(1);ArrayList<Integer> starts=new ArrayList<>(),ends=new ArrayList<>();
         if(new LuaSymbols(source).shadows(name))throw new IllegalArgumentException("Этот вызов нельзя уверенно распознать. Вернись к коду и выбери «Ввод».");
@@ -41,7 +41,7 @@ public final class LuaCall {
             if(c==','&&stack.size()==1){starts.add(arg);ends.add(n);arg=n+1;}
         }
         if(close<0||!mask.substring(close+1).matches("[ \\t]*;?[ \\t]*"))throw unsupported();
-        int index=name.equals("cls")?10:name.equals("print")?11:name.equals("circfill")?13:name.equals("rectfill")?14:15;
+        int index=name.equals("cls")?10:name.equals("print")?11:name.equals("circfill")?13:name.equals("rectfill")?14:name.equals("sspr")?18:15;
         LuaInsert form=new LuaInsert();form.choose(index);form.editing=true;form.screen=LuaInsert.Screen.FIELDS;
         if(starts.size()!=form.item().fields.length)throw unsupported();
         int[] from=new int[starts.size()],to=new int[from.length];

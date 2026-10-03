@@ -14,6 +14,7 @@ import art.pikoos.lab.core.WorkshopSession.Action;
 import art.pikoos.lab.core.WorkshopSession.Mode;
 import art.pikoos.lab.core.WorkshopCartridge;
 import art.pikoos.lab.core.SpriteRegion;
+import art.pikoos.lab.core.SpritePlacement;
 import art.pikoos.lab.core.SpriteMove;
 import art.pikoos.lab.core.SpriteAsset;
 import art.pikoos.lab.core.NameEditor;
@@ -42,6 +43,7 @@ final class WorkshopView extends View {
     private String previousNotice="Сохранено";
     private long noticeUntil;
     private RectF spriteArea;
+    private RectF placementArea;
     private int viewX,viewY,viewWidth,viewHeight;
     private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка","Прямоугольник","Прямоуг. с заливкой","Овал","Овал с заливкой"};
     private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из спрайта","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из спрайта","Контур: выбери два противоположных угла","Закрашенная фигура по двум углам","Контур овала внутри рамки по двум углам","Закрашенный овал внутри выбранной рамки"};
@@ -61,6 +63,7 @@ final class WorkshopView extends View {
     boolean codeKey(KeyEvent event){
         if(s.mode!=Mode.CODE||s.codeDraft==null||(event.getSource()&InputDevice.SOURCE_GAMEPAD)==InputDevice.SOURCE_GAMEPAD)return false;
         LuaDraft d=s.codeDraft;
+        if(d.panel==LuaDraft.Panel.SPRITE)return false;
         if(d.proposal()){
             if(d.insertion.screen!=LuaInsert.Screen.TEXT)return false;
             int k=event.getKeyCode();
@@ -115,7 +118,7 @@ final class WorkshopView extends View {
         if(getWidth()/scale<360) scale=getWidth()/360f;
         if(getHeight()/scale<480) scale=getHeight()/480f;
         w=getWidth()/scale;h=getHeight()/scale;bodyBottom=h-44;
-        c.save();c.scale(scale,scale);hits.clear();spriteArea=null;
+        c.save();c.scale(scale,scale);hits.clear();spriteArea=null;placementArea=null;
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
@@ -316,6 +319,7 @@ final class WorkshopView extends View {
     }
     private void luaEditor(){
         LuaDraft d=s.codeDraft;
+        if(d.panel==LuaDraft.Panel.SPRITE){spritePlacement();return;}
         if(d.proposal()){luaInsertion();return;}
         if(d.panel==LuaDraft.Panel.NAVIGATION){luaNavigation();return;}
         fitted("[ ] Код / "+projectTitle,16,75,24,7,w-32);
@@ -390,6 +394,35 @@ final class WorkshopView extends View {
             key(ok()+" выбрать",16,bodyBottom,10,()->action(Action.CONFIRM));
             key(back()+" к коду",w/2,bodyBottom,6,()->action(Action.CANCEL));
         }
+    }
+    private void spritePlacement(){
+        LuaDraft d=s.codeDraft;SpritePlacement v=d.placement;SpriteRegion r=v.source();hits.clear();
+        fitted("Спрайт в игре",16,75,24,14,w-32);
+        String[] stages={"1/4 Первый угол области","2/4 Второй угол области","3/4 Место на экране","4/4 Перед строкой "+(d.line()+1)};
+        fitted(stages[v.phase],16,100,18,7,w-32);
+        float size=Math.min(256,Math.min(w-32,bodyBottom-262)),left=(w-size)/2,top=116,cell=size/128;
+        placementArea=new RectF(left,top,left+size,top+size);
+        for(int y=0;y<128;y++)for(int x=0;x<128;x++)sceneBitmap.setPixel(x,y,COLORS[v.phase<2?s.cart().sheetPixel(x,y):v.pixel(s.cart(),x,y)]);
+        c.drawBitmap(sceneBitmap,null,new RectF(left,top,left+size,top+size),p);
+        outline(left-2,top-2,size+4,size+4,13);
+        c.save();c.clipRect(left-2,top-2,left+size+2,top+size+2);
+        outline(left+(v.phase<2?r.x:v.x)*cell,top+(v.phase<2?r.y:v.y)*cell,Math.max(2,r.width*cell),Math.max(2,r.height*cell),10);
+        if(v.phase<2)outline(left+(v.phase==0?v.ax:v.bx)*cell-2,top+(v.phase==0?v.ay:v.by)*cell-2,5,5,14);
+        c.restore();
+        fitted(v.phase<2?r.width+" × "+r.height+" · лист "+r.x+", "+r.y:"X "+v.x+" · Y "+v.y+" · "+r.width+" × "+r.height,16,top+size+22,18,10,w-32);
+        if(v.phase==3){
+            text("sspr("+r.x+","+r.y+","+r.width+","+r.height+",",16,bodyBottom-108,18,7);
+            text("     "+v.x+","+v.y+")",16,bodyBottom-86,18,7);
+            fitted("Внутри _draw, после cls()",16,bodyBottom-64,18,6,w-32);
+        }else{
+            fitted(v.phase<2?(r.sharesMap()?"Нижний лист общий с картой":"Крестовина: выбрать область"):"Пример без кода игры",16,top+size+44,18,6,w-32);
+            button("X Шаг: "+v.step+" пикс.",16,bodyBottom-86,w-32,32,false,()->action(Action.CONTEXT));
+        }
+        String[] actions={"Выбрать первый угол","Область выбрана","Проверить вставку","Вставить в черновик"};
+        button(ok()+" "+actions[v.phase],16,bodyBottom-44,w-32,34,true,()->action(Action.CONFIRM));
+        rect(0,bodyBottom,w,44,0);
+        key(back()+(v.phase==0?" отмена":" назад"),12,bodyBottom,6,()->action(Action.CANCEL));
+        fitted(v.phase==3?"Test — потом":"↑↓←→ двигать",w/2,bodyBottom+28,18,13,w/2-12);
     }
     private void diagnostic(){
         hits.clear();RuntimeDiagnostic d=s.diagnostic;
@@ -507,7 +540,8 @@ final class WorkshopView extends View {
             hit(16,182,w-32,28,()->action(Action.MENU));
             return;
         }
-        int count=i.item().fields.length,rows=Math.min(count+1,Math.max(2,(int)((bodyBottom-254)/36)));
+        boolean longCall=d.callEdit!=null&&i.item().id.equals("sspr")&&w<500;
+        int count=i.item().fields.length,rows=Math.min(count+1,Math.max(2,(int)((bodyBottom-(longCall?298:254))/36)));
         int first=Math.max(0,Math.min(i.field-rows/2,count+1-rows));
         for(int r=0;r<rows&&first+r<=count;r++){
             final int index=first+r;float y=112+r*36;boolean focus=index==i.field;
@@ -523,7 +557,8 @@ final class WorkshopView extends View {
         text(d.callEdit!=null?"Изменение Lua":"Lua после вставки",16,previewY+14,18,14);
         rect(16,previewY+24,w-32,bodyBottom-previewY-62,0);
         c.save();c.clipRect(16,previewY+24,w-16,bodyBottom-34);
-        if(d.callEdit!=null){fitted("Было: "+d.callEdit.original.trim(),24,previewY+46,16,6,w-48);fitted("Будет: "+d.callEdit.preview(i).trim(),24,previewY+70,16,10,w-48);}
+        if(longCall){codePreview("Было: "+d.callEdit.original.trim(),24,previewY+46,6,w-48);codePreview("Будет: "+d.callEdit.preview(i).trim(),24,previewY+90,10,w-48);}
+        else if(d.callEdit!=null){fitted("Было: "+d.callEdit.original.trim(),24,previewY+46,16,6,w-48);fitted("Будет: "+d.callEdit.preview(i).trim(),24,previewY+70,16,10,w-48);}
         else {int line=0;for(String row:i.code().split("\n")){fitted(row,24,previewY+46+line*22,18,7,w-48);line++;}}
         c.restore();
         fitted(w<500?"↑↓ поле  ←→ менять  "+ok()+" ввод":"↑↓ поле · ←→ значение · "+ok()+" ввод / "+(d.callEdit!=null?"правка":"вставка"),16,bodyBottom-12,16,6,w-32);
@@ -567,13 +602,18 @@ final class WorkshopView extends View {
             String part=value.substring(0,end);text(part,x,y+row*22,size,color);value=value.substring(end).trim();
         }
     }
+    private void codePreview(String value,float x,float y,int color,float max){
+        int end=value.length();while(end>1&&width(value.substring(0,end),18)>max)end--;
+        if(end<value.length()){int comma=value.lastIndexOf(',',end-1);if(comma>=0)end=comma+1;}
+        text(value.substring(0,end),x,y,18,color);fitted(value.substring(end),x,y+22,18,color,max);
+    }
     private void syntax(String source,float x,float y) {
         if(source.trim().startsWith("--")) {text(source,x,y,20,13);return;}
         java.util.regex.Matcher m=java.util.regex.Pattern.compile("[a-zA-Z_][a-zA-Z_0-9]*|[0-9]+(?:\\.[0-9]+)?|[^a-zA-Z_0-9]+").matcher(source);
         while(m.find()) {String token=m.group();int color=7;
             if(token.matches("[0-9].*"))color=9;
             if((" function end if then else local for in do and or true false ").contains(" "+token+" "))color=14;
-            if((" btn btnp spr cls rectfill circfill line pset all min mid ").contains(" "+token+" "))color=12;
+            if((" btn btnp spr sspr cls rectfill circfill line pset all min mid ").contains(" "+token+" "))color=12;
             text(token,x,y,20,color);x+=width(token,20);
         }
     }
@@ -948,6 +988,10 @@ final class WorkshopView extends View {
                 changed.run();invalidate();return true;
             }
             if(Math.abs(x-downX)>20||Math.abs(y-downY)>20)return true;
+            if(placementArea!=null&&placementArea.contains(x,y)&&s.mode==Mode.CODE&&s.codeDraft.panel==LuaDraft.Panel.SPRITE){
+                s.codeDraft.placement.point((int)((x-placementArea.left)*128/placementArea.width()),(int)((y-placementArea.top)*128/placementArea.height()));
+                changed.run();invalidate();performClick();return true;
+            }
             if(spriteArea!=null && spriteArea.contains(x,y) && (s.mode==Mode.NAVIGATE||s.mode==Mode.CANVAS)) {
                 s.paintAt(viewX+(int)((x-spriteArea.left)*viewWidth/spriteArea.width()),viewY+(int)((y-spriteArea.top)*viewHeight/spriteArea.height()));
                 changed.run();invalidate();return true;

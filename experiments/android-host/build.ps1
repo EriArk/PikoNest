@@ -32,6 +32,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaInsertTest'
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaSymbolsTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaCallTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaRuleTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'SpritePlacementTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaNavigationTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeDiagnosticTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeMenuTest')

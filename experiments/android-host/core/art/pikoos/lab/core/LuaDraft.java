@@ -8,7 +8,7 @@ import java.util.ArrayDeque;
 
 /** Portable literal-text editor with explicit snippet proposals; never normalizes unrelated Lua. */
 public final class LuaDraft {
-    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS, NAVIGATION }
+    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS, NAVIGATION, SPRITE }
     public static final String[] PAGES={"abcdefghijklmnopqrstuvwxyz0123456789_ ",
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ ","()[]{}=+-*/%^#<>~!;:,.\"'\\|&?$@_ "};
     public static final String[] COMMANDS={"Сохранить и закрыть","Сохранить и тест","Новая строка","Пробел","Табуляция",
@@ -25,6 +25,17 @@ public final class LuaDraft {
     public LuaInsert insertion;
     public LuaCall callEdit;
     public LuaNavigation navigation;
+    public SpritePlacement placement;
+    public void beginSprite(SpriteRegion region){
+        beginInsert();insertion=null;placement=new SpritePlacement(region);panel=Panel.SPRITE;
+    }
+    public void cancelSprite(){placement=null;panel=Panel.CURSOR;}
+    public void applySprite(){
+        if(placement==null||placement.phase!=3)return;
+        insertion=placement.form();panel=Panel.INSERT;
+        try{applyInsert();placement=null;}
+        catch(RuntimeException e){insertion=null;panel=Panel.SPRITE;throw e;}
+    }
     private final ArrayDeque<int[]> jumps=new ArrayDeque<>();
     public boolean canGoBack(){return !jumps.isEmpty();}
     public void beginNavigation(){navigation=new LuaNavigation(text,line());panel=Panel.NAVIGATION;}
@@ -182,7 +193,7 @@ public final class LuaDraft {
     /** Recovery snapshot, including original bytes for stale-draft detection. History is session-only. */
     public byte[] encode(){
         try{ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
-            boolean navState=navigation!=null||!jumps.isEmpty();out.writeInt(navState?5:4);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
+            boolean navState=placement!=null||navigation!=null||!jumps.isEmpty();out.writeInt(placement!=null?6:navState?5:4);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
             out.writeInt(cursor);out.writeInt(anchor);out.writeInt(page);out.writeInt(key);out.writeInt(panel.ordinal());out.writeInt(menu);
             write(out,clipboard.getBytes(StandardCharsets.UTF_8));out.writeBoolean(insertion!=null);if(insertion!=null)insertion.write(out);
             if(navState){
@@ -190,11 +201,12 @@ public final class LuaDraft {
                 if(navigation!=null){out.writeInt(navigation.tab);out.writeInt(navigation.index);out.writeInt(navigation.target);out.writeInt(navigation.digit);}
                 out.writeInt(jumps.size());for(int[] at:jumps){out.writeInt(at[0]);out.writeInt(at[1]);}
             }
+            if(placement!=null)placement.write(out);
             out.close();return bytes.toByteArray();
         }catch(IOException e){throw new IllegalStateException(e);}
     }
     public static LuaDraft restore(byte[] bytes){
-        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>5)throw new IOException("version");
+        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>6)throw new IOException("version");
             LuaDraft d=new LuaDraft(new WorkshopCartridge(read(in)),0);d.text=decode(read(in));
             d.cursor=in.readInt();d.anchor=in.readInt();d.page=in.readInt();d.key=in.readInt();int panel=in.readInt();d.menu=in.readInt();
             d.clipboard=decode(read(in));
@@ -208,6 +220,8 @@ public final class LuaDraft {
                 int count=in.readInt();if(count<0||count>32)throw new IOException("jumps");
                 for(int n=0;n<count;n++){int at=in.readInt(),anchor=in.readInt();if(!d.boundary(at)||(anchor!=-1&&!d.boundary(anchor)))throw new IOException("jump");d.jumps.addLast(new int[]{at,anchor});}
             }
+            if(version==6)d.placement=SpritePlacement.read(in);
+            if((panel==Panel.SPRITE.ordinal())!=(d.placement!=null))throw new IOException("sprite panel");
             if((panel==Panel.NAVIGATION.ordinal())!=(d.navigation!=null))throw new IOException("navigation panel");
             if(in.available()!=0||!d.boundary(d.cursor)||(d.anchor!=-1&&!d.boundary(d.anchor))||d.page<0||d.page>=PAGES.length
                 ||d.key<0||d.key>=PAGES[d.page].length()||panel<0||panel>=Panel.values().length||d.menu<0||d.menu>=COMMANDS.length)throw new IOException("state");

@@ -34,7 +34,8 @@ public final class LuaInsert {
         new Item("rect","rectfill · прямоугольник","Рисует заполненный прямоугольник между двумя углами включительно.",false,f("X0","8",Kind.EXPR),f("Y0","8",Kind.EXPR),f("X1","119",Kind.EXPR),f("Y1","119",Kind.EXPR),f("Цвет","12",Kind.COLOR)),
         new Item("sprite","spr · спрайт","Рисует один тайл спрайта 8×8. Размеры и другие параметры можно изменить в Lua.",false,f("Номер","0",Kind.EXPR),f("X","64",Kind.EXPR),f("Y","64",Kind.EXPR)),
         new Item("call","Вызвать функцию","Вызывает функцию без аргументов. Например, _init() может сбросить состояние игры.",false,f("Имя","_init",Kind.NAME)),
-        new Item("compare","if · сравнить значения","Сравнивает два значения. Если сравнение истинно, выполняется тело условия.",true,f("Слева","score",Kind.EXPR),f("Сравнение",">=",Kind.COMPARE),f("Справа","5",Kind.EXPR))
+        new Item("compare","if · сравнить значения","Сравнивает два значения. Если сравнение истинно, выполняется тело условия.",true,f("Слева","score",Kind.EXPR),f("Сравнение",">=",Kind.COMPARE),f("Справа","5",Kind.EXPR)),
+        new Item("sspr","Спрайт · разместить","Выбери область своего листа и место на экране. Вставляй внутри _draw после очистки кадра.",false,f("На листе X","0",Kind.EXPR),f("На листе Y","0",Kind.EXPR),f("Ширина","8",Kind.EXPR),f("Высота","8",Kind.EXPR),f("Экран X","60",Kind.EXPR),f("Экран Y","60",Kind.EXPR))
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
@@ -128,6 +129,7 @@ public final class LuaInsert {
             case "circle":return "circfill("+join()+")\n";
             case "rect":return "rectfill("+join()+")\n";
             case "sprite":return "spr("+join()+")\n";
+            case "sspr":return "sspr("+join()+")\n";
             case "call":return a+"()\n";
             default:throw new IllegalStateException("Unknown snippet");
         }

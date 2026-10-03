@@ -1,5 +1,11 @@
 # PIKOOS Android host experiment
 
+Version 0.0.42 adds visual sprite-region placement through Code → X → Sprite:
+two sheet corners, screen position, explicit ordinary `sspr` insertion, draft
+Undo/Redo, recovery and Test. Existing six-argument calls have editable fields.
+No hero binding or hidden runtime API is required. [Blank-to-runtime evidence
+and limits](../../docs/design/android-sprites-42/README.md).
+
 Version 0.0.41 replaces Tiny5 UI text with Monocraft, raises small text to an
 18-unit minimum and adapts compact actions. Lua caret/selection/touch spacing
 uses the actual font advance; ligatures are disabled. Runtime Test 8 shares
