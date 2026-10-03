@@ -82,6 +82,12 @@ asset shelf, several graphics tools and session undo/redo. The production runtim
 folder wizard, complete code/map/audio tools and release acceptance remain open.
 The accepted pixel style and controller-first interaction apply throughout.
 
+Current deliverable is an **Android APK**. Linux devices are occupied by TrainerOS;
+Linux porting/testing is deferred. [Android app requirements](ANDROID_APP.md)
+include adaptive handheld layouts/controls and direct game entry from third-party
+launchers. Verify external entry → official runtime → return, including cold/warm
+starts and missing access/setup, before Android release. Portable boundaries remain.
+
 | Order | Work | Completion gate |
 | --- | --- | --- |
 | 1. Production foundations | Confirm framework/layer tradeoffs; keep domain/workflows portable. Complete runtime import/validation/launch behind the Android backend. First-run setup chooses games, Splore downloads, own projects and data/library folders; explain and automatically prepare the supported purchased PICO-8 archive. | Fresh installation reaches a playable cart and returns reliably, without terminal/manual extraction; folders remain usable after reboot, permission loss has recovery. |
@@ -104,8 +110,9 @@ experimental online features. Stage acceptance does not follow automatically fro
 tests/screenshots: user-facing behavior and physical ergonomics need review.
 
 **Next slice after PNG Play:** diagnose and stabilize warm runtime launch/exit,
-including the observed external wrapper PulseAudio failure. Then address nested
-libraries/dependency handling and the runtime setup wizard.
+including the observed external wrapper PulseAudio failure. Then implement external
+launcher entry/return, nested libraries/dependency handling and the runtime setup
+wizard. Device/layout checks accompany each slice.
 Verified project/data migration remains a foundation task. Do not move existing
 projects or retire the experiment before preservation is demonstrated.
 

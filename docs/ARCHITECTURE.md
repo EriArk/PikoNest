@@ -6,6 +6,13 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+Current shipping target is the Android APK. [Android app requirements](ANDROID_APP.md)
+define adaptive device coverage and planned external-launch entry. That entry must
+map validated storage/format/origin into the shared application launch workflow;
+Android intent parsing belongs in the platform adapter. Play, workshop and external
+return destinations must remain distinct across lifecycle restoration. No external
+entry-point API is implemented or frozen yet; Linux implementation is deferred.
+
 ### Android lab 0.0.23: PNG Play transport and covers
 
 `CartridgeFormat` crosses the portable runtime port explicitly. Android stages

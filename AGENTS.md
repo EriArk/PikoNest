@@ -14,6 +14,15 @@ The intended emotional experience is closer to a creative toy than to a desktop 
 
 The first production target is Android gaming handhelds with physical controls.
 
+Owner clarification (2026-10-03): the current deliverable is an installable Android
+APK application. Linux handhelds are occupied by TrainerOS work; Linux porting and
+device validation are deferred and must not block Android. Keep portable boundaries.
+
+Support both the PIKOOS Play shelf and game launch from third-party Android
+launchers through PIKOOS. External play must not require editor/project import.
+Adaptive screen/controller support and external-launch acceptance are part of the
+Android release scope; see `docs/ANDROID_APP.md` for requirements and pending design.
+
 Do **not** architect PIKOOS around the Retroid Pocket Classic or any other single device. Devices will vary in:
 
 - display aspect ratio and resolution;
