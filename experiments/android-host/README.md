@@ -1,5 +1,10 @@
 # PIKOOS Android host experiment
 
+Runtime adapter revision 2 fixes replay of the initial game request after an
+interrupted boot/resume. Host remains 0.0.25; update the separate Runtime Test APK
+in place. [Build and scope](../runtime-restart/README.md) ·
+[Device evidence](../../docs/design/android-resume-25/README.md).
+
 Version 0.0.25 adds a separate explicit LaunchActivity for third-party launcher
 play, without loading/importing editor projects. Beacon and Retroid Launcher are
 configured and verified on the device. Incoming content grants or scoped Games

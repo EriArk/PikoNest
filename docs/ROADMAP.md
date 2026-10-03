@@ -8,11 +8,17 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded lab step (0.0.25): select a cart in Beacon or Retroid Launcher →
+Latest runtime fix (host 0.0.25, adapter revision 2): interrupted native boot →
+return to the same process → working input and preserved game state. The wrapper
+now records the consumed cold intent before launch, avoiding a spurious restart
+on first resume. Beacon/Retroid flows are checked again. Next: nested libraries
+and dependency-aware staging. [Device evidence](design/android-resume-25/README.md).
+
+Previous bounded lab step (0.0.25): select a cart in Beacon or Retroid Launcher →
 PIKOOS external entry → official runtime → return to the calling shelf. Scoped
 file access, picker recovery, duplicate-request protection and process-loss return
-are covered. Interrupting native boot exposed a wrapper hang; investigate that
-recovery next. Integrated runtime setup, dependencies and crash observation remain
+are covered. Interrupting native boot exposed the wrapper hang addressed above.
+Integrated runtime setup, dependencies and crash observation remain
 open. [Configuration and scope](ANDROID_APP.md#tested-lab-entry-0025) ·
 [Device evidence](design/android-external-24/README.md).
 

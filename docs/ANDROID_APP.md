@@ -127,8 +127,8 @@ Beacon and Retroid Launcher. This is an experimental package/entry contract;
 production naming and distribution are not frozen. Missing-runtime setup still
 explains the requirement rather than completing an integrated import wizard.
 Linked carts/files, runtime crash observation and reliable stale-session recovery
-remain open. Interrupting native startup with another entry also exposed a
-wrapper hang; see the evidence above. The wrapper cannot report a verified game result; returning is only
+remain open. The interrupted-startup hang is fixed in adapter revision 2:
+[resume evidence](design/android-resume-25/README.md). The wrapper cannot report a verified game result; returning is only
 an Activity lifecycle event. Existing narrow/wide screenshots are layout checks
 on one device, not a supported-device matrix.
 
@@ -136,6 +136,6 @@ The reproduced audio startup race is fixed in a separate test runtime adapter;
 this two-APK development setup is not final product packaging. See the
 [runtime experiment](../experiments/runtime-restart/README.md).
 
-Next: fix interrupted-startup recovery, then nested libraries and dependency-aware
-staging, followed by complete first-run runtime setup. Device/layout checks accompany each UI slice.
+Next: nested libraries and dependency-aware staging, followed by complete first-run
+runtime setup. Device/layout checks accompany each UI slice.
 These are Android release requirements, not optional post-release Linux work.

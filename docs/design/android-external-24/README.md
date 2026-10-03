@@ -1,5 +1,9 @@
 # External launcher play — Android lab 0.0.25
 
+Follow-up: the interrupted-startup failure below is reproduced and fixed in
+[runtime adapter revision 2](../android-resume-25/README.md). This page records
+the original 0.0.25 checks before that adapter update.
+
 2026-10-03. Actual Retroid Pocket Classic, Android 14, 1240×1080 landscape.
 User-supplied official PICO-8 0.2.7 through the separate Runtime Test adapter.
 Installed host versionCode 25; final APK SHA-256:
