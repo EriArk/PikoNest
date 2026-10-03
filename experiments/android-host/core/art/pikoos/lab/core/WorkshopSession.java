@@ -31,7 +31,8 @@ public final class WorkshopSession {
     private final Port port;
     private final ArrayDeque<WorkshopCartridge> undo = new ArrayDeque<>();
     private final ArrayDeque<WorkshopCartridge> redo = new ArrayDeque<>();
-    private final int[] toolFocus = new int[3];
+    private final int[] toolFocus = new int[4];
+    public final MapEditor mapEditor=new MapEditor();
     private WorkshopCartridge cart;
     public LuaDraft codeDraft;
     public int codeColumn;
@@ -446,9 +447,10 @@ public final class WorkshopSession {
     public void switchTool(int next) {
         if(pendingStroke())return;
         if (mode != Mode.NAVIGATE && mode != Mode.CANVAS && mode != Mode.SHEET) return;
-        if (tool == (next + 3) % 3) return;
+        if(mapEditor.picking)return;
+        if (tool == Math.floorMod(next,4)) return;
         toolFocus[tool] = focus;
-        tool = (next + 3) % 3; focus = toolFocus[tool]; mode = tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE;
+        tool = Math.floorMod(next,4); focus = toolFocus[tool]; mode = tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE;
     }
     public void select(int target) {
         if (mode != Mode.NAVIGATE) return;
@@ -741,6 +743,15 @@ public final class WorkshopSession {
                 if (action == Action.CANCEL) mode = paletteReturn;
                 return;
             }
+            if(tool==3&&mapEditor.picking){
+                if(action==Action.LEFT)mapEditor.move(-1,0);
+                if(action==Action.RIGHT)mapEditor.move(1,0);
+                if(action==Action.UP)mapEditor.move(0,-1);
+                if(action==Action.DOWN)mapEditor.move(0,1);
+                if(action==Action.CONFIRM)mapEditor.accept();
+                if(action==Action.CANCEL)mapEditor.cancel();
+                return;
+            }
             if (action == Action.MENU) { overlayReturn = mode; mode = Mode.MENU; menuItem = 0; menuRedo = false; return; }
             if (action == Action.ASSETS) { showAssets();return; }
             if (action == Action.TEST) { port.launch(cart.bytes()); return; }
@@ -757,6 +768,16 @@ public final class WorkshopSession {
             }
             if (action == Action.PREVIOUS) { switchTool(tool - 1); return; }
             if (action == Action.NEXT) { switchTool(tool + 1); return; }
+            if(tool==3){
+                if(action==Action.LEFT)mapEditor.move(-1,0);
+                if(action==Action.RIGHT)mapEditor.move(1,0);
+                if(action==Action.UP)mapEditor.move(0,-1);
+                if(action==Action.DOWN)mapEditor.move(0,1);
+                if(action==Action.CONTEXT)mapEditor.begin();
+                if(action==Action.CONFIRM)save(cart.withTile(mapEditor.x,mapEditor.y,mapEditor.tile),true);
+                if(action==Action.CANCEL){overlayReturn=mode;mode=Mode.MENU;menuItem=3;}
+                return;
+            }
             if (tool == 2) {
                 if(action==Action.REGION){chooseRegion();return;}
                 if(action==Action.ZOOM&&!browsingSprites){zoom=!zoom;return;}

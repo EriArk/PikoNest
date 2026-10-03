@@ -44,6 +44,8 @@ final class WorkshopView extends View {
     private long noticeUntil;
     private RectF spriteArea;
     private RectF placementArea;
+    private RectF mapArea;
+    private int mapLeft,mapTop;
     private int viewX,viewY,viewWidth,viewHeight;
     private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка","Прямоугольник","Прямоуг. с заливкой","Овал","Овал с заливкой"};
     private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из спрайта","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из спрайта","Контур: выбери два противоположных угла","Закрашенная фигура по двум углам","Контур овала внутри рамки по двум углам","Закрашенный овал внутри выбранной рамки"};
@@ -118,7 +120,7 @@ final class WorkshopView extends View {
         if(getWidth()/scale<360) scale=getWidth()/360f;
         if(getHeight()/scale<480) scale=getHeight()/480f;
         w=getWidth()/scale;h=getHeight()/scale;bodyBottom=h-44;
-        c.save();c.scale(scale,scale);hits.clear();spriteArea=null;placementArea=null;
+        c.save();c.scale(scale,scale);hits.clear();spriteArea=null;placementArea=null;mapArea=null;
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
@@ -134,16 +136,16 @@ final class WorkshopView extends View {
         }
         fitted(projectTitle,16,82,28,7,w-130);text("game.p8",w-98,80,18,13);
         rect(0,100,w,2,13);
-        String[] tabs={"Мастерская","[ ] Код","Спрайты"};
-        for(int i=0;i<3;i++) { final int tab=i;float x=12+i*(w-24)/3,tw=(w-24)/3;
+        String[] tabs={"Обзор","Код","Спрайты","Карта"};
+        for(int i=0;i<4;i++) { final int tab=i;float x=12+i*(w-24)/4,tw=(w-24)/4;
             rect(x,100,tw-3,40,s.tool==i?14:1);
             String title=w<500&&i==0?"Обзор":tabs[i];
-            float tx=x+(tw-width(title,20))/2;text(title,tx,128,20,s.tool==i?1:7);
+            int ts=w<500?18:20;float tx=x+(tw-width(title,ts))/2;text(title,tx,128,ts,s.tool==i?1:7);
             hit(x,100,tw,40,()->{s.switchTool(tab);changed.run();invalidate();});
         }
         rect(0,140,w,4,0);
         c.save();c.clipRect(0,144,w,bodyBottom);
-        if(s.mode==Mode.RECOLOR)recolorChooser();else if(s.mode==Mode.TRANSFORM)transformChooser();else if(s.mode==Mode.MOVE)moveChooser();else if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE)assetLibrary();else if(s.copying()&&s.mode!=Mode.ERROR)copyChooser();else if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
+        if(s.mode==Mode.RECOLOR)recolorChooser();else if(s.mode==Mode.TRANSFORM)transformChooser();else if(s.mode==Mode.MOVE)moveChooser();else if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE)assetLibrary();else if(s.copying()&&s.mode!=Mode.ERROR)copyChooser();else if(s.mode==Mode.REGION) regionChooser();else if(s.tool==3)mapEditor();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
         c.restore();
         footer();
         if(!previousNotice.equals(s.notice)){previousNotice=s.notice;noticeUntil=SystemClock.uptimeMillis()+2200;}
@@ -160,6 +162,11 @@ final class WorkshopView extends View {
     }
     private void footer() {
         rect(0,bodyBottom,w,44,0);
+        if(s.tool==3&&s.mode==Mode.NAVIGATE){
+            key(ok()+(s.mapEditor.picking?" выбрать":" тайл"),12,bodyBottom,10,()->action(Action.CONFIRM));
+            key(back()+(s.mapEditor.picking?" отмена":" меню"),w<500?138:190,bodyBottom,6,()->action(Action.CANCEL));
+            if(!s.mapEditor.picking)key("START тест",w-126,bodyBottom,14,()->action(Action.TEST));return;
+        }
         if(s.mode==Mode.MOVE){
             key(ok()+(s.move.phase==2?" готово":" угол"),12,bodyBottom,10,()->action(Action.CONFIRM));
             key(back()+" назад",w/3+12,bodyBottom,6,()->action(Action.CANCEL));
@@ -208,6 +215,50 @@ final class WorkshopView extends View {
     private void key(String label,float x,float y,int color,Runnable run) {
         if(w<500)label=label.replace(" выбрать"," выбор").replace(" сохранить"," сохр.").replace("START готово","START OK");
         text(label,x,y+28,18,color);hit(x,y,width(label,18)+8,44,run);
+    }
+    private void mapEditor(){
+        art.pikoos.lab.core.MapEditor m=s.mapEditor;
+        boolean narrow=w<500;float size=Math.min(narrow?192:320,bodyBottom-230);size=Math.max(128,(int)(size/16)*16);
+        float x=16,y=186,right=x+size+16,rw=w-right-16;
+        text(m.picking?"ВЫБЕРИ ТАЙЛ 8×8":"КАРТА · 128×64",16,169,18,14);
+        art.pikoos.lab.core.P8Map map;
+        try{map=s.cart().map();}catch(IllegalArgumentException e){
+            fitted("Карта пока не поддержана",16,208,20,9,w-32);
+            fitted("Исходник сохранён. Доступен код.",16,242,18,7,w-32);return;
+        }
+        mapLeft=m.left();mapTop=m.top();
+        for(int py=0;py<128;py++)for(int px=0;px<128;px++){
+            int color;
+            if(m.picking){color=s.cart().sheetPixel(px,py);if(px<8&&py<8)color=0;}
+            else{int tile=map.tile(mapLeft+px/8,mapTop+py/8);color=tile==0?0:s.cart().sheetPixel(tile%16*8+px%8,tile/16*8+py%8);}
+            sceneBitmap.setPixel(px,py,COLORS[color==0?1:color]);
+        }
+        rect(x-4,y-4,size+8,size+8,0);p.setColor(COLORS[7]);c.drawBitmap(sceneBitmap,null,new RectF(x,y,x+size,y+size),p);
+        float cell=size/16;
+        for(int i=0;i<=16;i++){rect(x+i*cell,y,1,size,0);rect(x,y+i*cell,size,1,0);}
+        int cx=m.picking?m.choice%16:m.x-mapLeft,cy=m.picking?m.choice/16:m.y-mapTop;
+        outline(x+cx*cell,y+cy*cell,cell,cell,10);
+        if(!m.picking&&mapTop<=32&&mapTop+16>32)rect(x,y+(32-mapTop)*cell,size,2,9);
+        mapArea=new RectF(x,y,x+size,y+size);
+        int tile=m.picking?m.choice:m.tile;
+        text("Тайл "+tile,right,205,20,10);
+        for(int py=0;py<8;py++)for(int px=0;px<8;px++){
+            int color=tile==0?0:s.cart().sheetPixel(tile%16*8+px,tile/16*8+py);
+            rect(right+px*6,218+py*6,6,6,color==0?0:color);
+        }
+        text(tile==0?"Пусто":"8×8",right+56,247,18,6);
+        text(m.picking?"Из листа":"Клетка",right,291,18,6);
+        text(m.picking?"0 = пусто":m.x+", "+m.y,right,315,18,7);
+        if(!m.picking){
+            button("X тайл",right,330,rw,40,false,()->action(Action.CONTEXT));
+            button("Y отмена",right,378,rw,40,false,()->action(Action.UNDO));
+        }
+        String label=m.picking?"Тайл из листа":m.y>=32?"Только просмотр":"↑↓←→ клетка";
+        fitted(label,16,y+size+27,18,m.y>=32&&!m.picking?9:6,size);
+        if(!narrow&&bodyBottom>470){
+            fitted(m.picking?"0 — пустая клетка":"В _draw после cls():",right,448,18,6,rw);
+            if(!m.picking)text("map(0,0,0,0,16,16)",right,474,18,7);
+        }
     }
     private void workshop() {
         if(!s.cart().hasHero()){resources();return;}
@@ -540,7 +591,7 @@ final class WorkshopView extends View {
             hit(16,182,w-32,28,()->action(Action.MENU));
             return;
         }
-        boolean longCall=d.callEdit!=null&&i.item().id.equals("sspr")&&w<500;
+        boolean longCall=d.callEdit!=null&&(i.item().id.equals("sspr")||i.item().id.equals("map"))&&w<500;
         int count=i.item().fields.length,rows=Math.min(count+1,Math.max(2,(int)((bodyBottom-(longCall?298:254))/36)));
         int first=Math.max(0,Math.min(i.field-rows/2,count+1-rows));
         for(int r=0;r<rows&&first+r<=count;r++){
@@ -936,6 +987,16 @@ final class WorkshopView extends View {
             text("Y отменить · R2 вернуть",dx+20,dy+361,16,6);
             text("История — в текущем сеансе",dx+20,dy+386,16,13);
         } else if(s.mode==Mode.HELP) {
+            if(s.tool==3){
+                text("Карта из тайлов",dx+20,dy+40,26,14);
+                fitted("Каждая клетка — спрайт 8×8.",dx+20,dy+80,18,7,dw-40);
+                fitted("Тайл 0 стирает клетку.",dx+20,dy+108,18,7,dw-40);
+                fitted("Строки 32–63 общие со спрайтами:",dx+20,dy+136,18,6,dw-40);
+                fitted("пока их можно только смотреть.",dx+20,dy+162,18,6,dw-40);
+                fitted("В игре: map() в _draw после cls().",dx+20,dy+188,18,7,dw-40);
+                button(ok()+" К коду",dx+16,dy+210,(dw-44)/2,48,true,()->action(Action.CONFIRM));
+                button(back()+" Назад",dx+28+(dw-44)/2,dy+210,(dw-44)/2,48,false,()->action(Action.CANCEL));return;
+            }
             if(!s.cart().hasHero()){
                 text("Ресурсы и игра",dx+20,dy+40,26,14);
                 fitted("Спрайт хранит пиксели.",dx+20,dy+80,20,7,dw-40);
@@ -988,6 +1049,12 @@ final class WorkshopView extends View {
                 changed.run();invalidate();return true;
             }
             if(Math.abs(x-downX)>20||Math.abs(y-downY)>20)return true;
+            if(mapArea!=null&&mapArea.contains(x,y)&&s.tool==3&&s.mode==Mode.NAVIGATE){
+                int tx=(int)((x-mapArea.left)*16/mapArea.width()),ty=(int)((y-mapArea.top)*16/mapArea.height());
+                if(s.mapEditor.picking)s.mapEditor.choice=ty*16+tx;
+                else{s.mapEditor.x=mapLeft+tx;s.mapEditor.y=mapTop+ty;}
+                changed.run();invalidate();performClick();return true;
+            }
             if(placementArea!=null&&placementArea.contains(x,y)&&s.mode==Mode.CODE&&s.codeDraft.panel==LuaDraft.Panel.SPRITE){
                 s.codeDraft.placement.point((int)((x-placementArea.left)*128/placementArea.width()),(int)((y-placementArea.top)*128/placementArea.height()));
                 changed.run();invalidate();performClick();return true;

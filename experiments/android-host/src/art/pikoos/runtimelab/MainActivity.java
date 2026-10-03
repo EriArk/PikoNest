@@ -452,6 +452,7 @@ public final class MainActivity extends Activity {
         if(session.codeDraft!=null)codeRecoveryFailed.remove(activeId);
         libraryPrefs.edit().putString("active",activeId).putBoolean("swapAB",session.swapAB).apply();
         prefs.edit().putInt("tool",session.tool).putInt("focus",session.focus)
+            .putInt("mapX",session.mapEditor.x).putInt("mapY",session.mapEditor.y).putInt("mapTile",session.mapEditor.tile)
             .putString("luaDraft",session.codeDraft==null?(codeRecoveryFailed.contains(activeId)?prefs.getString("luaDraft",""):""):Base64.encodeToString(session.codeDraft.encode(),Base64.NO_WRAP))
             .putInt("line",session.codeLine).putInt("x",session.cursorX).putInt("y",session.cursorY)
             .putInt("codeColumn",session.codeColumn)
@@ -489,7 +490,8 @@ public final class MainActivity extends Activity {
     }
     private int bounded(String key,int fallback,int max){return Math.max(0,Math.min(max,prefs.getInt(key,fallback)));}
     private void restoreUi(){
-        session.tool=bounded("tool",0,2);
+        session.tool=bounded("tool",0,3);
+        session.mapEditor.x=bounded("mapX",0,127);session.mapEditor.y=bounded("mapY",0,63);session.mapEditor.tile=bounded("mapTile",1,255);
         session.codeLine=bounded("line",session.cart().line(0),session.cart().code().split("\n",-1).length-1);
         session.codeColumn=bounded("codeColumn",0,2*1024*1024);
         session.color=bounded("color",14,15);
@@ -517,7 +519,7 @@ public final class MainActivity extends Activity {
         }
         int lineX=prefs.getInt("lineX",-1),lineY=prefs.getInt("lineY",-1);
         session.restoreStroke(lineX,lineY);
-        if(session.cart().hasHero()&&session.tool!=2&&prefs.getString("mode","").equals("VALUE")){
+        if(session.cart().hasHero()&&session.tool<2&&prefs.getString("mode","").equals("VALUE")){
             session.mode=Mode.VALUE;session.field=bounded("field",0,1);session.draft=Math.max(1,bounded("draft",2,4));
         }
         if(session.tool==2&&prefs.getString("mode","").equals("HERO"))session.previewHero();

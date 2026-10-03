@@ -1,0 +1,4 @@
+RUNNING: /work/game.p8
+map43:171,171,205
+pixels43:2,1
+empty43:1
