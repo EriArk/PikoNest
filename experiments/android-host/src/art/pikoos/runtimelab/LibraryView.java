@@ -19,6 +19,7 @@ final class LibraryView extends View {
     private final LibrarySession s;
     private final Runnable changed;
     private final Runnable folders;
+    private final Runnable play;
     private final String active;
     private final boolean swap;
     private final Paint p=new Paint();
@@ -29,13 +30,13 @@ final class LibraryView extends View {
         final RectF rect;final Runnable run;
         Hit(float x,float y,float w,float h,Runnable run){rect=new RectF(x,y,x+w,y+h);this.run=run;}
     }
-    LibraryView(Context context,LibrarySession session,String active,boolean swap,Runnable changed,Runnable folders){
-        super(context);s=session;this.active=active;this.swap=swap;this.changed=changed;this.folders=folders;
+    LibraryView(Context context,LibrarySession session,String active,boolean swap,Runnable changed,Runnable folders,Runnable play){
+        super(context);s=session;this.active=active;this.swap=swap;this.changed=changed;this.folders=folders;this.play=play;
         p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
         setContentDescription("Мои игры. Влево и вправо: картридж. Вниз: действия. Y: сохранить выбранную игру в файл .p8.");
     }
-    void action(Action a){if(a==Action.MENU&&s.mode==LibrarySession.Mode.SHELF){folders.run();return;}s.act(a);changed.run();invalidate();}
+    void action(Action a){if(a==Action.PREVIOUS&&s.mode==LibrarySession.Mode.SHELF){play.run();return;}if(a==Action.MENU&&s.mode==LibrarySession.Mode.SHELF){folders.run();return;}s.act(a);changed.run();invalidate();}
     private void rect(float x,float y,float w,float h,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+w,y+h,p);}
     private void outline(float x,float y,float w,float h,int color){rect(x,y,w,3,color);rect(x,y+h-3,w,3,color);rect(x,y,3,h,color);rect(x+w-3,y,3,h,color);}
     private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(size);c.drawText(value,x,y,p);}
@@ -50,7 +51,8 @@ final class LibraryView extends View {
         rect(0,0,w,h,1);rect(0,0,w,42,2);text("PIKOOS",16,30,28,7);text("твои маленькие миры",170,28,16,14);
         rect(w-100,0,100,42,2);text("≡ Папки",w-94,28,18,10);
         hits.add(new Hit(w-100,0,100,42,()->action(Action.MENU)));
-        text("Мои игры",16,85,30,7);
+        fit(w<500?"Проекты":"Мои проекты",16,85,26,7,w-262);
+        button("L Играть",w-230,53,120,false,()->action(Action.PREVIOUS));
         text(s.entries().isEmpty()?"Пока ни одной":(s.selected+1)+" / "+s.entries().size(),w-88,83,18,6);
         int columns=w>=550?3:2,start=s.selected/columns*columns;
         float gap=14,cw=(w-32-gap*(columns-1))/columns,top=112,bottom=h-210,ch=bottom-top;

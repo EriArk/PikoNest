@@ -6,6 +6,32 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+### Android lab 0.0.22: separate Play library
+
+`PlaySession` owns selection, all/recent/favorite filters and semantic actions.
+It has no ProjectStore/WorkshopCartridge dependency. `PlayCartridge` inspects
+text framing and decodes standard 128×128 base-palette labels; it is not a Lua
+validator or a full dependency analyzer. A conservative pattern blocks include
+directives and direct load/save/cstore/reload(...) references except `reload()`.
+Comments/strings/shadowed names may cause false positives; indirect file calls
+may evade the hint. Do not claim general multicart/dependency compatibility.
+
+Android `GameFolder` lists one SAF tree level, up to 128 games/2,048 entries,
+with a 2 MiB per-file lab read budget. Limits and subdirectories are surfaced.
+PNG, unreadable and unsupported text entries remain visible with an explanation.
+Indexing retains labels/metadata, not all cartridge payloads. Launch re-reads and
+rechecks a fresh snapshot before handing exact bytes to the existing backend.
+Only that runtime snapshot and Play metadata are written; originals are untouched.
+Generation checks reject stale scans/launch reads after leaving the screen.
+
+Play is the default home (pending import/export flows may resume first).
+R opens the project shelf, L there returns to Play. Folder setup returns to its
+originating screen. Stable document URIs identify favorites, selected cart and
+recent launch timestamps; rename/move identity migration is not implemented.
+Recent means accepted runtime launch, not observed play completion or a save state.
+Persisted runtime origin restores the correct shelf after Activity/process loss;
+editor launches still return to the editor. Runtime setup remains experimental.
+
 ### Android lab 0.0.21: persistent folder intentions
 
 Portable `FolderSetup` owns four roles, semantic selection, access states and

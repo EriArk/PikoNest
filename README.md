@@ -83,12 +83,18 @@ my-game/
 
 ## Status
 
+Android 0.0.22 adds the Play-first launcher: text carts from the Games folder,
+real cartridge labels, favorites/recent launches and return to the selected game.
+Workshop projects have a separate entrance. Originals and existing projects are
+preserved. PNG launch, dependencies and full runtime setup remain open.
+[Device evidence](docs/design/android-play-21/README.md).
+
 Android 0.0.21 adds persistent folder selection and access checks for games,
 downloads, projects and library/data. Existing lab files are retained; connecting
 these locations to indexing/saves and Splore remains separate work.
 [Device evidence](docs/design/android-folders-20/README.md).
-The next workflow is the owner's Play-first launcher: direct play with a separate
-Workshop entrance. See the [whole-product plan](docs/ROADMAP.md#completion-path).
+The Play-first launcher follows in 0.0.22 above. See the
+[whole-product plan](docs/ROADMAP.md#completion-path).
 
 Android 0.0.20 adds pixel-fragment movement inside the opened sprite/region.
 Select two corners, position the fragment with one-pixel steps, preview and apply.

@@ -8,7 +8,13 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded lab step (0.0.21): choose four persistent folder roles → verify
+Latest bounded lab step (0.0.22): dedicated Play home → read text carts from Games
+folder → launch official runtime → return to the selected cart. Includes actual
+labels, favorites/recent-launch filters and a separate Workshop entrance.
+PNG launch, dependency-aware staging, nested libraries and complete runtime setup
+remain open. [Device evidence](design/android-play-21/README.md).
+
+Previous step (0.0.21): choose four persistent folder roles → verify
 read/write access → recover after restart/cancel. Existing project storage is
 preserved; activation/migration and Splore integration remain open.
 [Device evidence](design/android-folders-20/README.md).
@@ -90,12 +96,11 @@ The sequence is a working plan, not a delivery-date or feasibility promise for
 experimental online features. Stage acceptance does not follow automatically from
 tests/screenshots: user-facing behavior and physical ergonomics need review.
 
-**Next slice after folder selection:** connect the games folder to a dedicated
-Play shelf and close browse → launch → return, preserving the Workshop entrance.
-This reflects the owner's explicit everyday-play priority. Runtime setup and
-verified project/data migration remain foundation tasks; selecting folder
-preferences alone does not complete them. Do not move existing projects or retire
-the experiment before preservation is demonstrated.
+**Next slice after the text-cart Play shelf:** support ordinary `.p8.png` cartridges
+through the runtime boundary, with their covers and format-aware read-only staging.
+Then address nested libraries/dependency handling and the runtime setup wizard.
+Verified project/data migration remains a foundation task. Do not move existing
+projects or retire the experiment before preservation is demonstrated.
 
 ## Added owner requirements: setup and reusable assets
 

@@ -23,6 +23,8 @@ import art.pikoos.lab.core.NameEditor;
 import android.util.Base64;
 import art.pikoos.lab.core.LibrarySession;
 import art.pikoos.lab.core.FolderSetup;
+import art.pikoos.lab.core.PlaySession;
+import art.pikoos.lab.core.PlayCartridge;
 import art.pikoos.lab.core.CartridgeImport;
 import art.pikoos.lab.core.CartridgeExport;
 import art.pikoos.lab.core.WorkshopSession;
@@ -52,6 +54,11 @@ public final class MainActivity extends Activity {
     private FolderSetup folders;
     private FolderView folderView;
     private boolean showingFolders;
+    private boolean showingPlay,folderReturnPlay;
+    private SharedPreferences playPrefs;
+    private PlaySession play;
+    private PlayView playView;
+    private int playGeneration;
     private static final int PICK_FOLDER=43;
     private String activeId="moon-garden";
     private String activeTitle="Лунный сад";
@@ -72,6 +79,7 @@ public final class MainActivity extends Activity {
         prefs=getSharedPreferences("moon-garden-ui",MODE_PRIVATE);
         libraryPrefs=getSharedPreferences("library-ui",MODE_PRIVATE);
         folderPrefs=getSharedPreferences("folder-setup",MODE_PRIVATE);
+        playPrefs=getSharedPreferences("play-library",MODE_PRIVATE);
         activeId=libraryPrefs.getString("active","moon-garden");
         if(!LibrarySession.validId(activeId))activeId="moon-garden";
         awaitingReturn=libraryPrefs.getBoolean("awaitingReturn",prefs.getBoolean("awaitingReturn",false));leftForRuntime=awaitingReturn;
@@ -111,7 +119,7 @@ public final class MainActivity extends Activity {
                     startActivityForResult(save,SAVE_CART);
                 }
             },template,asset("blank.p8"),asset("lights.p8"));
-            input=new ControllerInput(action->{if(showingFolders)folderView.action(action);else if(showingLibrary)shelf.action(action);else if(surface!=null)surface.action(action);},
+            input=new ControllerInput(action->{if(showingFolders)folderView.action(action);else if(showingPlay)playView.action(action);else if(showingLibrary)shelf.action(action);else if(surface!=null)surface.action(action);},
                 ()->session!=null?session.swapAB:libraryPrefs.getBoolean("swapAB",false));
             try{openProject(activeId,new WorkshopCartridge(store.read(activeId)));}
             catch(Exception e){Log.e(TAG,"Last project unavailable; retained",e);showLibrary();library.fail(e);shelf.invalidate();}
@@ -138,7 +146,8 @@ public final class MainActivity extends Activity {
                 }catch(Exception e){showLibrary(shelfSelection,4);library.fail(e);shelf.invalidate();}
             }
             if(exportJob!=null)exportJob.attach(exportListener);
-            if(!awaitingReturn&&folderPrefs.getBoolean("visible",false))showFolders();
+            if((!awaitingReturn||playPrefs.getBoolean("runtime",false))&&(library.mode==LibrarySession.Mode.SHELF||library.mode==LibrarySession.Mode.ERROR))showPlay();
+            if(!awaitingReturn&&folderPrefs.getBoolean("visible",false))showFolders(folderPrefs.getBoolean("fromPlay",true));
         }catch(Exception e){
             TextView error=new TextView(this);error.setText("Не удалось открыть проекты. Исходные файлы сохранены.\n"+e.getMessage());
             error.setTextColor(WorkshopView.COLORS[7]);error.setBackgroundColor(WorkshopView.COLORS[1]);error.setPadding(32,32,32,32);
@@ -172,6 +181,7 @@ public final class MainActivity extends Activity {
         showWorkshop();
     }
     private void showWorkshop(){
+        showingPlay=false;playGeneration++;
         showingFolders=false;
         showingLibrary=false;
         surface=new WorkshopView(this,session,activeTitle,()->persistUi());
@@ -181,13 +191,84 @@ public final class MainActivity extends Activity {
         showLibrary(activeId,0);
     }
     private void showLibrary(String preferred,int focus)throws Exception{
+        showingPlay=false;showingFolders=false;playGeneration++;
         persistUi();library.refresh(preferred);
         if(!library.entries().isEmpty())library.focus=Math.max(0,Math.min(4,focus));
         showingLibrary=true;
-        shelf=new LibraryView(this,library,activeId,session!=null&&session.swapAB,()->persistUi(),()->showFolders());
+        shelf=new LibraryView(this,library,activeId,session!=null&&session.swapAB,()->persistUi(),()->showFolders(),()->showPlay());
         setContentView(shelf);shelf.requestFocus();immersive();persistUi();
     }
-    private void showFolders(){
+    private void showPlay(){
+        persistUi();showingPlay=true;showingFolders=false;showingLibrary=false;
+        play=new PlaySession(new PlaySession.Port(){
+            public void launch(PlaySession.Game game){launchGame(game);}
+            public void refresh(){scanGames();}
+            public void workshop(){try{showLibrary();}catch(Exception e){play.fail("Не удалось открыть мастерскую");}}
+            public void folders(){showFolders();}
+            public void favorite(PlaySession.Game game,boolean value)throws Exception{
+                if(!playPrefs.edit().putBoolean("favorite:"+game.id,value).commit())throw new Exception("Cannot save favorite");
+            }
+        });
+        play.filter=Math.max(0,Math.min(2,playPrefs.getInt("filter",0)));
+        playView=new PlayView(this,play,session!=null&&session.swapAB,()->persistPlay());
+        setContentView(playView);playView.requestFocus();immersive();scanGames();
+    }
+    private void persistPlay(){
+        if(play==null)return;
+        SharedPreferences.Editor edit=playPrefs.edit().putInt("filter",play.filter);
+        if(play.current()!=null)edit.putString("selected",play.current().id);edit.apply();
+    }
+    private void scanGames(){
+        final int generation=++playGeneration;final PlaySession target=play;
+        final String location=folderPrefs.getString("GAMES.uri","");
+        if(location.isEmpty()){target.replace(java.util.Collections.emptyList(),"");target.notice="Select — выбери папку готовых игр";playView.invalidate();return;}
+        target.busy=true;target.error="";playView.invalidate();
+        final android.content.ContentResolver resolver=getApplicationContext().getContentResolver();
+        new Thread(()->{
+            GameFolder.Listing result=null;String failure=null;
+            try{result=GameFolder.list(resolver,location,playPrefs);}catch(Exception e){failure="Папка недоступна · Select: подключить снова";Log.w(TAG,"Game scan failed",e);}
+            final GameFolder.Listing ready=result;final String error=failure;
+            runOnUiThread(()->{
+                if(isDestroyed()||!showingPlay||generation!=playGeneration||target!=play)return;
+                if(error!=null){target.replace(java.util.Collections.emptyList(),"");target.fail(error);}
+                else{
+                    target.replace(ready.games,playPrefs.getString("selected",""));
+                    target.notice=ready.limited?"Показана часть папки · лимит полки 128 игр":ready.folders>0?"Подпапки пока не читаем · выбери нужную через Select":"Игры из выбранной папки · оригиналы сохранены";
+                }
+                playView.invalidate();
+            });
+        },"pikoos-game-scan").start();
+    }
+    private void launchGame(PlaySession.Game game){
+        final int generation=++playGeneration;final PlaySession target=play;
+        final android.content.ContentResolver resolver=getApplicationContext().getContentResolver();
+        new Thread(()->{
+            byte[] bytes=null;String failure=null;
+            try{
+                bytes=GameFolder.read(resolver,game.id);PlayCartridge checked=new PlayCartridge(game.title+".p8",bytes);
+                if(!checked.problem.isEmpty())failure=checked.problem;
+            }catch(Exception e){failure="Не удалось прочитать игру · L: обновить полку";}
+            final byte[] snapshot=bytes;final String error=failure;
+            runOnUiThread(()->{
+                if(isDestroyed()||!showingPlay||generation!=playGeneration||target!=play)return;
+                if(error!=null){target.fail(error);playView.invalidate();return;}
+                try{
+                    if(!backend.detect().launcherPresent)throw new Exception("Сначала подключи PICO-8 · оболочка не найдена");
+                    persistPlay();
+                    if(!playPrefs.edit().putBoolean("runtime",true).putString("selected",game.id).commit())throw new Exception("Не удалось сохранить место на полке");
+                    awaitingReturn=true;leftForRuntime=false;
+                    if(!libraryPrefs.edit().putBoolean("awaitingReturn",true).commit())throw new Exception("Не удалось сохранить состояние запуска");
+                    backend.launch(snapshot);
+                    game.recent=System.currentTimeMillis();playPrefs.edit().putLong("recent:"+game.id,game.recent).apply();
+                }catch(Exception e){awaitingReturn=false;playPrefs.edit().putBoolean("runtime",false).apply();libraryPrefs.edit().putBoolean("awaitingReturn",false).apply();target.fail(e.getMessage()==null?"Не удалось запустить PICO-8":e.getMessage());}
+                playView.invalidate();
+            });
+        },"pikoos-game-launch").start();
+    }
+    private void showFolders(){showFolders(showingPlay);}
+    private void showFolders(boolean fromPlay){
+        playGeneration++;folderReturnPlay=fromPlay;
+        folderPrefs.edit().putBoolean("fromPlay",fromPlay).apply();
         persistUi();
         String[] locations=new String[4],names=new String[4];
         for(FolderSetup.Role role:FolderSetup.Role.values()){
@@ -217,7 +298,10 @@ public final class MainActivity extends Activity {
             }
             public void leave(){
                 showingFolders=false;folderPrefs.edit().putBoolean("visible",false).apply();
-                setContentView(shelf);shelf.requestFocus();immersive();
+                if(folderReturnPlay)showPlay();else{
+                    try{showLibrary(library.current()==null?activeId:library.current().id,library.focus);}
+                    catch(Exception e){Log.w(TAG,"Could not return to project shelf",e);showWorkshop();}
+                }
             }
         },locations,names);
         folders.select(folderPrefs.getInt("selected",0));showingFolders=true;
@@ -426,11 +510,14 @@ public final class MainActivity extends Activity {
         if(session!=null&&awaitingReturn&&leftForRuntime){
             awaitingReturn=false;leftForRuntime=false;libraryPrefs.edit().putBoolean("awaitingReturn",false).apply();
             getSharedPreferences("moon-garden-ui",MODE_PRIVATE).edit().putBoolean("awaitingReturn",false).apply();
-            session.notice="Сохранено";surface.invalidate();
+            if(playPrefs.getBoolean("runtime",false)){
+                playPrefs.edit().putBoolean("runtime",false).apply();
+                if(!showingPlay)showPlay();else{play.busy=false;play.notice="Снова на полке · выбери, во что играть";playView.invalidate();}
+            }else{session.notice="Сохранено";surface.invalidate();}
             Log.i(TAG,"host_resumed tool="+session.tool+" focus="+session.focus+" result=unknown");
         }
     }
     @Override public boolean dispatchKeyEvent(KeyEvent event){return input!=null&&input.key(event)||super.dispatchKeyEvent(event);}
     @Override public boolean onGenericMotionEvent(MotionEvent event){return input!=null&&input.motion(event)||super.onGenericMotionEvent(event);}
-    @Override public void onBackPressed(){if(showingFolders)folderView.action(Action.CANCEL);else if(showingLibrary&&shelf!=null)shelf.action(Action.CANCEL);else if(surface!=null)surface.action(Action.CANCEL);else super.onBackPressed();}
+    @Override public void onBackPressed(){if(showingFolders)folderView.action(Action.CANCEL);else if(showingPlay)playView.action(Action.CANCEL);else if(showingLibrary&&shelf!=null)shelf.action(Action.CANCEL);else if(surface!=null)surface.action(Action.CANCEL);else super.onBackPressed();}
 }

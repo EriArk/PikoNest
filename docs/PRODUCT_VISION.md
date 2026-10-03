@@ -14,8 +14,8 @@ The default home offers a beautiful, controller-first **Play** library with dire
 launch, recent cartridges and favorites. **Workshop** is a separate, deliberate
 entrance for creation/editing. Playing does not require a project, remix, tutorial
 or editor; returning restores the library selection. Recent means recently
-launched, not a promised process save state. The current lab shelf still opens
-editor projects; the dedicated launcher is the next integrated workflow.
+launched, not a promised process save state. Lab 0.0.22 implements the first
+dedicated text-cart launcher; PNG launch, dependencies and runtime setup remain open.
 
 PIKOOS is a handheld-first environment for the full PICO-8 creative loop:
 

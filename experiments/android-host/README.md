@@ -1,5 +1,23 @@
 # PIKOOS Android host experiment
 
+Version 0.0.22 makes Играть the default home, separate from Мои проекты.
+D-pad selects, A/Start launches, X favorites, Y cycles all/recent/favorite filters,
+L rescans, Select opens folders, R enters the workshop project shelf (L returns).
+Touch selects a cart then the large play button launches it. Actual `__label__`
+images provide covers; absent/unsupported labels use a neutral cartridge image.
+Games are read through the persisted Games SAF tree without editor import.
+Favorites, recent launch timestamps and selection survive recreation. Launch reads
+fresh bytes; stale workers cannot launch after leaving. Runtime return preserves
+Play selection, including host process death, while editor testing stays separate.
+
+Scope: one directory level, up to 128 carts/2,048 entries, 2 MiB per text cart.
+PNG launch and dependencies remain unsupported. Conservative text hints identify
+includes/direct file calls (except empty `reload()`); this is not a complete Lua
+dependency analysis. These are PIKOOS lab limits, not PICO-8 limits. Recent means
+accepted launch, not a running-game save state or verified completion. Physical
+controller ergonomics and runtime setup remain separate acceptance work.
+[Device evidence](../../docs/design/android-play-21/README.md).
+
 Version 0.0.21 adds Папки on the shelf (Select or header button). Four persistent
 SAF roles: existing games (read), Splore downloads, projects and data/library
 (read/write). D-pad selects, A chooses through Android, X verifies, B returns.
