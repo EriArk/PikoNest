@@ -47,7 +47,7 @@ public final class WorkshopSession {
     }
     public void codeCommand(int command){
         if(mode!=Mode.CODE||codeDraft==null)return;
-        if(codeDraft.panel==LuaDraft.Panel.INSERT)return;
+        if(codeDraft.proposal())return;
         try{
             LuaDraft d=codeDraft;
             switch(command){
@@ -70,6 +70,7 @@ public final class WorkshopSession {
                 case 16:leaveCode();return;
                 case 17:d.changePage(1);d.panel=LuaDraft.Panel.KEYS;return;
                 case 18:d.beginInsert();return;
+                case 19:d.beginParameters();return;
                 default:return;
             }
             d.panel=LuaDraft.Panel.CURSOR;
@@ -108,12 +109,12 @@ public final class WorkshopSession {
         if(action==Action.LEFT)i.step(-1);if(action==Action.RIGHT)i.step(1);
         if(action==Action.CONTEXT)i.beginSymbols(d.text());
         if(action==Action.CONFIRM){if(i.field==i.item().fields.length)d.applyInsert();else i.beginText();}
-        if(action==Action.CANCEL)i.screen=LuaInsert.Screen.CATALOG;
+        if(action==Action.CANCEL){if(d.callEdit!=null)d.cancelInsert();else i.screen=LuaInsert.Screen.CATALOG;}
         // Start is intentionally not a launch/commit shortcut while reviewing a proposal.
     }
     private void codeAction(Action action)throws Exception{
         LuaDraft d=codeDraft;
-        if(d.panel==LuaDraft.Panel.INSERT){insertAction(action);return;}
+        if(d.proposal()){insertAction(action);return;}
         if(d.panel==LuaDraft.Panel.EXIT){
             if(action==Action.UP)d.menu=Math.max(0,d.menu-1);
             if(action==Action.DOWN)d.menu=Math.min(2,d.menu+1);
@@ -129,6 +130,7 @@ public final class WorkshopSession {
         if(action==Action.UNDO){d.history(false);return;}
         if(action==Action.REDO){d.history(true);return;}
         if(action==Action.CONTEXT&&d.panel==LuaDraft.Panel.CURSOR){d.beginInsert();return;}
+        if(action==Action.PREVIOUS&&d.panel==LuaDraft.Panel.CURSOR){d.beginParameters();return;}
         if(action==Action.MENU||action==Action.CONTEXT){
             d.panel=d.panel==LuaDraft.Panel.MENU?LuaDraft.Panel.CURSOR:LuaDraft.Panel.MENU;d.menu=0;return;
         }

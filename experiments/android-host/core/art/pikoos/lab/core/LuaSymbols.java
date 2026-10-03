@@ -82,6 +82,7 @@ public final class LuaSymbols {
         ArrayList<Entry> result=new ArrayList<>();if(complete)for(Entry e:entries.values())if(e.function==functions)result.add(e);
         return Collections.unmodifiableList(result);
     }
+    public boolean shadows(String name){return !complete||local.contains(name)||assigned.contains(name);}
     private static Entry api(String name,String value,String help){return new Entry(name,value,help,0,true);}
     private static final Entry[] API={
         api("time","time()","Время игры в секундах. Считается по обновлениям игры, не по настенным часам."),

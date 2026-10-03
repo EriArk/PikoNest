@@ -39,6 +39,9 @@ public final class LuaInsert {
     public boolean replaceAll=true;
     public String input="";
     private String[] values;
+    public boolean editing;
+    public Kind kind(int index){return editing&&item().fields[index].kind==Kind.COLOR?Kind.EXPR:item().fields[index].kind;}
+    public boolean colorChoice(int index){if(item().fields[index].kind!=Kind.COLOR)return false;try{int n=Integer.parseInt(values[index]);return n>=0&&n<=15;}catch(NumberFormatException e){return false;}}
     public int symbolGroup,symbolIndex;
     private LuaSymbols symbols;
     public LuaInsert(){choose(0);}
@@ -51,11 +54,12 @@ public final class LuaInsert {
     }
     public void set(int index,String value){
         if(index<0||index>=values.length)throw new IllegalArgumentException("Unknown field");
-        validate(item().fields[index].kind,value);values[index]=value;
+        validate(kind(index),value);values[index]=value;
     }
     private static void validate(Kind kind,String value){
         if(value==null||value.length()>256||value.indexOf('\n')>=0||value.indexOf('\r')>=0||value.indexOf('\0')>=0)
             throw new IllegalArgumentException("Параметр должен быть одной строкой до 256 символов");
+        if(!java.nio.charset.StandardCharsets.UTF_8.newEncoder().canEncode(value))throw new IllegalArgumentException("Недопустимый символ в параметре");
         if(kind!=Kind.STRING&&value.trim().isEmpty())throw new IllegalArgumentException("Введи значение");
         if(kind==Kind.NAME&&(!value.matches("[a-zA-Z_][a-zA-Z_0-9]*")||(" and break do else elseif end false for function if in local nil not or repeat return then true until while ").contains(" "+value+" ")))
             throw new IllegalArgumentException("Имя: латинские буквы, цифры и _. Начни с буквы или _; не используй слово Lua.");
@@ -67,7 +71,7 @@ public final class LuaInsert {
     }
     public void step(int direction){
         if(field>=values.length)return;
-        Kind kind=item().fields[field].kind;
+        Kind kind=colorChoice(field)?Kind.COLOR:kind(field);
         if(kind==Kind.INPUT){values[field]=values[field].equals("btn")?"btnp":"btn";return;}
         if(kind!=Kind.COLOR&&kind!=Kind.BUTTON&&kind!=Kind.EXPR)return;
         try{int old=Integer.parseInt(values[field]);long n=(long)old+direction;
@@ -77,7 +81,7 @@ public final class LuaInsert {
     }
     public void beginText(){
         if(field>=values.length)return;
-        Kind kind=item().fields[field].kind;if(kind==Kind.COLOR||kind==Kind.BUTTON||kind==Kind.INPUT){step(1);return;}
+        Kind kind=kind(field);if(kind==Kind.COLOR||kind==Kind.BUTTON||kind==Kind.INPUT){step(1);return;}
         input=values[field];replaceAll=true;page=key=0;screen=Screen.TEXT;
     }
     public void type(String added){
@@ -87,9 +91,9 @@ public final class LuaInsert {
     }
     public void erase(){if(replaceAll)input="";else if(!input.isEmpty())input=input.substring(0,input.offsetByCodePoints(input.length(),-1));replaceAll=false;}
     public void acceptText(){set(field,input);screen=Screen.FIELDS;}
-    public boolean canBrowse(){return field<values.length&&(item().fields[field].kind==Kind.EXPR||
+    public boolean canBrowse(){return field<values.length&&(kind(field)==Kind.EXPR||
         (item().fields[field].kind==Kind.NAME&&(item().id.equals("set")||item().id.equals("add")||item().id.equals("call"))));}
-    public boolean canBrowseApi(){return canBrowse()&&item().fields[field].kind==Kind.EXPR;}
+    public boolean canBrowseApi(){return canBrowse()&&kind(field)==Kind.EXPR;}
     public void attachSource(String source){symbols=new LuaSymbols(source);}
     public boolean completeSymbols(){return symbols!=null&&symbols.complete;}
     public java.util.List<LuaSymbols.Entry> choices(){
@@ -104,7 +108,7 @@ public final class LuaInsert {
     public void changePage(int delta){page=(page+delta+3)%3;key=Math.min(key,LuaDraft.PAGES[page].length()-1);}
     public String functionName(){return selected<3?new String[]{"_init","_update","_draw"}[selected]:item().id.equals("function")?values[0]:null;}
     public String code(){
-        for(int i=0;i<values.length;i++)validate(item().fields[i].kind,values[i]);
+        for(int i=0;i<values.length;i++)validate(kind(i),values[i]);
         String name=functionName();if(name!=null)return "function "+name+"()\n  \nend\n";
         String a=values[0];
         switch(item().id){
@@ -124,7 +128,7 @@ public final class LuaInsert {
         }
     }
     private String join(){StringBuilder b=new StringBuilder();for(String value:values){if(b.length()>0)b.append(',');b.append(value);}return b.toString();}
-    private static String quote(String s){return "\""+s.replace("\\","\\\\").replace("\"","\\\"")+"\"";}
+    static String quote(String s){return "\""+s.replace("\\","\\\\").replace("\"","\\\"")+"\"";}
     public String display(int index){
         String value=values[index];Kind kind=item().fields[index].kind;
         if(kind==Kind.BUTTON)return new String[]{"0 · влево","1 · вправо","2 · вверх","3 · вниз","4 · O","5 · X"}[Integer.parseInt(value)];
@@ -136,10 +140,10 @@ public final class LuaInsert {
         out.writeBoolean(replaceAll);out.writeUTF(input);for(String value:values)out.writeUTF(value);
         out.writeInt(symbolGroup);out.writeInt(symbolIndex);
     }
-    public static LuaInsert read(DataInputStream in,boolean browserState)throws IOException{
+    public static LuaInsert read(DataInputStream in,boolean browserState,boolean editing)throws IOException{
         LuaInsert insert=new LuaInsert();String id=in.readUTF();int found=-1;
         for(int i=0;i<ITEMS.length;i++)if(ITEMS[i].id.equals(id))found=i;
-        if(found<0)throw new IOException("snippet id");insert.choose(found);int screen=in.readInt();
+        if(found<0)throw new IOException("snippet id");insert.choose(found);insert.editing=editing;int screen=in.readInt();
         insert.field=in.readInt();insert.page=in.readInt();insert.key=in.readInt();insert.replaceAll=in.readBoolean();insert.input=in.readUTF();
         if(screen<0||screen>=Screen.values().length||insert.field<0||insert.field>insert.values.length||insert.page<0||insert.page>2
             ||insert.key<0||insert.key>=LuaDraft.PAGES[insert.page].length()||insert.input.length()>256

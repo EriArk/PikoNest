@@ -97,3 +97,21 @@ to manual input with an explicit empty state, not a partial-context claim.
 
 See [device evidence](design/android-symbols-33/README.md). Existing-source forms,
 scope-aware inline completion, source navigation and diagnostics remain open.
+
+## C02.2 continuation — 0.0.34
+
+`LuaCall` recognizes standalone single-line cls/print/circfill/rectfill/spr with
+supported explicit arities and records exact argument spans. Balanced nested
+delimiters and masked strings/comments determine boundaries; the model does not
+compile expressions or infer behavior. A declaration collision refuses a built-in
+form. Existing source, separators, indentation and trailing comments are preserved;
+only fields actually changed replace their original spans. No-op Apply creates no
+history. Replacing delimiters that escape the call is refused before mutation.
+
+The same `LuaInsert` fields/chooser act as a proposal; editing colors accepts Lua
+expressions and retains ordinary palette stepping for base color literals. Simple
+string literals get text fields; complex literals remain expressions. A separate
+PARAMETERS panel prevents changing the call's catalogue identity. Format 4 rebuilds
+the original binding from recovered text/cursor and validates its identity; formats
+1–3 remain readable. Source is checked again before applying, and storage retains
+the existing expected-bytes comparison. See [evidence](design/android-parameters-34/README.md).

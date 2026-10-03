@@ -59,7 +59,7 @@ final class WorkshopView extends View {
     boolean codeKey(KeyEvent event){
         if(s.mode!=Mode.CODE||s.codeDraft==null||(event.getSource()&InputDevice.SOURCE_GAMEPAD)==InputDevice.SOURCE_GAMEPAD)return false;
         LuaDraft d=s.codeDraft;
-        if(d.panel==LuaDraft.Panel.INSERT){
+        if(d.proposal()){
             if(d.insertion.screen!=LuaInsert.Screen.TEXT)return false;
             int k=event.getKeyCode();
             if(k==KeyEvent.KEYCODE_ENTER||k==KeyEvent.KEYCODE_DEL){
@@ -311,13 +311,13 @@ final class WorkshopView extends View {
     }
     private void luaEditor(){
         LuaDraft d=s.codeDraft;
-        if(d.panel==LuaDraft.Panel.INSERT){luaInsertion();return;}
+        if(d.proposal()){luaInsertion();return;}
         fitted("[ ] Код / "+projectTitle,16,75,24,7,w-32);
         boolean keys=d.panel==LuaDraft.Panel.KEYS,menu=d.panel==LuaDraft.Panel.MENU,exit=d.panel==LuaDraft.Panel.EXIT;
         String position=(d.line()+1)+":"+(d.column()+1)+(d.anchor()>=0?" · выделение":"");
         text(position,16,99,16,10);
         fitted(keys?"Набор текста":menu?"Правки":exit?"Закрыть черновик?":"Крестовина: курсор",w/2,99,16,14,w/2-16);
-        float bottom=keys?bodyBottom-240:bodyBottom-86;
+        float bottom=keys?bodyBottom-240:bodyBottom-106;
         int rows=Math.max(2,(int)((bottom-112)/24)),columns=Math.max(12,(int)((w-70)/12));
         int top=Math.max(0,Math.min(d.line()-rows/2,d.lineCount()-rows));
         int left=Math.max(0,d.column()-columns+4);
@@ -356,6 +356,8 @@ final class WorkshopView extends View {
         }else{
             button(ok()+" Ввод",16,bottom+12,(w-40)/2,36,false,()->action(Action.CONFIRM));
             button("X Вставить Lua",24+(w-40)/2,bottom+12,(w-40)/2,36,false,()->action(Action.CONTEXT));
+            fitted("L: параметры строки · Select: правки",16,bodyBottom-36,16,14,w-32);
+            hit(16,bodyBottom-54,w-32,26,()->action(Action.PREVIOUS));
             fitted(d.dirty()?"Черновик · START сохранит перед тестом":"Без изменений · START тест",16,bodyBottom-13,16,6,w-32);
         }
         rect(0,bodyBottom,w,44,0);
@@ -382,7 +384,7 @@ final class WorkshopView extends View {
         hits.clear();
         if(i.screen==LuaInsert.Screen.SYMBOLS){luaSymbols(i);return;}
         fitted(i.screen==LuaInsert.Screen.CATALOG?"+ Вставить Lua":i.item().title,16,75,24,14,w-32);
-        fitted("Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
+        fitted(d.callEdit!=null?"Параметры строки "+(d.line()+1)+" · "+back()+" отменить":"Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
         if(i.screen==LuaInsert.Screen.CATALOG){
             int rows=Math.max(3,(int)((bodyBottom-220)/38));
             int first=Math.max(0,Math.min(i.selected-rows/2,LuaInsert.ITEMS.length-rows));
@@ -425,21 +427,22 @@ final class WorkshopView extends View {
         int first=Math.max(0,Math.min(i.field-rows/2,count+1-rows));
         for(int r=0;r<rows&&first+r<=count;r++){
             final int index=first+r;float y=112+r*36;boolean focus=index==i.field;
-            if(index==count){button("+ Вставить в черновик",16,y,w-32,32,focus,()->{i.field=index;action(Action.CONFIRM);});continue;}
+            if(index==count){button(d.callEdit!=null?"Применить правку":"+ Вставить в черновик",16,y,w-32,32,focus,()->{i.field=index;action(Action.CONFIRM);});continue;}
             rect(16,y,w-32,32,focus?10:0);
             float labelWidth=Math.min(152,w*.38f);
             fitted(i.item().fields[index].label,24,y+23,18,focus?1:6,labelWidth-12);
             fitted(i.display(index),24+labelWidth,y+23,18,focus?1:7,w-labelWidth-62);
-            if(i.item().fields[index].kind==LuaInsert.Kind.COLOR)rect(w-44,y+8,16,16,Integer.parseInt(i.value(index)));
+            if(i.colorChoice(index))rect(w-44,y+8,16,16,Integer.parseInt(i.value(index)));
             hit(16,y,w-32,32,()->{i.field=index;action(Action.CONFIRM);});
         }
         float previewY=124+rows*36;
-        text("Lua после вставки",16,previewY+14,18,14);
+        text(d.callEdit!=null?"Изменение Lua":"Lua после вставки",16,previewY+14,18,14);
         rect(16,previewY+24,w-32,bodyBottom-previewY-62,0);
         c.save();c.clipRect(16,previewY+24,w-16,bodyBottom-34);
-        int line=0;for(String row:i.code().split("\n")){fitted(row,24,previewY+46+line*22,18,7,w-48);line++;}
+        if(d.callEdit!=null){fitted("Было: "+d.callEdit.original.trim(),24,previewY+46,16,6,w-48);fitted("Будет: "+d.callEdit.preview(i).trim(),24,previewY+70,16,10,w-48);}
+        else {int line=0;for(String row:i.code().split("\n")){fitted(row,24,previewY+46+line*22,18,7,w-48);line++;}}
         c.restore();
-        fitted("↑↓ поле · ←→ значение · A ввод / вставка",16,bodyBottom-12,16,6,w-32);
+        fitted("↑↓ поле · ←→ значение · "+ok()+" ввод / "+(d.callEdit!=null?"правка":"вставка"),16,bodyBottom-12,16,6,w-32);
         rect(0,bodyBottom,w,44,0);
         key(ok()+" выбрать",12,bodyBottom,10,()->action(Action.CONFIRM));
         key(back()+" назад",w/3,bodyBottom,6,()->action(Action.CANCEL));

@@ -1,12 +1,12 @@
 # PIKOOS Android host experiment
 
-Version 0.0.33 adds controller choices for shared names from the current Lua draft
-and eight PICO-8 expressions. In an insertion's name/expression field, X opens
-choices; A replaces the proposed parameter, B preserves it. Select/L/R switches
-source and left/right pages the list. The unfinished choice survives recovery.
-This is C03.1: conservative name indexing, without local scope resolution,
-inline completion, editing existing calls as forms or full P8SCII input.
-[Device checks and limits](../../docs/design/android-symbols-33/README.md) ·
+Version 0.0.34 opens supported existing single-line calls as parameter forms:
+L from the code cursor, or Select → Parameters. Preview shows before/after; Apply
+replaces only changed argument spans, preserving other source bytes. B cancels;
+one Undo reverses the operation. Unfinished forms recover after process death.
+This is bounded C02.2: cls/print/circfill/rectfill/spr with explicit supported
+arities, not a general Lua parser or a restriction on valid PICO-8 source.
+[Device checks and limits](../../docs/design/android-parameters-34/README.md) ·
 [Editor foundation](../../docs/EDITOR_FOUNDATION.md).
 
 Version 0.0.30 adds an isolated test launch from the verified runtime ZIP. In
