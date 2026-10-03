@@ -6,6 +6,27 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+### Android lab 0.0.18: reversible cartridge history
+
+Portable `WorkshopSession` keeps undo/redo deques of immutable whole-cartridge
+snapshots, with at most 32 retained edits in total. An effective new edit calls
+the save port before pushing the previous cart and clearing redo. Undo/redo saves
+the target before moving either stack or publishing it; failures preserve the
+current cart and both stacks. No-ops do not write or branch history.
+
+The semantic `REDO` action is exposed through the paired menu row and an Android
+R2 mapping. Modal drafts consume it without changing their base cart. Existing
+contextual Y actions remain intact. History does not include asset-store naming,
+exports, project creation or UI-only selection/color changes. Runtime launches
+receive exactly the currently saved snapshot. Current selection/cursor are not
+rewound by cartridge history.
+
+The existing Activity session cache preserves per-project history on navigation
+when loaded canonical bytes still match; new Activity/process sessions start
+with empty history. This remains a bounded lab implementation, not a persistent
+command journal or final memory-budget design. No history data enters `.p8`.
+[Device evidence](design/android-history-17/README.md).
+
 ### Android lab 0.0.17: two-point rectangle brushes
 
 `P8Graphics.withRectangle` changes indexed pixels within inclusive integer corners,

@@ -31,6 +31,7 @@ final class ControllerInput {
             case KeyEvent.KEYCODE_BACK:case KeyEvent.KEYCODE_ESCAPE:action=Action.CANCEL;break;
             case KeyEvent.KEYCODE_BUTTON_X:case KeyEvent.KEYCODE_X:action=Action.CONTEXT;break;
             case KeyEvent.KEYCODE_BUTTON_Y:case KeyEvent.KEYCODE_DEL:action=Action.UNDO;break;
+            case KeyEvent.KEYCODE_BUTTON_R2:action=Action.REDO;break;
             case KeyEvent.KEYCODE_BUTTON_L1:case KeyEvent.KEYCODE_Q:action=Action.PREVIOUS;break;
             case KeyEvent.KEYCODE_BUTTON_R1:case KeyEvent.KEYCODE_E:action=Action.NEXT;break;
             case KeyEvent.KEYCODE_BUTTON_START:case KeyEvent.KEYCODE_F5:action=Action.TEST;break;

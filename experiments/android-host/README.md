@@ -1,5 +1,23 @@
 # PIKOOS Android host experiment
 
+Version 0.0.18 adds Вернуть (redo) alongside Отменить in the first menu row.
+Select opens the menu on Undo; left/right selects the history action, A confirms.
+Touch either half of the row. Counts show available steps, and empty actions are
+muted. Y undoes and optional R2 redoes outside drafts, including while the menu
+is open. Devices without R2 have the same operation through the menu.
+
+Undo/redo covers whole canonical cartridge snapshots across graphics, copy/asset
+insertion and known template parameter/binding edits. Saving/renaming an asset,
+project creation, import and external export do not belong to cartridge history.
+New effective edits replace the redo branch only after successful saving.
+Failed writes, no-op edits and cancelled previews leave both stacks unchanged.
+Pending operations trap redo; Y retains its existing contextual meaning.
+At most 32 edits are retained per project in memory. Switching projects or
+returning from runtime keeps the cached history while the Activity lives and
+canonical bytes match. Activity/process recreation starts at saved bytes with
+empty history, as the menu's current-session hint states. There is no history
+serialization or custom cart metadata. [Evidence](../../docs/design/android-history-17/README.md).
+
 Version 0.0.17 adds Прямоугольник and Прямоуг. с заливкой (tool entries 8/9).
 Choose a color before starting. A sets the first corner; D-pad moves the opposite
 corner with a live pixel preview and width×height; A commits. B or Y while drawing

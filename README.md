@@ -83,6 +83,12 @@ my-game/
 
 ## Status
 
+Android 0.0.18 adds redo across workshop cartridge edits. Undo/Redo sit together
+in the controller/touch menu with available-step counts; Y/R2 are shortcuts.
+History keeps up to 32 edits per open project in the current session. Failed
+saves, no-ops and cancelled previews preserve the redo path.
+[Device evidence](docs/design/android-history-17/README.md).
+
 Android 0.0.17 adds outlined and filled rectangles to sprite tools. Choose two
 corners with the controller or touch, preview the size, then commit or cancel.
 Each shape is one ordinary gfx edit with whole-operation undo and draft recovery.

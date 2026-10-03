@@ -559,9 +559,18 @@ final class WorkshopView extends View {
             hit(dx+20+(dw-32)/2,dy+398,(dw-32)/2,44,()->action(Action.CANCEL));
         }else if(s.mode==Mode.MENU) {
             text("Мастерская",dx+20,dy+36,26,14);
-            String[] labels={"Отменить последнюю правку",s.swapAB?"B выбор / A назад":"A выбор / B назад","Как это работает","Вернуться к проекту","Мои игры","Ресурсы · библиотека"};
-            for(int i=0;i<6;i++){final int n=i;button(labels[i],dx+16,dy+54+i*48,dw-32,44,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
-            text("SELECT: меню · L/R: инструменты",dx+20,dy+380,16,6);
+            float historyWidth=(dw-40)/2;
+            for(int i=0;i<2;i++){
+                final boolean returning=i==1;int count=returning?s.redoCount():s.undoCount();
+                float x=dx+16+i*(historyWidth+8);boolean selected=s.menuItem==0&&s.menuRedo==returning;
+                rect(x,dy+54,historyWidth,44,selected?(count>0?10:5):0);
+                fitted((returning?"Вернуть":"Отменить")+" · "+count,x+10,dy+83,20,selected?(count>0?1:7):count>0?7:13,historyWidth-20);
+                hit(x,dy+54,historyWidth,44,()->{s.menuItem=0;s.menuRedo=returning;action(Action.CONFIRM);});
+            }
+            String[] labels={"",s.swapAB?"B выбор / A назад":"A выбор / B назад","Как это работает","Вернуться к проекту","Мои игры","Ресурсы · библиотека"};
+            for(int i=1;i<6;i++){final int n=i;button(labels[i],dx+16,dy+54+i*48,dw-32,44,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
+            text("Y отменить · R2 вернуть",dx+20,dy+361,16,6);
+            text("История — в текущем сеансе",dx+20,dy+386,16,13);
         } else if(s.mode==Mode.HELP) {
             if(!s.cart().hasHero()){
                 text("Ресурсы и игра",dx+20,dy+40,26,14);

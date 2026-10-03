@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 /** Portable interaction state. Input devices and Android persistence remain outside. */
 public final class WorkshopSession {
-    public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, CONTEXT, MENU,
+    public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, REDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS }
     public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE }
@@ -27,11 +27,13 @@ public final class WorkshopSession {
     }
     private final Port port;
     private final ArrayDeque<WorkshopCartridge> undo = new ArrayDeque<>();
+    private final ArrayDeque<WorkshopCartridge> redo = new ArrayDeque<>();
     private final int[] toolFocus = new int[3];
     private WorkshopCartridge cart;
     public Mode mode = Mode.NAVIGATE;
     public int tool, focus, codeLine, cursorX = 7, cursorY = 7, color = 14, paletteCursor = 14;
     public int field, draft, menuItem;
+    public boolean menuRedo;
     public int spriteSlot, sheetFocus;
     public boolean swapAB, browsingSprites = true;
     public DrawTool drawTool=DrawTool.BRUSH;
@@ -202,6 +204,9 @@ public final class WorkshopSession {
     public WorkshopSession(WorkshopCartridge cart, Port port) { this.cart = cart; this.port = port; }
     public WorkshopCartridge cart() { return cart; }
     public boolean canUndo() { return !undo.isEmpty(); }
+    public boolean canRedo() { return !redo.isEmpty(); }
+    public int undoCount() { return undo.size(); }
+    public int redoCount() { return redo.size(); }
     public int maxFocus(){return tool==2?(cart.hasHero()?7:6):cart.hasHero()?4:2;}
     public boolean twoPointTool(){return drawTool==DrawTool.LINE||drawTool==DrawTool.RECTANGLE||drawTool==DrawTool.FILLED_RECTANGLE;}
     public boolean pendingStroke(){return twoPointTool()&&lineX>=0&&lineY>=0;}
@@ -237,6 +242,7 @@ public final class WorkshopSession {
         if (remember) {
             if (undo.size() == 32) undo.removeLast();
             undo.push(cart);
+            redo.clear();
         }
         cart = next;
         notice = "Сохранено";
@@ -491,11 +497,14 @@ public final class WorkshopSession {
                 return;
             }
             if (mode == Mode.MENU) {
+                if (action == Action.UNDO || action == Action.REDO) { mode = overlayReturn; act(action); return; }
                 if (action == Action.UP) menuItem = clamp(menuItem - 1, 5);
                 if (action == Action.DOWN) menuItem = clamp(menuItem + 1, 5);
+                if (menuItem == 0 && action == Action.LEFT) menuRedo = false;
+                if (menuItem == 0 && action == Action.RIGHT) menuRedo = true;
                 if (action == Action.CANCEL || action == Action.MENU) mode = overlayReturn;
                 if (action == Action.CONFIRM) {
-                    if (menuItem == 0) { mode = overlayReturn; act(Action.UNDO); }
+                    if (menuItem == 0) { mode = overlayReturn; act(menuRedo ? Action.REDO : Action.UNDO); }
                     if (menuItem == 1) { swapAB = !swapAB; notice = "Кнопки изменены"; }
                     if (menuItem == 2) mode = Mode.HELP;
                     if (menuItem == 3) mode = overlayReturn;
@@ -523,12 +532,18 @@ public final class WorkshopSession {
                 if (action == Action.CANCEL) mode = paletteReturn;
                 return;
             }
-            if (action == Action.MENU) { overlayReturn = mode; mode = Mode.MENU; menuItem = 0; return; }
+            if (action == Action.MENU) { overlayReturn = mode; mode = Mode.MENU; menuItem = 0; menuRedo = false; return; }
             if (action == Action.ASSETS) { showAssets();return; }
             if (action == Action.TEST) { port.launch(cart.bytes()); return; }
-            if (action == Action.UNDO) {
-                if (!undo.isEmpty()) { save(undo.peek(), false); undo.pop(); notice = "Изменение отменено"; }
-                else notice = "Нет изменений для отмены";
+            if (action == Action.UNDO || action == Action.REDO) {
+                boolean returning = action == Action.REDO;
+                ArrayDeque<WorkshopCartridge> from = returning ? redo : undo, to = returning ? undo : redo;
+                if (!from.isEmpty()) {
+                    WorkshopCartridge previous = cart;
+                    save(from.peek(), false);
+                    from.pop(); to.push(previous); // Failed writes leave both stacks intact.
+                    notice = returning ? "Правка возвращена" : "Отменено · вернуть можно в меню";
+                } else notice = returning ? "Нет правок для возврата" : "Нет изменений для отмены";
                 return;
             }
             if (action == Action.PREVIOUS) { switchTool(tool - 1); return; }
