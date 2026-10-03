@@ -13,7 +13,7 @@ public final class LuaDraft {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ ","()[]{}=+-*/%^#<>~!;:,.\"'\\|&?$@_ "};
     public static final String[] COMMANDS={"Сохранить и закрыть","Сохранить и тест","Новая строка","Пробел","Табуляция",
         "Стереть слева","Удалить справа","Начать / снять выделение","Выделить всё","Копировать","Вырезать","Вставить",
-        "Отменить правку","Вернуть правку","В начало строки","В конец строки","Закрыть черновик","Буквы / символы","Вставить конструкцию / API","Параметры вызова в строке","Перейти к функции / строке","Вернуться к месту перехода","Проверить запуск (4 секунды)"};
+        "Отменить правку","Вернуть правку","В начало строки","В конец строки","Закрыть черновик","Буквы / символы","Вставить конструкцию / API","Поля текущей строки","Перейти к функции / строке","Вернуться к месту перехода","Проверить запуск (4 секунды)"};
     private static final int LIMIT=2*1024*1024; // Lab memory guard, not a PICO-8 code budget.
     private final WorkshopCartridge original;
     private final int lua;
@@ -157,7 +157,13 @@ public final class LuaDraft {
         if(!context.allowsLine(at))throw new IllegalArgumentException("Выбранная строка внутри текста или комментария");
         String function=insertion.functionName();
         if(function!=null&&context.defines(function))throw new IllegalArgumentException("Функция "+function+" уже задана. Перейди к её телу; существующий код не заменён.");
-        String raw=insertion.code();StringBuilder inserted=new StringBuilder();
+        String raw=insertion.code();
+        if(insertion.item().id.equals("compare")){
+            String header=raw.substring(0,raw.indexOf('\n'));LuaCall parsed=LuaCall.parse(header,0,header.length());
+            if(parsed.form.selected!=insertion.selected)throw new IllegalArgumentException("Сложное выражение: заключи каждую сторону сравнения в скобки.");
+            for(int n=0;n<3;n++)if(!parsed.form.value(n).equals(insertion.value(n).trim()))throw new IllegalArgumentException("Выражение вышло за границы поля. Проверь сравнение.");
+        }
+        StringBuilder inserted=new StringBuilder();
         for(String row:raw.split("\n"))inserted.append(indent).append(row).append(newline);
         String changed=text.substring(0,at)+inserted+text.substring(at);
         if(changed.getBytes(StandardCharsets.UTF_8).length>LIMIT)throw new IllegalArgumentException("Достигнут предел памяти черновика PIKOOS");

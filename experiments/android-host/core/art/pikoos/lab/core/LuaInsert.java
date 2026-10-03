@@ -5,7 +5,8 @@ import java.io.*;
 /** Small editable catalogue of ordinary Lua. No bindings or extra runtime components. */
 public final class LuaInsert {
     public enum Screen { CATALOG, FIELDS, TEXT, SYMBOLS }
-    public enum Kind { NAME, EXPR, STRING, COLOR, BUTTON, INPUT }
+    public enum Kind { NAME, EXPR, STRING, COLOR, BUTTON, INPUT, COMPARE }
+    public static final String[] COMPARISONS={"==","~=","!=","<","<=",">",">="};
     public static final class Field {
         public final String label,initial;public final Kind kind;
         Field(String label,String initial,Kind kind){this.label=label;this.initial=initial;this.kind=kind;}
@@ -32,7 +33,8 @@ public final class LuaInsert {
         new Item("circle","circfill · круг","Рисует заполненный круг по центру и радиусу; это обычная графика PICO-8.",false,f("X","64",Kind.EXPR),f("Y","64",Kind.EXPR),f("Радиус","6",Kind.EXPR),f("Цвет","14",Kind.COLOR)),
         new Item("rect","rectfill · прямоугольник","Рисует заполненный прямоугольник между двумя углами включительно.",false,f("X0","8",Kind.EXPR),f("Y0","8",Kind.EXPR),f("X1","119",Kind.EXPR),f("Y1","119",Kind.EXPR),f("Цвет","12",Kind.COLOR)),
         new Item("sprite","spr · спрайт","Рисует один тайл спрайта 8×8. Размеры и другие параметры можно изменить в Lua.",false,f("Номер","0",Kind.EXPR),f("X","64",Kind.EXPR),f("Y","64",Kind.EXPR)),
-        new Item("call","Вызвать функцию","Вызывает функцию без аргументов. Например, _init() может сбросить состояние игры.",false,f("Имя","_init",Kind.NAME))
+        new Item("call","Вызвать функцию","Вызывает функцию без аргументов. Например, _init() может сбросить состояние игры.",false,f("Имя","_init",Kind.NAME)),
+        new Item("compare","if · сравнить значения","Сравнивает два значения. Если сравнение истинно, выполняется тело условия.",true,f("Слева","score",Kind.EXPR),f("Сравнение",">=",Kind.COMPARE),f("Справа","5",Kind.EXPR))
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
@@ -68,10 +70,12 @@ public final class LuaInsert {
             if(n<0||n>(kind==Kind.COLOR?15:5))throw new IllegalArgumentException("Номер вне списка выбора");
         }
         if(kind==Kind.INPUT&&!value.equals("btn")&&!value.equals("btnp"))throw new IllegalArgumentException("Выбери btn или btnp");
+        if(kind==Kind.COMPARE&&!java.util.Arrays.asList(COMPARISONS).contains(value))throw new IllegalArgumentException("Выбери знак сравнения стрелками");
     }
     public void step(int direction){
         if(field>=values.length)return;
         Kind kind=colorChoice(field)?Kind.COLOR:kind(field);
+        if(kind==Kind.COMPARE){int at=java.util.Arrays.asList(COMPARISONS).indexOf(values[field]);values[field]=COMPARISONS[Math.floorMod(at+direction,COMPARISONS.length)];return;}
         if(kind==Kind.INPUT){values[field]=values[field].equals("btn")?"btnp":"btn";return;}
         if(kind!=Kind.COLOR&&kind!=Kind.BUTTON&&kind!=Kind.EXPR)return;
         try{int old=Integer.parseInt(values[field]);long n=(long)old+direction;
@@ -81,7 +85,7 @@ public final class LuaInsert {
     }
     public void beginText(){
         if(field>=values.length)return;
-        Kind kind=kind(field);if(kind==Kind.COLOR||kind==Kind.BUTTON||kind==Kind.INPUT){step(1);return;}
+        Kind kind=kind(field);if(kind==Kind.COLOR||kind==Kind.BUTTON||kind==Kind.INPUT||kind==Kind.COMPARE){step(1);return;}
         input=values[field];replaceAll=true;page=key=0;screen=Screen.TEXT;
     }
     public void type(String added){
@@ -113,6 +117,7 @@ public final class LuaInsert {
         String a=values[0];
         switch(item().id){
             case "if":return "if "+a+" then\n  \nend\n";
+            case "compare":return "if "+a+values[1]+values[2]+" then\n  \nend\n";
             case "for":return "for "+a+"="+values[1]+","+values[2]+","+values[3]+" do\n  \nend\n";
             case "while":return "while "+a+" do\n  \nend\n";
             case "set":return a+"="+values[1]+"\n";
@@ -133,6 +138,7 @@ public final class LuaInsert {
         String value=values[index];Kind kind=item().fields[index].kind;
         if(kind==Kind.BUTTON)return new String[]{"0 · влево","1 · вправо","2 · вверх","3 · вниз","4 · O","5 · X"}[Integer.parseInt(value)];
         if(kind==Kind.INPUT)return value.equals("btnp")?"btnp · нажатие / повтор":"btn · удержание";
+        if(kind==Kind.COMPARE){String[] meanings={"равно","не равно","не равно","меньше","не больше","больше","не меньше"};return value+" · "+meanings[java.util.Arrays.asList(COMPARISONS).indexOf(value)];}
         return value;
     }
     public void write(DataOutputStream out)throws IOException{

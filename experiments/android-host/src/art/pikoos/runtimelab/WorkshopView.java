@@ -464,8 +464,8 @@ final class WorkshopView extends View {
         LuaDraft d=s.codeDraft;LuaInsert i=d.insertion;
         hits.clear();
         if(i.screen==LuaInsert.Screen.SYMBOLS){luaSymbols(i);return;}
-        fitted(i.screen==LuaInsert.Screen.CATALOG?"+ Вставить Lua":i.item().title,16,75,24,14,w-32);
-        fitted(d.callEdit!=null?"Параметры строки "+(d.line()+1)+" · "+back()+" отменить":"Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
+        fitted(i.screen==LuaInsert.Screen.CATALOG?"+ Вставить Lua":d.callEdit!=null&&d.callEdit.name.equals("rule:elseif")?"elseif · иначе если":i.item().title,16,75,24,14,w-32);
+        fitted(d.callEdit!=null?(i.item().id.equals("set")||i.item().id.equals("add")?"Имя и значение меняются только в этой строке":"Поля строки "+(d.line()+1)+" · "+back()+" отменить"):"Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
         if(i.screen==LuaInsert.Screen.CATALOG){
             int rows=Math.max(3,(int)((bodyBottom-220)/38));
             int first=Math.max(0,Math.min(i.selected-rows/2,LuaInsert.ITEMS.length-rows));

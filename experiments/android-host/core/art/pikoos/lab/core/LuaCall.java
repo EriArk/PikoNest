@@ -3,12 +3,12 @@ package art.pikoos.lab.core;
 import java.util.*;
 import java.util.regex.*;
 
-/** Exact argument spans for a bounded set of standalone, single-line calls. */
+/** Exact field spans for bounded single-line calls and rules; never rewrites block bodies. */
 public final class LuaCall {
     public final int start,end;public final String original,name;
     private final int[] from,to;private final String[] initial;
     public final LuaInsert form;
-    private LuaCall(int start,int end,String original,String name,int[] from,int[] to,LuaInsert form){
+    LuaCall(int start,int end,String original,String name,int[] from,int[] to,LuaInsert form){
         this.start=start;this.end=end;this.original=original;this.name=name;this.from=from;this.to=to;this.form=form;
         initial=new String[from.length];for(int n=0;n<initial.length;n++)initial[n]=form.value(n);
     }
@@ -18,6 +18,13 @@ public final class LuaCall {
         if(start<0||end<start||end>source.length()||!context.allowsLine(start))throw unsupported();
         String raw=source.substring(start,end),mask=context.masked().substring(start,end);
         if(raw.indexOf('\n')>=0||raw.indexOf('\r')>=0)throw unsupported();
+        LuaCall rule=LuaRule.parse(raw,start,end);
+        if(rule!=null){
+            int depth=0;String prefix=context.masked().substring(0,start);
+            for(int n=0;n<prefix.length();n++){char c=prefix.charAt(n);if(c=='('||c=='['||c=='{')depth++;if(c==')'||c==']'||c=='}')depth--;}
+            if(depth!=0)throw unsupported();
+            return rule;
+        }
         Matcher head=Pattern.compile("^[ \\t]*(cls|print|circfill|rectfill|spr)[ \\t]*\\(").matcher(mask);
         if(!head.find())throw unsupported();
         String name=head.group(1);ArrayList<Integer> starts=new ArrayList<>(),ends=new ArrayList<>();
@@ -73,6 +80,8 @@ public final class LuaCall {
         String changed=preview(proposal);
         // New delimiters must not escape the single call or silently add/remove arguments.
         LuaCall check=parse(changed,0,changed.length());if(!check.name.equals(name)||check.from.length!=from.length)throw unsupported();
+        if(name.startsWith("rule:"))for(int n=0;n<from.length;n++)
+            if(!proposal.value(n).trim().equals(check.form.value(n)))throw unsupported();
         return source.substring(0,start)+changed+source.substring(end);
     }
 }

@@ -1,5 +1,12 @@
 # PIKOOS Android host experiment
 
+Version 0.0.40 adds bounded rule fields through L / Select → Current line fields:
+`if`/`elseif` headers, simple `=`/`+=` assignments and initialized local variables.
+Simple comparisons expose left/operator/right; numbers and operators use arrows.
+Only changed spans are replaced, with before/after, Cancel, one-step Undo and
+proposal recovery. Unknown Lua remains editable as source. An ordinary comparison
+insertion is appended to the catalogue. [Scope and device evidence](../../docs/design/android-rules-40/README.md).
+
 Version 0.0.39 corrects the blank-create hint: code is editable, not read-only.
 A fresh blank cart was authored through controller-event UI actions, tested,
 changed with undo/redo, diagnosed/fixed, reopened and exported. The exported bytes

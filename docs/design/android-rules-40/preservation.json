@@ -1,0 +1,13 @@
+{
+  "existing_files": 23,
+  "changed": [],
+  "added": [
+    "files/projects/remix-0010/game.p8"
+  ],
+  "result_sha256": "d807fde6166ac5f70fd5ef37da473a6d3682e152dac1a5dfacdb3380be0b6245",
+  "only_edits": [
+    "score=0 -> score=2",
+    "score+=1 -> score+=2",
+    "score>=5 -> score>=8"
+  ]
+}

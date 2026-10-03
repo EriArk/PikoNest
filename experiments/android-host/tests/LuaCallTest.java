@@ -33,8 +33,8 @@ public final class LuaCallTest {
         for(String expr:new String[]{"'a\\nb'","[[a,b)]]","'a'..'b'"}){
             d=new LuaDraft(cart("print("+expr+",1,2,7)\n"),0);d.beginParameters();check(d.insertion.kind(0)==LuaInsert.Kind.EXPR,"complex literal preserved as expression");d.insertion.set(1,"3");d.applyInsert();check(d.text().equals("print("+expr+",3,2,7)\n"),"complex literal untouched");
         }
-        for(String code:new String[]{"cls()","print(1)","spr(0,1,2,2,2)","if a then cls(1) end","x=print(1,2,3,4)","t.cls(1)",
-            "cls(1) cls(2)","-- cls(1)","s='cls(1)'","circfill(1,2,3,4","circfill(1,2,3,4]","circfill(1,,3,4)","circfill(1,2,3,4) + x"}){
+        for(String code:new String[]{"cls()","print(1)","spr(0,1,2,2,2)","if a then cls(1) end","t.cls(1)",
+            "cls(1) cls(2)","-- cls(1)","circfill(1,2,3,4","circfill(1,2,3,4]","circfill(1,,3,4)","circfill(1,2,3,4) + x"}){
             final LuaDraft rejected=new LuaDraft(cart(code+"\n"),0);refused(rejected::beginParameters,"unsafe/unsupported line accepted: "+code);check(rejected.text().equals(code+"\n"),"refusal preserves source");
         }
         for(String prefix:new String[]{"--[[\n","s=[=[\n","function cls(x) end\n","local cls=fn\n","function test(cls) end\n"}){

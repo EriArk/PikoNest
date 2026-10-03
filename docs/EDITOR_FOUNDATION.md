@@ -158,3 +158,19 @@ after process death the draft reopens and the user can repeat the check. Cancell
 may finish after the remaining timeout. Interrupted adapter directories are retained
 with a quota of eight; user-facing cleanup is pending. See
 [device evidence and remaining gates](design/android-diagnostics-36/README.md).
+
+## C02.3 continuation — 0.0.40
+
+`LuaRule` supplies exact spans for bounded if/elseif headers and simple named
+assignments to the existing `LuaCall` proposal/replacement path. A conservative
+expression grammar rejects statement escapes, unbalanced expressions and ambiguous
+forms before mutation; it is not full PICO-8 syntax, type or scope validation.
+Simple comparisons use three fields. Complex supported conditions retain a single
+expression field. A new comparison item is appended to the catalogue, keeping old
+IDs stable. Assignment name edits affect this line only, not references.
+
+Replacement preserves unchanged spans, comments, local declarations and block
+bodies; it reparses and compares field boundaries. A source mismatch refuses Apply.
+Existing draft persistence, history and platform ports remain in use. The ordinary
+Lua editor remains the fallback for unsupported source. See
+[supported grammar, controller workflow and runtime evidence](design/android-rules-40/README.md).
