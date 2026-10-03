@@ -1,11 +1,12 @@
 # PIKOOS Android host experiment
 
-Version 0.0.32 adds 17 ordinary Lua/API insertions with controller-edited parameters,
-code preview, contextual explanations and proposal recovery. X opens insertion
-from the cursor; Select opens all edit commands. A block places the cursor in its
-body and each insertion is one draft undo. Test saves before launch. This is C02.1,
-without project-symbol completion, editing existing calls as forms or full P8SCII input.
-[Device checks and limits](../../docs/design/android-insert-32/README.md) ·
+Version 0.0.33 adds controller choices for shared names from the current Lua draft
+and eight PICO-8 expressions. In an insertion's name/expression field, X opens
+choices; A replaces the proposed parameter, B preserves it. Select/L/R switches
+source and left/right pages the list. The unfinished choice survives recovery.
+This is C03.1: conservative name indexing, without local scope resolution,
+inline completion, editing existing calls as forms or full P8SCII input.
+[Device checks and limits](../../docs/design/android-symbols-33/README.md) ·
 [Editor foundation](../../docs/EDITOR_FOUNDATION.md).
 
 Version 0.0.30 adds an isolated test launch from the verified runtime ZIP. In

@@ -23,6 +23,8 @@ public final class LuaContext {
             }else if((close=longClose(source,i))!=null){int at=source.indexOf(close,i+close.length());unclosed=at<0;end=unclosed?source.length():at+close.length();}
             else {i++;continue;}
             for(int n=start;n<end;n++){if(result[n]!='\n'&&result[n]!='\r')result[n]=' ';if(n>start)protectedAt[n]=true;}
+            // Keep a lexical value barrier: x="..." followed by function f() is not x=function().
+            if(!source.startsWith("--",start))result[start]='@';
             // An unfinished string/comment protects the EOF insertion point too.
             if(unclosed)protectedAt[end]=true;
             i=end;
@@ -35,6 +37,7 @@ public final class LuaContext {
         return n<s.length()&&s.charAt(n)=='['?"]"+s.substring(pos+1,n)+"]":null;
     }
     public boolean allowsLine(int pos){return pos>=0&&pos<=source.length()&&!protectedAt[pos];}
+    String masked(){return mask;}
     public boolean defines(String name){
         String n=java.util.regex.Pattern.quote(name);
         return java.util.regex.Pattern.compile("(?<![A-Za-z0-9_])(?:function\\s+"+n+"\\s*\\(|"+n+"\\s*=(?!=))").matcher(mask).find();

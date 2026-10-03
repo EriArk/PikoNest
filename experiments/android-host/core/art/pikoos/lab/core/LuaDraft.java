@@ -136,21 +136,23 @@ public final class LuaDraft {
     /** Recovery snapshot, including original bytes for stale-draft detection. History is session-only. */
     public byte[] encode(){
         try{ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
-            out.writeInt(2);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
+            out.writeInt(3);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
             out.writeInt(cursor);out.writeInt(anchor);out.writeInt(page);out.writeInt(key);out.writeInt(panel.ordinal());out.writeInt(menu);
             write(out,clipboard.getBytes(StandardCharsets.UTF_8));out.writeBoolean(insertion!=null);if(insertion!=null)insertion.write(out);
             out.close();return bytes.toByteArray();
         }catch(IOException e){throw new IllegalStateException(e);}
     }
     public static LuaDraft restore(byte[] bytes){
-        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>2)throw new IOException("version");
+        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>3)throw new IOException("version");
             LuaDraft d=new LuaDraft(new WorkshopCartridge(read(in)),0);d.text=decode(read(in));
             d.cursor=in.readInt();d.anchor=in.readInt();d.page=in.readInt();d.key=in.readInt();int panel=in.readInt();d.menu=in.readInt();
             d.clipboard=decode(read(in));
-            if(version==2&&in.readBoolean())d.insertion=LuaInsert.read(in);
+            if(version>=2&&in.readBoolean())d.insertion=LuaInsert.read(in,version>=3);
             if(in.available()!=0||!d.boundary(d.cursor)||(d.anchor!=-1&&!d.boundary(d.anchor))||d.page<0||d.page>=PAGES.length
                 ||d.key<0||d.key>=PAGES[d.page].length()||panel<0||panel>=Panel.values().length||d.menu<0||d.menu>=COMMANDS.length)throw new IOException("state");
-            d.panel=Panel.values()[panel];if((d.panel==Panel.INSERT)!=(d.insertion!=null))throw new IOException("insert state");return d;
+            d.panel=Panel.values()[panel];if((d.panel==Panel.INSERT)!=(d.insertion!=null))throw new IOException("insert state");
+            if(d.insertion!=null&&d.insertion.screen==LuaInsert.Screen.SYMBOLS){d.insertion.attachSource(d.text);d.insertion.symbolMove(0);}
+            return d;
         }catch(IOException|IllegalArgumentException e){throw new IllegalArgumentException("Не удалось прочитать черновик кода; исходный проект сохранён",e);}
     }
     private boolean boundary(int i){return i>=0&&i<=text.length()&&(i==0||i==text.length()

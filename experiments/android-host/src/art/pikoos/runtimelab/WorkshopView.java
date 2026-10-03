@@ -380,6 +380,7 @@ final class WorkshopView extends View {
     private void luaInsertion(){
         LuaDraft d=s.codeDraft;LuaInsert i=d.insertion;
         hits.clear();
+        if(i.screen==LuaInsert.Screen.SYMBOLS){luaSymbols(i);return;}
         fitted(i.screen==LuaInsert.Screen.CATALOG?"+ Вставить Lua":i.item().title,16,75,24,14,w-32);
         fitted("Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
         if(i.screen==LuaInsert.Screen.CATALOG){
@@ -441,7 +442,36 @@ final class WorkshopView extends View {
         fitted("↑↓ поле · ←→ значение · A ввод / вставка",16,bodyBottom-12,16,6,w-32);
         rect(0,bodyBottom,w,44,0);
         key(ok()+" выбрать",12,bodyBottom,10,()->action(Action.CONFIRM));
-        key(back()+" каталог",w/2,bodyBottom,6,()->action(Action.CANCEL));
+        key(back()+" назад",w/3,bodyBottom,6,()->action(Action.CANCEL));
+        if(i.canBrowse())key("X имена",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
+    }
+    private void luaSymbols(LuaInsert i){
+        fitted("Выбрать значение",16,75,24,14,w-32);
+        fitted(i.item().fields[i.field].label+": "+i.value(i.field),16,100,16,6,w-32);
+        button("Из кода",16,112,(w-40)/2,32,i.symbolGroup==0,()->{if(i.symbolGroup!=0){i.symbolTab();changed.run();invalidate();}});
+        if(i.canBrowseApi())button("PICO-8",24+(w-40)/2,112,(w-40)/2,32,i.symbolGroup==1,()->{if(i.symbolGroup!=1){i.symbolTab();changed.run();invalidate();}});
+        java.util.List<art.pikoos.lab.core.LuaSymbols.Entry> list=i.choices();
+        int rows=Math.max(2,(int)((bodyBottom-312)/38));
+        int first=Math.max(0,Math.min(i.symbolIndex-rows/2,list.size()-rows));
+        for(int row=0;row<rows&&first+row<list.size();row++){
+            final int index=first+row;art.pikoos.lab.core.LuaSymbols.Entry e=list.get(index);
+            button(e.value+(i.symbolGroup==0?" · строка "+e.line:""),16,156+row*38,w-32,34,index==i.symbolIndex,
+                ()->{i.symbolIndex=index;action(Action.CONFIRM);});
+        }
+        float y=bodyBottom-142;rect(16,y-10,w-32,2,14);
+        if(list.isEmpty()){
+            wrapped(i.completeSymbols()?(i.symbolGroup==0?"Подходящих общих имён пока нет. Можно ввести значение вручную.":"Эти имена API переопределены в коде. Используй ручной ввод."):
+                "Не удалось разобрать имена. Ручной ввод остаётся доступен.",16,178,18,7,w-32,4);
+        }else{
+            art.pikoos.lab.core.LuaSymbols.Entry e=list.get(i.symbolIndex);
+            fitted("Будет: "+e.value,16,y+16,20,10,w-32);
+            wrapped(e.help,16,y+42,16,7,w-32,3);
+        }
+        fitted(ok()+" заменит параметр · "+back()+" оставит прежний",16,bodyBottom-38,14,6,w-32);
+        fitted(i.canBrowseApi()?"Select / L/R: источник · ←→ листать":"↑↓ выбрать · ←→ листать",16,bodyBottom-14,14,13,w-32);
+        rect(0,bodyBottom,w,44,0);
+        key(ok()+" выбрать",12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" назад",w/2,bodyBottom,6,()->action(Action.CANCEL));
     }
     private void wrapped(String value,float x,float y,int size,int color,float max,int rows){
         for(int row=0;row<rows&&!value.isEmpty();row++){

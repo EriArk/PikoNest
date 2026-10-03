@@ -4,7 +4,7 @@ import java.io.*;
 
 /** Small editable catalogue of ordinary Lua. No bindings or extra runtime components. */
 public final class LuaInsert {
-    public enum Screen { CATALOG, FIELDS, TEXT }
+    public enum Screen { CATALOG, FIELDS, TEXT, SYMBOLS }
     public enum Kind { NAME, EXPR, STRING, COLOR, BUTTON, INPUT }
     public static final class Field {
         public final String label,initial;public final Kind kind;
@@ -39,6 +39,8 @@ public final class LuaInsert {
     public boolean replaceAll=true;
     public String input="";
     private String[] values;
+    public int symbolGroup,symbolIndex;
+    private LuaSymbols symbols;
     public LuaInsert(){choose(0);}
     public Item item(){return ITEMS[selected];}
     public String value(int i){return values[i];}
@@ -85,6 +87,19 @@ public final class LuaInsert {
     }
     public void erase(){if(replaceAll)input="";else if(!input.isEmpty())input=input.substring(0,input.offsetByCodePoints(input.length(),-1));replaceAll=false;}
     public void acceptText(){set(field,input);screen=Screen.FIELDS;}
+    public boolean canBrowse(){return field<values.length&&(item().fields[field].kind==Kind.EXPR||
+        (item().fields[field].kind==Kind.NAME&&(item().id.equals("set")||item().id.equals("add")||item().id.equals("call"))));}
+    public boolean canBrowseApi(){return canBrowse()&&item().fields[field].kind==Kind.EXPR;}
+    public void attachSource(String source){symbols=new LuaSymbols(source);}
+    public boolean completeSymbols(){return symbols!=null&&symbols.complete;}
+    public java.util.List<LuaSymbols.Entry> choices(){
+        if(symbols==null||!canBrowse())return java.util.Collections.emptyList();
+        return symbolGroup==1?symbols.api():symbols.project(item().id.equals("call"));
+    }
+    public void beginSymbols(String source){if(!canBrowse())return;attachSource(source);symbolGroup=symbolIndex=0;screen=Screen.SYMBOLS;}
+    public void symbolMove(int delta){symbolIndex=Math.max(0,Math.min(Math.max(0,choices().size()-1),symbolIndex+delta));}
+    public void symbolTab(){if(canBrowseApi()){symbolGroup=1-symbolGroup;symbolIndex=0;}}
+    public void acceptSymbol(){java.util.List<LuaSymbols.Entry> list=choices();if(symbolIndex<list.size()){set(field,list.get(symbolIndex).value);screen=Screen.FIELDS;}}
     public void moveKey(int dx,int dy){key=Math.max(0,Math.min(LuaDraft.PAGES[page].length()-1,(key/10+dy)*10+Math.max(0,Math.min(9,key%10+dx))));}
     public void changePage(int delta){page=(page+delta+3)%3;key=Math.min(key,LuaDraft.PAGES[page].length()-1);}
     public String functionName(){return selected<3?new String[]{"_init","_update","_draw"}[selected]:item().id.equals("function")?values[0]:null;}
@@ -119,8 +134,9 @@ public final class LuaInsert {
     public void write(DataOutputStream out)throws IOException{
         out.writeUTF(item().id);out.writeInt(screen.ordinal());out.writeInt(field);out.writeInt(page);out.writeInt(key);
         out.writeBoolean(replaceAll);out.writeUTF(input);for(String value:values)out.writeUTF(value);
+        out.writeInt(symbolGroup);out.writeInt(symbolIndex);
     }
-    public static LuaInsert read(DataInputStream in)throws IOException{
+    public static LuaInsert read(DataInputStream in,boolean browserState)throws IOException{
         LuaInsert insert=new LuaInsert();String id=in.readUTF();int found=-1;
         for(int i=0;i<ITEMS.length;i++)if(ITEMS[i].id.equals(id))found=i;
         if(found<0)throw new IOException("snippet id");insert.choose(found);int screen=in.readInt();
@@ -128,6 +144,10 @@ public final class LuaInsert {
         if(screen<0||screen>=Screen.values().length||insert.field<0||insert.field>insert.values.length||insert.page<0||insert.page>2
             ||insert.key<0||insert.key>=LuaDraft.PAGES[insert.page].length()||insert.input.length()>256
             ||(screen==Screen.TEXT.ordinal()&&insert.field==insert.values.length))throw new IOException("snippet state");
-        insert.screen=Screen.values()[screen];for(int i=0;i<insert.values.length;i++)insert.set(i,in.readUTF());return insert;
+        insert.screen=Screen.values()[screen];for(int i=0;i<insert.values.length;i++)insert.set(i,in.readUTF());
+        if(browserState){insert.symbolGroup=in.readInt();insert.symbolIndex=in.readInt();}
+        if(insert.symbolGroup<0||insert.symbolGroup>1||insert.symbolIndex<0||insert.symbolIndex>100000
+            ||(insert.screen==Screen.SYMBOLS&&(!browserState||!insert.canBrowse()||(insert.symbolGroup==1&&!insert.canBrowseApi()))))throw new IOException("symbol state");
+        return insert;
     }
 }

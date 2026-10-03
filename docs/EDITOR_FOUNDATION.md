@@ -77,3 +77,23 @@ Recovery schema 2 includes an unfinished proposal and still reads schema 1.
 Opening/reviewing/cancelling a proposal does not save the cartridge. The same
 storage operation commits the resulting text; failed writes keep the draft.
 See [evidence and limitations](design/android-insert-32/README.md).
+
+## C03.1 continuation — 0.0.33
+
+`LuaSymbols` indexes simple assignments and named/assigned zero-argument functions
+from the current draft. Strings retain a non-name lexical barrier while their
+contents and comments are masked. Table members/constructor keys are excluded.
+Any name used by a local declaration, function parameter or loop variable anywhere
+in the draft is conservatively omitted. This sacrifices coverage rather than
+claiming a scope resolver. No includes or external files are indexed yet.
+
+`LuaInsert` offers a modal source/name picker only for applicable fields; choosing
+an entry changes the proposed field, not the source or saved cart. Expression
+fields also offer eight ordinary API calls with editable sample arguments. Simple
+assignment/declaration collisions hide matching built-ins. Dynamic bindings are
+not inferred. Recovery format 3 persists group/selection, reconstructs the index
+from the recovered draft and still reads formats 1/2. Index/signature bounds fail
+to manual input with an explicit empty state, not a partial-context claim.
+
+See [device evidence](design/android-symbols-33/README.md). Existing-source forms,
+scope-aware inline completion, source navigation and diagnostics remain open.
