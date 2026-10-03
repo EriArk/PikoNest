@@ -313,7 +313,7 @@ public final class MainActivity extends Activity {
         },locations,names);
         folders.select(folderPrefs.getInt("selected",0));showingFolders=true;
         folderPrefs.edit().putBoolean("visible",true).apply();
-        folderView=new FolderView(this,folders,session!=null&&session.swapAB,()->folderPrefs.edit().putInt("selected",folders.selected).apply());
+        folderView=new FolderView(this,folders,session!=null&&session.swapAB,()->folderPrefs.edit().putInt("selected",folders.selected).apply(),()->startActivity(new Intent(this,RuntimeSetupActivity.class)));
         setContentView(folderView);folderView.requestFocus();immersive();
     }
     private void checkFolder(FolderSetup.Role role,String location){

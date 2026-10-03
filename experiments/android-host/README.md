@@ -1,5 +1,12 @@
 # PIKOOS Android host experiment
 
+Version 0.0.29 adds Folders → R PICO-8: a controller-operated archive setup step.
+It validates the user's Raspberry Pi ZIP/ARM64 header, saves a private verified
+copy and restores/rechecks it after restart. Failed replacement/cancel preserves
+the prior archive. It does not install/activate that copy or change the existing
+runtime. [Setup scope](../../docs/FIRST_RUN_SETUP.md) ·
+[Device evidence](../../docs/design/android-runtime-setup-29/README.md).
+
 Version 0.0.28 adds bounded read-only multicart launch: direct literal `load` and
 file-backed `reload` across sibling text carts. It preserves ordinary calls and
 source files, and requires Runtime Test revision 3 for private file-set staging.

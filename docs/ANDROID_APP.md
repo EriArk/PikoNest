@@ -153,6 +153,14 @@ same preparer serves Play and external entry. Missing parts fail before dispatch
 ordinary calls remain unchanged. [Scope](DEPENDENT_CARTRIDGES.md) ·
 [Device evidence](design/android-multicart-28/README.md).
 
-Next: complete first-run runtime setup, with broader dependencies and durable
+Lab 0.0.29 adds archive selection/validation from Folders → R PICO-8. The portable
+inspector checks the Raspberry Pi ZIP and ARM64 header; Android keeps an atomic
+reference to a verified private copy, rechecks it on reopening and retains the
+previous selection on error/cancel. Runtime Test revision 3 stays unchanged.
+This is the archive step, not automatic runtime installation or proven readiness.
+[Scope](FIRST_RUN_SETUP.md) · [Evidence](design/android-runtime-setup-29/README.md).
+
+Next: isolated runtime preparation/activation and official test launch, then
+complete first-run routing, with broader dependencies and durable
 file writes still tracked explicitly. Device/layout checks accompany each UI slice.
 These are Android release requirements, not optional post-release Linux work.

@@ -14,18 +14,19 @@ final class FolderView extends View {
     private final FolderSetup s;
     private final boolean swap;
     private final Runnable changed;
+    private final Runnable runtime;
     private final Paint p=new Paint();
     private Canvas c;
     private float scale,w,h,downX,downY;
     private static final String[] TITLES={"Готовые игры","Загрузки Splore","Свои проекты","Библиотека и данные"};
     private static final String[] HINTS={"Чтение игр. Исходные файлы не меняются.","Место загрузок. Связь со Splore — позже.","Перенос нынешних проектов — отдельный шаг.","Спрайты, музыка и другие ресурсы для повторного использования."};
-    FolderView(Context context,FolderSetup session,boolean swap,Runnable changed){
-        super(context);s=session;this.swap=swap;this.changed=changed;
+    FolderView(Context context,FolderSetup session,boolean swap,Runnable changed,Runnable runtime){
+        super(context);s=session;this.swap=swap;this.changed=changed;this.runtime=runtime;
         p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
         setContentDescription("Папки. Вверх и вниз: назначение. A: выбрать папку. X: проверить доступ. B: на полку.");
     }
-    void action(Action a){s.act(a);changed.run();invalidate();}
+    void action(Action a){if(a==Action.NEXT&&!s.busy){runtime.run();return;}s.act(a);changed.run();invalidate();}
     private void rect(float x,float y,float width,float height,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+width,y+height,p);}
     private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(size);c.drawText(value,x,y,p);}
     private void fit(String value,float x,float y,int size,int color,float max){p.setTextSize(size);while(value.length()>1&&p.measureText(value)>max)value=value.substring(0,value.length()-2)+"…";text(value,x,y,size,color);}
@@ -33,7 +34,7 @@ final class FolderView extends View {
         c=canvas;scale=Math.max(1,Math.round(getResources().getDisplayMetrics().density));
         scale=Math.min(scale,Math.min(getWidth()/360f,getHeight()/540f));w=getWidth()/scale;h=getHeight()/scale;
         c.save();c.scale(scale,scale);rect(0,0,w,h,1);rect(0,0,w,42,2);
-        text("PIKOOS",16,30,28,7);text("дом для твоих игр",170,28,16,14);
+        text("PIKOOS",16,30,28,7);text("R PICO-8",w-114,28,20,14);
         text("Папки мастерской",16,82,28,7);
         fit("Выбери места. Проекты пока хранятся в приложении.",16,108,17,6,w-32);
         for(int i=0;i<4;i++){
@@ -57,7 +58,8 @@ final class FolderView extends View {
         if(e.getActionMasked()==MotionEvent.ACTION_DOWN){downX=x;downY=y;return true;}
         if(e.getActionMasked()==MotionEvent.ACTION_UP){
             if(Math.abs(x-downX)>20||Math.abs(y-downY)>20)return true;
-            if(y>=h-44)action(x<w/3?Action.CONFIRM:x<w*2/3?Action.CONTEXT:Action.CANCEL);
+            if(y<42&&x>w-140)action(Action.NEXT);
+            else if(y>=h-44)action(x<w/3?Action.CONFIRM:x<w*2/3?Action.CONTEXT:Action.CANCEL);
             else if(x>=16&&x<=w-16&&y>=124&&y<400){s.select((int)(y-124)/69);changed.run();invalidate();}
             performClick();return true;
         }return true;

@@ -8,13 +8,20 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded slice (host 0.0.28 / adapter revision 3): direct literal `load` and
+Latest bounded slice (host 0.0.29): controller-operated runtime archive step from
+Folders → R PICO-8. Validates the user's Raspberry Pi ZIP and ARM64 header, retains
+a private verified copy across restarts and preserves the prior copy on failure.
+This does not activate/install a new runtime. [Setup scope](FIRST_RUN_SETUP.md) ·
+[Evidence](design/android-runtime-setup-29/README.md).
+Next: isolated runtime preparation, activation with recovery and an official
+test launch; then finish first-run routing and folder/Splore integration.
+
+Previous slice (host 0.0.28 / adapter revision 3): direct literal `load` and
 file-backed `reload` across sibling `.p8` files, staged read-only in a private
 runtime session. Two-way chapter transitions, parameters and data reads match
 direct official-runtime execution. [Contract](DEPENDENT_CARTRIDGES.md) ·
 [Evidence](design/android-multicart-28/README.md).
-Next: integrated runtime setup; broader dependency and durable-write support
-remain separate compatibility requirements.
+Broader dependency and durable-write support remain separate compatibility requirements.
 
 Previous slice (host 0.0.27): ordinary `#include` Lua files, whole-cart code
 and selected tabs prepare into a temporary `.p8` for Play/external entry. Sources
@@ -148,7 +155,8 @@ The sequence is a working plan, not a delivery-date or feasibility promise for
 experimental online features. Stage acceptance does not follow automatically from
 tests/screenshots: user-facing behavior and physical ergonomics need review.
 
-**Next slice after bounded multicart staging:** the runtime setup wizard. Expand
+**Next slice after archive validation:** isolated runtime preparation/activation
+and a verified launch within the setup wizard. Expand
 dependency coverage and durable-write ownership separately. Continue
 lifecycle/device/layout checks with each slice; the test adapter does not close
 production runtime ownership, diagnostics or packaging.
