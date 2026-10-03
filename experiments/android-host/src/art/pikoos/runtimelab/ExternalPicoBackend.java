@@ -36,10 +36,22 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         return new Capabilities(detect().launcherPresent, false, false, false);
     }
     @Override public boolean stop() { return false; }
+    void checkAvailableForLaunch() throws Exception {
+        boolean external=activity instanceof LaunchActivity;
+        if(external&&activity.getSharedPreferences("library-ui",0).getBoolean("awaitingReturn",false))
+            throw new Exception("Игра уже запущена из PIKOOS. Вернись в неё и заверши игру перед новым запуском.");
+        if(!external&&activity.getSharedPreferences("external-launch",0).getBoolean("dispatched",false))
+            throw new Exception("Игра запущена из другого лаунчера. Сначала заверши её и вернись в лаунчер.");
+    }
+    void resume() throws Exception {
+        PackageInfo selected=runtime();
+        activity.startActivity(new Intent(Intent.ACTION_MAIN).setComponent(new ComponentName(selected.packageName,"com.godot.game.GodotAppLauncher")));
+    }
     @Override public void launch(byte[] cart) throws Exception {
         launch(cart,CartridgeFormat.P8);
     }
     @Override public void launch(byte[] cart,CartridgeFormat format) throws Exception {
+        checkAvailableForLaunch();
         PackageInfo selected = runtime();
         AtomicFile snapshot = new AtomicFile(new File(activity.getFilesDir(), "run"+format.extension));
         FileOutputStream out = null;

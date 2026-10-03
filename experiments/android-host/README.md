@@ -1,5 +1,13 @@
 # PIKOOS Android host experiment
 
+Version 0.0.25 adds a separate explicit LaunchActivity for third-party launcher
+play, without loading/importing editor projects. Beacon and Retroid Launcher are
+configured and verified on the device. Incoming content grants or scoped Games
+paths feed the shared cart validation/runtime path; failures offer file selection,
+retry, Play and cancel. The dispatch journal prevents duplicate snapshot writes.
+[Launcher setup](../../docs/ANDROID_APP.md#tested-lab-entry-0025) ·
+[Device evidence and limits](../../docs/design/android-external-24/README.md).
+
 Version 0.0.24 prefers the separately installed PIKOOS Runtime Test adapter, which
 fixes a reproduced PulseAudio startup-directory race and reaps its audio process
 on exit. The original wrapper remains the fallback without that fix. This is a

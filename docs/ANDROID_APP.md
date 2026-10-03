@@ -38,7 +38,7 @@ PIKOOS run it using the user's official PICO-8. The ordinary PIKOOS app icon sti
 opens Play. External play must bypass shelf selection and editor import, preserve
 the original `.p8` / `.p8.png`, and reuse the same runtime launch workflow.
 
-Proposed UX and integration contract, to prove before calling supported:
+Product UX and integration contract (lab coverage and remaining gates below):
 
 1. Receive one explicit game request; validate readability, format and supported
    dependencies using the shared launch workflow. Never forward arbitrary
@@ -60,21 +60,82 @@ Proposed UX and integration contract, to prove before calling supported:
 Android intents and permission-bearing content URIs are the initial technical
 direction, based on [Android intents](https://developer.android.com/guide/components/intents-filters)
 and [file sharing](https://developer.android.com/training/secure-file-sharing/share-file).
-Exact activity/action/MIME filters and path-based launcher adapters remain TBD.
+Lab 0.0.25 implements the explicit entry and scoped path adapter described below.
 Do not assume every launcher supplies the same request or that an absolute path
 grants access. Scope any path adapter to existing authorized storage. Do not
 register PIKOOS indiscriminately for all pictures merely because carts use PNG.
 
+## Tested lab entry (0.0.25)
+
+Explicit component: `art.pikoos.runtimelab/art.pikoos.runtimelab.LaunchActivity`.
+It is separate from the app's Play/editor task. It accepts VIEW/MAIN with a
+`content://` or `file://` data URI, SEND with a read-granted EXTRA_STREAM, or the
+`rom` string extra used by path-oriented frontends. Prefer a permission-bearing
+content URI. Raw paths only map to documents beneath the already authorized
+Games folder; they never grant broad filesystem access. Internal storage aliases
+and removable-volume paths are supported. No generic image intent filter.
+
+The same bounded format/dependency checks and runtime backend as Play are used.
+Source bytes are copied unchanged into the read-only runtime snapshot. External
+play never opens/imports an editor project. Missing access offers the system file
+picker, retry, Play fallback and cancel. A/B follow the host's swap setting.
+Backgrounded reads are invalidated. A persisted dispatch journal prevents an
+automatic second launch after process loss; a duplicate/new request during a
+dispatched game resumes its wrapper instead of replacing the snapshot.
+
+### Beacon 1.8.10
+
+Create a Custom platform, choose PIKOOS Runtime Lab as player and the same Games
+folder. Enable custom launch; use this exact command:
+
+```text
+am start -n art.pikoos.runtimelab/art.pikoos.runtimelab.LaunchActivity -a android.intent.action.VIEW -d {file_uri}
+```
+
+The device profile is named **PICO-8 - PIKOOS**, short name **PIKOOS**. Existing
+PICO8/RetroArch and other profiles remain. Beacon's placeholder syntax follows
+the wrapper's [frontend documentation](https://github.com/Macs75/pico8-android/wiki/Frontends-Integration).
+
+### Retroid Launcher beta 1.16 (2025-0618-1139)
+
+Create a custom PIKOOS platform/configuration:
+
+| Field | Value |
+| --- | --- |
+| Package | `art.pikoos.runtimelab` |
+| Activity | `art.pikoos.runtimelab.LaunchActivity` |
+| Action | `android.intent.action.VIEW` |
+| DataType / DataFilePathType | Leave empty |
+| Extra key / value | `rom` / `{file.path}` |
+| File suffixes | `p8`, `png` (without dots) |
+
+Add the Games directory, select it in Synchronize and scan. These fields were
+confirmed against the installed launcher and actual launches. Retroid extracts
+the final extension, so `p8.png` is not a suffix here; unrelated PNGs can appear,
+and PIKOOS still validates their format. Unknown homebrew metadata may report
+matching failures even though the game files were indexed. Choose **Safely Open**
+when Retroid reports the PIKOOS process already running. Force Open is unnecessary
+and is not part of the tested workflow.
+
+Both real launcher shelves now reach official PICO-8 and return to their selected
+cart on the reference device. See [device evidence](design/android-external-24/README.md).
+
 ## Status and order
 
-Lab 0.0.24 has a MAIN/LAUNCHER entry and an outgoing runtime share flow. It does
-not yet receive external game launch requests. Existing narrow/wide screenshots
-are layout checks on one device, not a supported-device matrix.
+Lab 0.0.25 proves the external-launch slice for single `.p8`/`.p8.png` carts in
+Beacon and Retroid Launcher. This is an experimental package/entry contract;
+production naming and distribution are not frozen. Missing-runtime setup still
+explains the requirement rather than completing an integrated import wizard.
+Linked carts/files, runtime crash observation and reliable stale-session recovery
+remain open. Interrupting native startup with another entry also exposed a
+wrapper hang; see the evidence above. The wrapper cannot report a verified game result; returning is only
+an Activity lifecycle event. Existing narrow/wide screenshots are layout checks
+on one device, not a supported-device matrix.
 
 The reproduced audio startup race is fixed in a separate test runtime adapter;
 this two-APK development setup is not final product packaging. See the
 [runtime experiment](../experiments/runtime-restart/README.md).
 
-Next: implement and verify external launcher entry/return, followed by nested libraries and the
-complete first-run runtime setup. Device/layout checks accompany each UI slice.
+Next: fix interrupted-startup recovery, then nested libraries and dependency-aware
+staging, followed by complete first-run runtime setup. Device/layout checks accompany each UI slice.
 These are Android release requirements, not optional post-release Linux work.

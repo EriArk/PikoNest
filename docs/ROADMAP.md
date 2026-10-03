@@ -8,7 +8,15 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded lab step (0.0.24): reproduce the audio startup-directory race →
+Latest bounded lab step (0.0.25): select a cart in Beacon or Retroid Launcher →
+PIKOOS external entry → official runtime → return to the calling shelf. Scoped
+file access, picker recovery, duplicate-request protection and process-loss return
+are covered. Interrupting native boot exposed a wrapper hang; investigate that
+recovery next. Integrated runtime setup, dependencies and crash observation remain
+open. [Configuration and scope](ANDROID_APP.md#tested-lab-entry-0025) ·
+[Device evidence](design/android-external-24/README.md).
+
+Previous step (0.0.24): reproduce the audio startup-directory race →
 fix the bootstrap in a separate test adapter → verify delayed startup, failure
 bounds, repeated launch/exit and cleanup. Host prefers that installed adapter;
 upstream fallback remains unfixed. Production packaging/setup is still open.
