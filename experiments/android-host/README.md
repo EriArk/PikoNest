@@ -1,5 +1,12 @@
 # PIKOOS Android host experiment
 
+Version 0.0.39 corrects the blank-create hint: code is editable, not read-only.
+A fresh blank cart was authored through controller-event UI actions, tested,
+changed with undo/redo, diagnosed/fixed, reopened and exported. The exported bytes
+ran in the separate original PICO-8 wrapper without workshop metadata. Android's
+Save confirmation used touch; physical UX and owner acceptance remain open.
+[ACC-01 evidence and next work](../../docs/design/android-acc01-39/README.md).
+
 Version 0.0.38 requires Runtime Test 7 for ordinary game dispatch. A signature-gated
 session handshake, portable phase observation and immutable one-shot return intent
 replace assumptions about Android task ordering. Visiting the host while a game

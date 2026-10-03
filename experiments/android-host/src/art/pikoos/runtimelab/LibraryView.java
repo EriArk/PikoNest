@@ -122,7 +122,7 @@ final class LibraryView extends View {
             fit(titles[s.templateChoice],x+74,y+88,24,10,dw-148);
             fit(descriptions[s.templateChoice],x+18,y+136,18,7,dw-36);
             text((s.templateChoice+1)+" / "+s.templateCount()+"  ·  ← → выбрать",x+18,y+170,18,6);
-            fit(s.templateChoice==1?"Спрайты — рисование, код — просмотр.":"Это будет отдельный проект.",x+18,y+208,18,11,dw-36);
+            fit(s.templateChoice==1?"Свой код, спрайты и правила игры.":"Это будет отдельный проект.",x+18,y+208,18,11,dw-36);
         }else{
             text("Исходные проекты сохранены.",x+18,y+82,18,7);
             String message=s.error;
