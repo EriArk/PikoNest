@@ -10,7 +10,7 @@ import art.pikoos.lab.core.WorkshopSession.Action;
 /** Isolated external-play task. Does not instantiate projects, editor or their journals. */
 public final class LaunchActivity extends Activity {
     private ExternalPicoBackend backend;private ControllerInput input;private LaunchView view;
-    private boolean dispatched,left,busy;private int generation;
+    private boolean dispatched,left,busy;private volatile int generation;
     private SharedPreferences state;
     @Override public void onCreate(Bundle saved){
         super.onCreate(saved);state=getSharedPreferences("external-launch",0);backend=new ExternalPicoBackend(this);
@@ -37,7 +37,8 @@ public final class LaunchActivity extends Activity {
         final int attempt=++generation;
         new Thread(()->{
             ExternalCartSource source=null;String error=null;
-            try{source=new ExternalCartSource(getApplicationContext(),request);}
+            try{source=new ExternalCartSource(getApplicationContext(),request,()->attempt!=generation);}
+            catch(java.util.concurrent.CancellationException e){return;}
             catch(SecurityException e){error="Нет доступа к игре. Выбери этот файл ещё раз.";}
             catch(IllegalArgumentException e){error=e.getMessage();}
             catch(Exception e){error="Не удалось прочитать игру. Проверь накопитель или выбери файл ещё раз.";}

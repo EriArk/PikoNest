@@ -52,6 +52,12 @@ A future alternative preview engine must never redefine compatibility.
 
 `Verify in PICO-8` should always mean testing with the official runtime.
 
+The Android 0.0.27 Play experiment prepares supported `#include` source sets into
+a temporary ordinary `.p8`, without rewriting their editable sources. This is a
+bounded launch operation, not a change to the canonical project format or support
+for runtime multicart/file writes. See the [linked-file contract](DEPENDENT_CARTRIDGES.md)
+and its direct-versus-prepared official-runtime checks.
+
 ### The base follows PICO-8's actual model
 
 Owner-confirmed rule, 2026-10-02: the base tools follow the real PICO-8 rules,

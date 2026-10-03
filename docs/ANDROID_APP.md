@@ -76,7 +76,8 @@ Games folder; they never grant broad filesystem access. Internal storage aliases
 and removable-volume paths are supported. No generic image intent filter.
 
 The same bounded format/dependency checks and runtime backend as Play are used.
-Source bytes are copied unchanged into the read-only runtime snapshot. External
+Standalone carts are copied unchanged into the read-only runtime snapshot;
+0.0.27 additionally prepares includes in a temporary cart as described below. External
 play never opens/imports an editor project. Missing access offers the system file
 picker, retry, Play fallback and cancel. A/B follow the host's swap setting.
 Backgrounded reads are invalidated. A persisted dispatch journal prevents an
@@ -141,6 +142,11 @@ document identities. A failed child folder leaves other games available; travers
 is bounded and old scans stop cooperatively when leaving the shelf. Device/core
 checks and remaining limits: [nested library evidence](design/android-nested-26/README.md).
 
-Next: dependency-aware staging, followed by complete first-run
+Lab 0.0.27 prepares simple `#include` dependencies through the connected Games
+tree for Play and external entry. It creates a temporary ordinary `.p8`, preserving
+the original cart and linked files. [Scope](DEPENDENT_CARTRIDGES.md) ·
+[Device evidence](design/android-includes-27/README.md).
+
+Next: runtime file-set/multicart staging, followed by complete first-run
 runtime setup. Device/layout checks accompany each UI slice.
 These are Android release requirements, not optional post-release Linux work.

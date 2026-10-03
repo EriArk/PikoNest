@@ -1,5 +1,12 @@
 # PIKOOS Android host experiment
 
+Version 0.0.27 prepares simple `#include` directives before Play/external launch:
+Lua file, all Lua tabs from `.p8`, or one tab. The connected Games tree supplies
+sibling/descendant files; originals remain untouched, and the resulting temporary
+cart uses ordinary PICO-8 code. Missing/unsupported dependencies stop before
+dispatch. [Contract and limits](../../docs/DEPENDENT_CARTRIDGES.md) ·
+[Official-runtime/device checks](../../docs/design/android-includes-27/README.md).
+
 Version 0.0.26 indexes the Games tree recursively, showing each cart's relative
 folder and preserving opaque document IDs for selection, favorites and recency.
 Portable breadth-first traversal handles cycles, unreadable children and bounded
@@ -45,8 +52,9 @@ Play selection, including host process death, while editor testing stays separat
 
 Current scope: root plus 16 subfolder levels, up to 128 carts/2,048 entries across
 the whole traversal, 2 MiB per cart. Partial results are explicitly reported.
-Dependencies remain unsupported. Conservative text hints identify
-includes/direct file calls (except empty `reload()`); this is not a complete Lua
+Simple includes now use the preparer described above. Other dependencies remain
+unsupported. Conservative text hints identify direct file calls (except empty
+`reload()`); this is not a complete Lua
 dependency analysis. These are PIKOOS lab limits, not PICO-8 limits. Recent means
 accepted launch, not a running-game save state or verified completion. Physical
 controller ergonomics and runtime setup remain separate acceptance work.

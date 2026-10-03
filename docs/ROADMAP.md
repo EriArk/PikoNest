@@ -8,11 +8,17 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded slice (host 0.0.26): Play indexes Games and its subfolders, shows
+Latest bounded slice (host 0.0.27): ordinary `#include` Lua files, whole-cart code
+and selected tabs prepare into a temporary `.p8` for Play/external entry. Sources
+stay untouched; missing dependencies fail before dispatch. Direct/prepared runtime
+captures match. [Contract](DEPENDENT_CARTRIDGES.md) ·
+[Evidence](design/android-includes-27/README.md).
+Next: runtime file-set/multicart staging, then integrated runtime setup.
+
+Previous slice (host 0.0.26): Play indexes Games and its subfolders, shows
 relative folder names, and keeps selection/favorites/recent launches per document.
 Traversal, limits and cancellation live in the portable core. See
 [nested library evidence](design/android-nested-26/README.md).
-Next: dependency-aware staging, then integrated runtime setup.
 
 Previous runtime fix (host 0.0.25, adapter revision 2): interrupted native boot →
 return to the same process → working input and preserved game state. The wrapper
@@ -135,7 +141,7 @@ The sequence is a working plan, not a delivery-date or feasibility promise for
 experimental online features. Stage acceptance does not follow automatically from
 tests/screenshots: user-facing behavior and physical ergonomics need review.
 
-**Next slice after nested libraries:** dependency-aware cart/file staging,
+**Next slice after include preparation:** runtime file-set/multicart staging,
 then the runtime setup wizard. Continue
 lifecycle/device/layout checks with each slice; the test adapter does not close
 production runtime ownership, diagnostics or packaging.

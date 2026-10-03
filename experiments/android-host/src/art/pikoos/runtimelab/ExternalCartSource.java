@@ -10,7 +10,7 @@ import java.io.InputStream;
 /** Read-only incoming Android transport. Never treats a raw path as a permission. */
 final class ExternalCartSource {
     final byte[] bytes;final String name;final CartridgeFormat format;
-    ExternalCartSource(Context context,Intent intent)throws Exception{
+    ExternalCartSource(Context context,Intent intent,java.util.function.BooleanSupplier cancelled)throws Exception{
         Uri uri=null;
         if(Intent.ACTION_SEND.equals(intent.getAction()))uri=intent.getParcelableExtra(Intent.EXTRA_STREAM);
         else if(Intent.ACTION_VIEW.equals(intent.getAction())||Intent.ACTION_MAIN.equals(intent.getAction()))uri=intent.getData();
@@ -36,11 +36,11 @@ final class ExternalCartSource {
         }
         if(filename==null)throw new IllegalArgumentException("Не удалось узнать имя картриджа.");
         format=CartridgeFormat.of(filename);name=filename;
+        byte[] original;
         try(InputStream in=resolver.openInputStream(uri)){
             if(in==null)throw new IllegalArgumentException("Не удалось прочитать игру.");
-            bytes=CartridgeImport.readBounded(in);
+            original=CartridgeImport.readBounded(in);
         }
-        PlayCartridge checked=new PlayCartridge(name,bytes);
-        if(!checked.problem.isEmpty())throw new IllegalArgumentException(checked.problem);
+        bytes=IncludeSource.prepare(resolver,context.getSharedPreferences("folder-setup",0).getString("GAMES.uri",""),uri,name,original,cancelled);
     }
 }

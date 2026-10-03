@@ -10,6 +10,9 @@ public final class PlayCartridge {
     public final String problem;
     public final int[] cover;
     public PlayCartridge(String filename,byte[] bytes){
+        this(filename,bytes,false);
+    }
+    public PlayCartridge(String filename,byte[] bytes,boolean canPrepareIncludes){
         String failure="";int[] image=null;
         if(filename.toLowerCase(Locale.ROOT).endsWith(".p8.png")){
             try{image=new P8Png(bytes).cover;}catch(IllegalArgumentException e){failure=e.getMessage();}
@@ -22,11 +25,11 @@ public final class PlayCartridge {
                 if(doc.sections().get(i).name.equals("lua"))code+=new String(doc.body(i),StandardCharsets.ISO_8859_1)+"\n";
                 if(doc.sections().get(i).name.equals("label"))image=label(doc.body(i));
             }
-            // Conservative hint, not a dependency analyzer: includes and file API references
-            // (even in comments/strings) require the future dependency-aware backend.
+            // Conservative hint, not a dependency analyzer. File API references (even in
+            // comments/strings) require future staging; includes need an explicit preparer.
             // reload() reloads the current snapshot and needs no sibling file.
             String inspected=code.replaceAll("\\breload\\s*\\(\\s*\\)","");
-            if(Pattern.compile("(?i)#include\\b|\\b(load|reload|cstore|save)\\s*\\(").matcher(inspected).find())
+            if((!canPrepareIncludes&&Pattern.compile("(?i)#include\\b").matcher(inspected).find())||Pattern.compile("(?i)\\b(load|reload|cstore|save)\\s*\\(").matcher(inspected).find())
                 failure="Возможны внешние файлы · их запуск ещё не готов";
         }catch(IllegalArgumentException e){failure="Не удалось распознать текстовый .p8";}
         problem=failure;cover=image;

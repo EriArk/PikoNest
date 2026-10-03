@@ -14,8 +14,8 @@ public final class GameTree {
     public interface Children extends AutoCloseable {Entry next()throws Exception;void close()throws Exception;}
     public interface Source {Children open(String directory)throws Exception;}
     public static final class Cart {
-        public final String id,name,folder;
-        Cart(Entry entry,String folder){id=entry.id;name=entry.name;this.folder=folder;}
+        public final String id,name,folder,parent;
+        Cart(Entry entry,String folder,String parent){id=entry.id;name=entry.name;this.folder=folder;this.parent=parent;}
     }
     public static final class Result {
         public final List<Cart> carts=new ArrayList<>();
@@ -46,7 +46,7 @@ public final class GameTree {
                         String lower=entry.name.toLowerCase(Locale.ROOT);
                         if(!lower.endsWith(".p8")&&!lower.endsWith(".p8.png"))continue;
                         if(result.carts.size()>=MAX_GAMES){result.limited=true;return result;}
-                        result.carts.add(new Cart(entry,folder.path));
+                        result.carts.add(new Cart(entry,folder.path,folder.id));
                     }
                 }
             }catch(CancellationException e){throw e;}

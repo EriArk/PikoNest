@@ -244,12 +244,15 @@ public final class MainActivity extends Activity {
     private void launchGame(PlaySession.Game game){
         final int generation=++playGeneration;final PlaySession target=play;
         final android.content.ContentResolver resolver=getApplicationContext().getContentResolver();
+        final String location=folderPrefs.getString("GAMES.uri","");
         new Thread(()->{
             byte[] bytes=null;String failure=null;
             try{
-                bytes=GameFolder.read(resolver,game.id);PlayCartridge checked=new PlayCartridge(game.title+game.format.extension,bytes);
-                if(!checked.problem.isEmpty())failure=checked.problem;
-            }catch(Exception e){failure="Не удалось прочитать игру · L: обновить полку";}
+                bytes=GameFolder.read(resolver,game.id);
+                bytes=IncludeSource.prepare(resolver,location,Uri.parse(game.id),game.title+game.format.extension,bytes,()->generation!=playGeneration);
+            }catch(java.util.concurrent.CancellationException e){return;}
+            catch(IllegalArgumentException e){failure=e.getMessage();}
+            catch(Exception e){failure="Не удалось прочитать игру · L: обновить полку";}
             final byte[] snapshot=bytes;final String error=failure;
             runOnUiThread(()->{
                 if(isDestroyed()||!showingPlay||generation!=playGeneration||target!=play)return;
