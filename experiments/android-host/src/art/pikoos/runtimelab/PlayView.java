@@ -15,14 +15,14 @@ final class PlayView extends View {
     private static final class Hit {RectF rect;Runnable run;Hit(float x,float y,float w,float h,Runnable r){rect=new RectF(x,y,x+w,y+h);run=r;}}
     PlayView(Context context,PlaySession session,boolean swap,Runnable changed){
         super(context);s=session;this.swap=swap;this.changed=changed;
-        p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));p.setAntiAlias(false);
+        PixelText.configure(context,p);p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);setContentDescription("Играть. Крестовина: игра. A: запуск. X: избранное. Y: фильтр. R: мастерская. Select: папки. L: обновить.");
     }
     void action(Action a){s.act(a);changed.run();invalidate();}
     private void rect(float x,float y,float bw,float bh,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+bw,y+bh,p);}
-    private void text(String t,float x,float y,int size,int color){p.setTextSize(size);p.setColor(WorkshopView.COLORS[color]);c.drawText(t,x,y,p);}
-    private void fit(String t,float x,float y,int size,int color,float max){p.setTextSize(size);while(t.length()>1&&p.measureText(t)>max)t=t.substring(0,t.length()-2)+"…";text(t,x,y,size,color);}
-    private void button(String t,float x,float y,float bw,int color,Runnable run){rect(x,y,bw,40,color);fit(t,x+10,y+27,20,7,bw-20);hits.add(new Hit(x,y,bw,40,run));}
+    private void text(String t,float x,float y,int size,int color){p.setTextSize(PixelText.size(size));p.setColor(WorkshopView.COLORS[color]);c.drawText(t,x,y,p);}
+    private void fit(String t,float x,float y,int size,int color,float max){p.setTextSize(PixelText.size(size));while(t.length()>1&&p.measureText(t)>max)t=t.substring(0,t.length()-2)+"…";text(t,x,y,size,color);}
+    private void button(String t,float x,float y,float bw,int color,Runnable run){rect(x,y,bw,40,color);fit(t,x+10,y+27,PixelText.actionSize(p,t,bw-20),7,bw-20);hits.add(new Hit(x,y,bw,40,run));}
     @Override protected void onDraw(Canvas canvas){
         c=canvas;scale=Math.min(Math.max(1,Math.round(getResources().getDisplayMetrics().density)),Math.min(getWidth()/360f,getHeight()/540f));
         w=getWidth()/scale;h=getHeight()/scale;c.save();c.scale(scale,scale);hits.clear();rect(0,0,w,h,1);

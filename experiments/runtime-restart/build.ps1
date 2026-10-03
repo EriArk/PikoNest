@@ -48,7 +48,7 @@ Copy-Item (Join-Path $pikoGate 'dex\classes.dex') (Join-Path $pikoDecoded 'class
 # Native Android menu assets do not go through Godot's resource loader/index.
 $pikoMenuAssets = Join-Path $pikoDecoded 'assets\pikoos'
 New-Item -ItemType Directory -Force $pikoMenuAssets | Out-Null
-Copy-Item -LiteralPath (Join-Path $pikoRoot 'experiments\android-host\assets\Tiny5-Regular.ttf'),(Join-Path $pikoRoot 'experiments\android-host\assets\OFL.txt') -Destination $pikoMenuAssets
+Copy-Item -LiteralPath (Join-Path $pikoRoot 'experiments\android-host\assets\Monocraft.ttf'),(Join-Path $pikoRoot 'experiments\android-host\assets\Monocraft-OFL.txt') -Destination $pikoMenuAssets
 
 # Side-by-side, locally signed experiment. Never uninstall/replace the user's wrapper.
 $pikoManifest = Join-Path $pikoDecoded 'AndroidManifest.xml'
@@ -56,7 +56,7 @@ $pikoText = [IO.File]::ReadAllText($pikoManifest).Replace('io.wip.pico8','art.pi
 $pikoText = $pikoText.Replace('<application ', '<permission android:name="art.pikoos.runtimeexperiment.PROBE" android:protectionLevel="signature"/><application ').Replace('</application>', '<activity android:name="art.pikoos.runtimeexperiment.DiagnosticActivity" android:exported="true" android:permission="art.pikoos.runtimeexperiment.PROBE" android:configChanges="orientation|screenSize|keyboardHidden" android:theme="@android:style/Theme.Translucent.NoTitleBar"/><activity android:name="art.pikoos.runtimeexperiment.ProbeActivity" android:exported="true" android:permission="art.pikoos.runtimeexperiment.PROBE" android:configChanges="orientation|screenSize|keyboardHidden" android:theme="@android:style/Theme.Translucent.NoTitleBar"/><provider android:name="art.pikoos.runtimeexperiment.ProbeStatusProvider" android:authorities="art.pikoos.runtimeexperiment.probe" android:exported="true" android:permission="art.pikoos.runtimeexperiment.PROBE"/></application>')
 [IO.File]::WriteAllText($pikoManifest,$pikoText,(New-Object Text.UTF8Encoding($false)))
 $pikoConfig = Join-Path $pikoDecoded 'apktool.yml'
-$pikoConfigText = [IO.File]::ReadAllText($pikoConfig).Replace('versionCode: 1','versionCode: 7').Replace('versionName: 1.6.6','versionName: 1.6.6-pikoos.7')
+$pikoConfigText = [IO.File]::ReadAllText($pikoConfig).Replace('versionCode: 1','versionCode: 8').Replace('versionName: 1.6.6','versionName: 1.6.6-pikoos.8')
 [IO.File]::WriteAllText($pikoConfig,$pikoConfigText,(New-Object Text.UTF8Encoding($false)))
 $pikoUnsigned = Join-Path $pikoBuild 'unsigned.apk'
 $pikoAligned = Join-Path $pikoBuild 'aligned.apk'

@@ -12,16 +12,16 @@ final class RuntimeSetupView extends View {
     private Canvas c;private float scale,w,h,downX,downY,buttonY;
     RuntimeSetupView(Context context,RuntimeSetup state,boolean swap){
         super(context);this.state=state;this.swap=swap;
-        p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));p.setAntiAlias(false);
+        PixelText.configure(context,p);p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
         setContentDescription("Подключение PICO-8. A: выбрать архив или проверить запуск. X: другой ZIP. Y: перепроверить архив. B: назад или отменить подготовку.");
     }
     void action(Action a){state.act(a);invalidate();}
     private void rect(float x,float y,float width,float height,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+width,y+height,p);}
-    private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(size);c.drawText(value,x,y,p);}
-    private void fit(String value,float x,float y,int size,int color,float width){p.setTextSize(size);while(value.length()>1&&p.measureText(value)>width)value=value.substring(0,value.length()-2)+"…";text(value,x,y,size,color);}
+    private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(PixelText.size(size));c.drawText(value,x,y,p);}
+    private void fit(String value,float x,float y,int size,int color,float width){p.setTextSize(PixelText.size(size));while(value.length()>1&&p.measureText(value)>width)value=value.substring(0,value.length()-2)+"…";text(value,x,y,size,color);}
     private float wrap(String value,float x,float y,int size,int color,float width){
-        String line="";p.setTextSize(size);
+        String line="";p.setTextSize(PixelText.size(size));
         for(String word:value.split(" ")){String next=line.isEmpty()?word:line+" "+word;
             if(!line.isEmpty()&&p.measureText(next)>width){fit(line,x,y,size,color,width);y+=size+4;line=word;}else line=next;}
         if(!line.isEmpty()){fit(line,x,y,size,color,width);y+=size+4;}return y;

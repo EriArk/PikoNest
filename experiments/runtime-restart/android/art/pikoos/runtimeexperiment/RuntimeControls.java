@@ -138,7 +138,7 @@ public final class RuntimeControls implements Application.ActivityLifecycleCallb
     private static final class MenuView extends View {
         final Controls controls;final Paint paint=new Paint();final Typeface font;
         final RectF[] buttons={new RectF(),new RectF()};float scale;int pressed=-1;
-        MenuView(Controls c){super(c.activity);controls=c;font=Typeface.createFromAsset(c.activity.getAssets(),"pikoos/Tiny5-Regular.ttf");setFocusable(true);setContentDescription("Меню игры: продолжить или завершить игру");}
+        MenuView(Controls c){super(c.activity);controls=c;font=Typeface.createFromAsset(c.activity.getAssets(),"pikoos/Monocraft.ttf");paint.setFontFeatureSettings("'liga' 0, 'calt' 0, 'dlig' 0");setFocusable(true);setContentDescription("Меню игры: продолжить или завершить игру");}
         void box(Canvas c,float x,float y,float w,float h,int color){paint.setColor(color);c.drawRect(x,y,x+w,y+h,paint);}
         void text(Canvas c,String s,float x,float y,float size,int color){paint.setTypeface(font);paint.setTextSize(size);paint.setColor(color);c.drawText(s,x,y,paint);}
         @Override protected void onDraw(Canvas canvas){
@@ -154,11 +154,11 @@ public final class RuntimeControls implements Application.ActivityLifecycleCallb
             }
             if(controls.model.failed){
                 text(c,"Игра пока не завершилась.",left+16,top+78,20,0xffffec27);
-                text(c,"Можно продолжить или повторить.",left+16,top+103,18,0xffc2c3c7);
+                text(c,"Продолжить или повторить.",left+16,top+103,18,0xffc2c3c7);
             }else{
                 text(c,"Вернуться из игры?",left+16,top+79,26,0xfffff1e8);
-                text(c,"Прогресс зависит от сохранений",left+16,top+108,18,0xffc2c3c7);
-                text(c,"самой игры.",left+16,top+130,18,0xffc2c3c7);
+                text(c,"Сохранение прогресса зависит",left+16,top+108,18,0xffc2c3c7);
+                text(c,"от самой игры.",left+16,top+130,18,0xffc2c3c7);
             }
             for(int i=0;i<2;i++){
                 RectF b=buttons[i];b.set(left+16,top+155+i*59,left+352,top+205+i*59);

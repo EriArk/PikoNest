@@ -32,28 +32,28 @@ final class LibraryView extends View {
     }
     LibraryView(Context context,LibrarySession session,String active,boolean swap,Runnable changed,Runnable folders,Runnable play){
         super(context);s=session;this.active=active;this.swap=swap;this.changed=changed;this.folders=folders;this.play=play;
-        p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));p.setAntiAlias(false);
+        PixelText.configure(context,p);p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
         setContentDescription("Мои игры. Влево и вправо: картридж. Вниз: действия. Y: сохранить выбранную игру в файл .p8.");
     }
     void action(Action a){if(a==Action.PREVIOUS&&s.mode==LibrarySession.Mode.SHELF){play.run();return;}if(a==Action.MENU&&s.mode==LibrarySession.Mode.SHELF){folders.run();return;}s.act(a);changed.run();invalidate();}
     private void rect(float x,float y,float w,float h,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+w,y+h,p);}
     private void outline(float x,float y,float w,float h,int color){rect(x,y,w,3,color);rect(x,y+h-3,w,3,color);rect(x,y,3,h,color);rect(x+w-3,y,3,h,color);}
-    private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(size);c.drawText(value,x,y,p);}
-    private void fit(String value,float x,float y,int size,int color,float max){p.setTextSize(size);while(value.length()>1&&p.measureText(value)>max)value=value.substring(0,value.length()-2)+"…";text(value,x,y,size,color);}
-    private void button(String label,float x,float y,float bw,boolean selected,Runnable run){rect(x,y,bw,44,selected?10:2);fit(label,x+12,y+29,20,selected?1:7,bw-24);hits.add(new Hit(x,y,bw,44,run));}
+    private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(PixelText.size(size));c.drawText(value,x,y,p);}
+    private void fit(String value,float x,float y,int size,int color,float max){p.setTextSize(PixelText.size(size));while(value.length()>1&&p.measureText(value)>max)value=value.substring(0,value.length()-2)+"…";text(value,x,y,size,color);}
+    private void button(String label,float x,float y,float bw,boolean selected,Runnable run){rect(x,y,bw,44,selected?10:2);fit(label,x+12,y+29,PixelText.actionSize(p,label,bw-24),selected?1:7,bw-24);hits.add(new Hit(x,y,bw,44,run));}
     private String ok(){return swap?"B":"A";}
     private String back(){return swap?"A":"B";}
     @Override protected void onDraw(Canvas canvas){
         super.onDraw(canvas);c=canvas;scale=Math.max(1,Math.round(getResources().getDisplayMetrics().density));
         if(getWidth()/scale<360)scale=getWidth()/360f;if(getHeight()/scale<480)scale=getHeight()/480f;
         w=getWidth()/scale;h=getHeight()/scale;c.save();c.scale(scale,scale);hits.clear();
-        rect(0,0,w,h,1);rect(0,0,w,42,2);text("PIKOOS",16,30,28,7);text("твои маленькие миры",170,28,16,14);
+        rect(0,0,w,h,1);rect(0,0,w,42,2);text("PIKOOS",16,30,28,7);if(w>=600)fit("твои маленькие миры",170,28,16,14,w-286);
         rect(w-100,0,100,42,2);text("≡ Папки",w-94,28,18,10);
         hits.add(new Hit(w-100,0,100,42,()->action(Action.MENU)));
-        fit(w<500?"Проекты":"Мои проекты",16,85,26,7,w-262);
-        button("L Играть",w-230,53,120,false,()->action(Action.PREVIOUS));
-        text(s.entries().isEmpty()?"Пока ни одной":(s.selected+1)+" / "+s.entries().size(),w-88,83,18,6);
+        fit(w<500?"Проекты":"Мои проекты",16,85,26,7,w<500?w-180:w-262);
+        button("L Играть",w<500?w-148:w-230,53,w<500?132:120,false,()->action(Action.PREVIOUS));
+        text(s.entries().isEmpty()?"0":(s.selected+1)+" / "+s.entries().size(),w<500?16:w-100,w<500?105:83,18,6);
         int columns=w>=550?3:2,start=s.selected/columns*columns;
         float gap=14,cw=(w-32-gap*(columns-1))/columns,top=112,bottom=h-210,ch=bottom-top;
         for(int col=0;col<columns;col++){
@@ -65,21 +65,21 @@ final class LibraryView extends View {
             artwork(entry.cart,x+(cw-art)/2,top+12,art);
             if(index==s.selected&&s.focus!=0)rect(x+cw-16,top+8,8,8,14);
             fit(entry.title,x+10,bottom-56,22,chosen?10:7,cw-20);
-            fit(entry.cart==null?"Не удалось открыть":entry.id.equals(active)?"Продолжить работу":"Мой проект",x+10,bottom-31,16,entry.cart==null?9:6,cw-20);
+            fit(entry.cart==null?"Ошибка открытия":entry.id.equals(active)?"Продолжить":"Мой проект",x+10,bottom-31,16,entry.cart==null?9:6,cw-20);
             for(int pin=0;pin<8;pin++)rect(x+12+pin*(cw-24)/8,bottom-17,5,7,5);
             hits.add(new Hit(x,top,cw,ch,()->{s.choose(index);changed.run();invalidate();}));
         }
         if(s.entries().isEmpty()){text("Здесь будут твои картриджи",24,185,22,14);text("Начни с маленькой игры ниже",24,219,18,6);}
-        fit("← → выбрать игру · ↓ действия",16,h-189,16,6,w-32);
-        button("+ Новая игра",16,h-168,(w-44)/2,s.focus==1,()->{s.command(1);changed.run();invalidate();});
-        button("Копия выбранной",28+(w-44)/2,h-168,(w-44)/2,s.focus==2,()->{s.command(2);changed.run();invalidate();});
+        fit(w<500?"←→ проект · ↓ действия":"← → выбрать игру · ↓ действия",16,h-189,16,6,w-32);
+        button(w<500?"Новая игра":"+ Новая игра",16,h-168,(w-44)/2,s.focus==1,()->{s.command(1);changed.run();invalidate();});
+        button(w<500?"Копия":"Копия выбранной",28+(w-44)/2,h-168,(w-44)/2,s.focus==2,()->{s.command(2);changed.run();invalidate();});
         button("Импорт .p8",16,h-112,(w-44)/2,s.focus==3,()->{s.command(3);changed.run();invalidate();});
-        button("Сохранить .p8",28+(w-44)/2,h-112,(w-44)/2,s.focus==4,()->{s.command(4);changed.run();invalidate();});
+        button(w<500?"Экспорт .p8":"Сохранить .p8",28+(w-44)/2,h-112,(w-44)/2,s.focus==4,()->{s.command(4);changed.run();invalidate();});
         rect(0,h-44,w,44,0);
-        text(ok()+(s.focus==0?" открыть":s.focus==1?" создать":s.focus==2?" копия":" выбрать"),12,h-16,18,10);text(back()+" мастерская",w<500?120:168,h-16,18,6);
+        text(ok()+(s.focus==0?" открыть":s.focus==1?" создать":s.focus==2?" копия":" выбрать"),12,h-16,18,10);text(back()+" мастерская",168,h-16,18,6);
         if(w>=500)text("Y в файл",w-108,h-16,18,14);
         hits.add(new Hit(0,h-44,116,44,()->action(Action.CONFIRM)));
-        hits.add(new Hit(w<500?120:168,h-44,155,44,()->action(Action.CANCEL)));
+        hits.add(new Hit(168,h-44,155,44,()->action(Action.CANCEL)));
         if(w>=500)hits.add(new Hit(w-116,h-44,116,44,()->action(Action.UNDO)));
         if(s.mode!=LibrarySession.Mode.SHELF)dialog();
         c.restore();
@@ -113,7 +113,7 @@ final class LibraryView extends View {
         float dw=Math.min(w-32,460),x=(w-dw)/2,y=(h-300)/2;
         rect(x,y,dw,300,1);outline(x,y,dw,300,14);
         boolean create=s.mode==LibrarySession.Mode.CREATE;
-        text(create?"Новая маленькая игра":"Не получилось",x+18,y+40,26,create?14:9);
+        fit(create?"Новая игра":"Не получилось",x+18,y+40,26,create?14:9,dw-36);
         if(create){
             String[] titles={"Лунный сад","Чистый лист","Огоньки"};
             String[] descriptions={"Персонаж, прыжок и платформы.","Пустой картридж для своих ресурсов.","Зажги всё поле. Меняй спрайты клеток."};
@@ -127,7 +127,7 @@ final class LibraryView extends View {
             text("Исходные проекты сохранены.",x+18,y+82,18,7);
             String message=s.error;
             for(int row=0;row<4&&!message.isEmpty();row++){
-                p.setTextSize(18);int count=message.length();while(count>1&&p.measureText(message.substring(0,count))>dw-36)count--;
+                p.setTextSize(PixelText.size(18));int count=message.length();while(count>1&&p.measureText(message.substring(0,count))>dw-36)count--;
                 text(message.substring(0,count),x+18,y+119+row*25,18,6);message=message.substring(count);
             }
         }

@@ -22,27 +22,27 @@ final class FolderView extends View {
     private static final String[] HINTS={"Чтение игр. Исходные файлы не меняются.","Место загрузок. Связь со Splore — позже.","Перенос нынешних проектов — отдельный шаг.","Спрайты, музыка и другие ресурсы для повторного использования."};
     FolderView(Context context,FolderSetup session,boolean swap,Runnable changed,Runnable runtime){
         super(context);s=session;this.swap=swap;this.changed=changed;this.runtime=runtime;
-        p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));p.setAntiAlias(false);
+        PixelText.configure(context,p);p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
         setContentDescription("Папки. Вверх и вниз: назначение. A: выбрать папку. X: проверить доступ. B: на полку.");
     }
     void action(Action a){if(a==Action.NEXT&&!s.busy){runtime.run();return;}s.act(a);changed.run();invalidate();}
     private void rect(float x,float y,float width,float height,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+width,y+height,p);}
-    private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(size);c.drawText(value,x,y,p);}
-    private void fit(String value,float x,float y,int size,int color,float max){p.setTextSize(size);while(value.length()>1&&p.measureText(value)>max)value=value.substring(0,value.length()-2)+"…";text(value,x,y,size,color);}
+    private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(PixelText.size(size));c.drawText(value,x,y,p);}
+    private void fit(String value,float x,float y,int size,int color,float max){p.setTextSize(PixelText.size(size));while(value.length()>1&&p.measureText(value)>max)value=value.substring(0,value.length()-2)+"…";text(value,x,y,size,color);}
     @Override protected void onDraw(Canvas canvas){
         c=canvas;scale=Math.max(1,Math.round(getResources().getDisplayMetrics().density));
         scale=Math.min(scale,Math.min(getWidth()/360f,getHeight()/540f));w=getWidth()/scale;h=getHeight()/scale;
         c.save();c.scale(scale,scale);rect(0,0,w,h,1);rect(0,0,w,42,2);
         text("PIKOOS",16,30,28,7);text("R PICO-8",w-114,28,20,14);
         text("Папки мастерской",16,82,28,7);
-        fit("Выбери места. Проекты пока хранятся в приложении.",16,108,17,6,w-32);
+        fit(w<500?"Проекты пока внутри PIKOOS.":"Выбери места. Проекты пока хранятся в приложении.",16,108,17,6,w-32);
         for(int i=0;i<4;i++){
             FolderSetup.Entry e=s.entry(i);float y=124+i*69;boolean selected=s.selected==i;
             rect(16,y,w-32,62,selected?2:0);rect(16,y,4,62,selected?10:13);
-            fit(TITLES[i],30,y+23,21,selected?10:7,w-180);
-            String state=e.state==FolderSetup.State.READY?"Проверена":e.state==FolderSetup.State.CHECKING?"Проверка…":e.state==FolderSetup.State.UNAVAILABLE?"Нет доступа":e.state==FolderSetup.State.UNKNOWN?"Проверить":"Выбрать";
-            fit(state,w-133,y+23,16,e.state==FolderSetup.State.READY?11:e.state==FolderSetup.State.UNAVAILABLE?9:6,100);
+            fit(w<500&&i==3?"Библиотека":TITLES[i],30,y+23,21,selected?10:7,w-190);
+            String state=e.state==FolderSetup.State.READY?"Готово":e.state==FolderSetup.State.CHECKING?"Читаю…":e.state==FolderSetup.State.UNAVAILABLE?"Ошибка":e.state==FolderSetup.State.UNKNOWN?"Проверить":"Выбрать";
+            fit(state,w-145,y+23,16,e.state==FolderSetup.State.READY?11:e.state==FolderSetup.State.UNAVAILABLE?9:6,115);
             fit(e.location.isEmpty()?"Папка ещё не выбрана":e.name,30,y+48,17,6,w-60);
         }
         FolderSetup.Entry e=s.entry(s.selected);

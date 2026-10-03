@@ -52,7 +52,7 @@ final class WorkshopView extends View {
     }
     WorkshopView(Context context, WorkshopSession session, String projectTitle, Runnable changed) {
         super(context); s=session; this.changed=changed;this.projectTitle=projectTitle;
-        p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));
+        PixelText.configure(context,p);
         p.setAntiAlias(false); p.setFilterBitmap(false);
         setFocusable(true); setFocusableInTouchMode(true);
         setContentDescription("Мастерская PIKOOS. Крестовина: выбор, A: подтвердить, B: назад, L/R: инструмент, Start: тест.");
@@ -97,17 +97,17 @@ final class WorkshopView extends View {
     private void outline(float x,float y,float width,float height,int color) {
         rect(x,y,width,2,color);rect(x,y+height-2,width,2,color);rect(x,y,2,height,color);rect(x+width-2,y,2,height,color);
     }
-    private void text(String value,float x,float y,int size,int color) { p.setColor(COLORS[color]);p.setTextSize(size);c.drawText(value,x,y,p); }
-    private float width(String value,int size) { p.setTextSize(size);return p.measureText(value); }
+    private void text(String value,float x,float y,int size,int color) { p.setColor(COLORS[color]);p.setTextSize(PixelText.size(size));c.drawText(value,x,y,p); }
+    private float width(String value,int size) { p.setTextSize(PixelText.size(size));return p.measureText(value); }
     private String ok(){return s.swapAB?"B":"A";}
     private String back(){return s.swapAB?"A":"B";}
     private void fitted(String value,float x,float y,int size,int color,float max) {
-        p.setTextSize(size);
+        p.setTextSize(PixelText.size(size));
         while(value.length()>1 && p.measureText(value)>max) value=value.substring(0,value.length()-2)+"…";
         text(value,x,y,size,color);
     }
     private void button(String label,float x,float y,float bw,float bh,boolean focus,Runnable run) {
-        rect(x,y,bw,bh,focus?10:0); fitted(label,x+10,y+bh/2+7,20,focus?1:7,bw-20); hit(x,y,bw,bh,run);
+        rect(x,y,bw,bh,focus?10:0); fitted(label,x+10,y+bh/2+7,PixelText.actionSize(p,label,bw-20),focus?1:7,bw-20); hit(x,y,bw,bh,run);
     }
     @Override protected void onDraw(Canvas canvas) {
         super.onDraw(canvas); c=canvas;
@@ -134,7 +134,8 @@ final class WorkshopView extends View {
         String[] tabs={"Мастерская","[ ] Код","Спрайты"};
         for(int i=0;i<3;i++) { final int tab=i;float x=12+i*(w-24)/3,tw=(w-24)/3;
             rect(x,100,tw-3,40,s.tool==i?14:1);
-            float tx=x+(tw-width(tabs[i],20))/2;text(tabs[i],tx,128,20,s.tool==i?1:7);
+            String title=w<500&&i==0?"Обзор":tabs[i];
+            float tx=x+(tw-width(title,20))/2;text(title,tx,128,20,s.tool==i?1:7);
             hit(x,100,tw,40,()->{s.switchTool(tab);changed.run();invalidate();});
         }
         rect(0,140,w,4,0);
@@ -202,6 +203,7 @@ final class WorkshopView extends View {
         if(s.mode!=Mode.REGION)key("START тест",w-126,bodyBottom,14,()->action(Action.TEST));
     }
     private void key(String label,float x,float y,int color,Runnable run) {
+        if(w<500)label=label.replace(" выбрать"," выбор").replace(" сохранить"," сохр.").replace("START готово","START OK");
         text(label,x,y+28,18,color);hit(x,y,width(label,18)+8,44,run);
     }
     private void workshop() {
@@ -320,9 +322,10 @@ final class WorkshopView extends View {
         boolean keys=d.panel==LuaDraft.Panel.KEYS,menu=d.panel==LuaDraft.Panel.MENU,exit=d.panel==LuaDraft.Panel.EXIT;
         String position=(d.line()+1)+":"+(d.column()+1)+(d.anchor()>=0?" · выделение":"");
         text(position,16,99,16,10);
-        fitted(keys?"Набор текста":menu?"Правки":exit?"Закрыть черновик?":"Крестовина: курсор",w/2,99,16,14,w/2-16);
+        fitted(keys?"Набор текста":menu?"Правки":exit?"Закрыть черновик?":w<500?"Курсор ↑↓←→":"Крестовина: курсор",w/2,99,16,14,w/2-16);
         float bottom=keys?bodyBottom-240:bodyBottom-106;
-        int rows=Math.max(2,(int)((bottom-112)/24)),columns=Math.max(12,(int)((w-70)/12));
+        float advance=(float)Math.ceil(width("M",20));
+        int rows=Math.max(2,(int)((bottom-112)/24)),columns=Math.max(12,(int)((w-70)/advance));
         int top=Math.max(0,Math.min(d.line()-rows/2,d.lineCount()-rows));
         int left=Math.max(0,d.column()-columns+4);
         rect(12,108,w-24,bottom-108,0);
@@ -334,15 +337,15 @@ final class WorkshopView extends View {
             String source=d.lineText(line);int count=source.codePointCount(0,source.length());
             for(int col=left;col<Math.min(count,columns+left);col++){
                 int from=source.offsetByCodePoints(0,col),to=source.offsetByCodePoints(from,1),absolute=d.lineStart(line)+from;
-                float x=58+(col-left)*12;
-                if(absolute>=d.selectionStart()&&absolute<d.selectionEnd())rect(x,y,12,24,4);
+                float x=58+(col-left)*advance;
+                if(absolute>=d.selectionStart()&&absolute<d.selectionEnd())rect(x,y,advance,24,4);
                 String glyph=source.substring(from,to);if(glyph.equals("\t"))glyph="→";
                 text(glyph,x,y+19,20,source.trim().startsWith("--")?13:7);
             }
-            if(line==d.line())rect(58+(d.column()-left)*12,y+2,2,21,10);
+            if(line==d.line())rect(58+(d.column()-left)*advance,y+2,2,21,10);
             final int viewLeft=left;
             for(int col=0;col<columns;col++){final int column=viewLeft+col;
-                hit(58+col*12,y,12,24,()->{if(s.mode!=Mode.CODE||d.panel!=LuaDraft.Panel.CURSOR)return;d.point(line,column);changed.run();invalidate();});}
+                hit(58+col*advance,y,advance,24,()->{if(s.mode!=Mode.CODE||d.panel!=LuaDraft.Panel.CURSOR)return;d.point(line,column);changed.run();invalidate();});}
         }
         c.restore();
         if(keys){
@@ -359,15 +362,15 @@ final class WorkshopView extends View {
             fitted("Y: отменить ввод · START: сохранить и тест",16,bodyBottom-12,16,13,w-32);
         }else{
             button(ok()+" Ввод",16,bottom+12,(w-40)/2,36,false,()->action(Action.CONFIRM));
-            button("X Вставить Lua",24+(w-40)/2,bottom+12,(w-40)/2,36,false,()->action(Action.CONTEXT));
+            button(w<500?"X Вставка":"X Вставить Lua",24+(w-40)/2,bottom+12,(w-40)/2,36,false,()->action(Action.CONTEXT));
             float hint=(w-32)/3;
             fitted("L: поля",16,bodyBottom-36,16,14,hint-4);
             hit(16,bodyBottom-54,hint,26,()->action(Action.PREVIOUS));
-            fitted("R: перейти",16+hint,bodyBottom-36,16,12,hint-4);
+            fitted(w<500?"R:найти":"R: перейти",16+hint,bodyBottom-36,16,12,hint-4);
             hit(16+hint,bodyBottom-54,hint,26,()->action(Action.NEXT));
-            fitted("L2: проверка",16+hint*2,bodyBottom-36,16,11,hint-4);
+            fitted(w<500?"L2:проба":"L2: проверка",16+hint*2,bodyBottom-36,16,11,hint-4);
             hit(16+hint*2,bodyBottom-54,hint,26,()->action(Action.CHECK));
-            fitted(d.dirty()?"Черновик · Select: правки · START: тест":"Без изменений · Select: правки · START: тест",16,bodyBottom-13,16,6,w-32);
+            fitted(w<500?(d.dirty()?"Черновик":"Сохранено")+" · Select: правки":d.dirty()?"Черновик · Select: правки · START: тест":"Без изменений · Select: правки · START: тест",16,bodyBottom-13,16,6,w-32);
         }
         rect(0,bodyBottom,w,44,0);
         key(ok()+(keys?" символ":" ввод"),12,bodyBottom,10,()->action(Action.CONFIRM));
@@ -523,7 +526,7 @@ final class WorkshopView extends View {
         if(d.callEdit!=null){fitted("Было: "+d.callEdit.original.trim(),24,previewY+46,16,6,w-48);fitted("Будет: "+d.callEdit.preview(i).trim(),24,previewY+70,16,10,w-48);}
         else {int line=0;for(String row:i.code().split("\n")){fitted(row,24,previewY+46+line*22,18,7,w-48);line++;}}
         c.restore();
-        fitted("↑↓ поле · ←→ значение · "+ok()+" ввод / "+(d.callEdit!=null?"правка":"вставка"),16,bodyBottom-12,16,6,w-32);
+        fitted(w<500?"↑↓ поле  ←→ менять  "+ok()+" ввод":"↑↓ поле · ←→ значение · "+ok()+" ввод / "+(d.callEdit!=null?"правка":"вставка"),16,bodyBottom-12,16,6,w-32);
         rect(0,bodyBottom,w,44,0);
         key(ok()+" выбрать",12,bodyBottom,10,()->action(Action.CONFIRM));
         key(back()+" назад",w/3,bodyBottom,6,()->action(Action.CANCEL));
@@ -688,7 +691,7 @@ final class WorkshopView extends View {
         text("Название спрайта",16,78,26,14);
         text(e.text().length()+" / 80",w-92,78,18,6);
         rect(16,96,w-32,48,e.replaceAll?10:0);outline(16,96,w-32,48,10);
-        String shown=e.text();p.setTextSize(26);
+        String shown=e.text();p.setTextSize(PixelText.size(26));
         while(shown.length()>1&&width(shown+(e.replaceAll?"":"_"),26)>w-58)shown=shown.substring(shown.offsetByCodePoints(0,1));
         text(shown+(e.replaceAll?"":"_"),26,129,26,e.replaceAll?1:7);
         fitted(e.warning.isEmpty()?(e.replaceAll?"Выделено всё · новая буква заменит название":"Ввод в конец · символ «·» вводит пробел"):e.warning,16,165,16,e.warning.isEmpty()?6:8,w-32);

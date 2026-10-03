@@ -1,5 +1,10 @@
 # PIKOOS Android host experiment
 
+Version 0.0.41 replaces Tiny5 UI text with Monocraft, raises small text to an
+18-unit minimum and adapts compact actions. Lua caret/selection/touch spacing
+uses the actual font advance; ligatures are disabled. Runtime Test 8 shares
+the readable menu font. [Typography and device evidence](../../docs/design/android-type-41/README.md).
+
 Version 0.0.40 adds bounded rule fields through L / Select → Current line fields:
 `if`/`elseif` headers, simple `=`/`+=` assignments and initialized local variables.
 Simple comparisons expose left/operator/right; numbers and operators use arrows.
@@ -355,8 +360,10 @@ The experiment has no library dependencies and includes no PICO-8 binary.
   destination image pixels.
   This deliberately handles the owned template, not arbitrary imported carts.
 - `assets/workshop.p8`: original diagnostic fixture, retained for regression.
-- `assets/Tiny5-Regular.ttf` and `OFL.txt`: Tiny5, SIL Open Font License;
-  same Cyrillic-capable pixel font as the approved study, from google/fonts.
+- `assets/Monocraft.ttf` and `Monocraft-OFL.txt`: current UI font, Idrees Hassan,
+  SIL OFL 1.1; pinned source and hash in the typography evidence above.
+- `assets/Tiny5-Regular.ttf` and `OFL.txt`: retained prior Tiny5 resource,
+  SIL Open Font License, from google/fonts.
 - `tests/`: executable byte-preservation/validation checks with no Android SDK.
 
 The host requests no storage, network or privileged permissions. A scoped

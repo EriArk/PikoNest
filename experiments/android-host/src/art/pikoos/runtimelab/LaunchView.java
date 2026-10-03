@@ -13,13 +13,13 @@ final class LaunchView extends View {
     private final Paint paint=new Paint();private float scale,w,h;private Canvas c;
     LaunchView(Context context,ControllerInput.Sink sink,boolean swap){
         super(context);this.sink=sink;this.swap=swap;
-        paint.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));paint.setAntiAlias(false);
+        PixelText.configure(context,paint);paint.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
     }
     private void box(float x,float y,float width,float height,int color){paint.setColor(PicoPalette.COLORS[color]);c.drawRect(x,y,x+width,y+height,paint);}
-    private void text(String value,float x,float y,int size,int color){paint.setColor(PicoPalette.COLORS[color]);paint.setTextSize(size);c.drawText(value,x,y,paint);}
+    private void text(String value,float x,float y,int size,int color){paint.setColor(PicoPalette.COLORS[color]);paint.setTextSize(PixelText.size(size));c.drawText(value,x,y,paint);}
     private void wrapped(String value,float y){
-        paint.setTextSize(20);String line="";
+        paint.setTextSize(PixelText.size(20));String line="";
         for(String word:value.split(" ")){
             if(paint.measureText(line+word)>w-48&&!line.isEmpty()){text(line,24,y,20,7);y+=27;line="";}
             while(paint.measureText(word)>w-48){int n=1;while(n<word.length()&&paint.measureText(word.substring(0,n+1))<w-48)n++;text(word.substring(0,n),24,y,20,7);y+=27;word=word.substring(n);}

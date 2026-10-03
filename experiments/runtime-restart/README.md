@@ -5,6 +5,10 @@
 This remains a separate Android research adapter, not a production runtime
 architecture or a new framework choice for PIKOOS.
 
+Revision 8 (`1.6.6-pikoos.8`, host 0.0.41) changes only our menu typography to
+Monocraft/OFL and shortens two explanations to fit. Session/input/exit behavior
+is unchanged. [Native and compact evidence](../../docs/design/android-type-41/README.md).
+
 ## Session return (adapter revision 7)
 
 `1.6.6-pikoos.7` / host 0.0.38 adds a signature-gated `beginSession` provider call
@@ -32,7 +36,7 @@ Activity receives a delegating `Window.Callback`. Host dispatch explicitly opts
 into the menu and supplies its A/B preference. Unhandled gameplay input and other
 window callbacks retain the upstream route. Direct wrapper setup/probe are unchanged.
 
-Select/Android Back opens a native Canvas menu with the host's Tiny5 font/OFL and
+Select/Android Back opens a native Canvas menu with the host's pixel font/OFL and
 PICO-8 palette. The portable `RuntimeMenu` owns safe selection and exit intent.
 Native transport sends ordinary Ctrl+Q through Godot after the dialog releases
 focus. It never kills processes or force-finishes the Activity. A four-second
