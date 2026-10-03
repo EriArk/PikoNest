@@ -39,7 +39,7 @@ final class PlayView extends View {
             int index=start+col;if(index>=s.games().size())break;final int chosen=index;PlaySession.Game g=s.games().get(index);
             float x=16+col*(cw+gap);boolean selected=index==s.selected;
             rect(x,top,cw,ch,selected?14:13);rect(x+3,top+3,cw-6,ch-6,0);
-            float size=Math.min(cw-22,ch-78),cx=x+(cw-size)/2,cy=top+12;
+            float size=Math.min(cw-22,ch-94),cx=x+(cw-size)/2,cy=top+12;
             if(g.cover!=null){float cell=size/128;for(int py=0;py<128;py++)for(int px=0;px<128;px++){p.setColor(g.cover[py*128+px]);c.drawRect(cx+px*cell,cy+py*cell,cx+(px+1)*cell+.01f,cy+(py+1)*cell+.01f,p);}}
             else{
                 rect(cx,cy,size,size,1);float u=size/64;
@@ -48,7 +48,8 @@ final class PlayView extends View {
                 rect(cx+20*u,cy+44*u,24*u,6*u,5);
             }
             if(g.favorite){String[] heart={"0110110","1111111","1111111","0111110","0011100","0001000"};for(int hy=0;hy<6;hy++)for(int hx=0;hx<7;hx++)if(heart[hy].charAt(hx)=='1')rect(x+cw-27+hx*3,top+8+hy*3,3,3,10);}
-            fit(g.title,x+10,bottom-42,21,selected?10:7,cw-20);
+            fit(g.title,x+10,bottom-58,21,selected?10:7,cw-20);
+            fit(g.folder.isEmpty()?"Корень папки":g.folder,x+10,bottom-38,15,6,cw-20);
             fit(!g.problem.isEmpty()?"Пока недоступно":g.format.extension+(g.recent>0?" · играли":" · PICO-8"),x+10,bottom-18,15,!g.problem.isEmpty()?9:6,cw-20);
             hits.add(new Hit(x,top,cw,ch,()->{s.select(chosen);changed.run();invalidate();}));
         }

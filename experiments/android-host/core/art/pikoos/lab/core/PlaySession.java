@@ -6,12 +6,13 @@ import art.pikoos.lab.core.WorkshopSession.Action;
 /** Game library, not editable projects. IDs are opaque storage handles. */
 public final class PlaySession {
     public static final class Game {
-        public final String id,title,problem;
+        public final String id,title,problem,folder;
         public final int[] cover;
         public final CartridgeFormat format;
         public boolean favorite;public long recent;
         public Game(String id,String title,String problem,int[] cover,boolean favorite,long recent){this(id,title,problem,cover,favorite,recent,CartridgeFormat.P8);}
-        public Game(String id,String title,String problem,int[] cover,boolean favorite,long recent,CartridgeFormat format){this.id=id;this.title=title;this.problem=problem;this.cover=cover;this.favorite=favorite;this.recent=recent;this.format=format;}
+        public Game(String id,String title,String problem,int[] cover,boolean favorite,long recent,CartridgeFormat format){this(id,title,problem,cover,favorite,recent,format,"");}
+        public Game(String id,String title,String problem,int[] cover,boolean favorite,long recent,CartridgeFormat format,String folder){this.id=id;this.title=title;this.problem=problem;this.cover=cover;this.favorite=favorite;this.recent=recent;this.format=format;this.folder=folder;}
     }
     public interface Port {
         void launch(Game game);void refresh();void workshop();void folders();
@@ -28,7 +29,9 @@ public final class PlaySession {
     public void replace(List<Game> games,String preferred){all=new ArrayList<>(games);rebuild(preferred);busy=false;error="";}
     public void rebuild(String preferred){
         visible=new ArrayList<>();for(Game g:all)if(filter==0||filter==1&&g.recent>0||filter==2&&g.favorite)visible.add(g);
-        visible.sort(filter==1?(a,b)->{int n=Long.compare(b.recent,a.recent);return n!=0?n:a.title.compareToIgnoreCase(b.title);}:(a,b)->a.title.compareToIgnoreCase(b.title));
+        Comparator<Game> order=Comparator.comparing((Game g)->g.title,String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(g->g.folder,String.CASE_INSENSITIVE_ORDER).thenComparing(g->g.format.extension).thenComparing(g->g.id);
+        visible.sort(filter==1?Comparator.comparingLong((Game g)->g.recent).reversed().thenComparing(order):order);
         selected=0;for(int i=0;i<visible.size();i++)if(visible.get(i).id.equals(preferred))selected=i;
     }
     public void select(int index){if(!busy&&!visible.isEmpty()){selected=Math.max(0,Math.min(visible.size()-1,index));error="";}}

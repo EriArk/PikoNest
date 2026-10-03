@@ -136,6 +136,11 @@ The reproduced audio startup race is fixed in a separate test runtime adapter;
 this two-APK development setup is not final product packaging. See the
 [runtime experiment](../experiments/runtime-restart/README.md).
 
-Next: nested libraries and dependency-aware staging, followed by complete first-run
+Lab 0.0.26 adds nested Games indexing with relative folder captions and stable
+document identities. A failed child folder leaves other games available; traversal
+is bounded and old scans stop cooperatively when leaving the shelf. Device/core
+checks and remaining limits: [nested library evidence](design/android-nested-26/README.md).
+
+Next: dependency-aware staging, followed by complete first-run
 runtime setup. Device/layout checks accompany each UI slice.
 These are Android release requirements, not optional post-release Linux work.

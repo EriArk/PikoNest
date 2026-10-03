@@ -1,7 +1,13 @@
 # PIKOOS Android host experiment
 
+Version 0.0.26 indexes the Games tree recursively, showing each cart's relative
+folder and preserving opaque document IDs for selection, favorites and recency.
+Portable breadth-first traversal handles cycles, unreadable children and bounded
+work. Leaving Play or destroying its Activity cancels further scan work between
+provider operations. [Scope and device evidence](../../docs/design/android-nested-26/README.md).
+
 Runtime adapter revision 2 fixes replay of the initial game request after an
-interrupted boot/resume. Host remains 0.0.25; update the separate Runtime Test APK
+interrupted boot/resume. It works with host 0.0.25 and later; update the separate Runtime Test APK
 in place. [Build and scope](../runtime-restart/README.md) ·
 [Device evidence](../../docs/design/android-resume-25/README.md).
 
@@ -37,7 +43,8 @@ Favorites, recent launch timestamps and selection survive recreation. Launch rea
 fresh bytes; stale workers cannot launch after leaving. Runtime return preserves
 Play selection, including host process death, while editor testing stays separate.
 
-Scope: one directory level, up to 128 carts/2,048 entries, 2 MiB per cart.
+Current scope: root plus 16 subfolder levels, up to 128 carts/2,048 entries across
+the whole traversal, 2 MiB per cart. Partial results are explicitly reported.
 Dependencies remain unsupported. Conservative text hints identify
 includes/direct file calls (except empty `reload()`); this is not a complete Lua
 dependency analysis. These are PIKOOS lab limits, not PICO-8 limits. Recent means

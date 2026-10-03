@@ -58,7 +58,7 @@ public final class MainActivity extends Activity {
     private SharedPreferences playPrefs;
     private PlaySession play;
     private PlayView playView;
-    private int playGeneration;
+    private volatile int playGeneration;
     private static final int PICK_FOLDER=43;
     private String activeId="moon-garden";
     private String activeTitle="Лунный сад";
@@ -226,14 +226,16 @@ public final class MainActivity extends Activity {
         final android.content.ContentResolver resolver=getApplicationContext().getContentResolver();
         new Thread(()->{
             GameFolder.Listing result=null;String failure=null;
-            try{result=GameFolder.list(resolver,location,playPrefs);}catch(Exception e){failure="Папка недоступна · Select: подключить снова";Log.w(TAG,"Game scan failed",e);}
+            try{result=GameFolder.list(resolver,location,playPrefs,()->generation!=playGeneration);}
+            catch(java.util.concurrent.CancellationException e){return;}
+            catch(Exception e){failure="Папка недоступна · Select: подключить снова";Log.w(TAG,"Game scan failed",e);}
             final GameFolder.Listing ready=result;final String error=failure;
             runOnUiThread(()->{
                 if(isDestroyed()||!showingPlay||generation!=playGeneration||target!=play)return;
                 if(error!=null){target.replace(java.util.Collections.emptyList(),"");target.fail(error);}
                 else{
                     target.replace(ready.games,playPrefs.getString("selected",""));
-                    target.notice=ready.limited?"Показана часть папки · лимит полки 128 игр":ready.folders>0?"Подпапки пока не читаем · выбери нужную через Select":"Игры из выбранной папки · оригиналы сохранены";
+                    target.notice=ready.limited?"Часть игр не показана · выбери папку точнее":ready.unreadable>0?"Не прочитано подпапок: "+ready.unreadable+" · L: повторить":"Игры из папки и подпапок · оригиналы сохранены";
                 }
                 playView.invalidate();
             });
@@ -385,7 +387,7 @@ public final class MainActivity extends Activity {
         shelf.invalidate();
     }
     @Override public Object onRetainNonConfigurationInstance(){return exportJob;}
-    @Override protected void onDestroy(){if(exportJob!=null)exportJob.detach(exportListener);super.onDestroy();}
+    @Override protected void onDestroy(){playGeneration++;if(exportJob!=null)exportJob.detach(exportListener);super.onDestroy();}
     private void saveCart(AtomicFile target,byte[] bytes)throws Exception{
         FileOutputStream out=null;
         try{out=target.startWrite();out.write(bytes);target.finishWrite(out);}

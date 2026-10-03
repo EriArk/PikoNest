@@ -8,11 +8,17 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest runtime fix (host 0.0.25, adapter revision 2): interrupted native boot →
+Latest bounded slice (host 0.0.26): Play indexes Games and its subfolders, shows
+relative folder names, and keeps selection/favorites/recent launches per document.
+Traversal, limits and cancellation live in the portable core. See
+[nested library evidence](design/android-nested-26/README.md).
+Next: dependency-aware staging, then integrated runtime setup.
+
+Previous runtime fix (host 0.0.25, adapter revision 2): interrupted native boot →
 return to the same process → working input and preserved game state. The wrapper
 now records the consumed cold intent before launch, avoiding a spurious restart
-on first resume. Beacon/Retroid flows are checked again. Next: nested libraries
-and dependency-aware staging. [Device evidence](design/android-resume-25/README.md).
+on first resume. Beacon/Retroid flows are checked again.
+[Device evidence](design/android-resume-25/README.md).
 
 Previous bounded lab step (0.0.25): select a cart in Beacon or Retroid Launcher →
 PIKOOS external entry → official runtime → return to the calling shelf. Scoped
@@ -129,8 +135,8 @@ The sequence is a working plan, not a delivery-date or feasibility promise for
 experimental online features. Stage acceptance does not follow automatically from
 tests/screenshots: user-facing behavior and physical ergonomics need review.
 
-**Next slice after the runtime audio fix:** implement external launcher entry/return,
-then nested libraries/dependency handling and the runtime setup wizard. Continue
+**Next slice after nested libraries:** dependency-aware cart/file staging,
+then the runtime setup wizard. Continue
 lifecycle/device/layout checks with each slice; the test adapter does not close
 production runtime ownership, diagnostics or packaging.
 Verified project/data migration remains a foundation task. Do not move existing
