@@ -7,7 +7,7 @@ import java.util.Arrays;
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, REDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE, OVAL, FILLED_OVAL }
     // Keep existing operation entries 5/6 stable while adding brushes after them.
     public static int moveMenuIndex(){return DrawTool.values().length+2;}
@@ -19,6 +19,7 @@ public final class WorkshopSession {
     }
     public interface Port {
         void save(byte[] bytes) throws Exception;
+        default void save(byte[] expected,byte[] bytes)throws Exception{save(bytes);}
         void launch(byte[] bytes) throws Exception;
         default void library() throws Exception {}
         default java.util.List<SpriteAsset> assets()throws Exception{return java.util.Collections.emptyList();}
@@ -31,6 +32,87 @@ public final class WorkshopSession {
     private final ArrayDeque<WorkshopCartridge> redo = new ArrayDeque<>();
     private final int[] toolFocus = new int[3];
     private WorkshopCartridge cart;
+    public LuaDraft codeDraft;
+    public int codeColumn;
+    public void restoreCode(byte[] bytes){codeDraft=LuaDraft.restore(bytes);tool=1;mode=Mode.CODE;}
+    private void beginCode(){codeDraft=new LuaDraft(cart,codeLine);codeDraft.point(codeLine,codeColumn);mode=Mode.CODE;}
+    private void finishCode(boolean test)throws Exception{
+        WorkshopCartridge candidate=codeDraft.edit().candidate(cart);
+        save(candidate,true);codeLine=codeDraft.line();codeColumn=codeDraft.column();codeDraft=null;mode=Mode.NAVIGATE;
+        if(test)port.launch(cart.bytes());
+    }
+    private void leaveCode(){
+        if(codeDraft.dirty()){codeDraft.panel=LuaDraft.Panel.EXIT;codeDraft.menu=0;}
+        else{codeLine=codeDraft.line();codeColumn=codeDraft.column();codeDraft=null;mode=Mode.NAVIGATE;}
+    }
+    public void codeCommand(int command){
+        if(mode!=Mode.CODE||codeDraft==null)return;
+        try{
+            LuaDraft d=codeDraft;
+            switch(command){
+                case 0:finishCode(false);return;
+                case 1:finishCode(true);return;
+                case 2:d.insertNewline();break;
+                case 3:d.replace(" ");break;
+                case 4:d.replace("\t");break;
+                case 5:d.erase(false);break;
+                case 6:d.erase(true);break;
+                case 7:d.select();break;
+                case 8:d.selectAll();break;
+                case 9:d.copy();break;
+                case 10:d.cut();break;
+                case 11:d.paste();break;
+                case 12:d.history(false);break;
+                case 13:d.history(true);break;
+                case 14:d.home();break;
+                case 15:d.end();break;
+                case 16:leaveCode();return;
+                case 17:d.changePage(1);d.panel=LuaDraft.Panel.KEYS;return;
+                default:return;
+            }
+            d.panel=LuaDraft.Panel.CURSOR;
+        }catch(Exception e){fail(e);}
+    }
+    public void codeText(String value){if(mode==Mode.CODE&&codeDraft!=null&&codeDraft.panel!=LuaDraft.Panel.EXIT)try{codeDraft.replace(value);}catch(Exception e){fail(e);}}
+    private void codeAction(Action action)throws Exception{
+        LuaDraft d=codeDraft;
+        if(d.panel==LuaDraft.Panel.EXIT){
+            if(action==Action.UP)d.menu=Math.max(0,d.menu-1);
+            if(action==Action.DOWN)d.menu=Math.min(2,d.menu+1);
+            if(action==Action.CANCEL)d.panel=LuaDraft.Panel.CURSOR;
+            if(action==Action.CONFIRM){
+                if(d.menu==0)d.panel=LuaDraft.Panel.CURSOR;
+                if(d.menu==1)finishCode(false);
+                if(d.menu==2){codeLine=d.line();codeColumn=d.column();codeDraft=null;mode=Mode.NAVIGATE;notice="Черновик отменён";}
+            }
+            return;
+        }
+        if(action==Action.TEST){finishCode(true);return;}
+        if(action==Action.UNDO){d.history(false);return;}
+        if(action==Action.REDO){d.history(true);return;}
+        if(action==Action.MENU||action==Action.CONTEXT){
+            d.panel=d.panel==LuaDraft.Panel.MENU?LuaDraft.Panel.CURSOR:LuaDraft.Panel.MENU;d.menu=0;return;
+        }
+        if(d.panel==LuaDraft.Panel.MENU){
+            if(action==Action.UP)d.menu=Math.max(0,d.menu-1);
+            if(action==Action.DOWN)d.menu=Math.min(LuaDraft.COMMANDS.length-1,d.menu+1);
+            if(action==Action.CONFIRM)codeCommand(d.menu);
+            if(action==Action.CANCEL)d.panel=LuaDraft.Panel.CURSOR;
+            return;
+        }
+        if(d.panel==LuaDraft.Panel.KEYS){
+            if(action==Action.UP)d.moveKey(0,-1);if(action==Action.DOWN)d.moveKey(0,1);
+            if(action==Action.LEFT)d.moveKey(-1,0);if(action==Action.RIGHT)d.moveKey(1,0);
+            if(action==Action.PREVIOUS)d.changePage(-1);if(action==Action.NEXT)d.changePage(1);
+            if(action==Action.CONFIRM)d.typeKey();
+            if(action==Action.CANCEL)d.panel=LuaDraft.Panel.CURSOR;
+            return;
+        }
+        if(action==Action.UP)d.move(0,-1);if(action==Action.DOWN)d.move(0,1);
+        if(action==Action.LEFT)d.move(-1,0);if(action==Action.RIGHT)d.move(1,0);
+        if(action==Action.CONFIRM)d.panel=LuaDraft.Panel.KEYS;
+        if(action==Action.CANCEL)leaveCode();
+    }
     public SpriteMove move;
     private Mode moveReturn=Mode.CANVAS;
     public String moveReturnMode(){return moveReturn.name();}
@@ -251,7 +333,9 @@ public final class WorkshopSession {
     private static int clamp(int n, int max) { return Math.max(0, Math.min(max, n)); }
     private void save(WorkshopCartridge next, boolean remember) throws Exception {
         if (Arrays.equals(next.bytes(), cart.bytes())) return;
-        port.save(next.bytes()); // Publish state only after durable storage succeeds.
+        CartEdit operation=new CartEdit(cart,next);
+        next=operation.candidate(cart);
+        port.save(cart.bytes(),next.bytes()); // Publish state only after durable storage succeeds.
         if (remember) {
             if (undo.size() == 32) undo.removeLast();
             undo.push(cart);
@@ -262,7 +346,7 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = mode==Mode.CODE||mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
         if(pendingStroke())return;
@@ -367,6 +451,7 @@ public final class WorkshopSession {
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if(mode==Mode.CODE){codeAction(action);return;}
             if(mode==Mode.MOVE){
                 if(action==Action.UP)move.step(0,-1);if(action==Action.DOWN)move.step(0,1);
                 if(action==Action.LEFT)move.step(-1,0);if(action==Action.RIGHT)move.step(1,0);
@@ -629,9 +714,7 @@ public final class WorkshopSession {
                 if (action == Action.LEFT) codeLine = clamp(codeLine - 8, max);
                 if (action == Action.RIGHT) codeLine = clamp(codeLine + 8, max);
                 if (action == Action.CONFIRM) {
-                    if (codeLine == cart.line(0)) edit(0);
-                    else if (codeLine == cart.line(1)) edit(1);
-                    else notice = cart.hasHero()?"Пока изменяются speed и jump":"Код открыт для просмотра";
+                    beginCode();
                 }
                 return;
             }

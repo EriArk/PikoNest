@@ -7,6 +7,8 @@ This document defines architectural boundaries and the intended shape of the sys
 Where a detail is still experimental, it is marked as such.
 
 Current inventory (2026-10-03, lab 0.0.30 / adapter 4): see [STATUS](STATUS.md).
+The subsequent 0.0.31 [editor decision](EDITOR_FOUNDATION.md) introduces portable
+LuaDraft/CartEdit, a compare-before-write storage port and a controller editing view.
 Implementation order and tracked gaps live in [ROADMAP](ROADMAP.md) and
 [BACKLOG](BACKLOG.md). Dated lab subsections below retain the scope of those
 versions; they are not a claim that later work is still absent or that the

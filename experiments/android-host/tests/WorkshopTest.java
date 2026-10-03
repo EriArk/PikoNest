@@ -48,7 +48,7 @@ public final class WorkshopTest {
         check(s.mode==Mode.ERROR&&s.cart().value(0)==2,"failed write cannot publish edited model");
         check(!s.canUndo(),"failed write cannot add undo entry");
         port.fail=false;s.act(Action.CANCEL);s.act(Action.NEXT);
-        s.selectCodeLine(s.cart().line(1));s.act(Action.LEFT);s.act(Action.CONFIRM);
+        s.selectCodeLine(s.cart().line(1));s.codeDraft.end();s.codeDraft.erase(false);s.codeText("2");s.codeCommand(0);
         check(s.cart().value(1)==2,"code parameter changes real Lua");
         s.act(Action.NEXT);s.act(Action.CONFIRM);s.act(Action.CONFIRM);check(s.mode==Mode.CANVAS,"controller enters canvas through sheet");
         int oldX=s.cursorX,oldY=s.cursorY,original=s.cart().pixel(oldX+1,oldY);

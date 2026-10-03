@@ -1,5 +1,13 @@
 # PIKOOS Android host experiment
 
+Version 0.0.31 adds general literal Lua editing through a controller-operated
+character palette, cursor, selection, internal clipboard and edit menu. A draft
+can be cancelled/recovered or committed as one project history operation; Test
+saves before launch. Existing sections remain byte-preserved. This is C01.1,
+without structural insertion/API completion or full P8SCII input.
+[Device checks and limits](../../docs/design/android-code-31/README.md) ·
+[Editor foundation](../../docs/EDITOR_FOUNDATION.md).
+
 Version 0.0.30 adds an isolated test launch from the verified runtime ZIP. In
 Folders → R PICO-8, A prepares/tests the candidate, X chooses another ZIP and Y
 rechecks it. Runtime Test revision 4 with the same signing identity is required.

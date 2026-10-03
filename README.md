@@ -83,12 +83,12 @@ my-game/
 
 ## Status
 
-As of 2026-10-03, host 0.0.30 / Runtime Test 4 is a working Android lab, not a
+As of 2026-10-03, host 0.0.31 / Runtime Test 4 is a working Android lab, not a
 complete game creator. It demonstrates Play/external launch, bounded linked-cart
-launch, sprite editing/reuse, single `.p8` import/export, session undo/redo and an
+launch, sprite editing/reuse, controller Lua drafts, single `.p8` import/export, session undo/redo and an
 isolated test of the user's purchased runtime archive.
 
-General Lua editing, map/animation/background tools, SFX/music, reusable mechanics,
+Structural/API-assisted Lua editing, map/animation/background tools, SFX/music, reusable mechanics,
 complete project recovery, production setup and the full creation loop remain open.
 The next creator milestone is a real game authored from a blank cart through
 PIKOOS with handheld controls, then tested and exported as ordinary PICO-8.
@@ -99,16 +99,16 @@ PIKOOS with handheld controls, then tested and exported as ordinary PICO-8.
 - [End-to-end acceptance](docs/ACCEPTANCE.md)
 - [Historical roadmap and lab milestones](docs/ROADMAP_HISTORY.md)
 - [Reproducible Android host and slice history](experiments/android-host/README.md)
-- [Latest device evidence](docs/design/android-runtime-probe-30/README.md)
+- [Latest editor device evidence](docs/design/android-code-31/README.md)
 
 The owner approved the PICO-8 visual direction, not the completeness of the
 application. APK GitHub releases/prereleases require explicit confirmation that
 the owner is fully satisfied and authorizes release. Development APKs stay local.
 Linux and optional online research do not block the local Android product.
 
-The production framework remains an explicit architecture decision (A01), not an
-implicit commitment made by the experimental Java/Canvas host. Core and platform
-boundaries stay portable.
+The [bounded editor decision](docs/EDITOR_FOUNDATION.md) retains Java/Canvas for
+the next creator slices and puts editing state/operations in portable core.
+Production wrapper delivery and the future Linux UI remain explicit decisions.
 
 Owner-provided PICO-8 archives in [dev-runtime](dev-runtime/README.md) are private
 development inputs; they must never enter application packages or public releases.

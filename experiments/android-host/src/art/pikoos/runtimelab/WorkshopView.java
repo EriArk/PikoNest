@@ -17,6 +17,9 @@ import art.pikoos.lab.core.SpriteRegion;
 import art.pikoos.lab.core.SpriteMove;
 import art.pikoos.lab.core.SpriteAsset;
 import art.pikoos.lab.core.NameEditor;
+import art.pikoos.lab.core.LuaDraft;
+import android.view.KeyEvent;
+import android.view.InputDevice;
 import art.pikoos.lab.core.HeroBinding;
 import art.pikoos.lab.core.WorkshopSession.DrawTool;
 import java.util.ArrayList;
@@ -52,6 +55,28 @@ final class WorkshopView extends View {
         setContentDescription("Мастерская PIKOOS. Крестовина: выбор, A: подтвердить, B: назад, L/R: инструмент, Start: тест.");
     }
     void action(Action a) { s.act(a); changed.run(); invalidate(); }
+    boolean codeKey(KeyEvent event){
+        if(s.mode!=Mode.CODE||s.codeDraft==null||(event.getSource()&InputDevice.SOURCE_GAMEPAD)==InputDevice.SOURCE_GAMEPAD)return false;
+        LuaDraft d=s.codeDraft;
+        if(d.panel==LuaDraft.Panel.EXIT||d.panel==LuaDraft.Panel.MENU)return false;
+        int key=event.getKeyCode(),command=-1;
+        if(event.isCtrlPressed()){
+            if(key==KeyEvent.KEYCODE_A)command=8;if(key==KeyEvent.KEYCODE_C)command=9;
+            if(key==KeyEvent.KEYCODE_X)command=10;if(key==KeyEvent.KEYCODE_V)command=11;
+            if(key==KeyEvent.KEYCODE_Z)command=event.isShiftPressed()?13:12;
+            if(key==KeyEvent.KEYCODE_Y)command=13;if(key==KeyEvent.KEYCODE_S)command=0;
+        }else{
+            if(key==KeyEvent.KEYCODE_DEL)command=5;if(key==KeyEvent.KEYCODE_FORWARD_DEL)command=6;
+            if(key==KeyEvent.KEYCODE_ENTER)command=2;if(key==KeyEvent.KEYCODE_TAB)command=4;
+            if(key==KeyEvent.KEYCODE_MOVE_HOME)command=14;if(key==KeyEvent.KEYCODE_MOVE_END)command=15;
+        }
+        if(command>=0){if(event.getAction()==KeyEvent.ACTION_DOWN){s.codeCommand(command);changed.run();invalidate();}return true;}
+        int codepoint=event.getUnicodeChar();
+        if(!event.isCtrlPressed()&&!event.isAltPressed()&&codepoint>=32&&codepoint<127){
+            if(event.getAction()==KeyEvent.ACTION_DOWN){s.codeText(Character.toString((char)codepoint));changed.run();invalidate();}return true;
+        }
+        return false;
+    }
     private void hit(float x,float y,float width,float height,Runnable action) { hits.add(new Hit(x,y,width,height,action)); }
     private void rect(float x,float y,float width,float height,int color) { p.setColor(COLORS[color]); p.setStyle(Paint.Style.FILL); c.drawRect(x,y,x+width,y+height,p); }
     private void outline(float x,float y,float width,float height,int color) {
@@ -79,12 +104,15 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
+        boolean draft=s.codeDraft!=null||s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
         if(s.mode!=Mode.NAME){text("≡",w-34,29,26,7);hit(w-48,0,48,44,()->action(Action.MENU));}
         if(s.mode==Mode.NAME){nameEditor();c.restore();return;}
+        if(s.codeDraft!=null&&(s.mode==Mode.CODE||s.mode==Mode.ERROR)){
+            luaEditor();if(s.mode==Mode.ERROR)dialog();c.restore();return;
+        }
         fitted(projectTitle,16,82,28,7,w-130);text("game.p8",w-98,80,18,13);
         rect(0,100,w,2,13);
         String[] tabs={"Мастерская","[ ] Код","Спрайты"};
@@ -265,7 +293,74 @@ final class WorkshopView extends View {
             button("+",w-64,bottom+14,44,44,false,()->action(Action.RIGHT));
         } else {
             text("Настоящий Lua из картриджа",16,bottom+30,20,7);
-            fitted(s.cart().hasHero()?ok()+": изменить speed / jump · X: объяснение":"Просмотр кода · L/R инструменты · START тест",16,bottom+57,16,6,w-32);
+            fitted(ok()+": редактировать Lua · L/R инструменты",16,bottom+57,16,6,w-32);
+        }
+    }
+    private void luaEditor(){
+        LuaDraft d=s.codeDraft;
+        fitted("[ ] Код / "+projectTitle,16,75,24,7,w-32);
+        boolean keys=d.panel==LuaDraft.Panel.KEYS,menu=d.panel==LuaDraft.Panel.MENU,exit=d.panel==LuaDraft.Panel.EXIT;
+        String position=(d.line()+1)+":"+(d.column()+1)+(d.anchor()>=0?" · выделение":"");
+        text(position,16,99,16,10);
+        fitted(keys?"Набор текста":menu?"Правки":exit?"Закрыть черновик?":"Крестовина: курсор",w/2,99,16,14,w/2-16);
+        float bottom=keys?bodyBottom-240:bodyBottom-86;
+        int rows=Math.max(2,(int)((bottom-112)/24)),columns=Math.max(12,(int)((w-70)/12));
+        int top=Math.max(0,Math.min(d.line()-rows/2,d.lineCount()-rows));
+        int left=Math.max(0,d.column()-columns+4);
+        rect(12,108,w-24,bottom-108,0);
+        c.save();c.clipRect(12,108,w-12,bottom);
+        for(int row=0;row<rows&&top+row<d.lineCount();row++){
+            final int line=top+row;float y=112+row*24;
+            if(line==d.line())rect(12,y,w-24,24,2);
+            text(""+(line+1),18,y+18,16,13);
+            String source=d.lineText(line);int count=source.codePointCount(0,source.length());
+            for(int col=left;col<Math.min(count,columns+left);col++){
+                int from=source.offsetByCodePoints(0,col),to=source.offsetByCodePoints(from,1),absolute=d.lineStart(line)+from;
+                float x=58+(col-left)*12;
+                if(absolute>=d.selectionStart()&&absolute<d.selectionEnd())rect(x,y,12,24,4);
+                String glyph=source.substring(from,to);if(glyph.equals("\t"))glyph="→";
+                text(glyph,x,y+19,20,source.trim().startsWith("--")?13:7);
+            }
+            if(line==d.line())rect(58+(d.column()-left)*12,y+2,2,21,10);
+            final int viewLeft=left;
+            for(int col=0;col<columns;col++){final int column=viewLeft+col;
+                hit(58+col*12,y,12,24,()->{if(s.mode!=Mode.CODE||d.panel!=LuaDraft.Panel.CURSOR)return;d.point(line,column);changed.run();invalidate();});}
+        }
+        c.restore();
+        if(keys){
+            float y=bottom+10,cell=(w-32)/10;
+            String[] labels={"abc","ABC","() +"};
+            for(int i=0;i<3;i++){final int page=i;
+                button(labels[i],16+i*(w-32)/3,y,(w-40)/3,32,d.page==i,()->{d.page=page;d.key=Math.min(d.key,LuaDraft.PAGES[page].length()-1);changed.run();invalidate();});}
+            String chars=LuaDraft.PAGES[d.page];
+            for(int i=0;i<chars.length();i++){final int index=i;float x=16+i%10*cell,ky=y+40+i/10*36;
+                rect(x,ky,cell-3,32,i==d.key?10:0);String label=chars.charAt(i)==' '?"_":chars.substring(i,i+1);
+                text(label,x+(cell-width(label,22))/2,ky+24,22,i==d.key?1:7);
+                hit(x,ky,cell-3,32,()->{d.key=index;action(Action.CONFIRM);});}
+            fitted("L/R: abc / символы · X: все правки",16,bodyBottom-34,16,6,w-32);
+            fitted("Y: отменить ввод · START: сохранить и тест",16,bodyBottom-12,16,13,w-32);
+        }else{
+            button(ok()+" Ввод",16,bottom+12,(w-40)/2,36,false,()->action(Action.CONFIRM));
+            button("X Правки",24+(w-40)/2,bottom+12,(w-40)/2,36,false,()->action(Action.CONTEXT));
+            fitted(d.dirty()?"Черновик · START сохранит перед тестом":"Без изменений · START тест",16,bodyBottom-13,16,6,w-32);
+        }
+        rect(0,bodyBottom,w,44,0);
+        key(ok()+(keys?" символ":" ввод"),12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+(keys?" курсор":" назад"),w/3+8,bodyBottom,6,()->action(Action.CANCEL));
+        key("X правки",w*2/3+8,bodyBottom,14,()->action(Action.CONTEXT));
+        if(menu||exit){
+            hits.clear(); // Modal controls own touch as well as controller input.
+            rect(0,bodyBottom,w,44,0);
+            float dw=Math.min(w-32,500),dx=(w-dw)/2,dy=112;
+            int visible=Math.max(3,(int)((bodyBottom-dy-52)/40));
+            String[] entries=exit?new String[]{"Продолжить правку","Сохранить и закрыть","Отбросить черновик"}:LuaDraft.COMMANDS;
+            int first=Math.max(0,Math.min(d.menu-visible/2,entries.length-visible));
+            rect(dx,dy,dw,bodyBottom-dy,1);outline(dx,dy,dw,bodyBottom-dy,14);
+            text(exit?"Есть несохранённый текст":"Правки  "+(d.menu+1)+" / "+entries.length,dx+12,dy+28,20,14);
+            for(int i=0;i<visible&&first+i<entries.length;i++){final int selected=first+i;
+                button(entries[selected],dx+8,dy+40+i*40,dw-16,36,d.menu==selected,()->{d.menu=selected;action(Action.CONFIRM);});}
+            key(ok()+" выбрать",16,bodyBottom,10,()->action(Action.CONFIRM));
+            key(back()+" к коду",w/2,bodyBottom,6,()->action(Action.CANCEL));
         }
     }
     private void syntax(String source,float x,float y) {

@@ -74,6 +74,7 @@ public final class MainActivity extends Activity {
     private boolean showingLibrary;
     private final HashMap<String,WorkshopSession> sessions=new HashMap<>();
     private boolean awaitingReturn,leftForRuntime;
+    private final java.util.HashSet<String> codeRecoveryFailed=new java.util.HashSet<>();
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
         prefs=getSharedPreferences("moon-garden-ui",MODE_PRIVATE);
@@ -162,6 +163,10 @@ public final class MainActivity extends Activity {
         if(next==null||!java.util.Arrays.equals(next.cart().bytes(),cart.bytes())) {
             next=new WorkshopSession(cart,new WorkshopSession.Port(){
                 public void save(byte[] bytes)throws Exception{saveCart(store.cart(id),bytes);Log.i(TAG,"project_saved id="+id+" bytes="+bytes.length);}
+                public void save(byte[] expected,byte[] bytes)throws Exception{
+                    if(!java.util.Arrays.equals(expected,store.read(id)))throw new Exception("Файл проекта изменился вне редактора. Исходник не заменён; вернись к правке или открой проект заново.");
+                    save(bytes);
+                }
                 public void launch(byte[] bytes)throws Exception{launchCart(bytes);}
                 public void library()throws Exception{showLibrary();}
                 public java.util.List<SpriteAsset> assets()throws Exception{return assetStore.list();}
@@ -172,6 +177,7 @@ public final class MainActivity extends Activity {
             activeId=id;session=next;
             prefs=getSharedPreferences(id+"-ui",MODE_PRIVATE);
             restoreUi();
+            restoreCodeDraft();
             sessions.put(id,next);
         }else{
             activeId=id;session=next;prefs=getSharedPreferences(id+"-ui",MODE_PRIVATE);
@@ -413,9 +419,12 @@ public final class MainActivity extends Activity {
         if(showingLibrary&&library!=null&&library.current()!=null)
             libraryPrefs.edit().putString("selected",library.current().id).putInt("focus",library.focus).apply();
         if(session==null)return;
+        if(session.codeDraft!=null)codeRecoveryFailed.remove(activeId);
         libraryPrefs.edit().putString("active",activeId).putBoolean("swapAB",session.swapAB).apply();
         prefs.edit().putInt("tool",session.tool).putInt("focus",session.focus)
+            .putString("luaDraft",session.codeDraft==null?(codeRecoveryFailed.contains(activeId)?prefs.getString("luaDraft",""):""):Base64.encodeToString(session.codeDraft.encode(),Base64.NO_WRAP))
             .putInt("line",session.codeLine).putInt("x",session.cursorX).putInt("y",session.cursorY)
+            .putInt("codeColumn",session.codeColumn)
             .putInt("color",session.color).putString("drawTool",session.drawTool.name()).putBoolean("swapAB",session.swapAB)
             .putString("pickerReturn",session.pickerReturn.name())
             .putInt("lineX",session.pendingStroke()?session.lineX:-1).putInt("lineY",session.pendingStroke()?session.lineY:-1)
@@ -452,6 +461,7 @@ public final class MainActivity extends Activity {
     private void restoreUi(){
         session.tool=bounded("tool",0,2);
         session.codeLine=bounded("line",session.cart().line(0),session.cart().code().split("\n",-1).length-1);
+        session.codeColumn=bounded("codeColumn",0,2*1024*1024);
         session.color=bounded("color",14,15);
         try{session.drawTool=DrawTool.valueOf(prefs.getString("drawTool",prefs.getBoolean("eraser",false)?"ERASER":"BRUSH"));}
         catch(IllegalArgumentException e){session.drawTool=DrawTool.BRUSH;}
@@ -502,6 +512,12 @@ public final class MainActivity extends Activity {
             }catch(Exception e){session.fail(e);}
         }
     }
+    private void restoreCodeDraft(){
+        codeRecoveryFailed.remove(activeId);
+        String encoded=prefs.getString("luaDraft","");
+        if(!encoded.isEmpty())try{session.restoreCode(Base64.decode(encoded,Base64.NO_WRAP));}
+        catch(Exception e){codeRecoveryFailed.add(activeId);Log.e(TAG,"Code draft retained in preferences",e);session.fail(e);}
+    }
     private void immersive(){
         if(Build.VERSION.SDK_INT>=30){
             getWindow().setDecorFitsSystemWindows(false);
@@ -524,7 +540,10 @@ public final class MainActivity extends Activity {
             Log.i(TAG,"host_resumed tool="+session.tool+" focus="+session.focus+" result=unknown");
         }
     }
-    @Override public boolean dispatchKeyEvent(KeyEvent event){return input!=null&&input.key(event)||super.dispatchKeyEvent(event);}
+    @Override public boolean dispatchKeyEvent(KeyEvent event){
+        if(!showingPlay&&!showingLibrary&&!showingFolders&&surface!=null&&surface.codeKey(event))return true;
+        return input!=null&&input.key(event)||super.dispatchKeyEvent(event);
+    }
     @Override public boolean onGenericMotionEvent(MotionEvent event){return input!=null&&input.motion(event)||super.onGenericMotionEvent(event);}
     @Override public void onBackPressed(){if(showingFolders)folderView.action(Action.CANCEL);else if(showingPlay)playView.action(Action.CANCEL);else if(showingLibrary&&shelf!=null)shelf.action(Action.CANCEL);else if(surface!=null)surface.action(Action.CANCEL);else super.onBackPressed();}
 }

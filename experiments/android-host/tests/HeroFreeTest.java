@@ -48,7 +48,7 @@ public final class HeroFreeTest {
         s.act(Action.ASSIGN_HERO);check(p.writes==0&&s.mode==Mode.SHEET,"hero action unavailable");
         s.selectSheet(10);check(s.mode==Mode.HELP,"generic help");s.act(Action.CONFIRM);
         s.selectSheet(9);check(s.mode==Mode.COPY_PLACE,"generic copy available");s.act(Action.CANCEL);s.switchTool(1);
-        s.act(Action.CONFIRM);check(s.mode==Mode.NAVIGATE&&p.writes==0,"code is read only");
+        s.act(Action.CONFIRM);check(s.mode==Mode.CODE&&p.writes==0,"hero-free code draft opens without writing");s.act(Action.CANCEL);
         s.act(Action.CONTEXT);s.act(Action.CONFIRM);check(s.codeLine>=0&&s.mode==Mode.NAVIGATE,"generic help returns to valid code line");
         s.openSprite(0);s.color=14;s.paintAt(7,7);check(p.writes==1&&s.cart().pixel(0,7,7)==14,"controller/editor write");
         s.act(Action.TEST);same(p.saved,p.launched,"runtime receives saved puzzle");
