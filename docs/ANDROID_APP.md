@@ -67,11 +67,14 @@ register PIKOOS indiscriminately for all pictures merely because carts use PNG.
 
 ## Status and order
 
-Lab 0.0.23 has a MAIN/LAUNCHER entry and an outgoing runtime share flow. It does
+Lab 0.0.24 has a MAIN/LAUNCHER entry and an outgoing runtime share flow. It does
 not yet receive external game launch requests. Existing narrow/wide screenshots
 are layout checks on one device, not a supported-device matrix.
 
-Next: stabilize the observed runtime warm-launch/audio lifecycle; then implement
-and verify external launcher entry/return, followed by nested libraries and the
+The reproduced audio startup race is fixed in a separate test runtime adapter;
+this two-APK development setup is not final product packaging. See the
+[runtime experiment](../experiments/runtime-restart/README.md).
+
+Next: implement and verify external launcher entry/return, followed by nested libraries and the
 complete first-run runtime setup. Device/layout checks accompany each UI slice.
 These are Android release requirements, not optional post-release Linux work.

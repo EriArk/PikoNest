@@ -16,7 +16,8 @@ entrance for creation/editing. Playing does not require a project, remix, tutori
 or editor; returning restores the library selection. Recent means recently
 launched, not a promised process save state. Lab 0.0.22 implements the first
 dedicated text-cart launcher; 0.0.23 adds PNG launch and covers. Dependency staging,
-reliable wrapper warm restarts and production runtime setup remain open.
+production runtime setup and full lifecycle acceptance remain open. Lab 0.0.24
+fixes a reproduced audio restart race in a separate development adapter.
 
 PIKOOS is a handheld-first environment for the full PICO-8 creative loop:
 

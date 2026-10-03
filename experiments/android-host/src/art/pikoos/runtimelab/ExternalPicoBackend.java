@@ -15,11 +15,18 @@ import java.io.FileOutputStream;
 /** An external-app research adapter, not the production runtime implementation. */
 public final class ExternalPicoBackend implements PicoRuntimeBackend {
     public static final String PACKAGE = "io.wip.pico8";
+    public static final String RESTART_TEST_PACKAGE = "art.pikoos.runtimeexperiment";
     private final Activity activity;
     public ExternalPicoBackend(Activity activity) { this.activity = activity; }
+    private PackageInfo runtime() throws PackageManager.NameNotFoundException {
+        try { return activity.getPackageManager().getPackageInfo(RESTART_TEST_PACKAGE, 0); }
+        catch (PackageManager.NameNotFoundException absent) {
+            return activity.getPackageManager().getPackageInfo(PACKAGE, 0);
+        }
+    }
     @Override public Availability detect() {
         try {
-            PackageInfo info = activity.getPackageManager().getPackageInfo(PACKAGE, 0);
+            PackageInfo info = runtime();
             return new Availability(true, info.versionName);
         } catch (PackageManager.NameNotFoundException e) {
             return new Availability(false, "");
@@ -33,7 +40,7 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         launch(cart,CartridgeFormat.P8);
     }
     @Override public void launch(byte[] cart,CartridgeFormat format) throws Exception {
-        if (!detect().launcherPresent) throw new IllegalStateException("PICO-8 wrapper is not installed");
+        PackageInfo selected = runtime();
         AtomicFile snapshot = new AtomicFile(new File(activity.getFilesDir(), "run"+format.extension));
         FileOutputStream out = null;
         try {
@@ -45,7 +52,7 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
             throw e;
         }
         Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setComponent(new ComponentName(PACKAGE, "com.godot.game.GodotAppLauncher"));
+        intent.setComponent(new ComponentName(selected.packageName, "com.godot.game.GodotAppLauncher"));
         android.net.Uri uri=format==CartridgeFormat.P8_PNG?CartProvider.PNG:CartProvider.CART;
         intent.setType(format.mime);
         intent.putExtra(Intent.EXTRA_STREAM, uri);

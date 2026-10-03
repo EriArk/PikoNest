@@ -1,5 +1,10 @@
 # Android runtime proof: execution plan
 
+2026-10-03 update: the warm-start audio race is reproduced and fixed in an isolated
+test adapter, used by host 0.0.24. [Evidence](design/android-restart-23/README.md)
+and [reproducible build](../experiments/runtime-restart/README.md). The original
+wrapper remains unchanged/unfixed; production runtime ownership remains open.
+
 Date: 2026-10-02. Status: official runtime baseline and experimental host
 edit/run/return loop demonstrated on hardware. The owner confirmed the smoke
 test's controls and sound. Roadmap 0.0A remains incomplete: production runtime

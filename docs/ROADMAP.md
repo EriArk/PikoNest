@@ -8,7 +8,13 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded lab step (0.0.23): PNG cartridge → actual cover → byte-exact binary
+Latest bounded lab step (0.0.24): reproduce the audio startup-directory race →
+fix the bootstrap in a separate test adapter → verify delayed startup, failure
+bounds, repeated launch/exit and cleanup. Host prefers that installed adapter;
+upstream fallback remains unfixed. Production packaging/setup is still open.
+[Device evidence](design/android-restart-23/README.md).
+
+Previous step (0.0.23): PNG cartridge → actual cover → byte-exact binary
 launch in official PICO-8 → restore Play selection after host process loss.
 Envelope validation and corruption rejection are covered; PNG editing/import and
 dependency analysis remain open. Repeated launch testing exposed an intermittent
@@ -109,10 +115,10 @@ The sequence is a working plan, not a delivery-date or feasibility promise for
 experimental online features. Stage acceptance does not follow automatically from
 tests/screenshots: user-facing behavior and physical ergonomics need review.
 
-**Next slice after PNG Play:** diagnose and stabilize warm runtime launch/exit,
-including the observed external wrapper PulseAudio failure. Then implement external
-launcher entry/return, nested libraries/dependency handling and the runtime setup
-wizard. Device/layout checks accompany each slice.
+**Next slice after the runtime audio fix:** implement external launcher entry/return,
+then nested libraries/dependency handling and the runtime setup wizard. Continue
+lifecycle/device/layout checks with each slice; the test adapter does not close
+production runtime ownership, diagnostics or packaging.
 Verified project/data migration remains a foundation task. Do not move existing
 projects or retire the experiment before preservation is demonstrated.
 

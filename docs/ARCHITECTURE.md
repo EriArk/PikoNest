@@ -13,6 +13,21 @@ Android intent parsing belongs in the platform adapter. Play, workshop and exter
 return destinations must remain distinct across lifecycle restoration. No external
 entry-point API is implemented or frozen yet; Linux implementation is deferred.
 
+### Android lab 0.0.24: isolated runtime audio lifecycle fix
+
+The Android adapter prefers the installed `art.pikoos.runtimeexperiment` package,
+falling back to `io.wip.pico8`. A pinned, locally rebuilt upstream wrapper fixes
+the bootstrap race between opening an old audio directory and asynchronous
+removal/recreation. Cleanup precedes server launch; readiness checks the socket
+with liveness/timeout; exit reaps the owned audio child. Core/project/UI code does
+not own these processes. The user's official runtime is still imported separately.
+
+This is a two-APK development arrangement, not a final packaging decision. Both
+wrappers share public runtime data; original private settings stay separate. The
+original fallback remains unfixed. Intent acceptance still cannot observe full
+runtime success/failure, and production import/diagnostics remain open.
+[Experiment and rollback](../experiments/runtime-restart/README.md).
+
 ### Android lab 0.0.23: PNG Play transport and covers
 
 `CartridgeFormat` crosses the portable runtime port explicitly. Android stages

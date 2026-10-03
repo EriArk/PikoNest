@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="art.pikoos.runtimelab" android:versionCode="23" android:versionName="0.0.23">
+    package="art.pikoos.runtimelab" android:versionCode="24" android:versionName="0.0.24">
     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
-    <queries><package android:name="io.wip.pico8" /></queries>
+    <queries><package android:name="io.wip.pico8" /><package android:name="art.pikoos.runtimeexperiment" /></queries>
     <application android:label="PIKOOS Runtime Lab" android:debuggable="true"
         android:allowBackup="false" android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">

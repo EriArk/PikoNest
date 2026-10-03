@@ -1,5 +1,11 @@
 # PIKOOS Android host experiment
 
+Version 0.0.24 prefers the separately installed PIKOOS Runtime Test adapter, which
+fixes a reproduced PulseAudio startup-directory race and reaps its audio process
+on exit. The original wrapper remains the fallback without that fix. This is a
+side-by-side development experiment; official binaries remain user-supplied.
+[Build/rollback](../runtime-restart/README.md) · [Device checks](../../docs/design/android-restart-23/README.md).
+
 Version 0.0.23 adds `.p8.png` launch and actual covers on Play. The original binary
 passes unchanged through a format-aware runtime port, PNG MIME and fixed read-only
 provider URI. Format captions distinguish same-name text/PNG carts. Portable PNG
