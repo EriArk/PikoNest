@@ -6,12 +6,19 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+Current inventory (2026-10-03, lab 0.0.30 / adapter 4): see [STATUS](STATUS.md).
+Implementation order and tracked gaps live in [ROADMAP](ROADMAP.md) and
+[BACKLOG](BACKLOG.md). Dated lab subsections below retain the scope of those
+versions; they are not a claim that later work is still absent or that the
+proposed architecture has been completed.
+
 Current shipping target is the Android APK. [Android app requirements](ANDROID_APP.md)
-define adaptive device coverage and planned external-launch entry. That entry must
+define adaptive device coverage and the external-launch contract. That entry must
 map validated storage/format/origin into the shared application launch workflow;
 Android intent parsing belongs in the platform adapter. Play, workshop and external
 return destinations must remain distinct across lifecycle restoration. No external
-entry-point API is implemented or frozen yet; Linux implementation is deferred.
+production entry-point API is frozen yet; a tested explicit Android lab entry
+exists since 0.0.25. Linux implementation is deferred.
 
 ### Android lab 0.0.24: isolated runtime audio lifecycle fix
 

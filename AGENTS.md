@@ -1,6 +1,13 @@
 # AGENTS.md — PIKOOS contributor instructions
 
-This repository is currently at the product/architecture stage. Treat this file as the primary implementation brief for Codex and other AI coding agents.
+This repository contains a working Android lab and product/architecture documents;
+it is not yet a complete creator. Treat this file as the primary implementation
+brief for Codex and other AI coding agents.
+
+Current planning entry points: `docs/STATUS.md` records demonstrated scope,
+`docs/ROADMAP.md` orders complete user workflows, `docs/BACKLOG.md` owns task IDs
+and status, and `docs/ACCEPTANCE.md` defines end-to-end acceptance. Historical lab
+version notes are evidence, not current task order or completed-product claims.
 
 ## 1. Product in one sentence
 
@@ -442,6 +449,14 @@ When a major decision is made:
 - if a requested implementation would break PICO-8 compatibility or platform portability, flag that explicitly before baking it in.
 
 ## 15. Near-term priority order
+
+The foundation-first list below is the original bootstrap order. The launch,
+round-trip and bounded controller experiments now exist. Follow the audited
+completion path in `docs/ROADMAP.md`: the next creator gap is general Lua editing
+and a real blank-cart creation loop (A01/A02 → C01/C02), alongside the remaining
+runtime/storage work. Do not keep extending launcher polish or template-specific
+controls as a substitute for missing general tools. Close tasks with explicit
+scope/evidence, and keep owner acceptance separate from technical test results.
 
 Until the foundations are proven, prioritize:
 

@@ -58,6 +58,11 @@ bounded launch operation, not a change to the canonical project format or suppor
 for runtime multicart/file writes. See the [linked-file contract](DEPENDENT_CARTRIDGES.md)
 and its direct-versus-prepared official-runtime checks.
 
+The later 0.0.28 slice also launches bounded read-only sibling carts through
+ordinary `load`/`reload`. Neither slice is a full project/dependency editor.
+Current gaps and planned verification are tracked in [STATUS](STATUS.md) and
+[BACKLOG](BACKLOG.md); the compatibility rules below remain authoritative.
+
 ### The base follows PICO-8's actual model
 
 Owner-confirmed rule, 2026-10-02: the base tools follow the real PICO-8 rules,

@@ -83,134 +83,35 @@ my-game/
 
 ## Status
 
-Android 0.0.22 adds the Play-first launcher: text carts from the Games folder,
-real cartridge labels, favorites/recent launches and return to the selected game.
-Workshop projects have a separate entrance. Originals and existing projects are
-preserved. PNG launch, dependencies and full runtime setup remain open.
-[Device evidence](docs/design/android-play-21/README.md).
+As of 2026-10-03, host 0.0.30 / Runtime Test 4 is a working Android lab, not a
+complete game creator. It demonstrates Play/external launch, bounded linked-cart
+launch, sprite editing/reuse, single `.p8` import/export, session undo/redo and an
+isolated test of the user's purchased runtime archive.
 
-Android 0.0.21 adds persistent folder selection and access checks for games,
-downloads, projects and library/data. Existing lab files are retained; connecting
-these locations to indexing/saves and Splore remains separate work.
-[Device evidence](docs/design/android-folders-20/README.md).
-The Play-first launcher follows in 0.0.22 above. See the
-[whole-product plan](docs/ROADMAP.md#completion-path).
+General Lua editing, map/animation/background tools, SFX/music, reusable mechanics,
+complete project recovery, production setup and the full creation loop remain open.
+The next creator milestone is a real game authored from a blank cart through
+PIKOOS with handheld controls, then tested and exported as ordinary PICO-8.
 
-Android 0.0.20 adds pixel-fragment movement inside the opened sprite/region.
-Select two corners, position the fragment with one-pixel steps, preview and apply.
-Overlapping moves, zeros, draft recovery and whole-edit undo/redo are covered.
-[Device evidence](docs/design/android-move-19/README.md). The
-[completion path](docs/ROADMAP.md#completion-path) separates the current lab from
-remaining production foundations, complete tools and release acceptance.
+- [Current capability audit](docs/STATUS.md)
+- [Whole-product roadmap](docs/ROADMAP.md#completion-path)
+- [Task backlog and dependencies](docs/BACKLOG.md)
+- [End-to-end acceptance](docs/ACCEPTANCE.md)
+- [Historical roadmap and lab milestones](docs/ROADMAP_HISTORY.md)
+- [Reproducible Android host and slice history](experiments/android-host/README.md)
+- [Latest device evidence](docs/design/android-runtime-probe-30/README.md)
 
-Android 0.0.19 adds outlined/filled oval brushes with controller/touch endpoints,
-live dimensions, draft recovery and whole-operation undo/redo. The portable raster
-matches 5,616 sampled masks from the user's official PICO-8 0.2.7 runtime.
-[Device evidence](docs/design/android-oval-18/README.md).
+The owner approved the PICO-8 visual direction, not the completeness of the
+application. APK GitHub releases/prereleases require explicit confirmation that
+the owner is fully satisfied and authorizes release. Development APKs stay local.
+Linux and optional online research do not block the local Android product.
 
-Android 0.0.18 adds redo across workshop cartridge edits. Undo/Redo sit together
-in the controller/touch menu with available-step counts; Y/R2 are shortcuts.
-History keeps up to 32 edits per open project in the current session. Failed
-saves, no-ops and cancelled previews preserve the redo path.
-[Device evidence](docs/design/android-history-17/README.md).
+The production framework remains an explicit architecture decision (A01), not an
+implicit commitment made by the experimental Java/Canvas host. Core and platform
+boundaries stay portable.
 
-Android 0.0.17 adds outlined and filled rectangles to sprite tools. Choose two
-corners with the controller or touch, preview the size, then commit or cancel.
-Each shape is one ordinary gfx edit with whole-operation undo and draft recovery.
-[Device evidence](docs/design/android-rectangle-16/README.md).
-
-Android 0.0.16 adds replacing one color throughout a selected sprite/region,
-with a live before/after preview, affected-pixel count, controller color selection,
-cancel, whole-edit undo and draft recovery. All supported carts use the same tool.
-[Device evidence](docs/design/android-recolor-15/README.md).
-
-Android 0.0.15 adds sprite/region mirrors and quarter/half turns with before/after
-preview, controller confirmation, cancellation and whole-operation undo.
-The tools are available in every supported cart. Quarter turns currently require
-a square selection; mirrors and half turns preserve any supported rectangle.
-[Device evidence](docs/design/android-transform-14/README.md).
-
-Android 0.0.14 adds saving a selected project as an ordinary external `.p8`.
-Y on the shelf opens a recoverable preview; the Android save dialog selects a
-new file. A saved result requires closing, reopening and byte-comparing that file.
-Unconfirmed writes are reported honestly and never retried automatically.
-[Device evidence](docs/design/android-export-13/README.md).
-
-Android 0.0.13 adds single text `.p8` import: read-only source, preview, explicit
-confirmation and an independent byte-preserved project. Imported sprites can use
-the same shared library. PNG carts, dependencies and folder setup remain pending;
-Android's system picker still has controller-navigation limitations.
-[Device evidence](docs/design/android-import-12/README.md).
-
-Android 0.0.12 adds controller-operated sprite names, both before saving and for
-existing library records. Draft recovery and title-only persistence keep pixels
-and carts unchanged. [Device evidence](docs/design/android-names-11/README.md).
-
-Android 0.0.11 adds a shared sprite library: extract selected pixels, keep an
-independent record, and insert into another project with placement, preview and
-undo. [Device evidence](docs/design/android-assets-10/README.md).
-
-Android 0.0.10 adds sprite/rectangle copying in every project, with explicit
-placement, replacement preview, cancel and exact undo. The product rule requires
-general tools to remain available independently of genre/template.
-[Device evidence](docs/design/android-copy-09/README.md).
-
-Android 0.0.9 separates Moon Garden bindings from basic cart/resource editing.
-New projects can also start with a blank cart or the hero-free Lights puzzle;
-their workshop offers sprite editing and Lua viewing without character controls.
-See [device/runtime evidence and limitations](docs/design/android-herofree-08/README.md).
-
-Android 0.0.8 uses precise sprite terminology in the existing editor; see
-[device capture](docs/design/android-terminology-07/README.md). The reusable asset
-library and first-run folder/runtime wizard are accepted requirements for future
-implementation, described in the documents above.
-
-The owner accepted the [PICO-8-style visual baseline](docs/UX_DIRECTION.md)
-after rejecting the original Android form, and authorized its implementation
-with controller-first interaction. The installed
-[Android workshop experiment](experiments/android-host/README.md) now edits
-real speed/jump parameters and sprite pixels in an ordinary `.p8`, with
-controller navigation, explicit commit/cancel, undo and runtime launch.
-Its sprite sheet now supports choosing, drawing a new image, safely copying
-an existing image and explicitly assigning a different hero, using the same
-controller workflow. See [device captures](docs/design/android-sprites-02/README.md).
-Drawing now includes a controller-operated tool chooser, connected fill,
-line preview/confirmation and a picker, with whole-operation undo. See
-[drawing captures](docs/design/android-drawing-04/README.md).
-Rectangular sheet areas now support images beyond 16×16, the same drawing tools
-and cursor-following zoom. The current selector covers the upper half of the
-standard sheet; shared-map editing remains a next step.
-See [region editing and runtime evidence](docs/design/android-regions-05/README.md).
-Large images can now be assigned as the owned template's hero after previewing
-their collision rectangle. Image placement, platform landing and screen bounds
-use the same saved body dimensions in ordinary Lua, with one-step undo.
-See [hero assignment and physics checks](docs/design/android-hero-06/README.md).
-The native project shelf now opens separate games, creates a fresh small-game
-template and makes independent copies, retaining each project's editing context.
-See [library device captures](docs/design/android-library-03/README.md).
-The [interactive study](experiments/ux-study/README.md) remains the visual
-baseline. Physical ergonomics and the complete product remain unaccepted.
-
-Owner-provided PICO-8 0.2.7 archives for private development are stored in
-[`dev-runtime/`](dev-runtime/README.md). They must stay outside application
-packages and public releases; end users still import their own runtime.
-
-Early foundation experiments. An installed Android host has demonstrated
-editing a real `.p8`, launching it in official PICO-8 and restoring its saved
-context after exit, including host process recreation. See the
-[device results and remaining limitations](docs/ANDROID_RUNTIME_POC.md) and
-[reproducible host experiment](experiments/android-host/README.md).
-
-A [portable `.p8` reader/writer proof](experiments/p8-roundtrip/README.md)
-now preserves complete source bytes and supports section-scoped edits, tested
-against the official demo corpus and used by the Android lab.
-
-The production framework remains undecided. The first milestone is proving
-three foundations:
-
-1. reliably launching the user's official PICO-8 runtime from Android and returning to PIKOOS;
-2. loss-safe parsing and writing of real `.p8` projects;
-3. a portable core that does not bake in Android or one handheld model.
+Owner-provided PICO-8 archives in [dev-runtime](dev-runtime/README.md) are private
+development inputs; they must never enter application packages or public releases.
 
 ---
 

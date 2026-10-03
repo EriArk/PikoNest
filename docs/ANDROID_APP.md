@@ -170,7 +170,12 @@ previous selection on error/cancel. Runtime Test revision 3 stays unchanged.
 This is the archive step, not automatic runtime installation or proven readiness.
 [Scope](FIRST_RUN_SETUP.md) · [Evidence](design/android-runtime-setup-29/README.md).
 
-Next: isolated runtime preparation/activation and official test launch, then
-complete first-run routing, with broader dependencies and durable
-file writes still tracked explicitly. Device/layout checks accompany each UI slice.
-These are Android release requirements, not optional post-release Linux work.
+Lab 0.0.30 / adapter 4 adds isolated candidate preparation/test from the retained
+archive; permanent activation and clean-device bootstrap remain open.
+[Evidence](design/android-runtime-probe-30/README.md).
+
+Current whole-product execution order is in [ROADMAP](ROADMAP.md), with runtime
+R01–R08, Play L01–L03 and platform acceptance Q01–Q06 in [BACKLOG](BACKLOG.md).
+Runtime/storage work proceeds alongside the missing general creator tools;
+device/layout checks accompany each UI slice. These are Android release
+requirements, not optional post-release Linux work.

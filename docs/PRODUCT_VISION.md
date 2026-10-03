@@ -7,6 +7,11 @@ of the user's official runtime. Use precise resource names in the interface.
 These are accepted needs; detailed workflows remain proposed until implemented
 and checked with the owner.
 
+Current implementation inventory: [STATUS](STATUS.md). The audited completion
+plan, task IDs and full-cycle acceptance are in [ROADMAP](ROADMAP.md),
+[BACKLOG](BACKLOG.md) and [ACCEPTANCE](ACCEPTANCE.md). Versioned lab references
+below are historical evidence, not completed-feature declarations.
+
 ## 1. Product idea
 
 Owner clarification, 2026-10-03: simply playing is a primary everyday use case.
