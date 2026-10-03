@@ -123,6 +123,14 @@ public final class P8Graphics {
         }
         return write(r,values);
     }
+    /** Inclusive corners; order-independent, with single-pixel/row/column cases. */
+    public P8Document withRectangle(SpriteRegion r,int x0,int y0,int x1,int y1,int value,boolean filled){
+        r.checkPixel(x0,y0);r.checkPixel(x1,y1);color(value);int[] values=read(r);
+        int left=Math.min(x0,x1),right=Math.max(x0,x1),top=Math.min(y0,y1),bottom=Math.max(y0,y1);
+        for(int y=top;y<=bottom;y++)for(int x=left;x<=right;x++)
+            if(filled||x==left||x==right||y==top||y==bottom)values[y*r.width+x]=value;
+        return write(r,values);
+    }
     public P8Document withLine(SpriteRegion r,int x0,int y0,int x1,int y1,int value){
         r.checkPixel(x0,y0);r.checkPixel(x1,y1);color(value);int[] values=read(r);
         if(x0>x1||(x0==x1&&y0>y1)){int t=x0;x0=x1;x1=t;t=y0;y0=y1;y1=t;}

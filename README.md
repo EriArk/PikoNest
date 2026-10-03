@@ -83,6 +83,11 @@ my-game/
 
 ## Status
 
+Android 0.0.17 adds outlined and filled rectangles to sprite tools. Choose two
+corners with the controller or touch, preview the size, then commit or cancel.
+Each shape is one ordinary gfx edit with whole-operation undo and draft recovery.
+[Device evidence](docs/design/android-rectangle-16/README.md).
+
 Android 0.0.16 adds replacing one color throughout a selected sprite/region,
 with a live before/after preview, affected-pixel count, controller color selection,
 cancel, whole-edit undo and draft recovery. All supported carts use the same tool.

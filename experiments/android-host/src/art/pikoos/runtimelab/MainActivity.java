@@ -251,7 +251,7 @@ public final class MainActivity extends Activity {
             .putInt("line",session.codeLine).putInt("x",session.cursorX).putInt("y",session.cursorY)
             .putInt("color",session.color).putString("drawTool",session.drawTool.name()).putBoolean("swapAB",session.swapAB)
             .putString("pickerReturn",session.pickerReturn.name())
-            .putInt("lineX",session.pendingLine()?session.lineX:-1).putInt("lineY",session.pendingLine()?session.lineY:-1)
+            .putInt("lineX",session.pendingStroke()?session.lineX:-1).putInt("lineY",session.pendingStroke()?session.lineY:-1)
             .putInt("field",session.field).putInt("draft",session.draft)
             .putInt("spriteSlot",session.spriteSlot).putInt("sheetFocus",session.sheetFocus)
             .putBoolean("region",session.region!=null).putBoolean("zoom",session.zoom)
@@ -278,7 +278,7 @@ public final class MainActivity extends Activity {
             .putBoolean("nameLatin",session.nameEditor!=null&&session.nameEditor.latin)
             .putBoolean("nameUpper",session.nameEditor!=null&&session.nameEditor.uppercase)
             .putBoolean("nameAll",session.nameEditor!=null&&session.nameEditor.replaceAll)
-            .putString("mode",session.heroDraft!=null?"HERO":session.mode==Mode.CANVAS||session.pendingLine()?"CANVAS":session.mode==Mode.VALUE?"VALUE":"NAVIGATE").apply();
+            .putString("mode",session.heroDraft!=null?"HERO":session.mode==Mode.CANVAS||session.pendingStroke()?"CANVAS":session.mode==Mode.VALUE?"VALUE":"NAVIGATE").apply();
     }
     private int bounded(String key,int fallback,int max){return Math.max(0,Math.min(max,prefs.getInt(key,fallback)));}
     private void restoreUi(){
@@ -308,7 +308,7 @@ public final class MainActivity extends Activity {
             else if(prefs.getString("mode","").equals("CANVAS"))session.mode=Mode.CANVAS;
         }
         int lineX=prefs.getInt("lineX",-1),lineY=prefs.getInt("lineY",-1);
-        if(session.mode==Mode.CANVAS&&session.drawTool==DrawTool.LINE&&lineX>=0&&lineX<session.selection().width&&lineY>=0&&lineY<session.selection().height){session.lineX=lineX;session.lineY=lineY;}
+        session.restoreStroke(lineX,lineY);
         if(session.cart().hasHero()&&session.tool!=2&&prefs.getString("mode","").equals("VALUE")){
             session.mode=Mode.VALUE;session.field=bounded("field",0,1);session.draft=Math.max(1,bounded("draft",2,4));
         }

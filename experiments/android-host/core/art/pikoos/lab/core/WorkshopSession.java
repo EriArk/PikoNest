@@ -8,7 +8,14 @@ public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS }
     public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR }
-    public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER }
+    public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE }
+    // Keep existing operation entries 5/6 stable while adding brushes after them.
+    public static int drawMenuCount(){return DrawTool.values().length+2;}
+    public static int drawMenuIndex(DrawTool tool){return tool.ordinal()<5?tool.ordinal():tool.ordinal()+2;}
+    public static DrawTool drawMenuTool(int index){
+        if(index<0||index>=drawMenuCount())throw new IllegalArgumentException("Tool outside menu");
+        return index==5||index==6?null:DrawTool.values()[index<5?index:index-2];
+    }
     public interface Port {
         void save(byte[] bytes) throws Exception;
         void launch(byte[] bytes) throws Exception;
@@ -54,7 +61,7 @@ public final class WorkshopSession {
     }
     /** Restore UI intent against current canonical pixels; never write on restore. */
     public void restoreRecolor(int from,int to,int field,String origin){
-        if(tool!=2||browsingSprites||pendingLine()||selection().sharesMap()
+        if(tool!=2||browsingSprites||pendingStroke()||selection().sharesMap()
             ||(mode!=Mode.CANVAS&&mode!=Mode.NAVIGATE)||from<0||from>15||to<0||to>15||field<0||field>1)return;
         Mode parsed;try{parsed=Mode.valueOf(origin);}catch(IllegalArgumentException e){return;}
         if(parsed!=Mode.CANVAS&&parsed!=Mode.NAVIGATE)return;
@@ -76,7 +83,7 @@ public final class WorkshopSession {
     }
     /** A restored operation is only a preview of current canonical pixels. Never auto-apply. */
     public void restoreTransform(String operation,String origin){
-        if(tool!=2||browsingSprites||pendingLine()||selection().sharesMap()
+        if(tool!=2||browsingSprites||pendingStroke()||selection().sharesMap()
             ||(mode!=Mode.CANVAS&&mode!=Mode.NAVIGATE))return;
         try{
             Mode parsed=Mode.valueOf(origin);SpriteTransform chosen=SpriteTransform.valueOf(operation);
@@ -181,7 +188,7 @@ public final class WorkshopSession {
     }
     /** Restore only a validated draft; always re-show the replacement before saving. */
     public void restoreCopy(int x,int y,String returnMode){
-        if(tool!=2||pendingLine()||cart.empty(selection())||selection().sharesMap())return;
+        if(tool!=2||pendingStroke()||cart.empty(selection())||selection().sharesMap())return;
         Mode origin;
         try{origin=Mode.valueOf(returnMode);}catch(IllegalArgumentException e){return;}
         if(origin!=Mode.SHEET&&origin!=Mode.CANVAS&&origin!=Mode.NAVIGATE)return;
@@ -196,9 +203,21 @@ public final class WorkshopSession {
     public WorkshopCartridge cart() { return cart; }
     public boolean canUndo() { return !undo.isEmpty(); }
     public int maxFocus(){return tool==2?(cart.hasHero()?7:6):cart.hasHero()?4:2;}
-    public boolean pendingLine(){return drawTool==DrawTool.LINE&&lineX>=0&&lineY>=0;}
+    public boolean twoPointTool(){return drawTool==DrawTool.LINE||drawTool==DrawTool.RECTANGLE||drawTool==DrawTool.FILLED_RECTANGLE;}
+    public boolean pendingStroke(){return twoPointTool()&&lineX>=0&&lineY>=0;}
+    public boolean pendingLine(){return drawTool==DrawTool.LINE&&pendingStroke();}
+    /** The legacy lineX/lineY preference keys hold the first point for all two-point tools. */
+    public void restoreStroke(int x,int y){
+        SpriteRegion r=selection();
+        if(tool==2&&mode==Mode.CANVAS&&!browsingSprites&&twoPointTool()&&!r.sharesMap()
+            &&x>=0&&y>=0&&x<r.width&&y<r.height){lineX=x;lineY=y;}
+    }
     public SpriteRegion selection(){return region==null?new SpriteRegion(spriteSlot*16,0,16,16):region;}
-    public WorkshopCartridge canvasPreview(){return pendingLine()?cart.withLine(selection(),lineX,lineY,cursorX,cursorY,color):cart;}
+    public WorkshopCartridge canvasPreview(){
+        if(!pendingStroke())return cart;
+        return drawTool==DrawTool.LINE?cart.withLine(selection(),lineX,lineY,cursorX,cursorY,color)
+            :cart.withRectangle(selection(),lineX,lineY,cursorX,cursorY,color,drawTool==DrawTool.FILLED_RECTANGLE);
+    }
     public SpriteRegion regionDraft(){
         return choosingEnd?new SpriteRegion(Math.min(anchorX,regionX)*8,Math.min(anchorY,regionY)*8,
             (Math.abs(anchorX-regionX)+1)*8,(Math.abs(anchorY-regionY)+1)*8):new SpriteRegion(regionX*8,regionY*8,8,8);
@@ -224,10 +243,10 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingLine()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
-        if(pendingLine())return;
+        if(pendingStroke())return;
         if (mode != Mode.NAVIGATE && mode != Mode.CANVAS && mode != Mode.SHEET) return;
         if (tool == (next + 3) % 3) return;
         toolFocus[tool] = focus;
@@ -238,7 +257,7 @@ public final class WorkshopSession {
         focus = clamp(target, maxFocus()); act(Action.CONFIRM);
     }
     public void openSprite(int slot) {
-        if(pendingLine()||transforming()||recoloring())return;
+        if(pendingStroke()||transforming()||recoloring())return;
         if (slot < 0 || slot >= WorkshopCartridge.SPRITE_COUNT) throw new IllegalArgumentException("Sprite slot out of range");
         spriteSlot = slot; sheetFocus = slot; browsingSprites = false;
         region=null;cursorX=clamp(cursorX,15);cursorY=clamp(cursorY,15);zoom=false;
@@ -252,7 +271,7 @@ public final class WorkshopSession {
     }
     public void openHero(){
         if(!cart.hasHero())return;
-        if(pendingLine()||transforming()||recoloring())return;
+        if(pendingStroke()||transforming()||recoloring())return;
         HeroBinding h=cart.hero();
         if(h.image.sharesMap()){notice="Редактор общей области с картой ещё не готов";return;}
         if(h.card()>=0){openSprite(h.card());return;}
@@ -305,7 +324,7 @@ public final class WorkshopSession {
         paletteCursor = clamp(value, 15); act(Action.CONFIRM);
     }
     public void chooseDrawTool(int value){
-        if(mode!=Mode.DRAW_TOOLS||value<0||value>DrawTool.values().length+1)return;
+        if(mode!=Mode.DRAW_TOOLS||value<0||value>=drawMenuCount())return;
         drawToolCursor=value;act(Action.CONFIRM);
     }
     private void draw()throws Exception {
@@ -314,6 +333,7 @@ public final class WorkshopSession {
             case ERASER:save(cart.withPixel(selection(),cursorX,cursorY,0),true);break;
             case FILL:save(cart.withFill(selection(),cursorX,cursorY,color),true);break;
             case LINE:lineX=cursorX;lineY=cursorY;notice="Выбери конец линии";break;
+            case RECTANGLE:case FILLED_RECTANGLE:lineX=cursorX;lineY=cursorY;notice="Выбери противоположный угол";break;
             case PICKER:color=cart.pixel(selection(),cursorX,cursorY);drawTool=pickerReturn;notice="Цвет взят";break;
         }
     }
@@ -434,9 +454,9 @@ public final class WorkshopSession {
                 }
                 return; // Selection only: never write, launch, undo or leave via a tab accidentally.
             }
-            if(pendingLine()){
+            if(pendingStroke()){
                 moveCursor(action);
-                if(action==Action.CANCEL||action==Action.UNDO){lineX=lineY=-1;notice="Линия отменена";}
+                if(action==Action.CANCEL||action==Action.UNDO){lineX=lineY=-1;notice=drawTool==DrawTool.LINE?"Линия отменена":"Прямоугольник отменён";}
                 if(action==Action.CONFIRM||action==Action.TEST){
                     save(canvasPreview(),true);lineX=lineY=-1;
                     if(action==Action.TEST)port.launch(cart.bytes());
@@ -444,8 +464,8 @@ public final class WorkshopSession {
                 return; // A draft cannot leak into other resources, tabs or runtime snapshots.
             }
             if(mode==Mode.DRAW_TOOLS){
-                if(action==Action.UP)drawToolCursor=clamp(drawToolCursor-1,6);
-                if(action==Action.DOWN)drawToolCursor=clamp(drawToolCursor+1,6);
+                if(action==Action.UP)drawToolCursor=clamp(drawToolCursor-1,drawMenuCount()-1);
+                if(action==Action.DOWN)drawToolCursor=clamp(drawToolCursor+1,drawMenuCount()-1);
                 if(action==Action.CONFIRM){
                     if(drawToolCursor==6){
                         Mode origin=overlayReturn;mode=origin;
@@ -455,7 +475,7 @@ public final class WorkshopSession {
                         Mode origin=overlayReturn;mode=origin;
                         restoreTransform(SpriteTransform.FLIP_HORIZONTAL.name(),origin.name());return;
                     }
-                    DrawTool chosen=DrawTool.values()[drawToolCursor];
+                    DrawTool chosen=drawMenuTool(drawToolCursor);
                     if(chosen==DrawTool.PICKER&&drawTool!=DrawTool.PICKER)pickerReturn=drawTool==DrawTool.ERASER?DrawTool.BRUSH:drawTool;
                     drawTool=chosen;mode=Mode.CANVAS;
                 }
@@ -516,7 +536,7 @@ public final class WorkshopSession {
             if (tool == 2) {
                 if(action==Action.REGION){chooseRegion();return;}
                 if(action==Action.ZOOM&&!browsingSprites){zoom=!zoom;return;}
-                if(action==Action.DRAW_TOOLS&&!browsingSprites){overlayReturn=mode;drawToolCursor=drawTool.ordinal();mode=Mode.DRAW_TOOLS;return;}
+                if(action==Action.DRAW_TOOLS&&!browsingSprites){overlayReturn=mode;drawToolCursor=drawMenuIndex(drawTool);mode=Mode.DRAW_TOOLS;return;}
                 if (action == Action.SPRITE_SHEET) { showSheet(); return; }
                 if (action == Action.NEW_SPRITE) { createSprite(false); return; }
                 if (action == Action.COPY_SPRITE) { createSprite(true); return; }

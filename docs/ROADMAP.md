@@ -8,7 +8,12 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded lab step (0.0.16): sprite/region → source/target color → live
+Latest bounded lab step (0.0.17): outlined/filled rectangle → two corners → live
+size/pixel preview → one gfx edit → undo or official-runtime test. Controller,
+touch endpoints, draft recovery and byte-preserving cancellation are covered.
+[Device evidence](design/android-rectangle-16/README.md).
+
+Previous step (0.0.16): sprite/region → source/target color → live
 preview and changed count → ordinary gfx replacement → undo or runtime test.
 Controller selection, transparent index 0, draft recovery, no-ops and failed saves
 are covered. [Device evidence](design/android-recolor-15/README.md).

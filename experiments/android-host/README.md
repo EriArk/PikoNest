@@ -1,5 +1,23 @@
 # PIKOOS Android host experiment
 
+Version 0.0.17 adds Прямоугольник and Прямоуг. с заливкой (tool entries 8/9).
+Choose a color before starting. A sets the first corner; D-pad moves the opposite
+corner with a live pixel preview and width×height; A commits. B or Y while drawing
+cancels the draft. Y after committing undoes the whole shape. Start commits a
+pending shape and launches those saved bytes, matching the existing line tool.
+Two touch taps set/commit the corners. Outline preserves the interior; the filled
+variant writes the entire rectangle, including index 0 when selected. Corners are
+inclusive, order-independent and may coincide, or produce a one-pixel row/column.
+All supported sprite/region sizes use the same tool, without requiring a template
+or hero. Existing upper-half-sheet lab restrictions still apply.
+
+Shape type, color, selection, both endpoints and zoom restore after process death
+as a preview. No automatic write occurs. Save failure keeps the draft; no-op
+shapes do not write or add undo. Pending shapes trap palette/menu/tab actions;
+instruction toasts stay hidden while drawing so dimensions remain visible.
+Ovals, square snapping and persistent undo history are not implemented in this
+slice. [Evidence](../../docs/design/android-rectangle-16/README.md).
+
 Version 0.0.16 adds Заменить цвет as the seventh sprite-tool entry. The menu
 scrolls with D-pad or touch swipe. In replacement preview, D-pad selects a palette
 index in an 8×2 grid; X switches source/target. Touch selects the field or swatch.

@@ -6,6 +6,27 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+### Android lab 0.0.17: two-point rectangle brushes
+
+`P8Graphics.withRectangle` changes indexed pixels within inclusive integer corners,
+in either direction, with a border-only or solid mask. It uses the existing gfx
+writer, so outside pixels and unrelated sections remain unchanged. The cart
+wrapper exposes the operation without platform or gameplay-role dependencies.
+
+`WorkshopSession.pendingStroke` covers lines and both rectangle brushes. Anchor,
+cursor, selected color, region and brush define a recomputed immutable preview.
+Confirm saves once before publication/history; Cancel/Y clears the draft; Start
+saves before launching, preserving the existing line workflow. Failure leaves
+the draft available for retry. No-op writes/history are suppressed as before.
+
+The old `lineX`/`lineY` preference keys now hold the first point for every two-point
+brush, while `drawTool` continues to persist its enum name. Portable `restoreStroke`
+checks mode, bounds, tool and the lab shared-map restriction before restoring a
+read-only draft. Menu indices are mapped explicitly so existing transform/recolor
+entries retain positions 5/6 and newly appended brushes cannot collide with them.
+No Lua shape calls or PIKOOS-specific runtime data are generated.
+[Device evidence](design/android-rectangle-16/README.md).
+
 ### Android lab 0.0.16: selected-region color replacement
 
 Portable `P8Graphics.replaceColor` changes matching palette indices only within

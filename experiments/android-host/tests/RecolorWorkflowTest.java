@@ -21,8 +21,8 @@ public final class RecolorWorkflowTest {
         s.cursorX=1;s.cursorY=1;s.color=12;s.drawTool=DrawTool.FILL;s.zoom=true;return s;
     }
     static void begin(WorkshopSession s){
-        s.act(Action.DRAW_TOOLS);for(int i=0;i<7;i++)s.act(Action.DOWN);s.act(Action.CONFIRM);
-        check(s.mode==Mode.RECOLOR,"last menu entry reachable with controller");
+        s.act(Action.DRAW_TOOLS);while(s.drawToolCursor<6)s.act(Action.DOWN);while(s.drawToolCursor>6)s.act(Action.UP);s.act(Action.CONFIRM);
+        check(s.mode==Mode.RECOLOR,"replacement menu entry reachable with controller");
     }
     static int verify(WorkshopCartridge before,WorkshopCartridge after,SpriteRegion r,int from,int to){
         int changed=0;

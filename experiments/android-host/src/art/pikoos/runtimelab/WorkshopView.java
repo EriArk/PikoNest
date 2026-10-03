@@ -38,8 +38,8 @@ final class WorkshopView extends View {
     private long noticeUntil;
     private RectF spriteArea;
     private int viewX,viewY,viewWidth,viewHeight;
-    private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка"};
-    private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из спрайта","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из спрайта"};
+    private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка","Прямоугольник","Прямоуг. с заливкой"};
+    private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из спрайта","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из спрайта","Контур: выбери два противоположных угла","Закрашенная фигура по двум углам"};
     private static final String[] TRANSFORM_NAMES={"Зеркало: слева направо","Зеркало: сверху вниз","Поворот на 90° вправо","Разворот на 180°"};
     private static final class Hit {
         final RectF rect; final Runnable action;
@@ -80,7 +80,7 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine()||s.copying()||s.transforming()||s.recoloring()||s.assetDraft!=null||s.nameEditor!=null;
+        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.assetDraft!=null||s.nameEditor!=null;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -100,7 +100,7 @@ final class WorkshopView extends View {
         c.restore();
         footer();
         if(!previousNotice.equals(s.notice)){previousNotice=s.notice;noticeUntil=SystemClock.uptimeMillis()+2200;}
-        if(s.mode==Mode.NAVIGATE||s.mode==Mode.CANVAS||s.mode==Mode.SHEET||s.mode==Mode.ASSETS){
+        if(!s.pendingStroke()&&(s.mode==Mode.NAVIGATE||s.mode==Mode.CANVAS||s.mode==Mode.SHEET||s.mode==Mode.ASSETS)){
             long remaining=noticeUntil-SystemClock.uptimeMillis();
             if(remaining>0&&!s.notice.equals("Сохранено")){
                 float tw=Math.min(w-32,width(s.notice,18)+28),tx=(w-tw)/2;
@@ -139,12 +139,12 @@ final class WorkshopView extends View {
             return;
         }
         String confirm=s.swapAB?"B":"A",cancel=s.swapAB?"A":"B";
-        String[] drawVerbs={"пиксель","стереть","залить",s.pendingLine()?"линия":"начало","цвет"};
+        String[] drawVerbs={"пиксель","стереть","залить",s.pendingStroke()?"линия":"начало","цвет",s.pendingStroke()?"готово":"угол",s.pendingStroke()?"готово":"угол"};
         String verb=s.mode==Mode.REGION?(s.choosingEnd?"рисовать":"угол"):s.mode==Mode.VALUE?"готово":s.mode==Mode.CANVAS?drawVerbs[s.drawTool.ordinal()]:s.mode==Mode.PALETTE?"цвет":s.mode==Mode.SHEET&&s.sheetFocus<8?"рисовать":"выбор";
         key(confirm+" "+verb,12,bodyBottom,10,()->action(Action.CONFIRM));
-        key(cancel+(s.pendingLine()?" отмена":" назад"),w<500?142:156,bodyBottom,6,()->action(Action.CANCEL));
+        key(cancel+(s.pendingStroke()?" отмена":" назад"),w<500?142:156,bodyBottom,6,()->action(Action.CANCEL));
         if(w>=540){
-            if(s.pendingLine())text("Конец линии",260,bodyBottom+28,18,6);
+            if(s.pendingStroke())text(s.drawTool==DrawTool.LINE?"Конец линии":"Второй угол",260,bodyBottom+28,18,6);
             else if(s.mode==Mode.VALUE)text("← → число",260,bodyBottom+28,18,6);
             else if(s.mode==Mode.PALETTE)text("↑ ↓ ← → цвет",260,bodyBottom+28,18,6);
             else if(s.mode==Mode.REGION)text("↑ ↓ ← → рамка",260,bodyBottom+28,18,6);
@@ -291,7 +291,7 @@ final class WorkshopView extends View {
             rect(x+px*cell,y+py*cell,cell,cell,color==0?((px+viewX+py+viewY)%2==0?0:1):color);
         }
         spriteArea=new RectF(x,y,x+sw,y+sh);
-        if(s.pendingLine()){
+        if(s.pendingStroke()){
             if(s.lineX>=viewX&&s.lineX<viewX+viewWidth&&s.lineY>=viewY&&s.lineY<viewY+viewHeight)
                 outline(x+(s.lineX-viewX)*cell,y+(s.lineY-viewY)*cell,cell,cell,10);
         }
@@ -299,8 +299,9 @@ final class WorkshopView extends View {
             float cx=x+(s.cursorX-viewX)*cell,cy=y+(s.cursorY-viewY)*cell;
             outline(cx-1,cy-1,cell+2,cell+2,0);outline(cx,cy,cell,cell,7);
         }
-        fitted(s.pendingLine()?"Линия: "+ok()+" готово · "+back()+" отмена":s.mode==Mode.CANVAS?DRAW_NAMES[s.drawTool.ordinal()]+" · "+s.cursorX+", "+s.cursorY:ok()+": войти в спрайт",16,180+size+24,16,s.pendingLine()?10:6,size);
-        if(180+size+48<bodyBottom)fitted(s.zoom?"Крупно · окно следует за курсором":s.pendingLine()?"Начало: "+s.lineX+", "+s.lineY:"X цвет · Y отмена",16,180+size+48,16,6,size);
+        String draftLabel=s.drawTool==DrawTool.LINE?"Линия":(Math.abs(s.cursorX-s.lineX)+1)+" × "+(Math.abs(s.cursorY-s.lineY)+1);
+        fitted(s.pendingStroke()?draftLabel+": "+ok()+" готово · "+back()+" отмена":s.mode==Mode.CANVAS?DRAW_NAMES[s.drawTool.ordinal()]+" · "+s.cursorX+", "+s.cursorY:ok()+": войти в спрайт",16,180+size+24,16,s.pendingStroke()?10:6,size);
+        if(180+size+48<bodyBottom)fitted(s.pendingStroke()?"Начало: "+s.lineX+", "+s.lineY:s.zoom?"Крупно · окно следует за курсором":"X цвет · Y отмена",16,180+size+48,16,6,size);
         text("ИНСТРУМЕНТЫ",right,169,18,14);
         button(DRAW_NAMES[s.drawTool.ordinal()]+"  >",right,180,rw,44,s.mode==Mode.NAVIGATE&&s.focus==1,()->action(Action.DRAW_TOOLS));
         boolean paletteActive=s.mode==Mode.PALETTE;
@@ -547,12 +548,12 @@ final class WorkshopView extends View {
             button(back()+" Отмена",dx+28+(dw-44)/2,dy+336,(dw-44)/2,48,false,()->action(Action.CANCEL));
         }else if(s.mode==Mode.DRAW_TOOLS){
             fitted("Инструменты спрайта",dx+20,dy+36,26,14,dw-104);
-            text((s.drawToolCursor+1)+" / 7",dx+dw-70,dy+34,18,6);
+            text((s.drawToolCursor+1)+" / "+WorkshopSession.drawMenuCount(),dx+dw-70,dy+34,18,6);
             int first=Math.max(0,s.drawToolCursor-5);
             for(int row=0;row<6;row++){final int item=first+row;
-                button(item==6?"Заменить цвет":item==5?"Отразить / повернуть":DRAW_NAMES[item],dx+16,dy+54+row*50,dw-32,44,s.drawToolCursor==item,()->{s.chooseDrawTool(item);changed.run();invalidate();});
+                button(item==6?"Заменить цвет":item==5?"Отразить / повернуть":DRAW_NAMES[WorkshopSession.drawMenuTool(item).ordinal()],dx+16,dy+54+row*50,dw-32,44,s.drawToolCursor==item,()->{s.chooseDrawTool(item);changed.run();invalidate();});
             }
-            fitted(s.drawToolCursor==6?"Заменить цвет во всём выделении":s.drawToolCursor==5?"Сравнить варианты перед применением":DRAW_HELP[s.drawToolCursor],dx+20,dy+389,18,7,dw-40);
+            fitted(s.drawToolCursor==6?"Заменить цвет во всём выделении":s.drawToolCursor==5?"Сравнить варианты перед применением":DRAW_HELP[WorkshopSession.drawMenuTool(s.drawToolCursor).ordinal()],dx+20,dy+389,18,7,dw-40);
             text(ok()+" выбрать · "+back()+" назад",dx+20,dy+426,18,6);
             hit(dx+12,dy+398,(dw-32)/2,44,()->action(Action.CONFIRM));
             hit(dx+20+(dw-32)/2,dy+398,(dw-32)/2,44,()->action(Action.CANCEL));
