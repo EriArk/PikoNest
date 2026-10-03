@@ -83,6 +83,13 @@ my-game/
 
 ## Status
 
+Android 0.0.21 adds persistent folder selection and access checks for games,
+downloads, projects and library/data. Existing lab files are retained; connecting
+these locations to indexing/saves and Splore remains separate work.
+[Device evidence](docs/design/android-folders-20/README.md).
+The next workflow is the owner's Play-first launcher: direct play with a separate
+Workshop entrance. See the [whole-product plan](docs/ROADMAP.md#completion-path).
+
 Android 0.0.20 adds pixel-fragment movement inside the opened sprite/region.
 Select two corners, position the fragment with one-pixel steps, preview and apply.
 Overlapping moves, zeros, draft recovery and whole-edit undo/redo are covered.

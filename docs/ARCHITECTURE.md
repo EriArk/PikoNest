@@ -6,6 +6,27 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+### Android lab 0.0.21: persistent folder intentions
+
+Portable `FolderSetup` owns four roles, semantic selection, access states and
+publish-after-verification behavior. Locations are opaque identifiers. Failed
+replacement/persistence retains the previous entry; denied rechecks preserve
+the original handle for reconnect. Cold restoration starts UNKNOWN, not READY.
+Cancellation ignores late results and never redirects a project store.
+
+Android `FolderAccess` uses persisted SAF tree grants, directory queries and an
+owned UUID probe for writable roles. Probe bytes are read back; only the created
+probe URI is deleted. Games require read access only. Provider calls run on a
+worker; destroyed/stale Activities cannot commit results. A process killed during
+the probe may leave its uniquely named temporary file; no cleanup scans delete
+unknown files. Folder preferences and pending picker role survive recreation.
+Existing project/asset stores and external runtime paths are unchanged: these
+are prepared locations, not active migration or Splore synchronization.
+
+Controller-first Play is now an explicit near-term workflow: its library/index
+must be separate from editable ProjectStore. Browsing/launching external games
+must not call editor import or rewrite originals. See PRODUCT_VISION and ROADMAP.
+
 ### Android lab 0.0.20: pixel-fragment movement
 
 Portable `SpriteMove` owns three-stage selection/placement intent within an

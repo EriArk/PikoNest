@@ -18,6 +18,7 @@ import java.util.ArrayList;
 final class LibraryView extends View {
     private final LibrarySession s;
     private final Runnable changed;
+    private final Runnable folders;
     private final String active;
     private final boolean swap;
     private final Paint p=new Paint();
@@ -28,13 +29,13 @@ final class LibraryView extends View {
         final RectF rect;final Runnable run;
         Hit(float x,float y,float w,float h,Runnable run){rect=new RectF(x,y,x+w,y+h);this.run=run;}
     }
-    LibraryView(Context context,LibrarySession session,String active,boolean swap,Runnable changed){
-        super(context);s=session;this.active=active;this.swap=swap;this.changed=changed;
+    LibraryView(Context context,LibrarySession session,String active,boolean swap,Runnable changed,Runnable folders){
+        super(context);s=session;this.active=active;this.swap=swap;this.changed=changed;this.folders=folders;
         p.setTypeface(Typeface.createFromAsset(context.getAssets(),"Tiny5-Regular.ttf"));p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
         setContentDescription("Мои игры. Влево и вправо: картридж. Вниз: действия. Y: сохранить выбранную игру в файл .p8.");
     }
-    void action(Action a){s.act(a);changed.run();invalidate();}
+    void action(Action a){if(a==Action.MENU&&s.mode==LibrarySession.Mode.SHELF){folders.run();return;}s.act(a);changed.run();invalidate();}
     private void rect(float x,float y,float w,float h,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+w,y+h,p);}
     private void outline(float x,float y,float w,float h,int color){rect(x,y,w,3,color);rect(x,y+h-3,w,3,color);rect(x,y,3,h,color);rect(x+w-3,y,3,h,color);}
     private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(size);c.drawText(value,x,y,p);}
@@ -47,6 +48,8 @@ final class LibraryView extends View {
         if(getWidth()/scale<360)scale=getWidth()/360f;if(getHeight()/scale<480)scale=getHeight()/480f;
         w=getWidth()/scale;h=getHeight()/scale;c.save();c.scale(scale,scale);hits.clear();
         rect(0,0,w,h,1);rect(0,0,w,42,2);text("PIKOOS",16,30,28,7);text("твои маленькие миры",170,28,16,14);
+        rect(w-100,0,100,42,2);text("≡ Папки",w-94,28,18,10);
+        hits.add(new Hit(w-100,0,100,42,()->action(Action.MENU)));
         text("Мои игры",16,85,30,7);
         text(s.entries().isEmpty()?"Пока ни одной":(s.selected+1)+" / "+s.entries().size(),w-88,83,18,6);
         int columns=w>=550?3:2,start=s.selected/columns*columns;

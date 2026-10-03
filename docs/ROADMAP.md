@@ -8,7 +8,12 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded lab step (0.0.20): select pixel fragment → place within opened
+Latest bounded lab step (0.0.21): choose four persistent folder roles → verify
+read/write access → recover after restart/cancel. Existing project storage is
+preserved; activation/migration and Splore integration remain open.
+[Device evidence](design/android-folders-20/README.md).
+
+Previous step (0.0.20): select pixel fragment → place within opened
 sprite/region → preview → one save/undo/redo operation. Overlap, index 0, controller,
 touch and draft recovery are covered. [Device evidence](design/android-move-19/README.md).
 
@@ -67,6 +72,7 @@ The accepted pixel style and controller-first interaction apply throughout.
 | Order | Work | Completion gate |
 | --- | --- | --- |
 | 1. Production foundations | Confirm framework/layer tradeoffs; keep domain/workflows portable. Complete runtime import/validation/launch behind the Android backend. First-run setup chooses games, Splore downloads, own projects and data/library folders; explain and automatically prepare the supported purchased PICO-8 archive. | Fresh installation reaches a playable cart and returns reliably, without terminal/manual extraction; folders remain usable after reboot, permission loss has recovery. |
+| 1b. Play-first launcher | Default Play library, separate Workshop entrance, cartridge covers, recent launches, favorites and direct controller launch/return from the connected games folder. Indexing remains separate from editable projects; preserve originals and report unsupported/dependent carts accurately. | Browse → play → return to the same selection, without importing a project or entering an editor. Verify runtime availability, offline play and restarts. |
 | 2. Project ownership and safety | Unify create/open/import/remix/save/export; persistent user folders, names, recovery, backups and persistent history. Add `.p8.png` and linked-file/multicart-aware import with lossless preservation. | A project can move between PIKOOS and ordinary PICO-8, survive app updates/interruption, and be restored from a backup with its dependencies. |
 | 3. Graphics and world tools | Finish sprite selection/allocation/flags, animation frames/timing, tile/map editing, backgrounds and camera/parallax tools. Handle shared map/gfx memory explicitly. | Create and animate original resources, construct a scrolling scene and test it; no mandatory hero or template. |
 | 4. Code, mechanics and learning | Controller-oriented Lua editing, completion, structural insertion and parameter panels; ordinary-Lua mechanics for movement, puzzles, objects, enemies, events, effects/particles. Contextual explanations and PICO-8 reference/help. | Build actual behavior from a blank cart without a physical keyboard; generated code stays inspectable/editable and unfamiliar code is preserved. |
@@ -84,10 +90,12 @@ The sequence is a working plan, not a delivery-date or feasibility promise for
 experimental online features. Stage acceptance does not follow automatically from
 tests/screenshots: user-facing behavior and physical ergonomics need review.
 
-**Next foundation slice after the current move tool:** establish persistent folder
-selection and access validation for the first-run workflow, preserving existing
-lab data. Follow with an explicit, verified migration path; do not move existing
-projects or retire the experiment before preservation is demonstrated.
+**Next slice after folder selection:** connect the games folder to a dedicated
+Play shelf and close browse → launch → return, preserving the Workshop entrance.
+This reflects the owner's explicit everyday-play priority. Runtime setup and
+verified project/data migration remain foundation tasks; selecting folder
+preferences alone does not complete them. Do not move existing projects or retire
+the experiment before preservation is demonstrated.
 
 ## Added owner requirements: setup and reusable assets
 

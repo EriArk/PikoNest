@@ -9,6 +9,14 @@ and checked with the owner.
 
 ## 1. Product idea
 
+Owner clarification, 2026-10-03: simply playing is a primary everyday use case.
+The default home offers a beautiful, controller-first **Play** library with direct
+launch, recent cartridges and favorites. **Workshop** is a separate, deliberate
+entrance for creation/editing. Playing does not require a project, remix, tutorial
+or editor; returning restores the library selection. Recent means recently
+launched, not a promised process save state. The current lab shelf still opens
+editor projects; the dedicated launcher is the next integrated workflow.
+
 PIKOOS is a handheld-first environment for the full PICO-8 creative loop:
 
 > **Play → inspect → remix → create → learn → test → share**

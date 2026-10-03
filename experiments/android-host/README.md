@@ -1,5 +1,16 @@
 # PIKOOS Android host experiment
 
+Version 0.0.21 adds Папки on the shelf (Select or header button). Four persistent
+SAF roles: existing games (read), Splore downloads, projects and data/library
+(read/write). D-pad selects, A chooses through Android, X verifies, B returns.
+Touch selects a row, then the footer chooses/checks it. Writable checks use an
+owned temporary file with read-back and cleanup; cold-start entries are unverified
+until rechecked. Cancelling or rejecting a replacement retains the old choice.
+Busy checks can be left; late results cannot publish. Existing lab files are not
+moved, and these locations do not yet drive indexing/saves/Splore. This is the
+folder foundation for the first-run wizard and the upcoming Play launcher.
+[Device evidence](../../docs/design/android-folders-20/README.md).
+
 Version 0.0.20 adds Перенести фрагмент as tool entry 12. Inside the opened
 sprite/region, choose first corner → opposite corner → destination. D-pad moves
 one pixel; A advances/applies. Touch sets the pixel position and the visible A

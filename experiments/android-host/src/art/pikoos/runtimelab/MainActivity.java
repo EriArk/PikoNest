@@ -22,6 +22,7 @@ import art.pikoos.lab.core.SpriteAsset;
 import art.pikoos.lab.core.NameEditor;
 import android.util.Base64;
 import art.pikoos.lab.core.LibrarySession;
+import art.pikoos.lab.core.FolderSetup;
 import art.pikoos.lab.core.CartridgeImport;
 import art.pikoos.lab.core.CartridgeExport;
 import art.pikoos.lab.core.WorkshopSession;
@@ -47,6 +48,11 @@ public final class MainActivity extends Activity {
     private SpriteAssetStore assetStore;
     private LibrarySession library;
     private LibraryView shelf;
+    private SharedPreferences folderPrefs;
+    private FolderSetup folders;
+    private FolderView folderView;
+    private boolean showingFolders;
+    private static final int PICK_FOLDER=43;
     private String activeId="moon-garden";
     private String activeTitle="Лунный сад";
     private static final int PICK_CART=41;
@@ -65,6 +71,7 @@ public final class MainActivity extends Activity {
         super.onCreate(saved);
         prefs=getSharedPreferences("moon-garden-ui",MODE_PRIVATE);
         libraryPrefs=getSharedPreferences("library-ui",MODE_PRIVATE);
+        folderPrefs=getSharedPreferences("folder-setup",MODE_PRIVATE);
         activeId=libraryPrefs.getString("active","moon-garden");
         if(!LibrarySession.validId(activeId))activeId="moon-garden";
         awaitingReturn=libraryPrefs.getBoolean("awaitingReturn",prefs.getBoolean("awaitingReturn",false));leftForRuntime=awaitingReturn;
@@ -104,7 +111,7 @@ public final class MainActivity extends Activity {
                     startActivityForResult(save,SAVE_CART);
                 }
             },template,asset("blank.p8"),asset("lights.p8"));
-            input=new ControllerInput(action->{if(showingLibrary)shelf.action(action);else if(surface!=null)surface.action(action);},
+            input=new ControllerInput(action->{if(showingFolders)folderView.action(action);else if(showingLibrary)shelf.action(action);else if(surface!=null)surface.action(action);},
                 ()->session!=null?session.swapAB:libraryPrefs.getBoolean("swapAB",false));
             try{openProject(activeId,new WorkshopCartridge(store.read(activeId)));}
             catch(Exception e){Log.e(TAG,"Last project unavailable; retained",e);showLibrary();library.fail(e);shelf.invalidate();}
@@ -131,6 +138,7 @@ public final class MainActivity extends Activity {
                 }catch(Exception e){showLibrary(shelfSelection,4);library.fail(e);shelf.invalidate();}
             }
             if(exportJob!=null)exportJob.attach(exportListener);
+            if(!awaitingReturn&&folderPrefs.getBoolean("visible",false))showFolders();
         }catch(Exception e){
             TextView error=new TextView(this);error.setText("Не удалось открыть проекты. Исходные файлы сохранены.\n"+e.getMessage());
             error.setTextColor(WorkshopView.COLORS[7]);error.setBackgroundColor(WorkshopView.COLORS[1]);error.setPadding(32,32,32,32);
@@ -164,6 +172,7 @@ public final class MainActivity extends Activity {
         showWorkshop();
     }
     private void showWorkshop(){
+        showingFolders=false;
         showingLibrary=false;
         surface=new WorkshopView(this,session,activeTitle,()->persistUi());
         setContentView(surface);surface.requestFocus();immersive();persistUi();
@@ -175,8 +184,74 @@ public final class MainActivity extends Activity {
         persistUi();library.refresh(preferred);
         if(!library.entries().isEmpty())library.focus=Math.max(0,Math.min(4,focus));
         showingLibrary=true;
-        shelf=new LibraryView(this,library,activeId,session!=null&&session.swapAB,()->persistUi());
+        shelf=new LibraryView(this,library,activeId,session!=null&&session.swapAB,()->persistUi(),()->showFolders());
         setContentView(shelf);shelf.requestFocus();immersive();persistUi();
+    }
+    private void showFolders(){
+        persistUi();
+        String[] locations=new String[4],names=new String[4];
+        for(FolderSetup.Role role:FolderSetup.Role.values()){
+            locations[role.ordinal()]=folderPrefs.getString(role.name()+".uri","");
+            names[role.ordinal()]=folderPrefs.getString(role.name()+".name","");
+        }
+        folders=new FolderSetup(new FolderSetup.Port(){
+            public void pick(FolderSetup.Role role){
+                try{
+                    if(!folderPrefs.edit().putString("pending",role.name()).commit())throw new Exception("Не удалось сохранить выбор");
+                    Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION|Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+                    if(role.writable())intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    String current=folders.entry(role.ordinal()).location;
+                    if(!current.isEmpty())intent.putExtra(android.provider.DocumentsContract.EXTRA_INITIAL_URI,Uri.parse(current));
+                    startActivityForResult(intent,PICK_FOLDER);
+                }catch(Exception e){folders.notice="Не удалось открыть выбор папки";folderView.invalidate();}
+            }
+            public void check(FolderSetup.Role role,String location){checkFolder(role,location);}
+            public void save(FolderSetup.Role role,String location,String name)throws Exception{
+                String key=role.name(),oldUri=folderPrefs.getString(key+".uri",""),oldName=folderPrefs.getString(key+".name","");
+                if(!folderPrefs.edit().putString(key+".uri",location).putString(key+".name",name).commit()){
+                    // SharedPreferences publishes in memory even when durable commit fails.
+                    folderPrefs.edit().putString(key+".uri",oldUri).putString(key+".name",oldName).commit();
+                    throw new Exception("Не удалось сохранить папку");
+                }
+            }
+            public void leave(){
+                showingFolders=false;folderPrefs.edit().putBoolean("visible",false).apply();
+                setContentView(shelf);shelf.requestFocus();immersive();
+            }
+        },locations,names);
+        folders.select(folderPrefs.getInt("selected",0));showingFolders=true;
+        folderPrefs.edit().putBoolean("visible",true).apply();
+        folderView=new FolderView(this,folders,session!=null&&session.swapAB,()->folderPrefs.edit().putInt("selected",folders.selected).apply());
+        setContentView(folderView);folderView.requestFocus();immersive();
+    }
+    private void checkFolder(FolderSetup.Role role,String location){
+        final FolderSetup target=folders;
+        final android.content.ContentResolver resolver=getApplicationContext().getContentResolver();
+        new Thread(()->{
+            String name=null,problem=null;
+            try{name=FolderAccess.verify(resolver,Uri.parse(location),role.writable());}
+            catch(Exception e){Log.w(TAG,"Folder access check failed",e);problem=e instanceof SecurityException?"Нет доступа. Выбери папку снова.":e.getMessage();if(problem==null)problem="Папка недоступна. Попробуй снова.";}
+            final String result=name,error=problem;
+            runOnUiThread(()->{
+                // A stale/recreated Activity cannot publish a new location. Retry is safe.
+                if(isDestroyed()||isFinishing()||!showingFolders||folders!=target)return;
+                target.complete(result,error);folderView.invalidate();
+            });
+        },"pikoos-folder-check").start();
+    }
+    private void folderResult(int result,Intent data){
+        String pending=folderPrefs.getString("pending","");folderPrefs.edit().remove("pending").apply();
+        if(!showingFolders)showFolders();
+        if(result!=RESULT_OK||data==null||data.getData()==null){folders.notice="Выбор отменён · прежняя папка сохранена";folderView.invalidate();return;}
+        try{
+            FolderSetup.Role role=FolderSetup.Role.valueOf(pending);Uri tree=data.getData();
+            int flags=data.getFlags()&(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            if(!role.writable())flags&=Intent.FLAG_GRANT_READ_URI_PERMISSION;
+            getContentResolver().takePersistableUriPermission(tree,flags);
+            folders.begin(role,tree.toString());
+        }catch(Exception e){folders.notice="Доступ не сохранён. Попробуй выбрать снова.";Log.w(TAG,"Folder selection failed",e);}
+        folderView.invalidate();
     }
     private static byte[] readAll(InputStream in)throws Exception{
         ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[4096];int count;
@@ -185,6 +260,7 @@ public final class MainActivity extends Activity {
     private byte[] asset(String name)throws Exception{try(InputStream in=getAssets().open(name)){return readAll(in);}}
     @Override protected void onActivityResult(int request,int result,Intent data){
         super.onActivityResult(request,result,data);
+        if(request==PICK_FOLDER){folderResult(result,data);return;}
         if(request==SAVE_CART){exportResult(result,data);return;}
         if(request!=PICK_CART||library==null)return;
         if(result!=RESULT_OK||data==null||data.getData()==null)return;
@@ -356,5 +432,5 @@ public final class MainActivity extends Activity {
     }
     @Override public boolean dispatchKeyEvent(KeyEvent event){return input!=null&&input.key(event)||super.dispatchKeyEvent(event);}
     @Override public boolean onGenericMotionEvent(MotionEvent event){return input!=null&&input.motion(event)||super.onGenericMotionEvent(event);}
-    @Override public void onBackPressed(){if(showingLibrary&&shelf!=null)shelf.action(Action.CANCEL);else if(surface!=null)surface.action(Action.CANCEL);else super.onBackPressed();}
+    @Override public void onBackPressed(){if(showingFolders)folderView.action(Action.CANCEL);else if(showingLibrary&&shelf!=null)shelf.action(Action.CANCEL);else if(surface!=null)surface.action(Action.CANCEL);else super.onBackPressed();}
 }

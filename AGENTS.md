@@ -119,6 +119,12 @@ product rule. A template-only parameter adapter is not the general tool itself.
 
 ### Controller-first
 
+Owner clarification (2026-10-03): everyday play is a primary use case. The
+default Play library must support attractive cartridge browsing, recent launches,
+favorites and direct controller launch/return. Workshop is a separate entrance.
+Playing must not require editor import, project creation, remixing or a tutorial.
+Build this workflow early, alongside the runtime/storage foundations.
+
 Important actions must be possible using handheld controls. Touch should make drawing, selection and editing better but should not become a hard architectural dependency.
 
 Input must use abstract actions, not hard-coded Android key codes or one device layout.

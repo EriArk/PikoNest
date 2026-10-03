@@ -28,6 +28,7 @@ $pikoTests = @(Get-ChildItem (Join-Path $PSScriptRoot 'tests') -Filter '*.java' 
 
 # Compile/test the domain with the JDK alone, proving no Android dependency.
 Invoke-PikoTool $pikoJavac (@('--release','8','-encoding','UTF-8','-d',(Join-Path $pikoBuild 'tests')) + $pikoCore + $pikoTests)
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'FolderSetupTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LabCartridgeTest',(Join-Path $PSScriptRoot 'assets\workshop.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'WorkshopTest',(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'SpriteWorkflowTest',(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
