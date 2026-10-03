@@ -1,5 +1,12 @@
 # PIKOOS Android host experiment
 
+Version 0.0.35 adds function/line navigation in the current Lua draft. R opens the
+chooser, L/R switches functions/line number, A jumps, B cancels, X returns to the
+previous location. Select-menu alternatives do not require shoulder buttons.
+Navigation preserves cart bytes and edit history; selection and return locations
+recover after process death. The outline is lexical, not cross-file symbol resolution.
+[Device checks and limits](../../docs/design/android-navigation-35/README.md).
+
 Version 0.0.34 opens supported existing single-line calls as parameter forms:
 L from the code cursor, or Select → Parameters. Preview shows before/after; Apply
 replaces only changed argument spans, preserving other source bytes. B cancels;

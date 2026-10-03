@@ -8,12 +8,12 @@ import java.util.ArrayDeque;
 
 /** Portable literal-text editor with explicit snippet proposals; never normalizes unrelated Lua. */
 public final class LuaDraft {
-    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS }
+    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS, NAVIGATION }
     public static final String[] PAGES={"abcdefghijklmnopqrstuvwxyz0123456789_ ",
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ ","()[]{}=+-*/%^#<>~!;:,.\"'\\|&?$@_ "};
     public static final String[] COMMANDS={"Сохранить и закрыть","Сохранить и тест","Новая строка","Пробел","Табуляция",
         "Стереть слева","Удалить справа","Начать / снять выделение","Выделить всё","Копировать","Вырезать","Вставить",
-        "Отменить правку","Вернуть правку","В начало строки","В конец строки","Закрыть черновик","Буквы / символы","Вставить конструкцию / API","Параметры вызова в строке"};
+        "Отменить правку","Вернуть правку","В начало строки","В конец строки","Закрыть черновик","Буквы / символы","Вставить конструкцию / API","Параметры вызова в строке","Перейти к функции / строке","Вернуться к месту перехода"};
     private static final int LIMIT=2*1024*1024; // Lab memory guard, not a PICO-8 code budget.
     private final WorkshopCartridge original;
     private final int lua;
@@ -24,6 +24,33 @@ public final class LuaDraft {
     public int page,key,menu;
     public LuaInsert insertion;
     public LuaCall callEdit;
+    public LuaNavigation navigation;
+    private final ArrayDeque<int[]> jumps=new ArrayDeque<>();
+    public boolean canGoBack(){return !jumps.isEmpty();}
+    public void beginNavigation(){navigation=new LuaNavigation(text,line());panel=Panel.NAVIGATION;}
+    public void cancelNavigation(){navigation=null;panel=Panel.CURSOR;}
+    public void jump(){
+        if(navigation==null||(navigation.tab==0&&navigation.entries.isEmpty()))return;
+        int at=lineStart(navigation.selectedLine());
+        if(at!=cursor||anchor>=0){if(jumps.size()==32)jumps.removeLast();jumps.push(new int[]{cursor,anchor});cursor=at;anchor=-1;}
+        cancelNavigation();
+    }
+    public void goBack(){
+        if(jumps.isEmpty())return;
+        int[] at=jumps.pop();cursor=at[0];anchor=at[1];cancelNavigation();
+    }
+    // Return positions follow unchanged text. Deleted positions land at replacement start.
+    private void changeText(String value){
+        int prefix=0,oldEnd=text.length(),newEnd=value.length();
+        while(prefix<oldEnd&&prefix<newEnd&&text.charAt(prefix)==value.charAt(prefix))prefix++;
+        while(oldEnd>prefix&&newEnd>prefix&&text.charAt(oldEnd-1)==value.charAt(newEnd-1)){oldEnd--;newEnd--;}
+        for(int[] at:jumps)for(int n=0;n<2;n++)if(at[n]>=0){
+            if(at[n]>=oldEnd)at[n]+=newEnd-oldEnd;
+            else if(at[n]>prefix)at[n]=prefix;
+        }
+        text=value;
+        for(int[] at:jumps)for(int n=0;n<2;n++)while(at[n]>0&&!boundary(at[n]))at[n]--;
+    }
     public boolean proposal(){return panel==Panel.INSERT||panel==Panel.PARAMETERS;}
     public void beginParameters(){
         if(selectionStart()!=selectionEnd())throw new IllegalArgumentException("Сними выделение перед правкой параметров");
@@ -34,7 +61,7 @@ public final class LuaDraft {
     private static final class State {
         final String text;final int cursor,anchor;
         State(LuaDraft d){text=d.text;cursor=d.cursor;anchor=d.anchor;}
-        void apply(LuaDraft d){d.text=text;d.cursor=cursor;d.anchor=anchor;}
+        void apply(LuaDraft d){d.changeText(text);d.cursor=cursor;d.anchor=anchor;}
     }
     public LuaDraft(WorkshopCartridge cart,int line){
         original=cart;P8Document doc=P8Document.parse(cart.bytes());lua=doc.uniqueSection("lua");
@@ -94,7 +121,7 @@ public final class LuaDraft {
         int from=selectionStart(),to=selectionEnd();
         String changed=text.substring(0,from)+value+text.substring(to);
         if(changed.getBytes(StandardCharsets.UTF_8).length>LIMIT)throw new IllegalArgumentException("Достигнут предел памяти черновика PIKOOS");
-        if(!changed.equals(text)){remember(undo);redo.clear();text=changed;}
+        if(!changed.equals(text)){remember(undo);redo.clear();changeText(changed);}
         cursor=from+value.length();anchor=-1;
     }
     private void remember(ArrayDeque<State> stack){if(stack.size()==32)stack.removeLast();stack.push(new State(this));}
@@ -102,7 +129,7 @@ public final class LuaDraft {
         if(selectionStart()!=selectionEnd()){replace("");return;}
         int from=forward?cursor:previous(cursor),to=forward?next(cursor):cursor;
         if(from==to)return;
-        remember(undo);redo.clear();text=text.substring(0,from)+text.substring(to);cursor=from;anchor=-1;
+        remember(undo);redo.clear();changeText(text.substring(0,from)+text.substring(to));cursor=from;anchor=-1;
     }
     public void history(boolean returning){
         ArrayDeque<State> from=returning?redo:undo,to=returning?undo:redo;
@@ -121,7 +148,7 @@ public final class LuaDraft {
         if(callEdit!=null){
             String changed=callEdit.replacement(text,insertion);
             if(changed.getBytes(StandardCharsets.UTF_8).length>LIMIT)throw new IllegalArgumentException("Достигнут предел памяти черновика PIKOOS");
-            if(!changed.equals(text)){remember(undo);redo.clear();text=changed;cursor=callEdit.start;anchor=-1;}
+            if(!changed.equals(text)){remember(undo);redo.clear();changeText(changed);cursor=callEdit.start;anchor=-1;}
             cancelInsert();return;
         }
         int at=lineStart(line());String current=lineText(line()),indent="";
@@ -135,7 +162,7 @@ public final class LuaDraft {
         String changed=text.substring(0,at)+inserted+text.substring(at);
         if(changed.getBytes(StandardCharsets.UTF_8).length>LIMIT)throw new IllegalArgumentException("Достигнут предел памяти черновика PIKOOS");
         int caret=insertion.item().block?at+inserted.indexOf(newline)+newline.length()+indent.length()+2:at+inserted.length()+indent.length();
-        remember(undo);redo.clear();text=changed;cursor=caret;anchor=-1;insertion=null;panel=Panel.CURSOR;
+        remember(undo);redo.clear();changeText(changed);cursor=caret;anchor=-1;insertion=null;panel=Panel.CURSOR;
     }
     public void cancelInsert(){insertion=null;callEdit=null;panel=Panel.CURSOR;}
     public CartEdit edit(){
@@ -149,18 +176,33 @@ public final class LuaDraft {
     /** Recovery snapshot, including original bytes for stale-draft detection. History is session-only. */
     public byte[] encode(){
         try{ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
-            out.writeInt(4);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
+            boolean navState=navigation!=null||!jumps.isEmpty();out.writeInt(navState?5:4);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
             out.writeInt(cursor);out.writeInt(anchor);out.writeInt(page);out.writeInt(key);out.writeInt(panel.ordinal());out.writeInt(menu);
             write(out,clipboard.getBytes(StandardCharsets.UTF_8));out.writeBoolean(insertion!=null);if(insertion!=null)insertion.write(out);
+            if(navState){
+                out.writeBoolean(navigation!=null);
+                if(navigation!=null){out.writeInt(navigation.tab);out.writeInt(navigation.index);out.writeInt(navigation.target);out.writeInt(navigation.digit);}
+                out.writeInt(jumps.size());for(int[] at:jumps){out.writeInt(at[0]);out.writeInt(at[1]);}
+            }
             out.close();return bytes.toByteArray();
         }catch(IOException e){throw new IllegalStateException(e);}
     }
     public static LuaDraft restore(byte[] bytes){
-        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>4)throw new IOException("version");
+        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>5)throw new IOException("version");
             LuaDraft d=new LuaDraft(new WorkshopCartridge(read(in)),0);d.text=decode(read(in));
             d.cursor=in.readInt();d.anchor=in.readInt();d.page=in.readInt();d.key=in.readInt();int panel=in.readInt();d.menu=in.readInt();
             d.clipboard=decode(read(in));
             if(version>=2&&in.readBoolean())d.insertion=LuaInsert.read(in,version>=3,panel==Panel.PARAMETERS.ordinal());
+            if(version>=5){
+                if(in.readBoolean()){
+                    LuaNavigation nav=new LuaNavigation(d.text,0);nav.tab=in.readInt();nav.index=in.readInt();nav.target=in.readInt();nav.digit=in.readInt();
+                    if(nav.tab<0||nav.tab>1||nav.index<0||nav.index>=Math.max(1,nav.entries.size())||nav.target<1||nav.target>nav.lines||nav.digit<0||nav.digit>=nav.digits())throw new IOException("navigation");
+                    d.navigation=nav;
+                }
+                int count=in.readInt();if(count<0||count>32)throw new IOException("jumps");
+                for(int n=0;n<count;n++){int at=in.readInt(),anchor=in.readInt();if(!d.boundary(at)||(anchor!=-1&&!d.boundary(anchor)))throw new IOException("jump");d.jumps.addLast(new int[]{at,anchor});}
+            }
+            if((panel==Panel.NAVIGATION.ordinal())!=(d.navigation!=null))throw new IOException("navigation panel");
             if(in.available()!=0||!d.boundary(d.cursor)||(d.anchor!=-1&&!d.boundary(d.anchor))||d.page<0||d.page>=PAGES.length
                 ||d.key<0||d.key>=PAGES[d.page].length()||panel<0||panel>=Panel.values().length||d.menu<0||d.menu>=COMMANDS.length)throw new IOException("state");
             d.panel=Panel.values()[panel];if(d.proposal()!=(d.insertion!=null))throw new IOException("insert state");

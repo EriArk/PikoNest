@@ -31,6 +31,7 @@ Invoke-PikoTool $pikoJavac (@('--release','8','-encoding','UTF-8','-d',(Join-Pat
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaInsertTest',(Join-Path $PSScriptRoot 'assets\blank.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaSymbolsTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaCallTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaNavigationTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaEditorTest',(Join-Path $PSScriptRoot 'assets\blank.p8'),(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'FolderSetupTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LauncherPathTest')

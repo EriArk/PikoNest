@@ -37,6 +37,7 @@ public final class LuaEditorTest {
             s.act(Action.CONFIRM);s.codeDraft.home();type(s,"-- my own cart");s.codeCommand(2);
             check(p.writes==0&&!s.canUndo(),"draft input never persists canonical cart");
             s.act(Action.NEXT);check(s.tool==1&&s.mode==Mode.CODE,"tool switch cannot discard draft");
+            check(s.codeDraft.panel==LuaDraft.Panel.NAVIGATION,"R opens navigation inside draft");s.act(Action.CANCEL);
             byte[] draft=s.codeDraft.encode();WorkshopSession restored=new WorkshopSession(cart,p);restored.restoreCode(draft);
             check(restored.codeDraft.text().equals(s.codeDraft.text()),"process recovery text");
             same(s.codeDraft.edit().candidate(cart).bytes(),restored.codeDraft.edit().candidate(cart).bytes(),"process recovery exact candidate");

@@ -19,6 +19,7 @@ import art.pikoos.lab.core.SpriteAsset;
 import art.pikoos.lab.core.NameEditor;
 import art.pikoos.lab.core.LuaDraft;
 import art.pikoos.lab.core.LuaInsert;
+import art.pikoos.lab.core.LuaNavigation;
 import android.view.KeyEvent;
 import android.view.InputDevice;
 import art.pikoos.lab.core.HeroBinding;
@@ -71,7 +72,7 @@ final class WorkshopView extends View {
             }
             return false;
         }
-        if(d.panel==LuaDraft.Panel.EXIT||d.panel==LuaDraft.Panel.MENU)return false;
+        if(d.panel==LuaDraft.Panel.EXIT||d.panel==LuaDraft.Panel.MENU||d.panel==LuaDraft.Panel.NAVIGATION)return false;
         int key=event.getKeyCode(),command=-1;
         if(event.isCtrlPressed()){
             if(key==KeyEvent.KEYCODE_A)command=8;if(key==KeyEvent.KEYCODE_C)command=9;
@@ -312,6 +313,7 @@ final class WorkshopView extends View {
     private void luaEditor(){
         LuaDraft d=s.codeDraft;
         if(d.proposal()){luaInsertion();return;}
+        if(d.panel==LuaDraft.Panel.NAVIGATION){luaNavigation();return;}
         fitted("[ ] Код / "+projectTitle,16,75,24,7,w-32);
         boolean keys=d.panel==LuaDraft.Panel.KEYS,menu=d.panel==LuaDraft.Panel.MENU,exit=d.panel==LuaDraft.Panel.EXIT;
         String position=(d.line()+1)+":"+(d.column()+1)+(d.anchor()>=0?" · выделение":"");
@@ -356,9 +358,11 @@ final class WorkshopView extends View {
         }else{
             button(ok()+" Ввод",16,bottom+12,(w-40)/2,36,false,()->action(Action.CONFIRM));
             button("X Вставить Lua",24+(w-40)/2,bottom+12,(w-40)/2,36,false,()->action(Action.CONTEXT));
-            fitted("L: параметры строки · Select: правки",16,bodyBottom-36,16,14,w-32);
-            hit(16,bodyBottom-54,w-32,26,()->action(Action.PREVIOUS));
-            fitted(d.dirty()?"Черновик · START сохранит перед тестом":"Без изменений · START тест",16,bodyBottom-13,16,6,w-32);
+            fitted("L: параметры",16,bodyBottom-36,16,14,w/2-20);
+            hit(16,bodyBottom-54,w/2-20,26,()->action(Action.PREVIOUS));
+            fitted("R: перейти",w/2,bodyBottom-36,16,12,w/2-16);
+            hit(w/2,bodyBottom-54,w/2-16,26,()->action(Action.NEXT));
+            fitted(d.dirty()?"Черновик · Select: правки · START: тест":"Без изменений · Select: правки · START: тест",16,bodyBottom-13,16,6,w-32);
         }
         rect(0,bodyBottom,w,44,0);
         key(ok()+(keys?" символ":" ввод"),12,bodyBottom,10,()->action(Action.CONFIRM));
@@ -378,6 +382,46 @@ final class WorkshopView extends View {
             key(ok()+" выбрать",16,bodyBottom,10,()->action(Action.CONFIRM));
             key(back()+" к коду",w/2,bodyBottom,6,()->action(Action.CANCEL));
         }
+    }
+    private void luaNavigation(){
+        LuaDraft d=s.codeDraft;LuaNavigation n=d.navigation;hits.clear();
+        fitted("Перейти / game.p8",16,75,24,14,w-32);
+        fitted("L/R: функции / строка · Select: вкладка",16,99,16,6,w-32);
+        float bw=(w-44)/2;
+        button("Функции · "+n.entries.size(),16,112,bw,36,n.tab==0,()->{n.tab=0;changed.run();invalidate();});
+        button("Номер строки",28+bw,112,bw,36,n.tab==1,()->{n.tab=1;changed.run();invalidate();});
+        float preview=bodyBottom-174;
+        if(n.tab==0){
+            int rows=Math.max(1,(int)((preview-188)/34));
+            int first=Math.max(0,Math.min(n.index-rows/2,n.entries.size()-rows));
+            for(int r=0;r<rows&&first+r<n.entries.size();r++){
+                final int item=first+r;LuaNavigation.Entry entry=n.entries.get(item);
+                button((entry.line+1)+"  "+entry.name,16,158+r*34,w-32,30,item==n.index,()->{n.index=item;changed.run();invalidate();});
+            }
+            fitted(n.entries.isEmpty()?"Именованных функций пока нет":n.truncated?"Часть списка · используй номер строки":"↑↓ выбор · ←→ по 6 · "+(n.index+1)+" / "+n.entries.size(),16,preview-12,16,13,w-32);
+        }else{
+            fitted("Строка 1 — "+n.lines,16,175,18,6,w-32);
+            String number=String.format(java.util.Locale.ROOT,"%0"+n.digits()+"d",n.target);
+            float cell=Math.min(42,(w-140)/n.digits()),x=(w-n.digits()*cell)/2;
+            button("-",16,185,42,42,false,()->action(Action.UP));
+            button("+",w-58,185,42,42,false,()->action(Action.DOWN));
+            for(int i=0;i<number.length();i++){
+                final int digit=number.length()-1-i;boolean selected=digit==n.digit;
+                rect(x+i*cell,185,cell-3,42,selected?10:0);
+                text(number.substring(i,i+1),x+i*cell+8,214,26,selected?1:7);
+                hit(x+i*cell,185,cell-3,42,()->{n.digit=digit;changed.run();invalidate();});
+            }
+            fitted("←→ разряд · ↑↓ меньше / больше",16,preview-12,16,13,w-32);
+        }
+        int line=n.selectedLine();
+        rect(12,preview,w-24,96,0);
+        fitted("СТРОКА "+(line+1)+" · предпросмотр",20,preview+20,16,12,w-40);
+        for(int i=0;i<3&&line+i<d.lineCount();i++)fitted(d.lineText(line+i),20,preview+43+i*20,16,i==0?10:6,w-40);
+        button(d.canGoBack()?"X Вернуться к прежнему месту":"Переходов ещё не было",16,bodyBottom-66,w-32,34,false,()->action(Action.CONTEXT));
+        fitted(ok()+": перейти · "+back()+": остаться на прежнем месте",16,bodyBottom-12,16,13,w-32);
+        rect(0,bodyBottom,w,44,0);
+        key(ok()+" перейти",12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" отмена",w/2,bodyBottom,6,()->action(Action.CANCEL));
     }
     private void luaInsertion(){
         LuaDraft d=s.codeDraft;LuaInsert i=d.insertion;

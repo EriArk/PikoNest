@@ -115,3 +115,22 @@ PARAMETERS panel prevents changing the call's catalogue identity. Format 4 rebui
 the original binding from recovered text/cursor and validates its identity; formats
 1–3 remain readable. Source is checked again before applying, and storage retains
 the existing expected-bytes comparison. See [evidence](design/android-parameters-34/README.md).
+
+## C03.2 continuation — 0.0.35
+
+`LuaNavigation` indexes named function declarations and simple function assignments
+in source order, including local/parameterized declarations and duplicate names.
+Strings/comments are masked. The outline is independent of callable symbol choices:
+a declaration can be a navigation destination without being safe to insert as a call.
+It does not resolve scopes, includes, table-index expressions or anonymous callbacks.
+The 100,000-token scan guard marks a partial outline; line navigation remains available.
+
+The NAVIGATION panel traps editing, save and Test. Preview does not move the cursor;
+Confirm jumps, Cancel preserves cursor/selection, and Back-location restores both.
+Up to 32 locations follow the unchanged prefix/suffix through text changes. Positions
+inside the replaced span collapse to its start, including multi-argument edits; this
+is positional tracking, not semantic identity. UTF-16/CRLF boundaries remain valid.
+Return history is independent of edit Undo/Redo and lasts for the current draft.
+Recovery format 5 stores navigation and return locations, validates bounds and rebuilds
+the outline. Ordinary drafts without navigation state still encode as format 4;
+formats 1–4 remain readable. See [evidence](design/android-navigation-35/README.md).

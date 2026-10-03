@@ -47,7 +47,7 @@ public final class WorkshopSession {
     }
     public void codeCommand(int command){
         if(mode!=Mode.CODE||codeDraft==null)return;
-        if(codeDraft.proposal())return;
+        if(codeDraft.proposal()||codeDraft.panel==LuaDraft.Panel.NAVIGATION)return;
         try{
             LuaDraft d=codeDraft;
             switch(command){
@@ -71,6 +71,8 @@ public final class WorkshopSession {
                 case 17:d.changePage(1);d.panel=LuaDraft.Panel.KEYS;return;
                 case 18:d.beginInsert();return;
                 case 19:d.beginParameters();return;
+                case 20:d.beginNavigation();return;
+                case 21:d.goBack();break;
                 default:return;
             }
             d.panel=LuaDraft.Panel.CURSOR;
@@ -115,6 +117,15 @@ public final class WorkshopSession {
     private void codeAction(Action action)throws Exception{
         LuaDraft d=codeDraft;
         if(d.proposal()){insertAction(action);return;}
+        if(d.panel==LuaDraft.Panel.NAVIGATION){
+            LuaNavigation n=d.navigation;
+            if(action==Action.UP)n.move(0,-1);if(action==Action.DOWN)n.move(0,1);
+            if(action==Action.LEFT)n.move(-1,0);if(action==Action.RIGHT)n.move(1,0);
+            if(action==Action.PREVIOUS||action==Action.NEXT||action==Action.MENU)n.tab=1-n.tab;
+            if(action==Action.CONFIRM)d.jump();if(action==Action.CANCEL)d.cancelNavigation();
+            if(action==Action.CONTEXT)d.goBack();
+            return;
+        }
         if(d.panel==LuaDraft.Panel.EXIT){
             if(action==Action.UP)d.menu=Math.max(0,d.menu-1);
             if(action==Action.DOWN)d.menu=Math.min(2,d.menu+1);
@@ -130,6 +141,7 @@ public final class WorkshopSession {
         if(action==Action.UNDO){d.history(false);return;}
         if(action==Action.REDO){d.history(true);return;}
         if(action==Action.CONTEXT&&d.panel==LuaDraft.Panel.CURSOR){d.beginInsert();return;}
+        if(action==Action.NEXT&&d.panel==LuaDraft.Panel.CURSOR){d.beginNavigation();return;}
         if(action==Action.PREVIOUS&&d.panel==LuaDraft.Panel.CURSOR){d.beginParameters();return;}
         if(action==Action.MENU||action==Action.CONTEXT){
             d.panel=d.panel==LuaDraft.Panel.MENU?LuaDraft.Panel.CURSOR:LuaDraft.Panel.MENU;d.menu=0;return;
