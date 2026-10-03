@@ -51,8 +51,8 @@ The core compiles with the JDK alone; the same controller actions drive device U
   history, backup, multi-file transactions and Save Copy conflict resolution are P03/P04.
 - The storage comparison is not a cross-process filesystem lock or a complete
   external-edit protocol. SAF project activation is still P02.
-- Character selection is a fallback for free text. Structural insertions, useful
-  parameter editors and API completion are C02/C03, not replaced by this keyboard.
+- Character selection is a fallback for free text. C02.1 now supplies structural
+  insertions and parameter proposals; context-aware completion remains C03.
 - Code tabs remain literal source, without a tab/include project editor (C04).
 - The viewer's existing syntax colors are cosmetic; the draft does not claim a Lua
   parser or validation. Errors still come from official PICO-8; C06 remains open.
@@ -61,3 +61,19 @@ The core compiles with the JDK alone; the same controller actions drive device U
 
 Reference: official [PICO-8 manual, Code Editor / Program Structure](https://www.lexaloffle.com/dl/docs/pico-8_manual.html).
 The new tool edits ordinary Lua and keeps runtime authority unchanged.
+
+## C02.1 continuation — 0.0.32
+
+`LuaInsert` holds a versioned proposal with 17 catalogue entries, field kinds,
+ordinary Lua preview and controller text entry. `LuaDraft` inserts before the
+current line, preserves its indentation/newline convention, places the caret in a
+new block and adds one undo entry. No runtime binding or source annotation is added.
+`LuaContext` masks strings/comments to refuse insertion inside them and detect
+literal duplicate function definitions/assignments conservatively. It is not a
+scope resolver: callback placement, conflicting update variants and arbitrary
+expressions still need user judgment and official runtime testing.
+
+Recovery schema 2 includes an unfinished proposal and still reads schema 1.
+Opening/reviewing/cancelling a proposal does not save the cartridge. The same
+storage operation commits the resulting text; failed writes keep the draft.
+See [evidence and limitations](design/android-insert-32/README.md).

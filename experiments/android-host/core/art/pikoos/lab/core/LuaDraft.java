@@ -6,14 +6,14 @@ import java.nio.ByteBuffer;
 import java.io.*;
 import java.util.ArrayDeque;
 
-/** Portable literal-text editor. It does not parse, normalize or generate Lua. */
+/** Portable literal-text editor with explicit snippet proposals; never normalizes unrelated Lua. */
 public final class LuaDraft {
-    public enum Panel { CURSOR, KEYS, MENU, EXIT }
+    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT }
     public static final String[] PAGES={"abcdefghijklmnopqrstuvwxyz0123456789_ ",
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ ","()[]{}=+-*/%^#<>~!;:,.\"'\\|&?$@_ "};
     public static final String[] COMMANDS={"Сохранить и закрыть","Сохранить и тест","Новая строка","Пробел","Табуляция",
         "Стереть слева","Удалить справа","Начать / снять выделение","Выделить всё","Копировать","Вырезать","Вставить",
-        "Отменить правку","Вернуть правку","В начало строки","В конец строки","Закрыть черновик","Буквы / символы"};
+        "Отменить правку","Вернуть правку","В начало строки","В конец строки","Закрыть черновик","Буквы / символы","Вставить конструкцию / API"};
     private static final int LIMIT=2*1024*1024; // Lab memory guard, not a PICO-8 code budget.
     private final WorkshopCartridge original;
     private final int lua;
@@ -22,6 +22,7 @@ public final class LuaDraft {
     private int cursor,anchor=-1;
     public Panel panel=Panel.CURSOR;
     public int page,key,menu;
+    public LuaInsert insertion;
     private final ArrayDeque<State> undo=new ArrayDeque<>(),redo=new ArrayDeque<>();
     private static final class State {
         final String text;final int cursor,anchor;
@@ -103,6 +104,27 @@ public final class LuaDraft {
     public void moveKey(int dx,int dy){key=Math.max(0,Math.min(PAGES[page].length()-1,(key/10+dy)*10+Math.max(0,Math.min(9,key%10+dx))));}
     public void changePage(int delta){page=(page+delta+PAGES.length)%PAGES.length;key=Math.min(key,PAGES[page].length()-1);}
     public void typeKey(){replace(PAGES[page].substring(key,key+1));}
+    public void beginInsert(){
+        if(selectionStart()!=selectionEnd())throw new IllegalArgumentException("Сними выделение перед вставкой. Существующий текст не заменяется.");
+        if(!new LuaContext(text).allowsLine(lineStart(line())))throw new IllegalArgumentException("Выбранная строка внутри текста или комментария. Перейди к строке Lua.");
+        insertion=new LuaInsert();panel=Panel.INSERT;
+    }
+    public void applyInsert(){
+        if(insertion==null||panel!=Panel.INSERT||insertion.screen!=LuaInsert.Screen.FIELDS)return;
+        int at=lineStart(line());String current=lineText(line()),indent="";
+        for(int i=0;i<current.length()&&(current.charAt(i)==' '||current.charAt(i)=='\t');i++)indent+=current.charAt(i);
+        LuaContext context=new LuaContext(text);
+        if(!context.allowsLine(at))throw new IllegalArgumentException("Выбранная строка внутри текста или комментария");
+        String function=insertion.functionName();
+        if(function!=null&&context.defines(function))throw new IllegalArgumentException("Функция "+function+" уже задана. Перейди к её телу; существующий код не заменён.");
+        String raw=insertion.code();StringBuilder inserted=new StringBuilder();
+        for(String row:raw.split("\n"))inserted.append(indent).append(row).append(newline);
+        String changed=text.substring(0,at)+inserted+text.substring(at);
+        if(changed.getBytes(StandardCharsets.UTF_8).length>LIMIT)throw new IllegalArgumentException("Достигнут предел памяти черновика PIKOOS");
+        int caret=insertion.item().block?at+inserted.indexOf(newline)+newline.length()+indent.length()+2:at+inserted.length()+indent.length();
+        remember(undo);redo.clear();text=changed;cursor=caret;anchor=-1;insertion=null;panel=Panel.CURSOR;
+    }
+    public void cancelInsert(){insertion=null;panel=Panel.CURSOR;}
     public CartEdit edit(){
         P8Document doc=P8Document.parse(original.bytes());
         byte[] body=text.getBytes(StandardCharsets.UTF_8);
@@ -114,19 +136,21 @@ public final class LuaDraft {
     /** Recovery snapshot, including original bytes for stale-draft detection. History is session-only. */
     public byte[] encode(){
         try{ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
-            out.writeInt(1);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
+            out.writeInt(2);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
             out.writeInt(cursor);out.writeInt(anchor);out.writeInt(page);out.writeInt(key);out.writeInt(panel.ordinal());out.writeInt(menu);
-            write(out,clipboard.getBytes(StandardCharsets.UTF_8));out.close();return bytes.toByteArray();
+            write(out,clipboard.getBytes(StandardCharsets.UTF_8));out.writeBoolean(insertion!=null);if(insertion!=null)insertion.write(out);
+            out.close();return bytes.toByteArray();
         }catch(IOException e){throw new IllegalStateException(e);}
     }
     public static LuaDraft restore(byte[] bytes){
-        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));if(in.readInt()!=1)throw new IOException("version");
+        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>2)throw new IOException("version");
             LuaDraft d=new LuaDraft(new WorkshopCartridge(read(in)),0);d.text=decode(read(in));
             d.cursor=in.readInt();d.anchor=in.readInt();d.page=in.readInt();d.key=in.readInt();int panel=in.readInt();d.menu=in.readInt();
             d.clipboard=decode(read(in));
+            if(version==2&&in.readBoolean())d.insertion=LuaInsert.read(in);
             if(in.available()!=0||!d.boundary(d.cursor)||(d.anchor!=-1&&!d.boundary(d.anchor))||d.page<0||d.page>=PAGES.length
                 ||d.key<0||d.key>=PAGES[d.page].length()||panel<0||panel>=Panel.values().length||d.menu<0||d.menu>=COMMANDS.length)throw new IOException("state");
-            d.panel=Panel.values()[panel];return d;
+            d.panel=Panel.values()[panel];if((d.panel==Panel.INSERT)!=(d.insertion!=null))throw new IOException("insert state");return d;
         }catch(IOException|IllegalArgumentException e){throw new IllegalArgumentException("Не удалось прочитать черновик кода; исходный проект сохранён",e);}
     }
     private boolean boundary(int i){return i>=0&&i<=text.length()&&(i==0||i==text.length()

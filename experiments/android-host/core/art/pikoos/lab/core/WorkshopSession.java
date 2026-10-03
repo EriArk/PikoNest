@@ -47,6 +47,7 @@ public final class WorkshopSession {
     }
     public void codeCommand(int command){
         if(mode!=Mode.CODE||codeDraft==null)return;
+        if(codeDraft.panel==LuaDraft.Panel.INSERT)return;
         try{
             LuaDraft d=codeDraft;
             switch(command){
@@ -68,14 +69,43 @@ public final class WorkshopSession {
                 case 15:d.end();break;
                 case 16:leaveCode();return;
                 case 17:d.changePage(1);d.panel=LuaDraft.Panel.KEYS;return;
+                case 18:d.beginInsert();return;
                 default:return;
             }
             d.panel=LuaDraft.Panel.CURSOR;
         }catch(Exception e){fail(e);}
     }
-    public void codeText(String value){if(mode==Mode.CODE&&codeDraft!=null&&codeDraft.panel!=LuaDraft.Panel.EXIT)try{codeDraft.replace(value);}catch(Exception e){fail(e);}}
+    public void codeText(String value){if(mode==Mode.CODE&&codeDraft!=null&&(codeDraft.panel==LuaDraft.Panel.CURSOR||codeDraft.panel==LuaDraft.Panel.KEYS))try{codeDraft.replace(value);}catch(Exception e){fail(e);}}
+    public void insertText(String value){if(mode==Mode.CODE&&codeDraft!=null&&codeDraft.insertion!=null&&codeDraft.insertion.screen==LuaInsert.Screen.TEXT)try{codeDraft.insertion.type(value);}catch(Exception e){fail(e);}}
+    private void insertAction(Action action){
+        LuaDraft d=codeDraft;LuaInsert i=d.insertion;
+        if(i.screen==LuaInsert.Screen.TEXT){
+            if(action==Action.UP)i.moveKey(0,-1);if(action==Action.DOWN)i.moveKey(0,1);
+            if(action==Action.LEFT)i.moveKey(-1,0);if(action==Action.RIGHT)i.moveKey(1,0);
+            if(action==Action.PREVIOUS)i.changePage(-1);if(action==Action.NEXT||action==Action.MENU)i.changePage(1);
+            if(action==Action.CONFIRM)i.type(LuaDraft.PAGES[i.page].substring(i.key,i.key+1));
+            if(action==Action.CONTEXT)i.erase();if(action==Action.UNDO)i.replaceAll=!i.replaceAll;
+            if(action==Action.TEST)i.acceptText();
+            if(action==Action.CANCEL)i.screen=LuaInsert.Screen.FIELDS;
+            return;
+        }
+        if(i.screen==LuaInsert.Screen.CATALOG){
+            if(action==Action.UP)i.choose(Math.max(0,i.selected-1));
+            if(action==Action.DOWN)i.choose(Math.min(LuaInsert.ITEMS.length-1,i.selected+1));
+            if(action==Action.CONFIRM)i.screen=LuaInsert.Screen.FIELDS;
+            if(action==Action.CANCEL)d.cancelInsert();
+            return;
+        }
+        if(action==Action.UP)i.field=Math.max(0,i.field-1);
+        if(action==Action.DOWN)i.field=Math.min(i.item().fields.length,i.field+1);
+        if(action==Action.LEFT)i.step(-1);if(action==Action.RIGHT)i.step(1);
+        if(action==Action.CONFIRM){if(i.field==i.item().fields.length)d.applyInsert();else i.beginText();}
+        if(action==Action.CANCEL)i.screen=LuaInsert.Screen.CATALOG;
+        // Start is intentionally not a launch/commit shortcut while reviewing a proposal.
+    }
     private void codeAction(Action action)throws Exception{
         LuaDraft d=codeDraft;
+        if(d.panel==LuaDraft.Panel.INSERT){insertAction(action);return;}
         if(d.panel==LuaDraft.Panel.EXIT){
             if(action==Action.UP)d.menu=Math.max(0,d.menu-1);
             if(action==Action.DOWN)d.menu=Math.min(2,d.menu+1);
@@ -90,6 +120,7 @@ public final class WorkshopSession {
         if(action==Action.TEST){finishCode(true);return;}
         if(action==Action.UNDO){d.history(false);return;}
         if(action==Action.REDO){d.history(true);return;}
+        if(action==Action.CONTEXT&&d.panel==LuaDraft.Panel.CURSOR){d.beginInsert();return;}
         if(action==Action.MENU||action==Action.CONTEXT){
             d.panel=d.panel==LuaDraft.Panel.MENU?LuaDraft.Panel.CURSOR:LuaDraft.Panel.MENU;d.menu=0;return;
         }

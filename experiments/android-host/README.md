@@ -1,11 +1,11 @@
 # PIKOOS Android host experiment
 
-Version 0.0.31 adds general literal Lua editing through a controller-operated
-character palette, cursor, selection, internal clipboard and edit menu. A draft
-can be cancelled/recovered or committed as one project history operation; Test
-saves before launch. Existing sections remain byte-preserved. This is C01.1,
-without structural insertion/API completion or full P8SCII input.
-[Device checks and limits](../../docs/design/android-code-31/README.md) ·
+Version 0.0.32 adds 17 ordinary Lua/API insertions with controller-edited parameters,
+code preview, contextual explanations and proposal recovery. X opens insertion
+from the cursor; Select opens all edit commands. A block places the cursor in its
+body and each insertion is one draft undo. Test saves before launch. This is C02.1,
+without project-symbol completion, editing existing calls as forms or full P8SCII input.
+[Device checks and limits](../../docs/design/android-insert-32/README.md) ·
 [Editor foundation](../../docs/EDITOR_FOUNDATION.md).
 
 Version 0.0.30 adds an isolated test launch from the verified runtime ZIP. In
