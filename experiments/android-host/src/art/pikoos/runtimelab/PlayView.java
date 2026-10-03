@@ -40,7 +40,7 @@ final class PlayView extends View {
             float x=16+col*(cw+gap);boolean selected=index==s.selected;
             rect(x,top,cw,ch,selected?14:13);rect(x+3,top+3,cw-6,ch-6,0);
             float size=Math.min(cw-22,ch-78),cx=x+(cw-size)/2,cy=top+12;
-            if(g.cover!=null){float cell=size/128;for(int py=0;py<128;py++)for(int px=0;px<128;px++)rect(cx+px*cell,cy+py*cell,cell+.01f,cell+.01f,g.cover[py*128+px]);}
+            if(g.cover!=null){float cell=size/128;for(int py=0;py<128;py++)for(int px=0;px<128;px++){p.setColor(g.cover[py*128+px]);c.drawRect(cx+px*cell,cy+py*cell,cx+(px+1)*cell+.01f,cy+(py+1)*cell+.01f,p);}}
             else{
                 rect(cx,cy,size,size,1);float u=size/64;
                 rect(cx+12*u,cy+8*u,40*u,48*u,2);rect(cx+17*u,cy+13*u,30*u,24*u,14);
@@ -49,7 +49,7 @@ final class PlayView extends View {
             }
             if(g.favorite){String[] heart={"0110110","1111111","1111111","0111110","0011100","0001000"};for(int hy=0;hy<6;hy++)for(int hx=0;hx<7;hx++)if(heart[hy].charAt(hx)=='1')rect(x+cw-27+hx*3,top+8+hy*3,3,3,10);}
             fit(g.title,x+10,bottom-42,21,selected?10:7,cw-20);
-            fit(!g.problem.isEmpty()?"Пока недоступно":g.recent>0?"Недавно запускали":"PICO-8",x+10,bottom-18,15,!g.problem.isEmpty()?9:6,cw-20);
+            fit(!g.problem.isEmpty()?"Пока недоступно":g.format.extension+(g.recent>0?" · играли":" · PICO-8"),x+10,bottom-18,15,!g.problem.isEmpty()?9:6,cw-20);
             hits.add(new Hit(x,top,cw,ch,()->{s.select(chosen);changed.run();invalidate();}));
         }
         if(s.games().isEmpty()){

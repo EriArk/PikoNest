@@ -6,6 +6,22 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+### Android lab 0.0.23: PNG Play transport and covers
+
+`CartridgeFormat` crosses the portable runtime port explicitly. Android stages
+exact source bytes to separate fixed read-only `run.p8` / `run.p8.png` URIs, with
+matching display name and MIME type. Existing text-only backends reject the PNG
+overload by default. Workshop editing remains canonical text `.p8`.
+
+Portable `P8Png` validates a bounded PNG envelope: 160×205, RGBA8, non-interlaced,
+chunk CRCs, exact inflated size and scanline filters. It extracts a 128×128 cover
+at (16,24) for display only, preserving RGB and ignoring encoded alpha bits.
+Labels from both formats reach the UI as ARGB. The original file is never
+re-encoded. This is not a compressed-Lua decoder or a cart compatibility verdict;
+PNG dependencies are not inspected. Runtime acceptance remains authoritative.
+Other PNG variants have an explicit unsupported-format error.
+[Verification and current wrapper lifecycle limitation](design/android-png-22/README.md).
+
 ### Android lab 0.0.22: separate Play library
 
 `PlaySession` owns selection, all/recent/favorite filters and semantic actions.
@@ -18,7 +34,7 @@ may evade the hint. Do not claim general multicart/dependency compatibility.
 
 Android `GameFolder` lists one SAF tree level, up to 128 games/2,048 entries,
 with a 2 MiB per-file lab read budget. Limits and subdirectories are surfaced.
-PNG, unreadable and unsupported text entries remain visible with an explanation.
+Unreadable and unsupported entries remain visible with an explanation.
 Indexing retains labels/metadata, not all cartridge payloads. Launch re-reads and
 rechecks a fresh snapshot before handing exact bytes to the existing backend.
 Only that runtime snapshot and Play metadata are written; originals are untouched.

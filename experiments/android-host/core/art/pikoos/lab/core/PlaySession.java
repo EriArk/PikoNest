@@ -7,9 +7,11 @@ import art.pikoos.lab.core.WorkshopSession.Action;
 public final class PlaySession {
     public static final class Game {
         public final String id,title,problem;
-        public final byte[] cover;
+        public final int[] cover;
+        public final CartridgeFormat format;
         public boolean favorite;public long recent;
-        public Game(String id,String title,String problem,byte[] cover,boolean favorite,long recent){this.id=id;this.title=title;this.problem=problem;this.cover=cover;this.favorite=favorite;this.recent=recent;}
+        public Game(String id,String title,String problem,int[] cover,boolean favorite,long recent){this(id,title,problem,cover,favorite,recent,CartridgeFormat.P8);}
+        public Game(String id,String title,String problem,int[] cover,boolean favorite,long recent,CartridgeFormat format){this.id=id;this.title=title;this.problem=problem;this.cover=cover;this.favorite=favorite;this.recent=recent;this.format=format;}
     }
     public interface Port {
         void launch(Game game);void refresh();void workshop();void folders();

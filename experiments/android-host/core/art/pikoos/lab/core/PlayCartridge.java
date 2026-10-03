@@ -8,10 +8,13 @@ import java.util.regex.Pattern;
 /** Read-only launch inspection, independent of every editor/template constraint. */
 public final class PlayCartridge {
     public final String problem;
-    public final byte[] cover;
+    public final int[] cover;
     public PlayCartridge(String filename,byte[] bytes){
-        String failure="";byte[] image=null;
-        if(!filename.toLowerCase(Locale.ROOT).endsWith(".p8"))failure="Запуск .p8.png ещё не подключён";
+        String failure="";int[] image=null;
+        if(filename.toLowerCase(Locale.ROOT).endsWith(".p8.png")){
+            try{image=new P8Png(bytes).cover;}catch(IllegalArgumentException e){failure=e.getMessage();}
+        }
+        else if(!filename.toLowerCase(Locale.ROOT).endsWith(".p8"))failure="Выбери .p8 или .p8.png";
         else try{
             P8Document doc=P8Document.parse(bytes);
             String code="";
@@ -28,12 +31,12 @@ public final class PlayCartridge {
         }catch(IllegalArgumentException e){failure="Не удалось распознать текстовый .p8";}
         problem=failure;cover=image;
     }
-    private static byte[] label(byte[] body){
+    private static int[] label(byte[] body){
         String[] rows=new String(body,StandardCharsets.US_ASCII).trim().split("\\r?\\n");
-        if(rows.length!=128)return null;byte[] result=new byte[128*128];
+        if(rows.length!=128)return null;int[] result=new int[128*128];
         for(int y=0;y<128;y++){
             if(rows[y].length()!=128)return null;
-            for(int x=0;x<128;x++){int color=Character.digit(rows[y].charAt(x),16);if(color<0)return null;result[y*128+x]=(byte)color;}
+            for(int x=0;x<128;x++){int color=Character.digit(rows[y].charAt(x),16);if(color<0)return null;result[y*128+x]=PicoPalette.COLORS[color];}
         }return result;
     }
 }

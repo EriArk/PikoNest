@@ -1,5 +1,13 @@
 # PIKOOS Android host experiment
 
+Version 0.0.23 adds `.p8.png` launch and actual covers on Play. The original binary
+passes unchanged through a format-aware runtime port, PNG MIME and fixed read-only
+provider URI. Format captions distinguish same-name text/PNG carts. Portable PNG
+envelope/cover reading supports 160×205 RGBA8, non-interlaced, all five PNG filters,
+CRC and bounded inflation. This does not decode Lua or import PNG into the editor.
+PNG dependencies are not detected/staged. See [device evidence and wrapper restart
+limitation](../../docs/design/android-png-22/README.md).
+
 Version 0.0.22 makes Играть the default home, separate from Мои проекты.
 D-pad selects, A/Start launches, X favorites, Y cycles all/recent/favorite filters,
 L rescans, Select opens folders, R enters the workshop project shelf (L returns).
@@ -10,8 +18,8 @@ Favorites, recent launch timestamps and selection survive recreation. Launch rea
 fresh bytes; stale workers cannot launch after leaving. Runtime return preserves
 Play selection, including host process death, while editor testing stays separate.
 
-Scope: one directory level, up to 128 carts/2,048 entries, 2 MiB per text cart.
-PNG launch and dependencies remain unsupported. Conservative text hints identify
+Scope: one directory level, up to 128 carts/2,048 entries, 2 MiB per cart.
+Dependencies remain unsupported. Conservative text hints identify
 includes/direct file calls (except empty `reload()`); this is not a complete Lua
 dependency analysis. These are PIKOOS lab limits, not PICO-8 limits. Recent means
 accepted launch, not a running-game save state or verified completion. Physical

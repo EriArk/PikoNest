@@ -24,7 +24,7 @@ public class PlayWorkflowTest {
         check(!new PlayCartridge("a.p8",new byte[0]).problem.isEmpty(),"bad framing rejected");
         StringBuilder label=new StringBuilder(header+"__label__\n");for(int y=0;y<128;y++){for(int x=0;x<128;x++)label.append("0123456789abcdef".charAt((x+y)%16));label.append('\n');}
         PlayCartridge picture=new PlayCartridge("a.p8",label.toString().getBytes(StandardCharsets.US_ASCII));
-        check(picture.cover.length==16384,"full cartridge label");for(int i=0;i<16384;i++)check(picture.cover[i]==(i%128+i/128)%16,"palette pixels");
+        check(picture.cover.length==16384,"full cartridge label");for(int i=0;i<16384;i++)check(picture.cover[i]==PicoPalette.COLORS[(i%128+i/128)%16],"palette pixels");
         Port port=new Port();PlaySession s=new PlaySession(port);
         PlaySession.Game a=new PlaySession.Game("one","Alpha","",null,false,10),b=new PlaySession.Game("two","Beta","not supported",null,true,20),c=new PlaySession.Game("three","Gamma","",null,false,0);
         s.replace(Arrays.asList(c,b,a),"two");check(s.current()==b,"restore by stable opaque id");

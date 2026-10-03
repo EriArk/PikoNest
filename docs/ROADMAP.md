@@ -8,10 +8,17 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded lab step (0.0.22): dedicated Play home → read text carts from Games
+Latest bounded lab step (0.0.23): PNG cartridge → actual cover → byte-exact binary
+launch in official PICO-8 → restore Play selection after host process loss.
+Envelope validation and corruption rejection are covered; PNG editing/import and
+dependency analysis remain open. Repeated launch testing exposed an intermittent
+external wrapper PulseAudio restart failure; stabilize that lifecycle next.
+[Device evidence](design/android-png-22/README.md).
+
+Previous step (0.0.22): dedicated Play home → read text carts from Games
 folder → launch official runtime → return to the selected cart. Includes actual
 labels, favorites/recent-launch filters and a separate Workshop entrance.
-PNG launch, dependency-aware staging, nested libraries and complete runtime setup
+Dependency-aware staging, nested libraries and complete runtime setup
 remain open. [Device evidence](design/android-play-21/README.md).
 
 Previous step (0.0.21): choose four persistent folder roles → verify
@@ -96,9 +103,9 @@ The sequence is a working plan, not a delivery-date or feasibility promise for
 experimental online features. Stage acceptance does not follow automatically from
 tests/screenshots: user-facing behavior and physical ergonomics need review.
 
-**Next slice after the text-cart Play shelf:** support ordinary `.p8.png` cartridges
-through the runtime boundary, with their covers and format-aware read-only staging.
-Then address nested libraries/dependency handling and the runtime setup wizard.
+**Next slice after PNG Play:** diagnose and stabilize warm runtime launch/exit,
+including the observed external wrapper PulseAudio failure. Then address nested
+libraries/dependency handling and the runtime setup wizard.
 Verified project/data migration remains a foundation task. Do not move existing
 projects or retire the experiment before preservation is demonstrated.
 

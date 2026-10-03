@@ -26,12 +26,11 @@ final class GameFolder {
                 if(!lower.endsWith(".p8")&&!lower.endsWith(".p8.png"))continue;
                 if(result.games.size()>=128){result.limited=true;break;}
                 String id=DocumentsContract.buildDocumentUriUsingTree(tree,c.getString(0)).toString();
-                String issue="";byte[] cover=null;
-                if(lower.endsWith(".p8.png"))issue="Запуск .p8.png ещё не подключён";
-                else try{PlayCartridge cart=new PlayCartridge(name,read(resolver,id));issue=cart.problem;cover=cart.cover;}
+                String issue="";int[] cover=null;
+                try{PlayCartridge cart=new PlayCartridge(name,read(resolver,id));issue=cart.problem;cover=cart.cover;}
                 catch(Exception e){issue="Файл недоступен или превышает лимит полки 2 МиБ";}
                 String title=name.substring(0,name.length()-(lower.endsWith(".p8.png")?7:3));
-                result.games.add(new PlaySession.Game(id,title.replaceAll("\\p{Cntrl}"," "),issue,cover,prefs.getBoolean("favorite:"+id,false),prefs.getLong("recent:"+id,0)));
+                result.games.add(new PlaySession.Game(id,title.replaceAll("\\p{Cntrl}"," "),issue,cover,prefs.getBoolean("favorite:"+id,false),prefs.getLong("recent:"+id,0),CartridgeFormat.of(name)));
             }
         }return result;
     }

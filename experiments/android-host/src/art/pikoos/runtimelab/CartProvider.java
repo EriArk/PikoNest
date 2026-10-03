@@ -10,15 +10,16 @@ import android.provider.OpenableColumns;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-/** Shares only one immutable-per-run snapshot; no arbitrary path resolution. */
+/** Shares two fixed snapshot paths (text/PNG), read-only; no arbitrary path resolution. */
 public final class CartProvider extends ContentProvider {
     public static final Uri CART = Uri.parse("content://art.pikoos.runtimelab.carts/run.p8");
+    public static final Uri PNG = Uri.parse("content://art.pikoos.runtimelab.carts/run.p8.png");
     @Override public boolean onCreate() { return true; }
     private File cart(Uri uri) {
-        if (!CART.equals(uri)) throw new IllegalArgumentException("Unknown cartridge URI");
-        return new File(getContext().getFilesDir(), "run.p8");
+        if (!CART.equals(uri)&&!PNG.equals(uri)) throw new IllegalArgumentException("Unknown cartridge URI");
+        return new File(getContext().getFilesDir(), PNG.equals(uri)?"run.p8.png":"run.p8");
     }
-    @Override public String getType(Uri uri) { cart(uri); return "text/plain"; }
+    @Override public String getType(Uri uri) { cart(uri); return PNG.equals(uri)?"image/png":"text/plain"; }
     @Override public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
         if (!"r".equals(mode)) throw new FileNotFoundException("Read-only cartridge");
         return ParcelFileDescriptor.open(cart(uri), ParcelFileDescriptor.MODE_READ_ONLY);
@@ -31,7 +32,7 @@ public final class CartProvider extends ContentProvider {
         MatrixCursor result = new MatrixCursor(columns);
         Object[] row = new Object[columns.length];
         for (int i = 0; i < columns.length; i++) {
-            if (OpenableColumns.DISPLAY_NAME.equals(columns[i])) row[i] = "pikoos-lab.p8";
+            if (OpenableColumns.DISPLAY_NAME.equals(columns[i])) row[i] = PNG.equals(uri)?"pikoos-lab.p8.png":"pikoos-lab.p8";
             else if (OpenableColumns.SIZE.equals(columns[i])) row[i] = file.length();
         }
         result.addRow(row);

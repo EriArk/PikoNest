@@ -245,7 +245,7 @@ public final class MainActivity extends Activity {
         new Thread(()->{
             byte[] bytes=null;String failure=null;
             try{
-                bytes=GameFolder.read(resolver,game.id);PlayCartridge checked=new PlayCartridge(game.title+".p8",bytes);
+                bytes=GameFolder.read(resolver,game.id);PlayCartridge checked=new PlayCartridge(game.title+game.format.extension,bytes);
                 if(!checked.problem.isEmpty())failure=checked.problem;
             }catch(Exception e){failure="Не удалось прочитать игру · L: обновить полку";}
             final byte[] snapshot=bytes;final String error=failure;
@@ -258,7 +258,7 @@ public final class MainActivity extends Activity {
                     if(!playPrefs.edit().putBoolean("runtime",true).putString("selected",game.id).commit())throw new Exception("Не удалось сохранить место на полке");
                     awaitingReturn=true;leftForRuntime=false;
                     if(!libraryPrefs.edit().putBoolean("awaitingReturn",true).commit())throw new Exception("Не удалось сохранить состояние запуска");
-                    backend.launch(snapshot);
+                    backend.launch(snapshot,game.format);
                     game.recent=System.currentTimeMillis();playPrefs.edit().putLong("recent:"+game.id,game.recent).apply();
                 }catch(Exception e){awaitingReturn=false;playPrefs.edit().putBoolean("runtime",false).apply();libraryPrefs.edit().putBoolean("awaitingReturn",false).apply();target.fail(e.getMessage()==null?"Не удалось запустить PICO-8":e.getMessage());}
                 playView.invalidate();

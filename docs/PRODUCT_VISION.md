@@ -15,7 +15,8 @@ launch, recent cartridges and favorites. **Workshop** is a separate, deliberate
 entrance for creation/editing. Playing does not require a project, remix, tutorial
 or editor; returning restores the library selection. Recent means recently
 launched, not a promised process save state. Lab 0.0.22 implements the first
-dedicated text-cart launcher; PNG launch, dependencies and runtime setup remain open.
+dedicated text-cart launcher; 0.0.23 adds PNG launch and covers. Dependency staging,
+reliable wrapper warm restarts and production runtime setup remain open.
 
 PIKOOS is a handheld-first environment for the full PICO-8 creative loop:
 
