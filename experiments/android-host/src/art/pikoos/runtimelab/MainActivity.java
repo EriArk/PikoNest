@@ -260,6 +260,9 @@ public final class MainActivity extends Activity {
             .putBoolean("browsingSprites",session.browsingSprites)
             .putBoolean("copying",session.copying()).putInt("copyX",session.copyX).putInt("copyY",session.copyY)
             .putString("copyReturn",session.copyReturnMode())
+            .putBoolean("transforming",session.transforming())
+            .putString("transformOperation",session.transforming()?session.transformOperation().name():"")
+            .putString("transformReturn",session.transformReturnMode())
             .putBoolean("assets",session.mode==Mode.ASSETS||session.assetDraft!=null||session.copyAsset!=null||session.nameEditor!=null)
             .putInt("assetIndex",session.assetIndex).putString("assetsReturn",session.assetsReturnMode())
             .putString("assetId",session.currentAsset()==null?"":session.currentAsset().id)
@@ -308,6 +311,7 @@ public final class MainActivity extends Activity {
         }
         if(session.tool==2&&prefs.getString("mode","").equals("HERO"))session.previewHero();
         if(prefs.getBoolean("copying",false))session.restoreCopy(prefs.getInt("copyX",-1),prefs.getInt("copyY",-1),prefs.getString("copyReturn",""));
+        if(prefs.getBoolean("transforming",false))session.restoreTransform(prefs.getString("transformOperation",""),prefs.getString("transformReturn",""));
         if(prefs.getBoolean("assets",false)){
             try{
                 session.restoreAssets(prefs.getString("assetsReturn","NAVIGATE"),prefs.getInt("assetIndex",0));

@@ -95,6 +95,10 @@ public final class WorkshopCartridge {
         for (int i = 0; i < SPRITE_COUNT; i++) if (!hero().overlaps(legacyRegion(i)) && empty(i)) return i;
         return -1;
     }
+    /** Rearrange pixels without changing references, dimensions or game-role bindings. */
+    public WorkshopCartridge transformed(SpriteRegion region,SpriteTransform operation) {
+        return edited(graphics.transform(region,operation));
+    }
     /** Explicit replacement of pixels; no allocation or game-role inference. */
     public WorkshopCartridge copyRegion(SpriteRegion source, SpriteRegion destination) {
         if(source.x<destination.x+destination.width&&destination.x<source.x+source.width

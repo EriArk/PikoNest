@@ -79,6 +79,21 @@ public final class P8Graphics {
         appended.write(marker,0,marker.length);appended.write(newline,0,newline.length);appended.write(changed,0,changed.length);
         return P8Document.parse(appended.toByteArray());
     }
+    public P8Document transform(SpriteRegion r,SpriteTransform operation){
+        if(!operation.supports(r))throw new IllegalArgumentException("Quarter turn requires a square selection");
+        int[] source=read(r),result=new int[source.length];
+        for(int y=0;y<r.height;y++)for(int x=0;x<r.width;x++){
+            int sx=x,sy=y;
+            switch(operation){
+                case FLIP_HORIZONTAL:sx=r.width-1-x;break;
+                case FLIP_VERTICAL:sy=r.height-1-y;break;
+                case ROTATE_CLOCKWISE:sx=y;sy=r.height-1-x;break;
+                case ROTATE_HALF:sx=r.width-1-x;sy=r.height-1-y;break;
+            }
+            result[y*r.width+x]=source[sy*r.width+sx];
+        }
+        return write(r,result);
+    }
     public P8Document withPixel(SpriteRegion r,int x,int y,int value){
         r.checkPixel(x,y);color(value);int[] values=read(r);values[y*r.width+x]=value;return write(r,values);
     }

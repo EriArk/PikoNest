@@ -1,5 +1,23 @@
 # PIKOOS Android host experiment
 
+Version 0.0.15 adds sprite transformations. Open a sprite/region, leave the canvas
+with B if drawing, move to the tool selector, then choose Отразить / повернуть.
+Left/right selects horizontal mirror, vertical mirror, clockwise 90° or 180°.
+The before/after preview always starts from the saved pixels; browsing operations
+does not stack them. A applies once, B cancels, Y afterwards undoes the whole edit.
+Touch uses the same operation selector and confirmation. Brush, cursor, region
+and zoom survive the operation. Start and tab switching cannot commit a preview.
+Only selected ordinary gfx pixels change; Lua, flags, map and role bindings stay
+unchanged. A sprite used multiple times changes everywhere it is referenced.
+No effective change means no write and no extra undo entry. Failed writes retain
+the preview; process recreation restores it for explicit confirmation against
+current saved pixels. Undo history remains in-memory, as for other lab edits.
+The upper 128×64 lab sheet restriction still applies. Quarter turns currently
+require square selections so the tool never silently expands its footprint;
+this is a lab limit, not a PICO-8 limit. Rectangular quarter turns with destination
+selection, arbitrary angles and animated transforms remain future work.
+[Evidence](../../docs/design/android-transform-14/README.md).
+
 Version 0.0.14 adds external `.p8` export. On My games, choose a cart and press Y,
 or navigate to Save .p8. The preview captures that project's current saved bytes;
 Confirm opens Android's create-document dialog, Cancel discards the preview.

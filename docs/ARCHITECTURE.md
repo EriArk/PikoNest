@@ -6,6 +6,24 @@ This document defines architectural boundaries and the intended shape of the sys
 
 Where a detail is still experimental, it is marked as such.
 
+### Android lab 0.0.15: sprite transformations
+
+Portable `SpriteTransform` describes permutations within an unchanged selection
+footprint. `P8Graphics.transform` snapshots source pixels before writing only
+changed gfx values, preserving unrelated section bytes and row conventions.
+`WorkshopSession` owns a modal, immutable candidate, selected operation and return
+mode. Browsing operations always recomputes from the canonical cart, never from
+the previous preview. Confirm uses the existing durable save port before publishing
+state and adding one undo entry. No-ops do neither. Failed saves keep the candidate.
+
+Android stores only selection/operation/return context in optional UI preferences.
+Restoration recomputes a read-only candidate from current canonical bytes and
+requires confirmation; no automatic application. Undo history is still in-memory.
+The transform changes actual indexed pixels, not `spr`/`sspr` flip arguments,
+sprite flags, bindings, collision dimensions or any runtime API. Square-only
+quarter turns and the upper-half sheet restriction are explicit lab boundaries.
+[Device evidence and tests](design/android-transform-14/README.md).
+
 ### Android lab 0.0.14: export with verified persistence
 
 Portable `CartridgeExport` holds the selected project's saved bytes, display

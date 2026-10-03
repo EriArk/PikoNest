@@ -40,6 +40,7 @@ final class WorkshopView extends View {
     private int viewX,viewY,viewWidth,viewHeight;
     private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка"};
     private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из спрайта","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из спрайта"};
+    private static final String[] TRANSFORM_NAMES={"Зеркало: слева направо","Зеркало: сверху вниз","Поворот на 90° вправо","Разворот на 180°"};
     private static final class Hit {
         final RectF rect; final Runnable action;
         Hit(float x,float y,float w,float h,Runnable action) { rect=new RectF(x,y,x+w,y+h); this.action=action; }
@@ -79,7 +80,7 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine()||s.copying()||s.assetDraft!=null||s.nameEditor!=null;
+        boolean draft=s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingLine()||s.copying()||s.transforming()||s.assetDraft!=null||s.nameEditor!=null;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -95,7 +96,7 @@ final class WorkshopView extends View {
         }
         rect(0,140,w,4,0);
         c.save();c.clipRect(0,144,w,bodyBottom);
-        if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE)assetLibrary();else if(s.copying()&&s.mode!=Mode.ERROR)copyChooser();else if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
+        if(s.mode==Mode.TRANSFORM)transformChooser();else if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE)assetLibrary();else if(s.copying()&&s.mode!=Mode.ERROR)copyChooser();else if(s.mode==Mode.REGION) regionChooser();else if(s.tool==0) workshop(); else if(s.tool==1) code(); else if(s.browsingSprites) spriteSheet(); else sprites();
         c.restore();
         footer();
         if(!previousNotice.equals(s.notice)){previousNotice=s.notice;noticeUntil=SystemClock.uptimeMillis()+2200;}
@@ -112,6 +113,12 @@ final class WorkshopView extends View {
     }
     private void footer() {
         rect(0,bodyBottom,w,44,0);
+        if(s.mode==Mode.TRANSFORM){
+            key(ok()+" применить",12,bodyBottom,s.transformAllowed()?10:13,()->action(Action.CONFIRM));
+            key(back()+" отмена",w<500?180:228,bodyBottom,6,()->action(Action.CANCEL));
+            if(w>=540)text("← → вариант",w-152,bodyBottom+28,18,6);
+            return;
+        }
         if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE){
             key(ok()+(s.mode==Mode.ASSET_SAVE||s.currentAsset()==null&&s.tool==2?" сохранить":s.currentAsset()==null?" спрайты":" вставить"),12,bodyBottom,10,()->action(Action.CONFIRM));
             key(back()+" назад",w<500?136:200,bodyBottom,6,()->action(Action.CANCEL));
@@ -432,16 +439,36 @@ final class WorkshopView extends View {
             fitted("Выбор места ничего не меняет в картридже.",16,by+80,16,13,w-32);
         }
     }
+    private void transformChooser(){
+        SpriteRegion r=s.selection();
+        fitted("ОТРАЗИТЬ / ПОВЕРНУТЬ",16,169,18,14,w-188);
+        fitted(r.width+" × "+r.height+" · "+(s.transformOperation().ordinal()+1)+" / 4",w-156,169,18,6,140);
+        button("<",16,188,44,44,false,()->action(Action.LEFT));
+        rect(68,188,w-136,44,0);
+        fitted(TRANSFORM_NAMES[s.transformOperation().ordinal()],80,216,22,10,w-160);
+        button(">",w-60,188,44,44,false,()->action(Action.RIGHT));
+        float size=Math.min(Math.min(160,(w-64)/2),bodyBottom-350),gap=32,left=(w-size*2-gap)/2;
+        text("БЫЛО",left,266,18,6);fitted(s.transformAllowed()?"БУДЕТ":"НУЖЕН КВАДРАТ",left+size+gap,266,18,s.transformAllowed()?10:13,w-left-size-gap-16);
+        picture(r,null,s.cart(),left,278,size);
+        if(s.transformAllowed())picture(r,null,s.transformPreview(),left+size+gap,278,size);
+        else{rect(left+size+gap,278,size,size,0);outline(left+size+gap,278,size,size,13);text("?",left+size+gap+size/2-8,278+size/2+12,32,13);}
+        float by=278+size;
+        fitted(s.transformAllowed()?"Изменится везде, где используется этот спрайт.":"Для 90° пока выбери квадратную область.",16,by+26,18,7,w-32);
+        fitted(s.transformAllowed()?"После применения Y отменит эту правку.":"Отражения и 180° доступны для прямоугольника.",16,by+51,18,6,w-32);
+    }
     private void copyPicture(SpriteRegion r,float x,float y,float size){
         picture(r,null,x,y,size);
     }
     private void picture(SpriteRegion r,SpriteAsset asset,float x,float y,float size){
+        picture(r,asset,s.cart(),x,y,size);
+    }
+    private void picture(SpriteRegion r,SpriteAsset asset,WorkshopCartridge cart,float x,float y,float size){
         rect(x,y,size,size,0);
         float cell=size/Math.max(r.width,r.height);
         if(cell>=1)cell=(int)cell;
         float sx=x+(size-r.width*cell)/2,sy=y+(size-r.height*cell)/2;
         for(int py=0;py<r.height;py++)for(int px=0;px<r.width;px++){
-            int color=asset==null?s.cart().pixel(r,px,py):asset.pixel(px,py);
+            int color=asset==null?cart.pixel(r,px,py):asset.pixel(px,py);
             rect(sx+px*cell,sy+py*cell,cell,cell,color==0?((px+py)%2==0?0:1):color);
         }
         outline(x,y,size,size,13);
@@ -471,7 +498,7 @@ final class WorkshopView extends View {
     private void dialog() {
         hits.clear(); // Modal controls trap touch as well as controller focus.
         p.setColor(0xcc000000);c.drawRect(0,0,w,h,p);
-        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.HERO?400:s.mode==Mode.DRAW_TOOLS?392:s.mode==Mode.MENU?404:280,dy=Math.max(16,(h-dh)/2);
+        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.HERO?400:s.mode==Mode.DRAW_TOOLS?444:s.mode==Mode.MENU?404:280,dy=Math.max(16,(h-dh)/2);
         rect(dx+6,dy+6,dw,dh,0);rect(dx,dy,dw,dh,1);outline(dx,dy,dw,dh,s.mode==Mode.ERROR?8:14);
         if(s.mode==Mode.HERO){
             HeroBinding hero=s.heroDraft;SpriteRegion r=hero.image;
@@ -490,14 +517,14 @@ final class WorkshopView extends View {
             button(ok()+" Назначить",dx+16,dy+336,(dw-44)/2,48,true,()->action(Action.CONFIRM));
             button(back()+" Отмена",dx+28+(dw-44)/2,dy+336,(dw-44)/2,48,false,()->action(Action.CANCEL));
         }else if(s.mode==Mode.DRAW_TOOLS){
-            text("Чем рисуем?",dx+20,dy+36,26,14);
-            for(int i=0;i<DRAW_NAMES.length;i++){final int item=i;
-                button(DRAW_NAMES[i],dx+16,dy+54+i*50,dw-32,44,s.drawToolCursor==i,()->{s.chooseDrawTool(item);changed.run();invalidate();});
+            text("Инструменты спрайта",dx+20,dy+36,26,14);
+            for(int i=0;i<=DRAW_NAMES.length;i++){final int item=i;
+                button(i==5?"Отразить / повернуть":DRAW_NAMES[i],dx+16,dy+54+i*50,dw-32,44,s.drawToolCursor==i,()->{s.chooseDrawTool(item);changed.run();invalidate();});
             }
-            fitted(DRAW_HELP[s.drawToolCursor],dx+20,dy+337,18,7,dw-40);
-            text(ok()+" выбрать · "+back()+" назад",dx+20,dy+374,18,6);
-            hit(dx+12,dy+346,(dw-32)/2,44,()->action(Action.CONFIRM));
-            hit(dx+20+(dw-32)/2,dy+346,(dw-32)/2,44,()->action(Action.CANCEL));
+            fitted(s.drawToolCursor==5?"Сравнить варианты перед применением":DRAW_HELP[s.drawToolCursor],dx+20,dy+389,18,7,dw-40);
+            text(ok()+" выбрать · "+back()+" назад",dx+20,dy+426,18,6);
+            hit(dx+12,dy+398,(dw-32)/2,44,()->action(Action.CONFIRM));
+            hit(dx+20+(dw-32)/2,dy+398,(dw-32)/2,44,()->action(Action.CANCEL));
         }else if(s.mode==Mode.MENU) {
             text("Мастерская",dx+20,dy+36,26,14);
             String[] labels={"Отменить последнюю правку",s.swapAB?"B выбор / A назад":"A выбор / B назад","Как это работает","Вернуться к проекту","Мои игры","Ресурсы · библиотека"};

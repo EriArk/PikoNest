@@ -83,6 +83,12 @@ my-game/
 
 ## Status
 
+Android 0.0.15 adds sprite/region mirrors and quarter/half turns with before/after
+preview, controller confirmation, cancellation and whole-operation undo.
+The tools are available in every supported cart. Quarter turns currently require
+a square selection; mirrors and half turns preserve any supported rectangle.
+[Device evidence](docs/design/android-transform-14/README.md).
+
 Android 0.0.14 adds saving a selected project as an ordinary external `.p8`.
 Y on the shelf opens a recoverable preview; the Android save dialog selects a
 new file. A saved result requires closing, reopening and byte-comparing that file.
