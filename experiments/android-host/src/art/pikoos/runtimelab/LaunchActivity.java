@@ -53,7 +53,7 @@ public final class LaunchActivity extends Activity {
                     // Journal precedes dispatch: process loss can never trigger an automatic second launch.
                     if(!state.edit().putBoolean("dispatched",true).commit())throw new Exception("Не удалось сохранить состояние запуска.");
                     dispatched=true;left=false;view.message=cart.name;view.busy=true;view.invalidate();
-                    backend.launch(cart.bytes,cart.format);
+                    if(cart.files!=null)backend.launch(cart.files);else backend.launch(cart.bytes,cart.format);
                     Log.i("PIKOOS-External","cart_dispatched format="+cart.format);
                 }catch(Exception e){
                     dispatched=false;state.edit().putBoolean("dispatched",false).commit();view.busy=false;

@@ -32,6 +32,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'FolderSetupTes
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LauncherPathTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'GameTreeTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'PicoIncludesTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeFileSetTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'P8PngTest',(Join-Path $PSScriptRoot 'tests\fixtures\lights-0.2.7.p8.png'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'PlayWorkflowTest',(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LabCartridgeTest',(Join-Path $PSScriptRoot 'assets\workshop.p8'))

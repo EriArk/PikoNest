@@ -14,7 +14,7 @@ is not recursive. The normal code/token limits still apply. This differs from
 runtime `load()`/`reload()` and file writes, which need a set of files available
 throughout execution.
 
-## Implemented experiment: Android host 0.0.27
+## Include preparation (introduced in Android host 0.0.27)
 
 Play and the external launcher entry can prepare a text cart with simple
 `#include file.lua`, `#include file.p8` and `#include file.p8:N` directives.
@@ -34,8 +34,8 @@ bytes. No wrapper update or PIKOOS runtime API is needed.
 - Validate the resulting cart before dispatch. Missing files, unsupported paths,
   duplicate names, unavailable tabs, ambiguous sections, framing changes and
   bounded-read failures abort preparation. No partially prepared cart is sent.
-- Statements that may need files at runtime retain the previous conservative
-  rejection, including when they occur in included code.
+- In 0.0.27, statements needing runtime files retained conservative rejection.
+  Host 0.0.28 adds the bounded file-set path below, including calls in included code.
 
 ### Deliberate current limits
 
@@ -57,21 +57,63 @@ as an atomic filesystem transaction, so concurrent edits during preparation are
 not covered.
 
 The lexical masker prevents comments and strings from causing include reads.
-The final conservative launch hint can still refuse `#include`/file-call text in
-comments or strings. This is not a complete Lua parser. Include expansion changes
+The include hint can still refuse unsupported `#include` text in comments or
+strings. This is not a complete Lua parser. Include expansion changes
 runtime line numbers; source-mapped diagnostics are future work. Nested include
 directives are explicitly refused rather than recursively expanded.
 
 Direct-launch and PIKOOS-prepared captures match for the owned three-form fixture
 in the user's official 0.2.7 runtime. [Device/test evidence](design/android-includes-27/README.md).
 
+## Read-only multicart experiment: host 0.0.28 / adapter revision 3
+
+Play and external entry now stage direct `load("chapter.p8", ...)` and
+`reload(dest, source, length, "data.p8")` dependencies from the selected cart's
+own folder. Calls and filenames remain ordinary PICO-8 code. Reloading the
+current ROM with zero to three arguments does not need an external file.
+
+`RuntimeDependencies` follows literal calls through each cart's prepared Lua,
+deduplicates cycles, and shares snapshots across includes and carts. The Android
+source also caches named reads during initial include inspection. No source file
+is rewritten. `RuntimeFileSet` carries immutable ordinary file bytes through the
+portable runtime boundary. Limits are 32 carts, 2 MiB per cart and 8 MiB per set;
+source reads also have an 8 MiB bound. These are lab limits, not PICO-8 limits.
+
+The separate revision-3 adapter receives an internal `PIKOSET1` envelope through
+one fixed read-only provider URI. This transport is **not** a new project or
+distribution format. The adapter validates the entire envelope before extracting
+into a fresh private session folder, then supplies that folder as PICO-8's root.
+It preserves upstream's persistent runtime home for ordinary cartdata/dset.
+Files are read-only (444), directory 555. After monitored native exit, only the
+recorded files in that session directory are removed, without recursive deletion.
+Unexpected/crashed sessions are retained; a 32-directory quota bounds accumulation.
+
+### Deliberate current limits
+
+- Only sibling text `.p8` files, ASCII basename letters/digits/underscore/hyphen/
+  dot, at most 120 characters; lowercase extension; no `..`, case collisions,
+  spaces, Unicode, directories or `.p8.png` dependencies.
+- Filenames must be literal strings in direct calls. Detected computed names,
+  escaped filenames, aliases, `save` and `cstore` stop preparation. Durable game
+  file writes need a separate ownership/recovery design, not disposable copies.
+- This is a conservative lexical collector, not a complete Lua parser or a
+  sandbox. Reflection such as `_ENV["load"]` is not certified; unrelated custom
+  identifiers may cause refusals. Unknown dynamic access is not general support.
+- Requires the connected Games tree and Runtime Test revision 3. A single-file
+  grant cannot authorize sibling reads. The old adapter still handles single carts,
+  but file-set dispatch asks for an update before changing its staged snapshot.
+- Crash cleanup/recovery UI, transactional source reads, provider timeouts and
+  persisted cartdata regression across multicart sessions remain future checks.
+
+The owned Petal Gate fixture exercises two-way load, parameter transfer and a
+third data cart in official PICO-8 0.2.7. Native and prepared chapter captures
+match. [Device/test evidence](design/android-multicart-28/README.md).
+
 ## Next boundary
 
-Multicart `load()`, data `reload()`, computed filenames, PNG code inspection and
-file-writing/save ownership remain open. They need a bounded file-set runtime
-port and isolation of per-game working files, preserving directory layout and
-original names. Do not flatten runtime loads or silently discard durable writes.
-The current two-fixed-URI external adapter cannot provide this contract.
+Integrated runtime setup is next. Broader multicart paths, computed filenames,
+PNG code inspection, durable file writes and stale-session recovery remain explicit
+compatibility work; this experiment does not claim arbitrary linked-cart support.
 
 Library/project import and export of a linked source set are separate from this
 read-only Play launch workflow. They still require preservation, missing-file

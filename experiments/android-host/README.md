@@ -1,5 +1,11 @@
 # PIKOOS Android host experiment
 
+Version 0.0.28 adds bounded read-only multicart launch: direct literal `load` and
+file-backed `reload` across sibling text carts. It preserves ordinary calls and
+source files, and requires Runtime Test revision 3 for private file-set staging.
+Missing dependencies stop before dispatch. [Contract and limits](../../docs/DEPENDENT_CARTRIDGES.md) ·
+[Device evidence](../../docs/design/android-multicart-28/README.md).
+
 Version 0.0.27 prepares simple `#include` directives before Play/external launch:
 Lua file, all Lua tabs from `.p8`, or one tab. The connected Games tree supplies
 sibling/descendant files; originals remain untouched, and the resulting temporary
@@ -52,10 +58,10 @@ Play selection, including host process death, while editor testing stays separat
 
 Current scope: root plus 16 subfolder levels, up to 128 carts/2,048 entries across
 the whole traversal, 2 MiB per cart. Partial results are explicitly reported.
-Simple includes now use the preparer described above. Other dependencies remain
-unsupported. Conservative text hints identify direct file calls (except empty
-`reload()`); this is not a complete Lua
-dependency analysis. These are PIKOOS lab limits, not PICO-8 limits. Recent means
+Simple includes and literal sibling text-cart loads use the preparers above.
+Computed paths, PNG dependencies and durable file writes remain unsupported.
+Conservative lexical inspection is not complete Lua dependency analysis.
+These are PIKOOS lab limits, not PICO-8 limits. Recent means
 accepted launch, not a running-game save state or verified completion. Physical
 controller ergonomics and runtime setup remain separate acceptance work.
 [Device evidence](../../docs/design/android-play-21/README.md).

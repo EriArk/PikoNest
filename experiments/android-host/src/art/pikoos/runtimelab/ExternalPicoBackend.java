@@ -51,9 +51,17 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         launch(cart,CartridgeFormat.P8);
     }
     @Override public void launch(byte[] cart,CartridgeFormat format) throws Exception {
+        dispatch(cart,"run"+format.extension,format==CartridgeFormat.P8_PNG?CartProvider.PNG:CartProvider.CART,format.mime,false);
+    }
+    @Override public void launch(art.pikoos.lab.core.RuntimeFileSet files)throws Exception{
+        dispatch(files.transport(),"run.pikoset",CartProvider.FILES,"application/octet-stream",true);
+    }
+    private void dispatch(byte[] cart,String filename,android.net.Uri uri,String mime,boolean fileSet)throws Exception{
         checkAvailableForLaunch();
         PackageInfo selected = runtime();
-        AtomicFile snapshot = new AtomicFile(new File(activity.getFilesDir(), "run"+format.extension));
+        if(fileSet&&(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<3))
+            throw new Exception("Обнови PIKOOS Runtime Test до версии 3 для запуска частей игры");
+        AtomicFile snapshot = new AtomicFile(new File(activity.getFilesDir(),filename));
         FileOutputStream out = null;
         try {
             out = snapshot.startWrite();
@@ -65,8 +73,7 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         }
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setComponent(new ComponentName(selected.packageName, "com.godot.game.GodotAppLauncher"));
-        android.net.Uri uri=format==CartridgeFormat.P8_PNG?CartProvider.PNG:CartProvider.CART;
-        intent.setType(format.mime);
+        intent.setType(mime);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
         intent.setClipData(ClipData.newRawUri("PICO-8 cartridge", uri));
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

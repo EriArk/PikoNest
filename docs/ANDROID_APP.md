@@ -147,6 +147,12 @@ tree for Play and external entry. It creates a temporary ordinary `.p8`, preserv
 the original cart and linked files. [Scope](DEPENDENT_CARTRIDGES.md) ·
 [Device evidence](design/android-includes-27/README.md).
 
-Next: runtime file-set/multicart staging, followed by complete first-run
-runtime setup. Device/layout checks accompany each UI slice.
+Lab 0.0.28 / Runtime Test revision 3 adds direct literal sibling `.p8` load/reload
+through a portable file-set port and private read-only runtime sessions. The
+same preparer serves Play and external entry. Missing parts fail before dispatch;
+ordinary calls remain unchanged. [Scope](DEPENDENT_CARTRIDGES.md) ·
+[Device evidence](design/android-multicart-28/README.md).
+
+Next: complete first-run runtime setup, with broader dependencies and durable
+file writes still tracked explicitly. Device/layout checks accompany each UI slice.
 These are Android release requirements, not optional post-release Linux work.

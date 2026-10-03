@@ -23,7 +23,7 @@ final class GameFolder {
                 String name=entry.name,lower=name.toLowerCase(Locale.ROOT);
                 String id=DocumentsContract.buildDocumentUriUsingTree(tree,entry.id).toString();
                 String issue="";int[] cover=null;
-                try{PlayCartridge cart=new PlayCartridge(name,read(resolver,id),true);issue=cart.problem;cover=cart.cover;}
+                try{PlayCartridge cart=new PlayCartridge(name,read(resolver,id),true,true);issue=cart.problem;cover=cart.cover;}
                 catch(Exception e){issue="Файл недоступен или превышает лимит полки 2 МиБ";}
                 String title=name.substring(0,name.length()-(lower.endsWith(".p8.png")?7:3));
                 result.games.add(new PlaySession.Game(id,title.replaceAll("\\p{Cntrl}"," "),issue,cover,prefs.getBoolean("favorite:"+id,false),prefs.getLong("recent:"+id,0),CartridgeFormat.of(name),entry.folder.replaceAll("\\p{Cntrl}"," ")));

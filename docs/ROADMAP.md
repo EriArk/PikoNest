@@ -8,12 +8,19 @@ The project should not begin by building a beautiful full UI around assumptions 
 
 Version numbers are approximate planning markers, not release promises.
 
-Latest bounded slice (host 0.0.27): ordinary `#include` Lua files, whole-cart code
+Latest bounded slice (host 0.0.28 / adapter revision 3): direct literal `load` and
+file-backed `reload` across sibling `.p8` files, staged read-only in a private
+runtime session. Two-way chapter transitions, parameters and data reads match
+direct official-runtime execution. [Contract](DEPENDENT_CARTRIDGES.md) ·
+[Evidence](design/android-multicart-28/README.md).
+Next: integrated runtime setup; broader dependency and durable-write support
+remain separate compatibility requirements.
+
+Previous slice (host 0.0.27): ordinary `#include` Lua files, whole-cart code
 and selected tabs prepare into a temporary `.p8` for Play/external entry. Sources
 stay untouched; missing dependencies fail before dispatch. Direct/prepared runtime
 captures match. [Contract](DEPENDENT_CARTRIDGES.md) ·
 [Evidence](design/android-includes-27/README.md).
-Next: runtime file-set/multicart staging, then integrated runtime setup.
 
 Previous slice (host 0.0.26): Play indexes Games and its subfolders, shows
 relative folder names, and keeps selection/favorites/recent launches per document.
@@ -141,8 +148,8 @@ The sequence is a working plan, not a delivery-date or feasibility promise for
 experimental online features. Stage acceptance does not follow automatically from
 tests/screenshots: user-facing behavior and physical ergonomics need review.
 
-**Next slice after include preparation:** runtime file-set/multicart staging,
-then the runtime setup wizard. Continue
+**Next slice after bounded multicart staging:** the runtime setup wizard. Expand
+dependency coverage and durable-write ownership separately. Continue
 lifecycle/device/layout checks with each slice; the test adapter does not close
 production runtime ownership, diagnostics or packaging.
 Verified project/data migration remains a foundation task. Do not move existing

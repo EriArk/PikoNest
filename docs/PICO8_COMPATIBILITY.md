@@ -324,3 +324,12 @@ If a convenience feature has two possible designs:
 prefer the second for standard projects.
 
 The value of PIKOOS is making the real system approachable, not hiding a different engine behind a PICO-8 skin.
+
+## 18. Temporary linked-file launch preparation
+
+Host 0.0.28 can prepare simple includes and a bounded set of sibling text carts
+for ordinary `load`/`reload`. The source remains ordinary `.p8` and linked files;
+runtime calls are not flattened or replaced by custom APIs. Internal adapter
+transport is not an editable project format. Official-runtime fixture comparisons
+are evidence for that limited path, not proof of arbitrary Lua compatibility.
+See [linked-file contract and pending support](DEPENDENT_CARTRIDGES.md).

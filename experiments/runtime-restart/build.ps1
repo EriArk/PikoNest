@@ -40,7 +40,7 @@ $pikoManifest = Join-Path $pikoDecoded 'AndroidManifest.xml'
 $pikoText = [IO.File]::ReadAllText($pikoManifest).Replace('io.wip.pico8','art.pikoos.runtimeexperiment').Replace('<application ','<application android:debuggable="true" ').Replace('android:label="@string/godot_project_name_string"','android:label="PIKOOS Runtime Test"')
 [IO.File]::WriteAllText($pikoManifest,$pikoText,(New-Object Text.UTF8Encoding($false)))
 $pikoConfig = Join-Path $pikoDecoded 'apktool.yml'
-$pikoConfigText = [IO.File]::ReadAllText($pikoConfig).Replace('versionCode: 1','versionCode: 2').Replace('versionName: 1.6.6','versionName: 1.6.6-pikoos.2')
+$pikoConfigText = [IO.File]::ReadAllText($pikoConfig).Replace('versionCode: 1','versionCode: 3').Replace('versionName: 1.6.6','versionName: 1.6.6-pikoos.3')
 [IO.File]::WriteAllText($pikoConfig,$pikoConfigText,(New-Object Text.UTF8Encoding($false)))
 $pikoUnsigned = Join-Path $pikoBuild 'unsigned.apk'
 $pikoAligned = Join-Path $pikoBuild 'aligned.apk'

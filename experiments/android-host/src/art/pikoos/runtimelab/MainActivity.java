@@ -246,14 +246,16 @@ public final class MainActivity extends Activity {
         final android.content.ContentResolver resolver=getApplicationContext().getContentResolver();
         final String location=folderPrefs.getString("GAMES.uri","");
         new Thread(()->{
-            byte[] bytes=null;String failure=null;
+            byte[] bytes=null;art.pikoos.lab.core.RuntimeFileSet files=null;String failure=null;
             try{
                 bytes=GameFolder.read(resolver,game.id);
-                bytes=IncludeSource.prepare(resolver,location,Uri.parse(game.id),game.title+game.format.extension,bytes,()->generation!=playGeneration);
+                IncludeSource.Prepared ready=IncludeSource.launch(resolver,location,Uri.parse(game.id),game.title+game.format.extension,bytes,()->generation!=playGeneration);
+                bytes=ready.bytes;files=ready.files;
             }catch(java.util.concurrent.CancellationException e){return;}
             catch(IllegalArgumentException e){failure=e.getMessage();}
             catch(Exception e){failure="Не удалось прочитать игру · L: обновить полку";}
             final byte[] snapshot=bytes;final String error=failure;
+            final art.pikoos.lab.core.RuntimeFileSet fileSet=files;
             runOnUiThread(()->{
                 if(isDestroyed()||!showingPlay||generation!=playGeneration||target!=play)return;
                 if(error!=null){target.fail(error);playView.invalidate();return;}
@@ -263,7 +265,7 @@ public final class MainActivity extends Activity {
                     if(!playPrefs.edit().putBoolean("runtime",true).putString("selected",game.id).commit())throw new Exception("Не удалось сохранить место на полке");
                     awaitingReturn=true;leftForRuntime=false;
                     if(!libraryPrefs.edit().putBoolean("awaitingReturn",true).commit())throw new Exception("Не удалось сохранить состояние запуска");
-                    backend.launch(snapshot,game.format);
+                    if(fileSet!=null)backend.launch(fileSet);else backend.launch(snapshot,game.format);
                     game.recent=System.currentTimeMillis();playPrefs.edit().putLong("recent:"+game.id,game.recent).apply();
                 }catch(Exception e){awaitingReturn=false;playPrefs.edit().putBoolean("runtime",false).apply();libraryPrefs.edit().putBoolean("awaitingReturn",false).apply();target.fail(e.getMessage()==null?"Не удалось запустить PICO-8":e.getMessage());}
                 playView.invalidate();
