@@ -1,0 +1,57 @@
+{
+  "offset_candidates": {
+    "game-origin": [
+      [
+        0,
+        0
+      ]
+    ],
+    "game-middle": [
+      [
+        32,
+        0
+      ]
+    ],
+    "game-right-held": [
+      [
+        64,
+        0
+      ]
+    ],
+    "game-right-bound": [
+      [
+        96,
+        0
+      ]
+    ],
+    "game-right-beyond": [
+      [
+        128,
+        0
+      ]
+    ],
+    "game-down-held": [
+      [
+        128,
+        32
+      ]
+    ],
+    "game-bottom-bound": [
+      [
+        128,
+        128
+      ]
+    ],
+    "game-bottom-beyond": [
+      [
+        128,
+        128
+      ]
+    ]
+  },
+  "hud_white_pixels": 150,
+  "hud_fixed": true,
+  "right_edge_reached": true,
+  "bottom_clamp": true,
+  "comparison": "nearest palette, 128x128 pixel centers, exclude text colours 1 and 7"
+}

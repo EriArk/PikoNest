@@ -40,7 +40,7 @@ public final class SpriteAnimationTest {
         SpriteAnimation.validateSource("frames=3\nf=1\ni=2\nelapsed=4\n-- time=0\n");checks++;
         LuaDraft protectedDraft=LuaInsertTest.draft("--[[\ninside\n]]\n");protectedDraft.point(1,0);refused(()->protectedDraft.beginAnimation(new SpriteRegion(0,0,8,8)));
         LuaInsertTest.Port port=new LuaInsertTest.Port();WorkshopSession s=new WorkshopSession(original,port);s.switchTool(1);s.codeLine=2;s.act(Action.CONFIRM);s.act(Action.CONTEXT);
-        for(int n=0;n<LuaInsert.ITEMS.length-1;n++)s.act(Action.DOWN);s.act(Action.CONFIRM);check(s.codeDraft.panel==LuaDraft.Panel.ANIMATION,"controller entry");
+        for(int n=0;!LuaInsert.ITEMS[n].id.equals("animation");n++)s.act(Action.DOWN);s.act(Action.CONFIRM);check(s.codeDraft.panel==LuaDraft.Panel.ANIMATION,"controller entry");
         s.act(Action.TEST);s.codeCommand(1);check(port.saves==0&&port.launches==0,"modal traps save/Test");
         s.act(Action.CONTEXT);check(s.codeDraft.animation.playing,"controller play");s.act(Action.UNDO);check(!s.codeDraft.animation.playing,"controller stop");
         for(int n=0;n<3;n++)s.act(Action.DOWN);s.act(Action.CONFIRM);check(s.codeDraft.animation.count()==2,"controller duplicate");

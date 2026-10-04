@@ -195,6 +195,7 @@ public final class LuaDraft {
         String function=insertion.functionName();
         if(function!=null&&context.defines(function))throw new IllegalArgumentException("Функция "+function+" уже задана. Перейди к её телу; существующий код не заменён.");
         String raw=insertion.code();
+        if(insertion.cameraRecipe()){WorldCamera.validateSource(text,insertion.item().id.equals("camera_follow"));WorldCamera.validateForm(insertion);}
         if(insertion.item().id.equals("move_call"))TileMotion.validateCall(text,insertion.value(0),insertion.value(1),insertion.value(2));
         boolean tileProbe=insertion.tileRecipe();
         if(tileProbe){

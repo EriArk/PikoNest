@@ -6,11 +6,16 @@ import java.util.regex.*;
 /** Exact field spans for bounded single-line calls and rules; never rewrites block bodies. */
 public final class LuaCall {
     public final int start,end;public final String original,name;
-    private final int[] from,to;private final String[] initial;
+    private final int[] from,to,fields;private final String[] initial;
     public final LuaInsert form;
     LuaCall(int start,int end,String original,String name,int[] from,int[] to,LuaInsert form){
+        this(start,end,original,name,from,to,form,null);
+    }
+    LuaCall(int start,int end,String original,String name,int[] from,int[] to,LuaInsert form,int[] fields){
         this.start=start;this.end=end;this.original=original;this.name=name;this.from=from;this.to=to;this.form=form;
-        initial=new String[from.length];for(int n=0;n<initial.length;n++)initial[n]=form.value(n);
+        this.fields=fields==null?new int[from.length]:fields;
+        if(fields==null)for(int n=0;n<from.length;n++)this.fields[n]=n;
+        initial=new String[from.length];for(int n=0;n<initial.length;n++)initial[n]=form.value(this.fields[n]);
     }
     private static IllegalArgumentException unsupported(){return new IllegalArgumentException("Для этой строки формы пока нет. Вернись к коду и выбери «Ввод».");}
     public static LuaCall parse(String source,int start,int end){
@@ -25,7 +30,7 @@ public final class LuaCall {
             if(depth!=0)throw unsupported();
             return rule;
         }
-        Matcher head=Pattern.compile("^[ \\t]*(cls|print|circfill|rectfill|spr|sspr|map)[ \\t]*\\(").matcher(mask);
+        Matcher head=Pattern.compile("^[ \\t]*(cls|print|circfill|rectfill|spr|sspr|map|camera)[ \\t]*\\(").matcher(mask);
         if(!head.find())throw unsupported();
         String name=head.group(1);ArrayList<Integer> starts=new ArrayList<>(),ends=new ArrayList<>();
         if(new LuaSymbols(source).shadows(name))throw new IllegalArgumentException("Этот вызов нельзя уверенно распознать. Вернись к коду и выбери «Ввод».");
@@ -42,6 +47,13 @@ public final class LuaCall {
         }
         if(close<0||!mask.substring(close+1).matches("[ \\t]*;?[ \\t]*"))throw unsupported();
         int index=name.equals("cls")?10:name.equals("print")?11:name.equals("circfill")?13:name.equals("rectfill")?14:name.equals("sspr")?18:name.equals("map")?19:15;
+        if(name.equals("camera")){
+            WorldCamera.validateSource(source,false);
+            boolean empty=raw.substring(head.end(),close).trim().isEmpty();
+            String id=empty?"camera_reset":"camera";
+            for(int n=0;n<LuaInsert.ITEMS.length;n++)if(LuaInsert.ITEMS[n].id.equals(id))index=n;
+            if(empty){starts.clear();ends.clear();}
+        }
         LuaInsert form=new LuaInsert();form.choose(index);form.editing=true;form.screen=LuaInsert.Screen.FIELDS;
         if(starts.size()!=form.item().fields.length)throw unsupported();
         int[] from=new int[starts.size()],to=new int[from.length];
@@ -49,6 +61,7 @@ public final class LuaCall {
             int a=starts.get(n),b=ends.get(n);while(a<b&&Character.isWhitespace(raw.charAt(a)))a++;while(b>a&&Character.isWhitespace(raw.charAt(b-1)))b--;
             if(a==b)throw unsupported();from[n]=a;to[n]=b;
         }
+        if(name.equals("camera")&&from.length==2){LuaCall follow=WorldCamera.follow(source,raw,start,end,from,to);if(follow!=null)return follow;}
         String literal=name.equals("print")?literal(raw.substring(from[0],to[0])):null;
         if(literal!=null){form.choose(12);form.editing=true;}
         try{for(int n=0;n<from.length;n++)form.set(n,n==0&&literal!=null?literal:raw.substring(from[n],to[n]));}
@@ -69,15 +82,16 @@ public final class LuaCall {
         if(proposal.selected!=form.selected)throw unsupported();
         StringBuilder changed=new StringBuilder();int at=0;
         for(int n=0;n<from.length;n++){
-            changed.append(original,at,from[n]);String value=proposal.value(n);
+            changed.append(original,at,from[n]);String value=proposal.value(fields[n]);
             changed.append(value.equals(initial[n])?original.substring(from[n],to[n]):
-                proposal.kind(n)==LuaInsert.Kind.STRING?LuaInsert.quote(value):value);at=to[n];
+                proposal.kind(fields[n])==LuaInsert.Kind.STRING?LuaInsert.quote(value):value);at=to[n];
         }
         return changed.append(original.substring(at)).toString();
     }
     public String replacement(String source,LuaInsert proposal){
         if(end>source.length()||!source.substring(start,end).equals(original))throw new IllegalArgumentException("Строка уже изменилась. Открой параметры заново; правка не применена.");
         String changed=preview(proposal);
+        if(proposal.cameraRecipe()){WorldCamera.validateSource(source,proposal.item().id.equals("camera_follow"));WorldCamera.validateForm(proposal);}
         // New delimiters must not escape the single call or silently add/remove arguments.
         LuaCall check=parse(changed,0,changed.length());if(!check.name.equals(name)||check.from.length!=from.length)throw unsupported();
         if(name.startsWith("rule:"))for(int n=0;n<from.length;n++)

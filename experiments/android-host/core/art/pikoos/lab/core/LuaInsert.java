@@ -41,7 +41,10 @@ public final class LuaInsert {
         new Item("solid_box","Препятствие · область","solid_box(x,y,w,h): точка начала и размеры в пикселях карты. Проверяет все клетки области. Касание края не считается пересечением.",false,f("Имя","solid_box",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Карта, шир.","128",Kind.MAP_WIDTH),f("Карта, выс.","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE)),
         new Item("move_box","Движение · стены","Создаёт движение по флагам: сначала X, затем Y. Проверяет весь путь шага. После вставки выбери «Движение · вызов» в _update.",false,f("Имя","move_box",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Карта, шир.","128",Kind.MAP_WIDTH),f("Карта, выс.","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE)),
         new Item("move_call","Движение · вызов","Выбери функцию движения, переменные координат, размер и шаг в пикселях. Вставляй в _update. Функцию сначала добавь через «Движение · стены».",false,f("Функция","move_box",Kind.NAME),f("Коорд. X","x",Kind.NAME),f("Коорд. Y","y",Kind.NAME),f("Ширина, px","8",Kind.EXPR),f("Высота, px","8",Kind.EXPR),f("Шаг X","1",Kind.EXPR),f("Шаг Y","0",Kind.EXPR)),
-        new Item("animation","Анимация · кадры","Выбери области листа, порядок и время каждого кадра. Просмотри анимацию и вставь Lua внутри _draw после cls().",false)
+        new Item("animation","Анимация · кадры","Выбери области листа, порядок и время каждого кадра. Просмотри анимацию и вставь Lua внутри _draw после cls().",false),
+        new Item("camera","Камера · положение","Левый верхний угол экрана в мире, в пикселях. Вставляй после cls(), перед картой и объектами. Перед счётом и меню выбери «Камера · экран».",false,f("Мир X","0",Kind.EXPR),f("Мир Y","0",Kind.EXPR)),
+        new Item("camera_follow","Камера · следить","Точка мира будет в центре, пока камера не достигнет края поля. Выбери X/Y через «имена» или введи выражение. Поле начинается в (0,0); размеры — в клетках 8×8.",false,f("Точка X","x",Kind.EXPR),f("Точка Y","y",Kind.EXPR),f("Поле, шир.","32",Kind.MAP_WIDTH),f("Поле, выс.","32",Kind.MAP_HEIGHT)),
+        new Item("camera_reset","Камера · экран","Возвращает экранные координаты (0,0). Вставляй после карты и объектов, перед счётом и меню в _draw. Положение объектов в мире не меняется.",false)
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
@@ -49,7 +52,8 @@ public final class LuaInsert {
     public boolean tileRecipe(){return item().id.equals("solid")||areaRecipe()||motionRecipe();}
     public boolean areaRecipe(){return item().id.equals("solid_box");}
     public boolean motionRecipe(){return item().id.equals("move_box");}
-    public boolean fullPreview(){return areaRecipe()||motionRecipe()||item().id.equals("move_call");}
+    public boolean cameraRecipe(){return item().id.startsWith("camera");}
+    public boolean fullPreview(){return areaRecipe()||motionRecipe()||item().id.equals("move_call")||cameraRecipe();}
     public void beginPreview(){screen=Screen.PREVIEW;previewLine=0;}
     public boolean replaceAll=true;
     public String input="";
@@ -133,10 +137,13 @@ public final class LuaInsert {
     public String functionName(){return selected<3?new String[]{"_init","_update","_draw"}[selected]:item().id.equals("function")?values[0]:null;}
     public String code(){
         if(item().id.equals("animation"))throw new IllegalArgumentException("Открой визуальный выбор кадров");
+        if(item().id.equals("camera_reset"))return "camera()\n";
         for(int i=0;i<values.length;i++)validate(kind(i),values[i]);
         String name=functionName();if(name!=null)return "function "+name+"()\n  \nend\n";
         String a=values[0];
         switch(item().id){
+            case "camera":return "camera("+join()+")\n";
+            case "camera_follow":return WorldCamera.code(values[0],values[1],values[2],values[3]);
             case "solid":return TileProbe.code(a,values[1],values[2],values[3],values[4]);
             case "solid_box":return TileProbe.areaCode(a,values[1],values[2],values[3],values[4]);
             case "move_box":return TileMotion.code(a,values[1],values[2],values[3],values[4]);
@@ -164,6 +171,7 @@ public final class LuaInsert {
     static String quote(String s){return "\""+s.replace("\\","\\\\").replace("\"","\\\"")+"\"";}
     public String display(int index){
         String value=values[index];Kind kind=item().fields[index].kind;
+        if(cameraRecipe()&&(kind==Kind.MAP_WIDTH||kind==Kind.MAP_HEIGHT))return value+" кл · "+(Integer.parseInt(value)*8)+" px";
         if(kind==Kind.OUTSIDE)return value.equals("true")?"Препятствие":"Свободно";
         if(kind==Kind.BUTTON)return new String[]{"0 · влево","1 · вправо","2 · вверх","3 · вниз","4 · O","5 · X"}[Integer.parseInt(value)];
         if(kind==Kind.INPUT)return value.equals("btnp")?"btnp · нажатие / повтор":"btn · удержание";
@@ -189,7 +197,7 @@ public final class LuaInsert {
         if(browserState){insert.symbolGroup=in.readInt();insert.symbolIndex=in.readInt();}
         if(insert.screen==Screen.PREVIEW){
             insert.previewLine=in.readInt();
-            if(!browserState||editing||!insert.fullPreview()||insert.previewLine<0||insert.previewLine>insert.code().length())throw new IOException("preview state");
+            if(!browserState||(editing&&!insert.cameraRecipe())||!insert.fullPreview()||insert.previewLine<0||insert.previewLine>insert.code().length())throw new IOException("preview state");
         }
         if(insert.symbolGroup<0||insert.symbolGroup>1||insert.symbolIndex<0||insert.symbolIndex>100000
             ||(insert.screen==Screen.SYMBOLS&&(!browserState||!insert.canBrowse()||(insert.symbolGroup==1&&!insert.canBrowseApi()))))throw new IOException("symbol state");

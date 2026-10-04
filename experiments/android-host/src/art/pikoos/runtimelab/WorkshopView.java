@@ -23,6 +23,7 @@ import art.pikoos.lab.core.SpriteAsset;
 import art.pikoos.lab.core.NameEditor;
 import art.pikoos.lab.core.LuaDraft;
 import art.pikoos.lab.core.LuaInsert;
+import art.pikoos.lab.core.LuaCall;
 import art.pikoos.lab.core.LuaNavigation;
 import art.pikoos.lab.core.RuntimeDiagnostic;
 import android.view.KeyEvent;
@@ -716,7 +717,7 @@ final class WorkshopView extends View {
             hit(16,182,w-32,28,()->action(Action.MENU));
             return;
         }
-        boolean longCall=d.callEdit!=null&&(i.item().id.equals("sspr")||i.item().id.equals("map"))&&w<500;
+        boolean longCall=d.callEdit!=null&&((i.item().id.equals("sspr")||i.item().id.equals("map"))&&w<500||i.cameraRecipe());
         int count=i.item().fields.length,rows=Math.min(count+1,Math.max(2,(int)((bodyBottom-(longCall?298:254))/36)));
         if(i.tileRecipe())rows=2;
         int first=Math.max(0,Math.min(i.field-rows/2,count+1-rows));
@@ -731,7 +732,7 @@ final class WorkshopView extends View {
             hit(16,y,w-32,32,()->{i.field=index;action(Action.CONFIRM);});
         }
         float previewY=124+rows*36;
-        text(i.fullPreview()?"Начало Lua":d.callEdit!=null?"Изменение Lua":"Lua после вставки",16,previewY+14,18,14);
+        text(i.fullPreview()?"Lua · предварительно":d.callEdit!=null?"Изменение Lua":"Lua после вставки",16,previewY+14,18,14);
         rect(16,previewY+24,w-32,bodyBottom-previewY-62,0);
         c.save();c.clipRect(16,previewY+24,w-16,bodyBottom-34);
         if(longCall){codePreview("Было: "+d.callEdit.original.trim(),24,previewY+46,6,w-48);codePreview("Будет: "+d.callEdit.preview(i).trim(),24,previewY+90,10,w-48);}
@@ -746,10 +747,13 @@ final class WorkshopView extends View {
         else if(i.fullPreview())key("X Lua",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
     }
     private void luaRecipePreview(LuaInsert i){
-        fitted(i.motionRecipe()?"Движение · код":i.item().id.equals("move_call")?"Движение · вызов":"Область · код функции",16,75,22,14,w-32);
-        fitted(i.motionRecipe()?"Сначала X, затем Y · пиксели":i.item().id.equals("move_call")?"Новые X,Y · на месте курсора":"Карта: x,y,w,h в пикселях",16,100,16,6,w-32);
+        fitted(i.cameraRecipe()?i.item().title:i.motionRecipe()?"Движение · код":i.item().id.equals("move_call")?"Движение · вызов":"Область · код функции",16,75,22,14,w-32);
+        fitted(i.cameraRecipe()?(s.codeDraft.callEdit!=null?"Было / будет · только эта строка":i.item().id.equals("camera_reset")?"После мира · перед счётом и меню":"Перед миром · после cls()"):i.motionRecipe()?"Сначала X, затем Y · пиксели":i.item().id.equals("move_call")?"Новые X,Y · на месте курсора":"Карта: x,y,w,h в пикселях",16,100,16,6,w-32);
         java.util.ArrayList<String> rows=new java.util.ArrayList<>();
-        for(String line:i.code().split("\n")){
+        LuaCall edit=s.codeDraft.callEdit;
+        String preview=edit==null?i.code():"Было:\n"+edit.original+"\n\nБудет:\n"+edit.preview(i);
+        if(i.cameraRecipe()&&edit==null)preview+=(i.item().id.equals("camera_reset")?"\nДальше рисуй счёт и меню.\nОни останутся на экране.":"\nДальше рисуй карту и объекты.\nПеред счётом и меню добавь\n«Камера · экран».\nЭкран = мир − камера.");
+        for(String line:preview.split("\n")){
             if(line.isEmpty()){rows.add("");continue;}
             while(!line.isEmpty()){
                 int n=line.length();while(n>1&&width(line.substring(0,n),18)>w-48)n--;
@@ -762,7 +766,7 @@ final class WorkshopView extends View {
         for(int n=0;n<visible&&i.previewLine+n<rows.size();n++)text(rows.get(i.previewLine+n),24,134+n*22,18,7);
         fitted((i.previewLine+1)+"–"+Math.min(rows.size(),i.previewLine+visible)+"/"+rows.size()+(w<500?" · ↑↓ · ←→":" · ↑↓ читать · ←→ листать"),16,bodyBottom-12,16,6,w-32);
         rect(0,bodyBottom,w,44,0);
-        key(ok()+" вставить",12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(ok()+(edit==null?" вставить":" заменить"),12,bodyBottom,10,()->action(Action.CONFIRM));
         key(back()+" поля",w/2,bodyBottom,6,()->action(Action.CANCEL));
         hit(16,112,(w-32)/2,visible*22+8,()->action(Action.LEFT));
         hit(w/2,112,(w-32)/2,visible*22+8,()->action(Action.RIGHT));
