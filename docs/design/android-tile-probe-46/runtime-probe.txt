@@ -1,0 +1,9 @@
+proot error: execve("/usr/bin/busybox"): No such file or directory
+proot info: possible causes:
+  * the program is a script but its interpreter (eg. /bin/sh) was not found;
+  * the program is an ELF but its interpreter (eg. ld-linux.so) was not found;
+  * the program is a foreign binary but qemu was not specified;
+  * qemu does not work correctly (if specified);
+  * the loader was not found or doesn't work.
+fatal error: see `proot --help`.
+proot error: can't chmod '/data/user/0/art.pikoos.runtimeexperiment/files/tile-probe-46-oracle/tmp/proot-22824-VEuKxS': No such file or directory

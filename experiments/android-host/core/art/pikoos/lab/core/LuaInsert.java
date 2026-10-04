@@ -5,7 +5,7 @@ import java.io.*;
 /** Small editable catalogue of ordinary Lua. No bindings or extra runtime components. */
 public final class LuaInsert {
     public enum Screen { CATALOG, FIELDS, TEXT, SYMBOLS }
-    public enum Kind { NAME, EXPR, STRING, COLOR, BUTTON, INPUT, COMPARE }
+    public enum Kind { NAME, EXPR, STRING, COLOR, BUTTON, INPUT, COMPARE, FLAG, MAP_WIDTH, MAP_HEIGHT, OUTSIDE }
     public static final String[] COMPARISONS={"==","~=","!=","<","<=",">",">="};
     public static final class Field {
         public final String label,initial;public final Kind kind;
@@ -37,6 +37,7 @@ public final class LuaInsert {
         new Item("compare","if · сравнить значения","Сравнивает два значения. Если сравнение истинно, выполняется тело условия.",true,f("Слева","score",Kind.EXPR),f("Сравнение",">=",Kind.COMPARE),f("Справа","5",Kind.EXPR)),
         new Item("sspr","Спрайт · разместить","Выбери область своего листа и место на экране. Вставляй внутри _draw после очистки кадра.",false,f("На листе X","0",Kind.EXPR),f("На листе Y","0",Kind.EXPR),f("Ширина","8",Kind.EXPR),f("Высота","8",Kind.EXPR),f("Экран X","60",Kind.EXPR),f("Экран Y","60",Kind.EXPR)) ,
         new Item("map","map · показать карту","Рисует тайлы карты. Вставляй в _draw после cls(). Размер задаётся в клетках 8×8, положение на экране — в пикселях.",false,f("Карта X","0",Kind.EXPR),f("Карта Y","0",Kind.EXPR),f("Экран X","0",Kind.EXPR),f("Экран Y","0",Kind.EXPR),f("Ширина, кл","16",Kind.EXPR),f("Высота, кл","16",Kind.EXPR))
+        ,new Item("solid","Препятствие · точка карты","Создаёт функцию в начале Lua. solid_at(x,y): true, если точка на тайле с флагом. x/y — пиксели от начала карты, не экрана.",false,f("Имя","solid_at",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Ширина, кл","128",Kind.MAP_WIDTH),f("Высота, кл","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE))
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
@@ -73,10 +74,17 @@ public final class LuaInsert {
         }
         if(kind==Kind.INPUT&&!value.equals("btn")&&!value.equals("btnp"))throw new IllegalArgumentException("Выбери btn или btnp");
         if(kind==Kind.COMPARE&&!java.util.Arrays.asList(COMPARISONS).contains(value))throw new IllegalArgumentException("Выбери знак сравнения стрелками");
+        if(kind==Kind.FLAG||kind==Kind.MAP_WIDTH||kind==Kind.MAP_HEIGHT){
+            int n;try{n=Integer.parseInt(value);}catch(NumberFormatException e){throw new IllegalArgumentException("Выбери целое число стрелками");}
+            if(n<(kind==Kind.FLAG?0:1)||n>(kind==Kind.FLAG?7:kind==Kind.MAP_WIDTH?128:64))throw new IllegalArgumentException("Значение вне диапазона инструмента");
+        }
+        if(kind==Kind.OUTSIDE&&!value.equals("true")&&!value.equals("false"))throw new IllegalArgumentException("Выбери поведение за краем");
     }
     public void step(int direction){
         if(field>=values.length)return;
         Kind kind=colorChoice(field)?Kind.COLOR:kind(field);
+        if(kind==Kind.OUTSIDE){values[field]=values[field].equals("true")?"false":"true";return;}
+        if(kind==Kind.FLAG||kind==Kind.MAP_WIDTH||kind==Kind.MAP_HEIGHT){int min=kind==Kind.FLAG?0:1,max=kind==Kind.FLAG?7:kind==Kind.MAP_WIDTH?128:64;values[field]=""+Math.max(min,Math.min(max,Integer.parseInt(values[field])+direction));return;}
         if(kind==Kind.COMPARE){int at=java.util.Arrays.asList(COMPARISONS).indexOf(values[field]);values[field]=COMPARISONS[Math.floorMod(at+direction,COMPARISONS.length)];return;}
         if(kind==Kind.INPUT){values[field]=values[field].equals("btn")?"btnp":"btn";return;}
         if(kind!=Kind.COLOR&&kind!=Kind.BUTTON&&kind!=Kind.EXPR)return;
@@ -87,7 +95,7 @@ public final class LuaInsert {
     }
     public void beginText(){
         if(field>=values.length)return;
-        Kind kind=kind(field);if(kind==Kind.COLOR||kind==Kind.BUTTON||kind==Kind.INPUT||kind==Kind.COMPARE){step(1);return;}
+        Kind kind=kind(field);if(kind==Kind.COLOR||kind==Kind.BUTTON||kind==Kind.INPUT||kind==Kind.COMPARE||kind==Kind.FLAG||kind==Kind.MAP_WIDTH||kind==Kind.MAP_HEIGHT||kind==Kind.OUTSIDE){step(1);return;}
         input=values[field];replaceAll=true;page=key=0;screen=Screen.TEXT;
     }
     public void type(String added){
@@ -118,6 +126,7 @@ public final class LuaInsert {
         String name=functionName();if(name!=null)return "function "+name+"()\n  \nend\n";
         String a=values[0];
         switch(item().id){
+            case "solid":return TileProbe.code(a,values[1],values[2],values[3],values[4]);
             case "if":return "if "+a+" then\n  \nend\n";
             case "compare":return "if "+a+values[1]+values[2]+" then\n  \nend\n";
             case "for":return "for "+a+"="+values[1]+","+values[2]+","+values[3]+" do\n  \nend\n";
@@ -140,6 +149,7 @@ public final class LuaInsert {
     static String quote(String s){return "\""+s.replace("\\","\\\\").replace("\"","\\\"")+"\"";}
     public String display(int index){
         String value=values[index];Kind kind=item().fields[index].kind;
+        if(kind==Kind.OUTSIDE)return value.equals("true")?"Препятствие":"Свободно";
         if(kind==Kind.BUTTON)return new String[]{"0 · влево","1 · вправо","2 · вверх","3 · вниз","4 · O","5 · X"}[Integer.parseInt(value)];
         if(kind==Kind.INPUT)return value.equals("btnp")?"btnp · нажатие / повтор":"btn · удержание";
         if(kind==Kind.COMPARE){String[] meanings={"равно","не равно","не равно","меньше","не больше","больше","не меньше"};return value+" · "+meanings[java.util.Arrays.asList(COMPARISONS).indexOf(value)];}

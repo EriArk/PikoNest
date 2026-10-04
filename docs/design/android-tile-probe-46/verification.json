@@ -1,0 +1,13 @@
+{
+  "all_old_files_preserved": 28,
+  "new_files": [
+    "files/projects/remix-0013/game.p8"
+  ],
+  "all_non_lua_sections_unchanged": true,
+  "official_visible_result": [
+    "true",
+    "false"
+  ],
+  "headless_edge_probe": "blocked by proot setup before execution",
+  "tested_sha256": "0edc0367a9f353fe23dc5ec32baf5e38f142bd6de8cf56a466bc62c6163a04ea"
+}

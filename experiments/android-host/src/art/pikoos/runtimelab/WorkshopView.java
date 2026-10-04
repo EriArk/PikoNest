@@ -598,7 +598,7 @@ final class WorkshopView extends View {
         hits.clear();
         if(i.screen==LuaInsert.Screen.SYMBOLS){luaSymbols(i);return;}
         fitted(i.screen==LuaInsert.Screen.CATALOG?"+ Вставить Lua":d.callEdit!=null&&d.callEdit.name.equals("rule:elseif")?"elseif · иначе если":i.item().title,16,75,24,14,w-32);
-        fitted(d.callEdit!=null?(i.item().id.equals("set")||i.item().id.equals("add")?"Имя и значение меняются только в этой строке":"Поля строки "+(d.line()+1)+" · "+back()+" отменить"):"Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
+        fitted(i.item().id.equals("solid")?"Начало Lua · x/y в пикселях":d.callEdit!=null?(i.item().id.equals("set")||i.item().id.equals("add")?"Имя и значение меняются только в этой строке":"Поля строки "+(d.line()+1)+" · "+back()+" отменить"):"Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
         if(i.screen==LuaInsert.Screen.CATALOG){
             int rows=Math.max(3,(int)((bodyBottom-220)/38));
             int first=Math.max(0,Math.min(i.selected-rows/2,LuaInsert.ITEMS.length-rows));
@@ -639,6 +639,7 @@ final class WorkshopView extends View {
         }
         boolean longCall=d.callEdit!=null&&(i.item().id.equals("sspr")||i.item().id.equals("map"))&&w<500;
         int count=i.item().fields.length,rows=Math.min(count+1,Math.max(2,(int)((bodyBottom-(longCall?298:254))/36)));
+        if(i.item().id.equals("solid"))rows=2;
         int first=Math.max(0,Math.min(i.field-rows/2,count+1-rows));
         for(int r=0;r<rows&&first+r<=count;r++){
             final int index=first+r;float y=112+r*36;boolean focus=index==i.field;

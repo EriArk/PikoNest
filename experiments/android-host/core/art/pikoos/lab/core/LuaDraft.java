@@ -169,6 +169,8 @@ public final class LuaDraft {
         String function=insertion.functionName();
         if(function!=null&&context.defines(function))throw new IllegalArgumentException("Функция "+function+" уже задана. Перейди к её телу; существующий код не заменён.");
         String raw=insertion.code();
+        boolean tileProbe=insertion.item().id.equals("solid");
+        if(tileProbe){TileProbe.validateSource(text,insertion.value(0));at=0;indent="";}
         if(insertion.item().id.equals("compare")){
             String header=raw.substring(0,raw.indexOf('\n'));LuaCall parsed=LuaCall.parse(header,0,header.length());
             if(parsed.form.selected!=insertion.selected)throw new IllegalArgumentException("Сложное выражение: заключи каждую сторону сравнения в скобки.");
@@ -178,7 +180,7 @@ public final class LuaDraft {
         for(String row:raw.split("\n"))inserted.append(indent).append(row).append(newline);
         String changed=text.substring(0,at)+inserted+text.substring(at);
         if(changed.getBytes(StandardCharsets.UTF_8).length>LIMIT)throw new IllegalArgumentException("Достигнут предел памяти черновика PIKOOS");
-        int caret=insertion.item().block?at+inserted.indexOf(newline)+newline.length()+indent.length()+2:at+inserted.length()+indent.length();
+        int caret=tileProbe?0:insertion.item().block?at+inserted.indexOf(newline)+newline.length()+indent.length()+2:at+inserted.length()+indent.length();
         remember(undo);redo.clear();changeText(changed);cursor=caret;anchor=-1;insertion=null;panel=Panel.CURSOR;
     }
     public void cancelInsert(){insertion=null;callEdit=null;panel=Panel.CURSOR;}
