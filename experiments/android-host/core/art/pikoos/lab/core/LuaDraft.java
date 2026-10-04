@@ -83,6 +83,10 @@ public final class LuaDraft {
         if(insert){beginInsert();branchHeader=b.header;}
     }
     public SpritePlacement placement;
+    public SpritePlacement backgroundPicker;
+    public void beginBackgroundPick(){if(insertion!=null&&insertion.backgroundRecipe())backgroundPicker=new SpritePlacement(BackgroundLayer.region(insertion));}
+    public void acceptBackgroundPick(){if(backgroundPicker.phase==0){backgroundPicker.next();return;}BackgroundLayer.setRegion(insertion,backgroundPicker.source());backgroundPicker=null;}
+    public void cancelBackgroundPick(){if(backgroundPicker.phase==1)backgroundPicker.phase=0;else backgroundPicker=null;}
     public SpriteAnimation animation;
     public AnimationEdit animationEdit;
     public boolean animationBefore;
@@ -258,6 +262,7 @@ public final class LuaDraft {
         String function=insertion.functionName();
         if(function!=null&&context.defines(function))throw new IllegalArgumentException("Функция "+function+" уже задана. Перейди к её телу; существующий код не заменён.");
         String raw=insertion.code();
+        if(insertion.backgroundRecipe())BackgroundLayer.validate(text,insertion);
         if(insertion.doorRecipe())DoorTransition.validate(text,insertion);
         if(insertion.cameraRecipe()){WorldCamera.validateSource(text,insertion.item().id);WorldCamera.validateForm(insertion);}
         if(insertion.item().id.equals("move_call"))TileMotion.validateCall(text,insertion.value(0),insertion.value(1),insertion.value(2));
@@ -297,6 +302,12 @@ public final class LuaDraft {
     }
     /** Recovery snapshot, including original bytes for stale-draft detection. History is session-only. */
     public byte[] encode(){
+        if(backgroundPicker!=null)try{
+            SpritePlacement pick=backgroundPicker;backgroundPicker=null;byte[] base;
+            try{base=encode();}finally{backgroundPicker=pick;}
+            ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
+            out.writeInt(12);write(out,base);pick.write(out);out.close();return bytes.toByteArray();
+        }catch(IOException e){throw new IllegalStateException(e);}
         if(actions!=null||actionHeader>=0)try{
             ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
             out.writeInt(actionMenu>=0?11:10);write(out,encodeBase(actions==null?panel:Panel.CURSOR));
@@ -327,7 +338,13 @@ public final class LuaDraft {
         }catch(IOException e){throw new IllegalStateException(e);}
     }
     public static LuaDraft restore(byte[] bytes){
-        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>11)throw new IOException("version");
+        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>12)throw new IOException("version");
+            if(version==12){
+                byte[] base=read(in);if(base.length<4||ByteBuffer.wrap(base).getInt()>=12)throw new IOException("nested picker");
+                LuaDraft d=restore(base);SpritePlacement pick=SpritePlacement.read(in);
+                if(!d.proposal()||d.insertion==null||!d.insertion.backgroundRecipe()||d.insertion.screen!=LuaInsert.Screen.FIELDS||pick.phase>1||in.available()!=0)throw new IOException("background picker");
+                d.backgroundPicker=pick;return d;
+            }
             if(version==10||version==11){
                 byte[] base=read(in);if(base.length<4||ByteBuffer.wrap(base).getInt()>=10)throw new IOException("nested action state");
                 LuaDraft d=restore(base);int header=in.readInt(),line=in.readInt();boolean editing=in.readBoolean();

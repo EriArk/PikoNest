@@ -1,5 +1,11 @@
 # PIKOOS Android host experiment
 
+Version 0.0.60 adds the first horizontal background strip tool: controller sheet
+region selection, independent speed, camera parallax, visibility, reusable parameter
+presets and reopening the generated ordinary Lua. Multiple scoped blocks preserve
+camera state. Picker and proposal recovery, Undo/Redo and compact layout are covered.
+[Evidence and limits](../../docs/design/android-background-60/README.md).
+
 Version 0.0.59 adds Select → move up/down or delete in the branch action list.
 Each operation previews before/after, restores after restart, and applies as one
 undoable edit. Only simple recognized branches are supported; local declarations,

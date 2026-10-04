@@ -1,0 +1,18 @@
+{
+  "version": "0.0.60",
+  "version_code": 60,
+  "apk_sha256": "5039e1f9864f7ef86cdb93af91e07b9a5b5e6797f7f0cb2fcc1e4b941a9d6e0c",
+  "apk_bytes": 340900,
+  "device": "Retroid Pocket Classic",
+  "serial": "MC94516AQF040305380",
+  "official_runtime": "0.2.7",
+  "runtime_checks": "10/10",
+  "core_checks": 71,
+  "native_capture": "1240x1080",
+  "compact_capture": "720x960",
+  "input": "ADB controller events; not physical UX acceptance",
+  "release": false,
+  "installed_package": "60 minSdk=26 targetSdk=34\r\n    minExtensionVersions=[]\r\n    versionName=0.0.60",
+  "display": "Physical size: 1080x1240",
+  "music_volume_state": "STREAM_MUSIC:\r\n   Muted: true\r\n   Muted Internally: false\r\n   Min: 0\r\n   Max: 15\r\n   streamVolume:0\r\n   Current: 2 (speaker): 9, 100 (bt_a2dp_hp): 1, 4000000 (usb_headset): 1, 20000000 (ble_headset): 1, 20000002 (ble_broadcast): 1, 40000000 (default): 5\r\n   Devices: speaker(2)\r\n   Volume Group: AUDIO_STREAM_MUSIC\r\n\r\n- STREAM_ALARM:\r\n   Muted: false\r\n   Muted Internally: false\r\n   Min: 1\r\n   Max: 7\r\n   streamVolume:6\r\n   Current: 2 (speaker): 6, 40000000 (default): 6\r\n   Devices: speaker(2)\r\n   Volume Group: AUDIO_STREAM_ALARM\r\n\r\n- STREAM_NOTIFICATION:\r\n   Muted: false\r\n   Muted Internally: fal"
+}

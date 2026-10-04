@@ -5,7 +5,7 @@ import java.io.*;
 /** Small editable catalogue of ordinary Lua. No bindings or extra runtime components. */
 public final class LuaInsert {
     public enum Screen { CATALOG, FIELDS, TEXT, SYMBOLS, PREVIEW }
-    public enum Kind { NAME, EXPR, STRING, COLOR, BUTTON, INPUT, COMPARE, FLAG, MAP_WIDTH, MAP_HEIGHT, OUTSIDE, ROOM_COLS, ROOM_ROWS, WORLD_POINT, GATE_SIZE }
+    public enum Kind { NAME, EXPR, STRING, COLOR, BUTTON, INPUT, COMPARE, FLAG, MAP_WIDTH, MAP_HEIGHT, OUTSIDE, ROOM_COLS, ROOM_ROWS, WORLD_POINT, GATE_SIZE, SHEET_POS, SHEET_SIZE, BG_Y, BG_SPEED, BG_FACTOR, BG_VISIBLE }
     public static final String[] COMPARISONS={"==","~=","!=","<","<=",">",">="};
     public static final class Field {
         public final String label,initial;public final Kind kind;
@@ -48,7 +48,10 @@ public final class LuaInsert {
         new Item("camera_rooms","Камера · комнаты","Одна комната — экран 128×128. Камера переключается, когда точка пересекает границу комнаты. Задай число комнат по X/Y; начало мира (0,0). Перед HUD добавь «Камера · экран».",false,f("Точка X","x",Kind.EXPR),f("Точка Y","y",Kind.EXPR),f("Комнат X","2",Kind.ROOM_COLS),f("Комнат Y","2",Kind.ROOM_ROWS)),
         new Item("door_pair","Переход · пара областей","Две области одного размера. Точка попадает в начало другой области. Выйди из обеих, чтобы перейти снова. Вставляй в _update после изменения X/Y. Память — новое имя для этой пары и точки. Подходит для курсора, фигуры или другого объекта; спрайт не нужен.",false,f("Точка X","x",Kind.NAME),f("Точка Y","y",Kind.NAME),f("Память","gate_busy",Kind.NAME),f("A · X","96",Kind.WORLD_POINT),f("A · Y","48",Kind.WORLD_POINT),f("B · X","160",Kind.WORLD_POINT),f("B · Y","48",Kind.WORLD_POINT),f("Ширина","16",Kind.GATE_SIZE),f("Высота","32",Kind.GATE_SIZE)),
         new Item("if_else","Условие · если / иначе","Сравни значения и добавь действия в две ветви. За один вызов выполняется только одна: после then, если условие истинно; после else — в остальных случаях. Счёт, состояние, меню и другие правила — обычные переменные Lua.",true,f("Слева","phase",Kind.EXPR),f("Сравнение","==",Kind.COMPARE),f("Справа","0",Kind.EXPR)),
-        new Item("branches","Условия · действия","Выбери ветвь существующего условия: открой её действия или добавь новое из каталога. Просмотр не меняет код.",false)
+        new Item("branches","Условия · действия","Выбери ветвь существующего условия: открой её действия или добавь новое из каталога. Просмотр не меняет код.",false),
+        new Item("background","Фон · полоса / параллакс","Область листа повторяется по горизонтали. Вставляй в _draw после cls(); более поздний слой рисуется поверх. Камера восстанавливается. 0 — экранный фон, 1 — движение вместе с миром.",false,
+            f("Область листа","0",Kind.SHEET_POS),f("Лист Y","0",Kind.SHEET_POS),f("Ширина","16",Kind.SHEET_SIZE),f("Высота","16",Kind.SHEET_SIZE),
+            f("На экране Y","24",Kind.BG_Y),f("Скорость px/с","4",Kind.BG_SPEED),f("Параллакс","0.5",Kind.BG_FACTOR),f("Видимость","true",Kind.BG_VISIBLE))
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
@@ -67,9 +70,10 @@ public final class LuaInsert {
         for(int n=0;n<ITEMS.length;n++)if(ITEMS[n].id.equals(toRooms?"camera_rooms":"camera_follow")){choose(n);break;}
         set(0,x);set(1,y);set(2,""+(toRooms?width/16:width*16));set(3,""+(toRooms?height/16:height*16));field=currentField;previewLine=0;
     }
+    public boolean backgroundRecipe(){return item().id.equals("background");}
     public boolean doorRecipe(){return item().id.equals("door_pair");}
     public boolean conditionalBranches(){return item().id.equals("if_else");}
-    public boolean fullPreview(){return areaRecipe()||motionRecipe()||item().id.equals("move_call")||cameraRecipe()||doorRecipe()||conditionalBranches();}
+    public boolean fullPreview(){return areaRecipe()||motionRecipe()||item().id.equals("move_call")||cameraRecipe()||doorRecipe()||backgroundRecipe()||conditionalBranches();}
     public void beginPreview(){screen=Screen.PREVIEW;previewLine=0;}
     public boolean replaceAll=true;
     public String input="";
@@ -96,6 +100,14 @@ public final class LuaInsert {
             throw new IllegalArgumentException("Параметр должен быть одной строкой до 256 символов");
         if(!java.nio.charset.StandardCharsets.UTF_8.newEncoder().canEncode(value))throw new IllegalArgumentException("Недопустимый символ в параметре");
         if(kind!=Kind.STRING&&value.trim().isEmpty())throw new IllegalArgumentException("Введи значение");
+        if(kind==Kind.BG_FACTOR&&!java.util.Arrays.asList(BackgroundLayer.FACTORS).contains(value))throw new IllegalArgumentException("Параллакс: 0, 0.25, 0.5, 0.75 или 1");
+        if(kind==Kind.BG_VISIBLE&&!value.equals("true")&&!value.equals("false"))throw new IllegalArgumentException("Выбери видимость");
+        if(kind==Kind.SHEET_POS||kind==Kind.SHEET_SIZE||kind==Kind.BG_Y||kind==Kind.BG_SPEED){
+            int min=kind==Kind.SHEET_SIZE?1:kind==Kind.BG_Y?-127:kind==Kind.BG_SPEED?-32:0;
+            int max=kind==Kind.SHEET_SIZE?128:kind==Kind.BG_SPEED?32:127;
+            try{int n=Integer.parseInt(value);if(!value.matches("-?[0-9]+")||n<min||n>max)throw new NumberFormatException();}
+            catch(NumberFormatException e){throw new IllegalArgumentException("Диапазон этого поля: "+min+"…"+max);}
+        }
         if(kind==Kind.NAME&&(!value.matches("[a-zA-Z_][a-zA-Z_0-9]*")||(" and break do else elseif end false for function if in local nil not or repeat return then true until while ").contains(" "+value+" ")))
             throw new IllegalArgumentException("Имя: латинские буквы, цифры и _. Начни с буквы или _; не используй слово Lua.");
         if(kind==Kind.COLOR||kind==Kind.BUTTON){
@@ -122,6 +134,9 @@ public final class LuaInsert {
     public void step(int direction){
         if(field>=values.length)return;
         Kind kind=colorChoice(field)?Kind.COLOR:kind(field);
+        if(kind==Kind.BG_FACTOR){int n=java.util.Arrays.asList(BackgroundLayer.FACTORS).indexOf(values[field]);values[field]=BackgroundLayer.FACTORS[Math.max(0,Math.min(4,n+direction))];return;}
+        if(kind==Kind.BG_VISIBLE){values[field]=values[field].equals("true")?"false":"true";return;}
+        if(kind==Kind.BG_Y||kind==Kind.BG_SPEED){int max=kind==Kind.BG_Y?127:32;values[field]=""+Math.max(-max,Math.min(max,Integer.parseInt(values[field])+direction));return;}
         if(kind==Kind.WORLD_POINT||kind==Kind.GATE_SIZE){values[field]=""+Math.max(kind==Kind.WORLD_POINT?-16384:1,Math.min(kind==Kind.WORLD_POINT?16383:1024,Integer.parseInt(values[field])+direction));return;}
         if(kind==Kind.ROOM_COLS||kind==Kind.ROOM_ROWS){values[field]=""+Math.max(1,Math.min(kind==Kind.ROOM_COLS?8:4,Integer.parseInt(values[field])+direction));return;}
         if(kind==Kind.OUTSIDE){values[field]=values[field].equals("true")?"false":"true";return;}
@@ -136,6 +151,7 @@ public final class LuaInsert {
     }
     public void beginText(){
         if(field>=values.length)return;
+        if(kind(field)==Kind.BG_FACTOR||kind(field)==Kind.BG_VISIBLE){step(1);return;}
         if(kind(field)==Kind.ROOM_COLS||kind(field)==Kind.ROOM_ROWS){step(1);return;}
         Kind kind=kind(field);if(kind==Kind.COLOR||kind==Kind.BUTTON||kind==Kind.INPUT||kind==Kind.COMPARE||kind==Kind.FLAG||kind==Kind.MAP_WIDTH||kind==Kind.MAP_HEIGHT||kind==Kind.OUTSIDE){step(1);return;}
         input=values[field];replaceAll=true;page=key=0;screen=Screen.TEXT;
@@ -172,6 +188,7 @@ public final class LuaInsert {
         String a=values[0];
         switch(item().id){
             case "if_else":return "if "+a+values[1]+values[2]+" then\n  \nelse\n  \nend\n";
+            case "background":return BackgroundLayer.code(this);
             case "door_pair":return DoorTransition.code(this);
             case "camera":return "camera("+join()+")\n";
             case "camera_follow":return WorldCamera.code(values[0],values[1],values[2],values[3]);
@@ -203,6 +220,8 @@ public final class LuaInsert {
     static String quote(String s){return "\""+s.replace("\\","\\\\").replace("\"","\\\"")+"\"";}
     public String display(int index){
         String value=values[index];Kind kind=item().fields[index].kind;
+        if(kind==Kind.BG_VISIBLE)return value.equals("true")?"Показать":"Скрыть";
+        if(kind==Kind.BG_FACTOR)return value.equals("0")?"0 · экран":value.equals("1")?"1 · мир":value;
         if(kind==Kind.ROOM_COLS||kind==Kind.ROOM_ROWS)return value+" ("+(Integer.parseInt(value)*128)+"px)";
         if(cameraRecipe()&&(kind==Kind.MAP_WIDTH||kind==Kind.MAP_HEIGHT))return value+" кл · "+(Integer.parseInt(value)*8)+" px";
         if(kind==Kind.OUTSIDE)return value.equals("true")?"Препятствие":"Свободно";
@@ -226,11 +245,12 @@ public final class LuaInsert {
             ||insert.key<0||insert.key>=LuaDraft.PAGES[insert.page].length()||insert.input.length()>256
             ||(screen==Screen.TEXT.ordinal()&&insert.field==insert.values.length))throw new IOException("snippet state");
         insert.screen=Screen.values()[screen];for(int i=0;i<insert.values.length;i++)insert.set(i,in.readUTF());
+        if(insert.backgroundRecipe())BackgroundLayer.region(insert);
         if(id.equals("animation")&&insert.screen!=Screen.CATALOG)throw new IOException("visual animation proposal");
         if(browserState){insert.symbolGroup=in.readInt();insert.symbolIndex=in.readInt();}
         if(insert.screen==Screen.PREVIEW){
             insert.previewLine=in.readInt();
-            if(!browserState||(editing&&!insert.cameraRecipe()&&!insert.doorRecipe())||!insert.fullPreview()||insert.previewLine<0||insert.previewLine>insert.code().length())throw new IOException("preview state");
+            if(!browserState||(editing&&!insert.cameraRecipe()&&!insert.doorRecipe()&&!insert.backgroundRecipe())||!insert.fullPreview()||insert.previewLine<0||insert.previewLine>insert.code().length())throw new IOException("preview state");
         }
         if(insert.symbolGroup<0||insert.symbolGroup>1||insert.symbolIndex<0||insert.symbolIndex>100000
             ||(insert.screen==Screen.SYMBOLS&&(!browserState||!insert.canBrowse()||(insert.symbolGroup==1&&!insert.canBrowseApi()))))throw new IOException("symbol state");

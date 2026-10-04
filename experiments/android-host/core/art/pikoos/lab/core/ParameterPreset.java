@@ -24,7 +24,7 @@ public final class ParameterPreset {
     public static boolean portable(LuaInsert f,int n,String value){
         String id=f.item().id;LuaInsert.Kind kind=f.item().fields[n].kind;
         if(kind==LuaInsert.Kind.NAME||kind==LuaInsert.Kind.FLAG)return false;
-        if(id.equals("sprite")&&n==0||id.equals("sspr")&&n<4||id.equals("map")&&n<2)return false;
+        if(id.equals("sprite")&&n==0||(id.equals("sspr")||id.equals("background"))&&n<4||id.equals("map")&&n<2)return false;
         if(kind==LuaInsert.Kind.EXPR||kind==LuaInsert.Kind.COLOR)
             return value.matches("-?(?:[0-9]+(?:\\.[0-9]+)?|\\.[0-9]+)")||value.equals("true")||value.equals("false");
         return true;

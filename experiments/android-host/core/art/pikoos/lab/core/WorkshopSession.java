@@ -163,11 +163,16 @@ public final class WorkshopSession {
             if(action==Action.CONFIRM){
                 if(i.item().id.equals("branches"))d.beginBranches();
                 else if(d.branchInsertion()&&(i.item().id.equals("sspr")||i.item().id.equals("animation")))throw new IllegalArgumentException("Для визуального размещения сначала открой код ветви. Здесь доступна форма spr и другие действия.");
-                else if(i.item().id.equals("sspr"))d.beginSprite(selection());else if(i.item().id.equals("animation"))d.beginAnimation(selection());else i.screen=LuaInsert.Screen.FIELDS;
+                else if(i.item().id.equals("sspr"))d.beginSprite(selection());else if(i.item().id.equals("animation"))d.beginAnimation(selection());else {if(i.backgroundRecipe())BackgroundLayer.setRegion(i,selection());i.screen=LuaInsert.Screen.FIELDS;}
             }
             if(action==Action.CANCEL)d.cancelInsert();
             return;
         }
+        if(i.backgroundRecipe()&&(action==Action.UP||action==Action.DOWN)){
+            int at=0;while(at<BackgroundLayer.FORM_FIELDS.length-1&&BackgroundLayer.FORM_FIELDS[at]<i.field)at++;
+            i.field=BackgroundLayer.FORM_FIELDS[Math.max(0,Math.min(5,at+(action==Action.UP?-1:1)))];return;
+        }
+        if(i.backgroundRecipe()&&action==Action.CONFIRM&&i.field<4){d.beginBackgroundPick();return;}
         if(action==Action.UP)i.field=Math.max(0,i.field-1);
         if(action==Action.MENU){presets=new PresetPanel(i,port);return;}
         if(action==Action.DOWN)i.field=Math.min(i.item().fields.length,i.field+1);
@@ -181,6 +186,12 @@ public final class WorkshopSession {
     private void codeAction(Action action)throws Exception{
         if(presets!=null){presets.act(action);if(presets.closed)presets=null;return;}
         LuaDraft d=codeDraft;
+        if(d.backgroundPicker!=null){
+            SpritePlacement pick=d.backgroundPicker;
+            if(action==Action.LEFT)pick.move(-1,0);if(action==Action.RIGHT)pick.move(1,0);if(action==Action.UP)pick.move(0,-1);if(action==Action.DOWN)pick.move(0,1);
+            if(action==Action.CONTEXT||action==Action.PREVIOUS||action==Action.NEXT)pick.toggleStep();
+            if(action==Action.CONFIRM)d.acceptBackgroundPick();if(action==Action.CANCEL)d.cancelBackgroundPick();return;
+        }
         if(d.panel==LuaDraft.Panel.ANIMATION){
             SpriteAnimation a=d.animation;
             if(a.picker!=null){

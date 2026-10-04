@@ -428,6 +428,7 @@ final class WorkshopView extends View {
     }
     private void luaEditor(){
         if(s.presets!=null){presetLibrary();return;}
+        if(s.codeDraft.backgroundPicker!=null){hits.clear();regionPicker(s.codeDraft.backgroundPicker,"Область фонового слоя");return;}
         if(s.codeDraft.panel==LuaDraft.Panel.ACTIONS){luaActions();return;}
         LuaDraft d=s.codeDraft;
         if(d.panel==LuaDraft.Panel.BRANCHES){luaBranches();return;}
@@ -549,8 +550,11 @@ final class WorkshopView extends View {
         key(a.playing?"X пауза":"X пуск",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
     }
     private void animationPicker(SpriteAnimation a){
-        SpritePlacement v=a.picker;SpriteRegion r=v.source();
-        fitted(v.phase==2?"Место анимации":"Область кадра "+(a.selected+1),16,75,24,14,w-32);
+        regionPicker(a.picker,a.picker.phase==2?"Место анимации":"Область кадра "+(a.selected+1));
+    }
+    private void regionPicker(SpritePlacement v,String title){
+        SpriteRegion r=v.source();
+        fitted(title,16,75,24,14,w-32);
         fitted(v.phase==0?"Первый угол · A дальше":v.phase==1?"Второй угол · A готово":"Внутри _draw после cls()",16,100,18,7,w-32);
         float size=Math.min(256,Math.min(w-32,bodyBottom-256)),left=(w-size)/2,top=112,cell=size/128;
         placementArea=new RectF(left,top,left+size,top+size);
@@ -809,6 +813,7 @@ final class WorkshopView extends View {
         hits.clear();
         if(i.screen==LuaInsert.Screen.SYMBOLS){luaSymbols(i);return;}
         if(i.screen==LuaInsert.Screen.PREVIEW){luaRecipePreview(i);return;}
+        if(i.backgroundRecipe()&&i.screen==LuaInsert.Screen.FIELDS){backgroundForm(i);return;}
         fitted(i.screen==LuaInsert.Screen.CATALOG?(d.branchInsertion()?"+ Действие в ветви":"+ Вставить Lua"):d.callEdit!=null&&d.callEdit.name.equals("rule:elseif")?"elseif · иначе если":i.item().title,16,75,24,14,w-32);
         fitted(d.branchInsertion()?"Ветвь: "+d.insertionBranch().title:i.tileRecipe()?"Начало Lua · x/y в пикселях":d.callEdit!=null?(i.item().id.equals("set")||i.item().id.equals("add")?"Имя и значение меняются только в этой строке":"Поля строки "+(d.line()+1)+" · "+back()+" отменить"):"Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
         if(i.screen==LuaInsert.Screen.FIELDS&&i.cameraMode()){
@@ -901,14 +906,37 @@ final class WorkshopView extends View {
         if(i.canBrowse())key("X имена",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
         else if(i.fullPreview())key("X Lua",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
     }
+    private void backgroundForm(LuaInsert i){
+        fitted("Фон · полоса / параллакс",16,75,24,14,w-32);
+        fitted("Пример: 1 сек · камера X=64",16,100,16,6,w-32);
+        for(int y=0;y<128;y++)for(int x=0;x<128;x++){int color=art.pikoos.lab.core.BackgroundLayer.pixel(s.cart(),i,x,y,1,64);sceneBitmap.setPixel(x,y,COLORS[color==0?1:color]);}
+        c.drawBitmap(sceneBitmap,null,new RectF(16,112,112,208),p);outline(15,111,98,98,13);
+        SpriteRegion region=art.pikoos.lab.core.BackgroundLayer.region(i);
+        fitted(region.width+" × "+region.height+" px",128,134,18,10,w-144);
+        wrapped("Повтор по X. Камера после слоя прежняя.",128,162,16,6,w-144,3);
+        int[] fields=art.pikoos.lab.core.BackgroundLayer.FORM_FIELDS;int selected=0;while(selected<5&&fields[selected]<i.field)selected++;
+        int rows=Math.max(2,(int)((bodyBottom-280)/36)),first=Math.max(0,Math.min(selected-rows/2,6-rows));
+        for(int n=0;n<rows&&first+n<6;n++){
+            final int field=fields[first+n];String label=field==0?"Область листа: "+region.x+", "+region.y:field==8?"Просмотреть Lua":i.item().fields[field].label+": "+i.display(field);
+            button(label,16,224+n*36,w-32,32,i.field==field,()->{i.field=field;action(Action.CONFIRM);});
+        }
+        fitted("↑↓ поля · ←→ менять",16,bodyBottom-42,16,6,w-32);
+        fitted("Select: наборы · фон без героя",16,bodyBottom-16,16,13,w-32);
+        rect(0,bodyBottom,w,44,0);key(ok()+" выбор",12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" назад",w/3,bodyBottom,6,()->action(Action.CANCEL));key("X Lua",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
+    }
     private void luaRecipePreview(LuaInsert i){
-        fitted(i.cameraRecipe()||i.doorRecipe()||i.conditionalBranches()?i.item().title:i.motionRecipe()?"Движение · код":i.item().id.equals("move_call")?"Движение · вызов":"Область · код функции",16,75,22,14,w-32);
+        fitted(i.cameraRecipe()||i.doorRecipe()||i.conditionalBranches()||i.backgroundRecipe()?i.item().title:i.motionRecipe()?"Движение · код":i.item().id.equals("move_call")?"Движение · вызов":"Область · код функции",16,75,22,14,w-32);
         fitted(i.conditionalBranches()?"Одно сравнение → одна из ветвей":i.doorRecipe()?"В _update · после изменения X/Y":i.cameraRecipe()?(s.codeDraft.callEdit!=null?"Было / будет · только эта строка":i.item().id.equals("camera_reset")?"После мира · перед счётом и меню":"Перед миром · после cls()"):i.motionRecipe()?"Сначала X, затем Y · пиксели":i.item().id.equals("move_call")?"Новые X,Y · на месте курсора":"Карта: x,y,w,h в пикселях",16,100,16,6,w-32);
         java.util.ArrayList<String> rows=new java.util.ArrayList<>();
         LuaCall edit=s.codeDraft.callEdit;
         String preview=edit==null?i.code():"Было:\n"+edit.original+"\n\nБудет:\n"+edit.preview(i);
         if(i.conditionalBranches())preview+="\nПосле вставки курсор под then.\nДобавь туда действия для «да».\nПод else — действия для «нет».\nL на if снова откроет сравнение.\nИзменение переменной внутри\nthen не запускает else тут же.";
         if(i.doorRecipe())preview="Вход A → начало B, B → A.\nПовтор — после выхода из обеих.\nПроверяется точка X/Y, не спрайт.\nРисование задаётся отдельно.\n\n"+preview;
+        if(i.backgroundRecipe()){
+            rect(0,80,w,28,1);fitted("В _draw после cls() · камера сохранится",16,100,16,6,w-32);
+            preview="Полоса повторяется по горизонтали.\nПлюс скорости — вправо.\n0 параллакса — привязка к экрану.\n1 — к миру; 0.5 — вдвое медленнее.\nПоздний слой рисуется поверх.\n\n"+preview;
+        }
         if(i.cameraRecipe()&&edit==null)preview+=(i.item().id.equals("camera_reset")?"\nДальше рисуй счёт и меню.\nОни останутся на экране.":"\nДальше рисуй карту и объекты.\nПеред счётом и меню добавь\n«Камера · экран».\nЭкран = мир − камера.");
         if(i.item().id.equals("camera_rooms"))preview+="\n\nКомната: 128×128 пикселей.\nПереход на X/Y = 128, 256…\nЗа краем — крайняя комната.\nКоординаты объектов прежние.";
         for(String line:preview.split("\n")){
@@ -1387,6 +1415,10 @@ final class WorkshopView extends View {
                 int tx=(int)((x-mapArea.left)*16/mapArea.width()),ty=(int)((y-mapArea.top)*16/mapArea.height());
                 if(s.mapEditor.picking)s.mapEditor.choice=ty*16+tx;
                 else{s.mapEditor.point(mapLeft+tx,mapTop+ty);}
+                changed.run();invalidate();performClick();return true;
+            }
+            if(placementArea!=null&&placementArea.contains(x,y)&&s.mode==Mode.CODE&&s.codeDraft.backgroundPicker!=null){
+                s.codeDraft.backgroundPicker.point((int)((x-placementArea.left)*128/placementArea.width()),(int)((y-placementArea.top)*128/placementArea.height()));
                 changed.run();invalidate();performClick();return true;
             }
             if(placementArea!=null&&placementArea.contains(x,y)&&s.mode==Mode.CODE&&s.codeDraft.panel==LuaDraft.Panel.SPRITE){
