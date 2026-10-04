@@ -195,7 +195,7 @@ public final class LuaDraft {
         String function=insertion.functionName();
         if(function!=null&&context.defines(function))throw new IllegalArgumentException("Функция "+function+" уже задана. Перейди к её телу; существующий код не заменён.");
         String raw=insertion.code();
-        if(insertion.cameraRecipe()){WorldCamera.validateSource(text,insertion.item().id.equals("camera_follow"));WorldCamera.validateForm(insertion);}
+        if(insertion.cameraRecipe()){WorldCamera.validateSource(text,insertion.item().id);WorldCamera.validateForm(insertion);}
         if(insertion.item().id.equals("move_call"))TileMotion.validateCall(text,insertion.value(0),insertion.value(1),insertion.value(2));
         boolean tileProbe=insertion.tileRecipe();
         if(tileProbe){
@@ -272,7 +272,7 @@ public final class LuaDraft {
             if(d.panel==Panel.PARAMETERS){
                 if(version<4||d.insertion.screen==LuaInsert.Screen.CATALOG)throw new IOException("parameter state");
                 d.callEdit=LuaCall.parse(d.text,d.lineStart(d.line()),d.lineEnd(d.line()));
-                if(d.callEdit.form.selected!=d.insertion.selected)throw new IOException("parameter target");
+                if(d.callEdit.item!=d.insertion.selected&&!WorldCamera.modeSwitch(d.callEdit.name,d.insertion))throw new IOException("parameter target");
             }
             if(d.insertion!=null&&d.insertion.screen==LuaInsert.Screen.SYMBOLS){d.insertion.attachSource(d.text);d.insertion.symbolMove(0);}
             return d;

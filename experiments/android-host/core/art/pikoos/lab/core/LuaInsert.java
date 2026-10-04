@@ -5,7 +5,7 @@ import java.io.*;
 /** Small editable catalogue of ordinary Lua. No bindings or extra runtime components. */
 public final class LuaInsert {
     public enum Screen { CATALOG, FIELDS, TEXT, SYMBOLS, PREVIEW }
-    public enum Kind { NAME, EXPR, STRING, COLOR, BUTTON, INPUT, COMPARE, FLAG, MAP_WIDTH, MAP_HEIGHT, OUTSIDE }
+    public enum Kind { NAME, EXPR, STRING, COLOR, BUTTON, INPUT, COMPARE, FLAG, MAP_WIDTH, MAP_HEIGHT, OUTSIDE, ROOM_COLS, ROOM_ROWS }
     public static final String[] COMPARISONS={"==","~=","!=","<","<=",">",">="};
     public static final class Field {
         public final String label,initial;public final Kind kind;
@@ -44,7 +44,8 @@ public final class LuaInsert {
         new Item("animation","Анимация · кадры","Выбери области листа, порядок и время каждого кадра. Просмотри анимацию и вставь Lua внутри _draw после cls().",false),
         new Item("camera","Камера · положение","Левый верхний угол экрана в мире, в пикселях. Вставляй после cls(), перед картой и объектами. Перед счётом и меню выбери «Камера · экран».",false,f("Мир X","0",Kind.EXPR),f("Мир Y","0",Kind.EXPR)),
         new Item("camera_follow","Камера · следить","Точка мира будет в центре, пока камера не достигнет края поля. Выбери X/Y через «имена» или введи выражение. Поле начинается в (0,0); размеры — в клетках 8×8.",false,f("Точка X","x",Kind.EXPR),f("Точка Y","y",Kind.EXPR),f("Поле, шир.","32",Kind.MAP_WIDTH),f("Поле, выс.","32",Kind.MAP_HEIGHT)),
-        new Item("camera_reset","Камера · экран","Возвращает экранные координаты (0,0). Вставляй после карты и объектов, перед счётом и меню в _draw. Положение объектов в мире не меняется.",false)
+        new Item("camera_reset","Камера · экран","Возвращает экранные координаты (0,0). Вставляй после карты и объектов, перед счётом и меню в _draw. Положение объектов в мире не меняется.",false),
+        new Item("camera_rooms","Камера · комнаты","Одна комната — экран 128×128. Камера переключается, когда точка пересекает границу комнаты. Задай число комнат по X/Y; начало мира (0,0). Перед HUD добавь «Камера · экран».",false,f("Точка X","x",Kind.EXPR),f("Точка Y","y",Kind.EXPR),f("Комнат X","2",Kind.ROOM_COLS),f("Комнат Y","2",Kind.ROOM_ROWS))
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
@@ -53,6 +54,16 @@ public final class LuaInsert {
     public boolean areaRecipe(){return item().id.equals("solid_box");}
     public boolean motionRecipe(){return item().id.equals("move_box");}
     public boolean cameraRecipe(){return item().id.startsWith("camera");}
+    public boolean cameraMode(){return item().id.equals("camera_follow")||item().id.equals("camera_rooms");}
+    public void switchCameraMode(){
+        if(!cameraMode())return;
+        boolean toRooms=item().id.equals("camera_follow");
+        int width=Integer.parseInt(values[2]),height=Integer.parseInt(values[3]);
+        if(toRooms&&(width%16!=0||height%16!=0))throw new IllegalArgumentException("Для комнат 128×128 ширина и высота поля должны быть кратны 16 клеткам. Размеры не изменены.");
+        String x=values[0],y=values[1];int currentField=field;
+        for(int n=0;n<ITEMS.length;n++)if(ITEMS[n].id.equals(toRooms?"camera_rooms":"camera_follow")){choose(n);break;}
+        set(0,x);set(1,y);set(2,""+(toRooms?width/16:width*16));set(3,""+(toRooms?height/16:height*16));field=currentField;previewLine=0;
+    }
     public boolean fullPreview(){return areaRecipe()||motionRecipe()||item().id.equals("move_call")||cameraRecipe();}
     public void beginPreview(){screen=Screen.PREVIEW;previewLine=0;}
     public boolean replaceAll=true;
@@ -93,10 +104,15 @@ public final class LuaInsert {
             if(n<(kind==Kind.FLAG?0:1)||n>(kind==Kind.FLAG?7:kind==Kind.MAP_WIDTH?128:64))throw new IllegalArgumentException("Значение вне диапазона инструмента");
         }
         if(kind==Kind.OUTSIDE&&!value.equals("true")&&!value.equals("false"))throw new IllegalArgumentException("Выбери поведение за краем");
+        if(kind==Kind.ROOM_COLS||kind==Kind.ROOM_ROWS){
+            int n;try{n=Integer.parseInt(value);}catch(NumberFormatException e){throw new IllegalArgumentException("Выбери число комнат стрелками");}
+            if(n<1||n>(kind==Kind.ROOM_COLS?8:4))throw new IllegalArgumentException("Число комнат вне диапазона инструмента");
+        }
     }
     public void step(int direction){
         if(field>=values.length)return;
         Kind kind=colorChoice(field)?Kind.COLOR:kind(field);
+        if(kind==Kind.ROOM_COLS||kind==Kind.ROOM_ROWS){values[field]=""+Math.max(1,Math.min(kind==Kind.ROOM_COLS?8:4,Integer.parseInt(values[field])+direction));return;}
         if(kind==Kind.OUTSIDE){values[field]=values[field].equals("true")?"false":"true";return;}
         if(kind==Kind.FLAG||kind==Kind.MAP_WIDTH||kind==Kind.MAP_HEIGHT){int min=kind==Kind.FLAG?0:1,max=kind==Kind.FLAG?7:kind==Kind.MAP_WIDTH?128:64;values[field]=""+Math.max(min,Math.min(max,Integer.parseInt(values[field])+direction));return;}
         if(kind==Kind.COMPARE){int at=java.util.Arrays.asList(COMPARISONS).indexOf(values[field]);values[field]=COMPARISONS[Math.floorMod(at+direction,COMPARISONS.length)];return;}
@@ -109,6 +125,7 @@ public final class LuaInsert {
     }
     public void beginText(){
         if(field>=values.length)return;
+        if(kind(field)==Kind.ROOM_COLS||kind(field)==Kind.ROOM_ROWS){step(1);return;}
         Kind kind=kind(field);if(kind==Kind.COLOR||kind==Kind.BUTTON||kind==Kind.INPUT||kind==Kind.COMPARE||kind==Kind.FLAG||kind==Kind.MAP_WIDTH||kind==Kind.MAP_HEIGHT||kind==Kind.OUTSIDE){step(1);return;}
         input=values[field];replaceAll=true;page=key=0;screen=Screen.TEXT;
     }
@@ -144,6 +161,7 @@ public final class LuaInsert {
         switch(item().id){
             case "camera":return "camera("+join()+")\n";
             case "camera_follow":return WorldCamera.code(values[0],values[1],values[2],values[3]);
+            case "camera_rooms":return WorldCamera.roomsCode(values[0],values[1],values[2],values[3]);
             case "solid":return TileProbe.code(a,values[1],values[2],values[3],values[4]);
             case "solid_box":return TileProbe.areaCode(a,values[1],values[2],values[3],values[4]);
             case "move_box":return TileMotion.code(a,values[1],values[2],values[3],values[4]);
@@ -171,6 +189,7 @@ public final class LuaInsert {
     static String quote(String s){return "\""+s.replace("\\","\\\\").replace("\"","\\\"")+"\"";}
     public String display(int index){
         String value=values[index];Kind kind=item().fields[index].kind;
+        if(kind==Kind.ROOM_COLS||kind==Kind.ROOM_ROWS)return value+" ("+(Integer.parseInt(value)*128)+"px)";
         if(cameraRecipe()&&(kind==Kind.MAP_WIDTH||kind==Kind.MAP_HEIGHT))return value+" кл · "+(Integer.parseInt(value)*8)+" px";
         if(kind==Kind.OUTSIDE)return value.equals("true")?"Препятствие":"Свободно";
         if(kind==Kind.BUTTON)return new String[]{"0 · влево","1 · вправо","2 · вверх","3 · вниз","4 · O","5 · X"}[Integer.parseInt(value)];

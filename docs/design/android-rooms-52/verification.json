@@ -1,0 +1,18 @@
+{
+  "host": "0.0.52",
+  "apk_bytes": 312228,
+  "apk_sha256": "3e8a0efe20de2dbce5fb3be5005d3d6df7fca1d489a689112537eb9a2fc422f8",
+  "core_checks": 69,
+  "runtime_checks": 18,
+  "project": "remix-0019",
+  "project_sha256": "b45c8c79ff22abbef421c43d78749791e6f409d07fb9764156b4d696880dd496",
+  "old_files_preserved": 34,
+  "non_lua_preserved": true,
+  "only_camera_call_changed": true,
+  "save_undo_redo_exact": true,
+  "media_volume": 0,
+  "screens": [
+    "1240x1080",
+    "720x960"
+  ]
+}

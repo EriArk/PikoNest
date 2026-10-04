@@ -6,13 +6,14 @@ import java.util.regex.*;
 /** Exact field spans for bounded single-line calls and rules; never rewrites block bodies. */
 public final class LuaCall {
     public final int start,end;public final String original,name;
+    public final int item;
     private final int[] from,to,fields;private final String[] initial;
     public final LuaInsert form;
     LuaCall(int start,int end,String original,String name,int[] from,int[] to,LuaInsert form){
         this(start,end,original,name,from,to,form,null);
     }
     LuaCall(int start,int end,String original,String name,int[] from,int[] to,LuaInsert form,int[] fields){
-        this.start=start;this.end=end;this.original=original;this.name=name;this.from=from;this.to=to;this.form=form;
+        this.start=start;this.end=end;this.original=original;this.name=name;this.from=from;this.to=to;this.form=form;this.item=form.selected;
         this.fields=fields==null?new int[from.length]:fields;
         if(fields==null)for(int n=0;n<from.length;n++)this.fields[n]=n;
         initial=new String[from.length];for(int n=0;n<initial.length;n++)initial[n]=form.value(this.fields[n]);
@@ -79,7 +80,8 @@ public final class LuaCall {
         return value.toString();
     }
     public String preview(LuaInsert proposal){
-        if(proposal.selected!=form.selected)throw unsupported();
+        if(WorldCamera.modeSwitch(name,proposal))return WorldCamera.switchedCall(original,proposal);
+        if(proposal.selected!=item)throw unsupported();
         StringBuilder changed=new StringBuilder();int at=0;
         for(int n=0;n<from.length;n++){
             changed.append(original,at,from[n]);String value=proposal.value(fields[n]);
@@ -91,9 +93,11 @@ public final class LuaCall {
     public String replacement(String source,LuaInsert proposal){
         if(end>source.length()||!source.substring(start,end).equals(original))throw new IllegalArgumentException("Строка уже изменилась. Открой параметры заново; правка не применена.");
         String changed=preview(proposal);
-        if(proposal.cameraRecipe()){WorldCamera.validateSource(source,proposal.item().id.equals("camera_follow"));WorldCamera.validateForm(proposal);}
+        if(proposal.cameraRecipe()){WorldCamera.validateSource(source,proposal.item().id);WorldCamera.validateForm(proposal);}
         // New delimiters must not escape the single call or silently add/remove arguments.
-        LuaCall check=parse(changed,0,changed.length());if(!check.name.equals(name)||check.from.length!=from.length)throw unsupported();
+        LuaCall check=parse(changed,0,changed.length());
+        if(WorldCamera.modeSwitch(name,proposal)){if(check.form.selected!=proposal.selected)throw unsupported();}
+        else if(!check.name.equals(name)||check.from.length!=from.length)throw unsupported();
         if(name.startsWith("rule:"))for(int n=0;n<from.length;n++)
             if(!proposal.value(n).trim().equals(check.form.value(n)))throw unsupported();
         return source.substring(0,start)+changed+source.substring(end);

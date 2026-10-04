@@ -679,6 +679,11 @@ final class WorkshopView extends View {
         if(i.screen==LuaInsert.Screen.PREVIEW){luaRecipePreview(i);return;}
         fitted(i.screen==LuaInsert.Screen.CATALOG?"+ Вставить Lua":d.callEdit!=null&&d.callEdit.name.equals("rule:elseif")?"elseif · иначе если":i.item().title,16,75,24,14,w-32);
         fitted(i.tileRecipe()?"Начало Lua · x/y в пикселях":d.callEdit!=null?(i.item().id.equals("set")||i.item().id.equals("add")?"Имя и значение меняются только в этой строке":"Поля строки "+(d.line()+1)+" · "+back()+" отменить"):"Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
+        if(i.screen==LuaInsert.Screen.FIELDS&&i.cameraMode()){
+            rect(0,80,w,26,1);
+            fitted(i.item().id.equals("camera_rooms")?"Y следить · комната 128×128":"Y комнаты · сменить режим",16,100,16,6,w-32);
+            hit(16,80,w-32,28,()->action(Action.UNDO));
+        }
         if(i.screen==LuaInsert.Screen.CATALOG){
             int rows=Math.max(3,(int)((bodyBottom-220)/38));
             int first=Math.max(0,Math.min(i.selected-rows/2,LuaInsert.ITEMS.length-rows));
@@ -753,6 +758,7 @@ final class WorkshopView extends View {
         LuaCall edit=s.codeDraft.callEdit;
         String preview=edit==null?i.code():"Было:\n"+edit.original+"\n\nБудет:\n"+edit.preview(i);
         if(i.cameraRecipe()&&edit==null)preview+=(i.item().id.equals("camera_reset")?"\nДальше рисуй счёт и меню.\nОни останутся на экране.":"\nДальше рисуй карту и объекты.\nПеред счётом и меню добавь\n«Камера · экран».\nЭкран = мир − камера.");
+        if(i.item().id.equals("camera_rooms"))preview+="\n\nКомната: 128×128 пикселей.\nПереход на X/Y = 128, 256…\nЗа краем — крайняя комната.\nКоординаты объектов прежние.";
         for(String line:preview.split("\n")){
             if(line.isEmpty()){rows.add("");continue;}
             while(!line.isEmpty()){
