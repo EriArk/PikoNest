@@ -190,6 +190,7 @@ public final class MainActivity extends Activity {
                 public void storeAsset(SpriteAsset asset)throws Exception{assetStore.create(asset);}
                 public void renameAsset(SpriteAsset expected,String title)throws Exception{assetStore.rename(expected,title);}
                 public void categorizeAsset(SpriteAsset expected,SpriteAsset.Category category)throws Exception{assetStore.categorize(expected,category);}
+                public void favoriteAsset(SpriteAsset expected,boolean favorite)throws Exception{assetStore.favorite(expected,favorite);}
                 public String projectOrigin(){return projectTitle;}
                 public java.util.List<art.pikoos.lab.core.ParameterPreset> presets()throws Exception{return presetStore.list();}
                 public void storePreset(art.pikoos.lab.core.ParameterPreset p)throws Exception{presetStore.create(p);}
@@ -549,7 +550,7 @@ public final class MainActivity extends Activity {
         if(!prefs.getString("moveDraft","").isEmpty())session.restoreMove(prefs.getString("moveDraft",""),prefs.getString("moveReturn",""));
         if(prefs.getBoolean("assets",false)){
             try{
-                session.assetFilter=Math.max(0,Math.min(SpriteAsset.Category.values().length,prefs.getInt("assetFilter",0)));
+                session.assetFilter=Math.max(0,Math.min(WorkshopSession.favoriteAssetFilter(),prefs.getInt("assetFilter",0)));
                 session.restoreAssets(prefs.getString("assetsReturn","NAVIGATE"),prefs.getInt("assetIndex",0));
                 session.selectAssetId(prefs.getString("assetId",""));
                 String saved=prefs.getString("assetDraft",""),copy=prefs.getString("copyAsset","");

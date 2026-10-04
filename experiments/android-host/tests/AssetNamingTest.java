@@ -49,12 +49,12 @@ public final class AssetNamingTest {
         Port p=new Port();SpriteAsset asset=SpriteAsset.capture(cart,new SpriteRegion(0,0,16,16),"Z sprite","Origin");
         SpriteAsset second=SpriteAsset.capture(cart,new SpriteRegion(0,0,16,16),"B sprite","Other");
         p.records.put(asset.id,asset.encode());p.records.put(second.id,second.encode());
-        WorkshopSession s=new WorkshopSession(cart,p);s.act(Action.ASSETS);s.selectAssetId(asset.id);s.act(Action.UNDO);
-        check(s.mode==Mode.NAME&&s.nameEditor.replaceAll,"Y starts rename with entire title selected");
+        WorkshopSession s=new WorkshopSession(cart,p);s.act(Action.ASSETS);s.selectAssetId(asset.id);s.act(Action.MENU);s.act(Action.UNDO);
+        check(s.mode==Mode.NAME&&s.nameEditor.replaceAll,"Select then Y starts rename with entire title selected");
         type(s,"КОТ");s.act(Action.CANCEL);
         same(p.records.get(asset.id),asset.encode(),"cancel leaves record exact");check(s.currentAsset().id.equals(asset.id),"cancel retains selection");
-        s.act(Action.UNDO);s.act(Action.TEST);check(p.renames==0&&p.launches==0,"unchanged Done performs no write or launch");
-        s.act(Action.UNDO);s.act(Action.CONTEXT);s.act(Action.TEST);check(s.mode==Mode.NAME,"blank title remains in editor");
+        s.act(Action.MENU);s.act(Action.UNDO);s.act(Action.TEST);check(p.renames==0&&p.launches==0,"unchanged Done performs no write or launch");
+        s.act(Action.MENU);s.act(Action.UNDO);s.act(Action.CONTEXT);s.act(Action.TEST);check(s.mode==Mode.NAME,"blank title remains in editor");
         s.act(Action.NEXT);check(s.nameEditor.latin&&s.tool==0,"L/R changes alphabet without changing tool");
         type(s,"A CAT");p.fail=true;s.act(Action.TEST);
         check(s.mode==Mode.ERROR&&s.nameEditor.text().equals("A CAT"),"failure retains draft");
@@ -66,9 +66,9 @@ public final class AssetNamingTest {
         check(!s.canUndo()&&p.writes==0&&p.launches==0,"metadata rename does not pollute cart undo or runtime");same(s.cart().bytes(),original,"cart bytes untouched");
         s.act(Action.CANCEL);p.records.put(second.id,second.withTitle("0 first").encode());s.act(Action.ASSETS);
         check(s.currentAsset().id.equals(asset.id)&&s.assetIndex==1,"refresh follows ID across order changes");
-        s.act(Action.UNDO);type(s,"Д");p.records.put(asset.id,renamed.withTitle("External").encode());s.act(Action.TEST);
+        s.act(Action.MENU);s.act(Action.UNDO);type(s,"Д");p.records.put(asset.id,renamed.withTitle("External").encode());s.act(Action.TEST);
         check(s.mode==Mode.ERROR&&SpriteAsset.decode(p.records.get(asset.id)).title.equals("External"),"stale snapshot cannot overwrite concurrent rename");
-        s.act(Action.CANCEL);s.act(Action.CANCEL);s.act(Action.CANCEL);s.act(Action.ASSETS);s.act(Action.UNDO);
+        s.act(Action.CANCEL);s.act(Action.CANCEL);s.act(Action.CANCEL);s.act(Action.ASSETS);s.act(Action.MENU);s.act(Action.UNDO);
         type(s,"НОВОЕ");
         NameEditor restoredEditor=new NameEditor(s.nameEditor.text());restoredEditor.replaceAll=false;restoredEditor.key=17;
         WorkshopSession restored=new WorkshopSession(cart,p);restored.restoreAssets("NAVIGATE",0);

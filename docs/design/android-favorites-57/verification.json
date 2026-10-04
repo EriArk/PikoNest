@@ -1,0 +1,21 @@
+{
+  "version": "0.0.57",
+  "date": "2026-10-04",
+  "apk_sha256": "862d61e1aec1632b1d8e5b174b3b9abab3366bd19ab141365fbdd6577358869e",
+  "apk_bytes": 332708,
+  "new_favorite_checks": 58,
+  "full_build": "passed; see build-final.log",
+  "installed_version_code": 57,
+  "device": "Retroid Pocket Classic; ADB controller events",
+  "screen_checks": [
+    "1240x1080",
+    "720x960"
+  ],
+  "native_screen_restored": true,
+  "media_volume": 0,
+  "files_checked": 40,
+  "byte_identical": 39,
+  "changed_asset_only_favorite": "files/asset-library/sprites/689409f4-65af-4cd6-8a4e-08dd87f86b19.pksp",
+  "runtime_gameplay": "not repeated; only workshop metadata/UI changed",
+  "release_published": false
+}

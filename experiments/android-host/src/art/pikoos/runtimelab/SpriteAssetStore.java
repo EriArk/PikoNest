@@ -49,6 +49,9 @@ final class SpriteAssetStore {
     synchronized void categorize(SpriteAsset expected,SpriteAsset.Category category)throws IOException{
         update(expected,expected.withCategory(category));
     }
+    synchronized void favorite(SpriteAsset expected,boolean favorite)throws IOException{
+        update(expected,expected.withFavorite(favorite));
+    }
     private void update(SpriteAsset expected,SpriteAsset next)throws IOException{
         AtomicFile target=new AtomicFile(file(expected.id));
         byte[] actual=target.readFully();

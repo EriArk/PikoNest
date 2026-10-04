@@ -28,6 +28,7 @@ public final class WorkshopSession {
         default void renameAsset(SpriteAsset expected,String title)throws Exception{throw new Exception("Переименование не подключено");}
         default void categorizeAsset(SpriteAsset expected,SpriteAsset.Category category)throws Exception{throw new Exception("Категории не подключены");}
         default String projectOrigin(){return "Проект";}
+        default void favoriteAsset(SpriteAsset expected,boolean favorite)throws Exception{throw new Exception("Избранное ресурсов не подключено");}
         default java.util.List<ParameterPreset> presets()throws Exception{return java.util.Collections.emptyList();}
         default void storePreset(ParameterPreset preset)throws Exception{throw new Exception("Библиотека наборов не подключена");}
         default void updatePreset(ParameterPreset expected,ParameterPreset next)throws Exception{throw new Exception("Библиотека наборов не подключена");}
@@ -362,10 +363,11 @@ public final class WorkshopSession {
     public boolean namingNewAsset;
     public int assetFilter,assetCategoryChoice;
     private boolean categoryForDraft;
-    public String assetFilterTitle(){return assetFilter==0?"Все":SpriteAsset.Category.values()[assetFilter-1].title;}
+    public static int favoriteAssetFilter(){return SpriteAsset.Category.values().length+1;}
+    public String assetFilterTitle(){return assetFilter==0?"Все":assetFilter==favoriteAssetFilter()?"Избранное":SpriteAsset.Category.values()[assetFilter-1].title;}
     public java.util.List<SpriteAsset> assets(){
         java.util.List<SpriteAsset> result=new java.util.ArrayList<>();
-        for(SpriteAsset a:assets)if(assetFilter==0||a.category.ordinal()==assetFilter-1)result.add(a);
+        for(SpriteAsset a:assets)if(assetFilter==0||assetFilter==favoriteAssetFilter()&&a.favorite||a.category.ordinal()==assetFilter-1)result.add(a);
         return java.util.Collections.unmodifiableList(result);
     }
     public SpriteAsset currentAsset(){java.util.List<SpriteAsset> list=assets();return list.isEmpty()?null:list.get(clamp(assetIndex,list.size()-1));}
@@ -689,9 +691,9 @@ public final class WorkshopSession {
                 return;
             }
             if(mode==Mode.ASSETS){
-                if(action==Action.PREVIOUS||action==Action.NEXT){assetFilter=Math.floorMod(assetFilter+(action==Action.NEXT?1:-1),SpriteAsset.Category.values().length+1);assetIndex=0;return;}
+                if(action==Action.PREVIOUS||action==Action.NEXT){assetFilter=Math.floorMod(assetFilter+(action==Action.NEXT?1:-1),favoriteAssetFilter()+1);assetIndex=0;return;}
                 if(action==Action.MENU){beginCategory();return;}
-                if(action==Action.UNDO){beginName();return;}
+                if(action==Action.UNDO){SpriteAsset a=currentAsset();if(a!=null){port.favoriteAsset(a,!a.favorite);publishAsset(a.withFavorite(!a.favorite));notice=a.favorite?"Убрано из избранного":"Спрайт в избранном";}return;}
                 if(action==Action.CANCEL){mode=assetsReturn;return;}
                 if(action==Action.LEFT||action==Action.UP)assetIndex=clamp(assetIndex-1,assets().size()-1);
                 if(action==Action.RIGHT||action==Action.DOWN)assetIndex=clamp(assetIndex+1,assets().size()-1);
@@ -840,6 +842,7 @@ public final class WorkshopSession {
                 return;
             }
             if(mode==Mode.ASSET_CATEGORY){
+                if(action==Action.UNDO){mode=categoryForDraft?Mode.ASSET_SAVE:Mode.ASSETS;beginName();return;}
                 if(action==Action.UP||action==Action.LEFT)assetCategoryChoice=clamp(assetCategoryChoice-1,SpriteAsset.Category.values().length-1);
                 if(action==Action.DOWN||action==Action.RIGHT)assetCategoryChoice=clamp(assetCategoryChoice+1,SpriteAsset.Category.values().length-1);
                 if(action==Action.CANCEL)mode=categoryForDraft?Mode.ASSET_SAVE:Mode.ASSETS;

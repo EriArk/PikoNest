@@ -1,5 +1,10 @@
 # PIKOOS Android host experiment
 
+Version 0.0.57 adds cross-project sprite favorites: Y toggles the selected resource,
+L from All opens Favorites. Rename moves to Select → Y; category selection stays
+there. Old asset records remain byte-stable until changed; favorite metadata does
+not modify cartridges or pixels. [Evidence](../../docs/design/android-favorites-57/README.md).
+
 Version 0.0.56 adds named parameter presets inside each tool's form (Select):
 save/review, favorites, cross-project reuse and recovery. Project names, expressions
 and resource references stay in the target; applying fills a proposal before the

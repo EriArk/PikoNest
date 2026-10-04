@@ -204,12 +204,12 @@ final class WorkshopView extends View {
         if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE){
             if(s.mode==Mode.ASSETS&&s.currentAsset()==null&&s.assetFilter!=0){
                 key(back()+" назад",12,bodyBottom,6,()->action(Action.CANCEL));
-                if(s.tool==2)key("X сохранить",w-132,bodyBottom,14,()->action(Action.CONTEXT));
+                if(s.tool==2)key(w<500?"X в библ.":"X сохранить",w<500?w-116:w-132,bodyBottom,14,()->action(Action.CONTEXT));
                 return;
             }
-            key(ok()+(s.mode==Mode.ASSET_SAVE||s.currentAsset()==null&&s.tool==2?" сохранить":s.currentAsset()==null?" спрайты":" вставить"),12,bodyBottom,10,()->action(Action.CONFIRM));
+            key(ok()+(s.mode==Mode.ASSET_SAVE||s.currentAsset()==null&&s.tool==2?(w<500?" в библ.":" сохранить"):s.currentAsset()==null?" спрайты":w<500?" место":" вставить"),12,bodyBottom,10,()->action(Action.CONFIRM));
             key(back()+" назад",w<500?136:200,bodyBottom,6,()->action(Action.CANCEL));
-            if(s.mode==Mode.ASSETS&&s.tool==2)key("X сохранить",w-132,bodyBottom,14,()->action(Action.CONTEXT));
+            if(s.mode==Mode.ASSETS&&s.tool==2)key(w<500?"X в библ.":"X сохранить",w<500?w-116:w-132,bodyBottom,14,()->action(Action.CONTEXT));
             if(s.mode==Mode.ASSET_SAVE)key("X имя",w-88,bodyBottom,14,()->action(Action.CONTEXT));
             return;
         }
@@ -1010,13 +1010,13 @@ final class WorkshopView extends View {
         hit(16,176,(w-32)/2,32,()->action(Action.PREVIOUS));hit(w/2,176,(w-32)/2,32,()->action(Action.NEXT));
         SpriteAsset chosen=s.currentAsset();
         if(chosen==null){
-            fitted(s.assetFilter==0?"Здесь будут твои спрайты":"Категория пуста",16,238,22,7,w-32);
+            fitted(s.assetFilter==0?"Здесь будут твои спрайты":s.assetFilter==WorkshopSession.favoriteAssetFilter()?"Избранных пока нет":"Категория пуста",16,238,22,7,w-32);
             if(s.assetFilter==0){
                 fitted("Выбери область во вкладке «Спрайты».",16,266,20,6,w-32);
                 fitted("Затем: меню → Ресурсы → X в библиотеку.",16,298,18,6,w-32);
             }else{
                 fitted("L/R — другая категория",16,270,18,6,w-32);
-                wrapped("Выбери спрайт в «Все» и нажми Select, чтобы назначить ему категорию.",16,310,18,6,w-32,3);
+                wrapped(s.assetFilter==WorkshopSession.favoriteAssetFilter()?"Нажми R → «Все». Выбери спрайт и нажми Y, чтобы добавить в избранное.":"Выбери спрайт в «Все» и нажми Select, чтобы назначить ему категорию.",16,310,18,6,w-32,3);
             }
         }else{
             text((s.assetIndex+1)+" / "+s.assets().size(),w-84,199,18,10);
@@ -1026,6 +1026,7 @@ final class WorkshopView extends View {
                 final int index=first+i;SpriteAsset a=s.assets().get(index);float x=16+i*(cw+gap),size=Math.min(cw-16,ch-48);
                 rect(x,214,cw,ch,0);assetPicture(a,x+(cw-size)/2,222,size);
                 outline(x,214,cw,ch,index==s.assetIndex?10:13);
+                if(a.favorite){rect(x+cw-26,218,22,22,1);text("*",x+cw-22,237,22,10);}
                 fitted(a.title,x+8,214+ch-14,18,index==s.assetIndex?10:7,cw-16);
                 hit(x,214,cw,ch,()->{s.selectAsset(index);changed.run();invalidate();});
             }
@@ -1033,19 +1034,20 @@ final class WorkshopView extends View {
             fitted(chosen.width+" × "+chosen.height+" · "+chosen.origin,16,by+28,18,7,w-32);
             fitted("Select: "+chosen.category.title,16,by+52,16,13,w-32);
             hit(16,by+32,w-32,26,()->action(Action.MENU));
-            fitted("← → выбрать · Y название",16,by+78,18,6,w-32);
+            fitted(chosen.favorite?"Y убрать из избранного":"Y в избранное",16,by+78,18,chosen.favorite?10:6,w-32);
             hit(16,by+56,w-32,34,()->action(Action.UNDO));
         }
     }
     private void assetCategories(){
-        hits.clear();fitted("Категория спрайта",16,78,24,14,w-32);
+        hits.clear();fitted("Категория / название",16,78,24,14,w-32);
         fitted("Пиксели и использование не меняются",16,102,16,6,w-32);
         SpriteAsset.Category[] categories=SpriteAsset.Category.values();
         for(int n=0;n<categories.length;n++){final int index=n;
             button(categories[n].title,16,120+n*36,w-32,32,n==s.assetCategoryChoice,()->{s.assetCategoryChoice=index;action(Action.CONFIRM);});
         }
-        rect(0,bodyBottom,w,44,0);key(ok()+" сохранить",12,bodyBottom,10,()->action(Action.CONFIRM));
-        key(back()+" отмена",w/2,bodyBottom,6,()->action(Action.CANCEL));
+        rect(0,bodyBottom,w,44,0);key(ok()+" выбор",12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" назад",w/3,bodyBottom,6,()->action(Action.CANCEL));
+        key("Y имя",w*2/3,bodyBottom,14,()->action(Action.UNDO));
     }
     private void nameEditor(){
         nameEditor(s.nameEditor,"Название спрайта");
