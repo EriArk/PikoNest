@@ -1,125 +1,114 @@
 # PIKOOS
 
-**A cute, handheld-first PICO-8 workshop for playing, making, learning, remixing, and sharing games.**
+**Play PICO-8 games. Open them up. Change them. Make your own — on the handheld itself.**
 
-PIKOOS is an Android-first shell and creation environment built around the **official PICO-8 runtime**. It is designed for handheld gaming devices with physical controls, with a future Linux port planned for devices such as the RG DS and other ARM handhelds.
+PIKOOS is a controller-first home and workshop for **PICO-8** on Android gaming handhelds.  
+It gives playing and creating their own space: open **Play** when you just want your games, or step into the **Workshop** when you want to draw, change, learn, remix or build something new.
 
-PIKOOS is not a replacement fantasy console and not merely a launcher. The goal is a complete, playful loop:
+PIKOOS stays close to the real thing. Projects remain ordinary `.p8` cartridges, generated code is ordinary Lua, and games run through the user's official PICO-8 runtime.
 
 > **Play → Peek Inside → Remix → Create → Learn → Test → Share**
 
-A beginner should be able to make something move almost immediately, then gradually discover that they have been learning real Lua and real PICO-8 along the way.
+<p align="center">
+  <img src="docs/showcase/0.0.61/01-play-library.png" width="720" alt="PIKOOS Play library">
+</p>
 
-## Core principles
+## Play first
 
-- **Real PICO-8 first.** Standard `.p8` cartridges remain the canonical project format.
-- **Official runtime.** The user supplies their own official PICO-8 installation; PIKOOS does not bundle it.
-- **Cute and simple.** The UI should feel like a friendly creative toy, not a desktop IDE squeezed onto a handheld.
-- **Learn by doing.** Lua/PICO-8 concepts are taught contextually while the user creates and modifies games.
-- **Controller-first.** Everything important should be usable with handheld controls; touch is an enhancement, not a hard dependency.
-- **Portable architecture.** Android is the first target, but core logic must not depend on Android or on any one device.
-- **Tools for every game.** Templates supply initial content; they do not restrict tools by genre or require a hero.
-- **No custom PICO-8 dialect.** Standard projects should remain understandable and runnable in ordinary PICO-8.
+PIKOOS is meant to be useful even when you do not want to make anything.
 
-## What PIKOOS aims to include
+The Play library treats cartridges like games rather than files: covers, folders, favorites, recent carts and direct launch. Leaving a game should bring you back where you started, whether it came from PIKOOS itself or a supported external launcher.
 
-- Cartridge library and launcher
-- Reusable asset library across projects and chapters
-- First-run folder selection and automatic preparation of the user's runtime
-- Import of the user's official PICO-8 runtime
-- Source viewing and remixing
-- Handheld-friendly code, sprite, map, SFX and music tools
-- Smart Lua/PICO-8 code input without requiring a physical keyboard
-- A library of reusable game mechanics that produces ordinary Lua code
-- Contextual learning and a lightweight Lua/PICO-8 skill book
-- Fast edit → test → edit workflow
-- Cartridge budget/limit visualization
-- Multicart project support presented as one game/project
-- Debug/test helpers
-- Local Link Play experiments
-- Optional PIKOOS online extensions and personalized online cartridges
+The Workshop is separate on purpose. Playing a game should never turn into a tutorial, project setup or editor unless you ask for it.
 
-## Platforms
+## A workshop made for handheld controls
 
-### First target: Android handhelds
+A small gaming handheld is a great place to draw pixels and tweak a game. It is a terrible place to pretend you have a desktop keyboard.
 
-PIKOOS should run on Android gaming handhelds regardless of brand, screen aspect ratio, or exact control layout. Retroid Pocket Classic is a particularly interesting device because of its near-square display, but **it is not the architectural target**.
+PIKOOS is built around that fact.
 
-The current runtime direction is to launch the user's official ARM64/Raspberry Pi PICO-8 build inside Android through a small Linux/proot-style compatibility layer, similar in spirit to existing community wrappers.
+You can work with sprites, sprite sheets, maps, animations, camera behavior, rooms, transitions and background layers using the controller. Code tools can insert and edit common Lua/PICO-8 structures through readable forms, while the normal source stays visible and editable whenever you want it.
 
-### Later: Linux handhelds
+<table>
+  <tr>
+    <td width="50%"><img src="docs/showcase/0.0.61/02-sprite-editor.png" alt="PIKOOS sprite editor"></td>
+    <td width="50%"><img src="docs/showcase/0.0.61/03-sprite-sheet.png" alt="PIKOOS sprite sheet selection"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Draw and edit directly on the handheld.</sub></td>
+    <td align="center"><sub>Select real regions of the PICO-8 sprite sheet.</sub></td>
+  </tr>
+</table>
 
-The platform/runtime layer must be replaceable so that PIKOOS can later run natively on Linux handhelds such as the RG DS and other ARM Linux devices without rewriting the editor, project model, learning system, mechanics library, or UI logic.
+There is no separate PIKOOS scripting language and no block system that traps a project inside the app. If a tool adds a condition, movement rule, draw call or animation, it becomes normal Lua in the cartridge.
 
-## Project format
+<table>
+  <tr>
+    <td width="50%"><img src="docs/showcase/0.0.61/04-tool-catalogue.png" alt="PIKOOS Lua tool catalogue"></td>
+    <td width="50%"><img src="docs/showcase/0.0.61/05-background-layers.png" alt="PIKOOS background layers"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Build rules without typing every character.</sub></td>
+    <td align="center"><sub>Compose and reorder moving background layers.</sub></td>
+  </tr>
+</table>
 
-The cartridge remains the source of truth:
+## Learn by changing real games
 
-```text
-my-game/
-  my-game.p8
-  .pikoos/
-    project.json
-    notes/
-    screenshots/
-    tests/
-    history/
-```
+PIKOOS is meant to make the distance between **player** and **creator** very small.
 
-`.pikoos/` contains optional workshop metadata. Removing it must not prevent the standard cartridge from opening in normal PICO-8.
+A beginner should be able to change something visible first — a color, a value, a rule, a sprite, a jump, a condition — and only then discover the Lua behind it. Explanations live next to the thing being changed instead of turning the app into a course that must be completed before anything fun happens.
 
-## Documentation
+Templates and reusable mechanics are there to give you useful starting points, not to define what kind of game you are allowed to make. A platformer may begin with movement and jumping; a puzzle may begin with a board and rules. The underlying tools remain available to both.
 
-- [`AGENTS.md`](AGENTS.md) — rules and context for Codex/AI contributors
-- [`docs/PRODUCT_VISION.md`](docs/PRODUCT_VISION.md) — product and UX vision
-- [`docs/PICO8_LEARNING_RESOURCES.md`](docs/PICO8_LEARNING_RESOURCES.md) — PICO-8 reference, guide requirements and source catalogue
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — technical boundaries and proposed architecture
-- [`docs/ASSET_LIBRARY.md`](docs/ASSET_LIBRARY.md) — reusable sprites, backgrounds, SFX and music
-- [`docs/VISUAL_EFFECTS.md`](docs/VISUAL_EFFECTS.md) — particle/VFX research and proposed tool requirements
-- [`docs/FIRST_RUN_SETUP.md`](docs/FIRST_RUN_SETUP.md) — folders, archive choice and automatic runtime preparation
-- [`docs/PICO8_COMPATIBILITY.md`](docs/PICO8_COMPATIBILITY.md) — compatibility invariants
-- [`docs/ONLINE_CARTRIDGES.md`](docs/ONLINE_CARTRIDGES.md) — personalized online-cart concept
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — staged implementation plan
+The long-term goal is simple: someone can arrive because they like tiny games, start modifying them out of curiosity, and eventually become comfortable writing real PICO-8 code.
 
-## Status
+## Make things once, use them again
 
-As of 2026-10-03, host 0.0.38 / Runtime Test 7 is a working Android lab, not a
-complete game creator. It demonstrates Play/external launch, bounded linked-cart
-launch, sprite editing/reuse, controller Lua drafts, function/line navigation, parameterized insertions, existing-call forms and name/API choices, single `.p8` import/export, session undo/redo and an
-isolated test of the user's purchased runtime archive. A separate four-second
-official-runtime trial checks a draft copy and links recognized errors to source;
-it does not certify the whole game or replace interactive Test.
-Select/Android Back now opens a PIKOOS game menu for host-dispatched sessions,
-with Continue and graceful exit. A session journal now distinguishes visiting
-PIKOOS from ending a game; an explicit return callback preserves the launch origin
-after Home/resume. Tested on the workshop, Play and both installed launchers.
-Physical-controller acceptance and general runtime crash recovery remain open.
+PIKOOS has a shared asset library for things worth keeping between projects. Today that already includes reusable sprites and parameter presets; the finished library is intended to cover sprites, animations, backgrounds, SFX, music and other reusable pieces while keeping their source and dependencies understandable.
 
-Structural/API-assisted Lua editing, map/animation/background tools, SFX/music, reusable mechanics,
-complete project recovery, production setup and the full creation loop remain open.
-The next creator milestone is a real game authored from a blank cart through
-PIKOOS with handheld controls, then tested and exported as ordinary PICO-8.
+<table>
+  <tr>
+    <td width="50%"><img src="docs/showcase/0.0.61/06-asset-library.png" alt="PIKOOS asset library"></td>
+    <td width="50%"><img src="docs/showcase/0.0.61/07-game-runtime.png" alt="Game running in official PICO-8"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Keep useful pieces for the next game.</sub></td>
+    <td align="center"><sub>Test the result in the official PICO-8 runtime.</sub></td>
+  </tr>
+</table>
 
+## Where PIKOOS is going
+
+The complete Android version is meant to cover the whole handheld creation loop: browse and play cartridges, start from a blank cart or a lightweight template, draw sprites and maps, build rules and mechanics, animate things, work with cameras and backgrounds, add effects, SFX and music, test and diagnose the game, reuse pieces across projects, remix existing carts, handle larger multicart projects, and export a normal PICO-8 project that still works outside PIKOOS.
+
+The edit → test loop is deliberately central. Change something, press a physical shortcut, run it in official PICO-8, exit, and return to the same place in the Workshop.
+
+After the local Android product is solid, the architecture is intended to grow toward **Linux handhelds**, experimental **Link Play** between devices, and optional PIKOOS-aware online cartridges. Those are later directions, not requirements for the core editor and player.
+
+## Current state
+
+PIKOOS is under active development. **0.0.61 is a working Android development lab, not a public release.**
+
+The current build already has a Play library, project creation/import/export, sprite and map editing, controller-first Lua editing and structured tools, conditions and branch actions, reusable presets and sprites, tile flags and collision helpers, movement helpers, animations, camera/room tools, transitions, background layers, session undo/redo, runtime diagnostics, and the edit → official PICO-8 → return loop.
+
+There is still substantial work before the Android product is considered finished: sound and music creation, VFX, broader mechanics and event tools, deeper learning/reference features, full remix and project/dependency workflows, clean first-run/runtime setup, stronger recovery, controller-only edge cases, device coverage and final UX acceptance.
+
+For the detailed implementation state and the deliberately picky acceptance rules, see:
+
+- [Product vision](docs/PRODUCT_VISION.md)
 - [Current capability audit](docs/STATUS.md)
-- [Whole-product roadmap](docs/ROADMAP.md#completion-path)
-- [Task backlog and dependencies](docs/BACKLOG.md)
+- [Roadmap](docs/ROADMAP.md)
 - [End-to-end acceptance](docs/ACCEPTANCE.md)
-- [Historical roadmap and lab milestones](docs/ROADMAP_HISTORY.md)
-- [Reproducible Android host and slice history](experiments/android-host/README.md)
-- [Latest session return device evidence](docs/design/android-return-38/README.md)
-- [Editor diagnostics evidence](docs/design/android-diagnostics-36/README.md)
+- [Current showcase](docs/showcase/0.0.61/README.md)
 
-The owner approved the PICO-8 visual direction, not the completeness of the
-application. APK GitHub releases/prereleases require explicit confirmation that
-the owner is fully satisfied and authorizes release. Development APKs stay local.
-Linux and optional online research do not block the local Android product.
+## PICO-8 compatibility
 
-The [bounded editor decision](docs/EDITOR_FOUNDATION.md) retains Java/Canvas for
-the next creator slices and puts editing state/operations in portable core.
-Production wrapper delivery and the future Linux UI remain explicit decisions.
+PIKOOS does **not** bundle PICO-8. The user supplies their own official PICO-8 installation.
 
-Owner-provided PICO-8 archives in [dev-runtime](dev-runtime/README.md) are private
-development inputs; they must never enter application packages or public releases.
+The cartridge is the source of truth. PIKOOS metadata may live alongside a project, but removing that metadata must not turn the game into a proprietary PIKOOS-only format. Ordinary projects should remain understandable and runnable in normal PICO-8.
+
+Android handhelds are the first target. Retroid Pocket Classic is the main development device today, but PIKOOS is not intended to depend on one screen shape, control layout or manufacturer.
 
 ---
 
