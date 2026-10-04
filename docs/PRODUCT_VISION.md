@@ -1,5 +1,15 @@
 # PikoNest Product Vision
 
+Product-coherence proposal, 2026-10-04, [issue #2](https://github.com/EriArk/PikoNest/issues/2):
+**Play / Workshop / Splore** are the top-level entrances. Creator and Editor are
+Workshop contexts. Play does not require project import; inspecting/remixing
+preserves the source game and explicitly creates an editable copy. Test returns
+to the same project/tool/resource/focus. Splore uses official PICO-8; browser-assisted
+publishing follows [issue #1](https://github.com/EriArk/PikoNest/issues/1).
+This direction is documented for owner review, not claimed implemented or accepted.
+[UX_DIRECTION](UX_DIRECTION.md) owns the shared navigation, visual roles, terminology
+and controller grammar; [UX_AUDIT](UX_AUDIT.md) records evidence and bounded slices.
+
 Owner additions: a persistent [asset library](ASSET_LIBRARY.md) for user-created
 and extracted sprites, backgrounds, SFX and music reusable across projects and
 chapters; a [first-run wizard](FIRST_RUN_SETUP.md) for folders and automatic setup

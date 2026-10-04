@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-04",
+  "lab_version": "0.0.65",
+  "device": "Retroid Pocket Classic",
+  "inspection": "Limited runtime-gate observation via ADB; no full editor replay",
+  "project_and_asset_files_before": 48,
+  "project_and_asset_files_after": 48,
+  "changed_project_and_asset_files": [],
+  "apk_changed": false,
+  "runtime_force_stopped": false,
+  "final_action": "Android Home; existing runtime not terminated"
+}
