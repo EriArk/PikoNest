@@ -684,6 +684,10 @@ final class WorkshopView extends View {
             fitted(i.item().id.equals("camera_rooms")?"Y следить · комната 128×128":"Y комнаты · сменить режим",16,100,16,6,w-32);
             hit(16,80,w-32,28,()->action(Action.UNDO));
         }
+        if(i.screen==LuaInsert.Screen.FIELDS&&i.doorRecipe()){
+            rect(0,80,w,26,1);
+            fitted("A ↔ B · после выхода можно снова",16,100,16,6,w-32);
+        }
         if(i.screen==LuaInsert.Screen.CATALOG){
             int rows=Math.max(3,(int)((bodyBottom-220)/38));
             int first=Math.max(0,Math.min(i.selected-rows/2,LuaInsert.ITEMS.length-rows));
@@ -722,9 +726,10 @@ final class WorkshopView extends View {
             hit(16,182,w-32,28,()->action(Action.MENU));
             return;
         }
-        boolean longCall=d.callEdit!=null&&((i.item().id.equals("sspr")||i.item().id.equals("map"))&&w<500||i.cameraRecipe());
+        boolean longCall=d.callEdit!=null&&((i.item().id.equals("sspr")||i.item().id.equals("map"))&&w<500||i.cameraRecipe()||i.doorRecipe());
         int count=i.item().fields.length,rows=Math.min(count+1,Math.max(2,(int)((bodyBottom-(longCall?298:254))/36)));
         if(i.tileRecipe())rows=2;
+        if(i.doorRecipe())rows=Math.min(rows,5);
         int first=Math.max(0,Math.min(i.field-rows/2,count+1-rows));
         for(int r=0;r<rows&&first+r<=count;r++){
             final int index=first+r;float y=112+r*36;boolean focus=index==i.field;
@@ -737,10 +742,16 @@ final class WorkshopView extends View {
             hit(16,y,w-32,32,()->{i.field=index;action(Action.CONFIRM);});
         }
         float previewY=124+rows*36;
-        text(i.fullPreview()?"Lua · предварительно":d.callEdit!=null?"Изменение Lua":"Lua после вставки",16,previewY+14,18,14);
+        text(i.doorRecipe()?"Переход · предварительно":i.fullPreview()?"Lua · предварительно":d.callEdit!=null?"Изменение Lua":"Lua после вставки",16,previewY+14,18,14);
         rect(16,previewY+24,w-32,bodyBottom-previewY-62,0);
         c.save();c.clipRect(16,previewY+24,w-16,bodyBottom-34);
-        if(longCall){codePreview("Было: "+d.callEdit.original.trim(),24,previewY+46,6,w-48);codePreview("Будет: "+d.callEdit.preview(i).trim(),24,previewY+90,10,w-48);}
+        if(i.doorRecipe()){
+            fitted("A: ("+i.value(3)+", "+i.value(4)+") ↔ B: ("+i.value(5)+", "+i.value(6)+")",24,previewY+46,18,7,w-48);
+            fitted("Области "+i.value(7)+"×"+i.value(8)+" px · точка "+i.value(0)+", "+i.value(1),24,previewY+70,18,7,w-48);
+            fitted("Вход → начало другой области",24,previewY+94,16,6,w-48);
+            fitted("Полный Lua — в просмотре",24,previewY+118,16,14,w-48);
+        }
+        else if(longCall){codePreview("Было: "+d.callEdit.original.trim(),24,previewY+46,6,w-48);codePreview("Будет: "+d.callEdit.preview(i).trim(),24,previewY+90,10,w-48);}
         else if(d.callEdit!=null){fitted("Было: "+d.callEdit.original.trim(),24,previewY+46,16,6,w-48);fitted("Будет: "+d.callEdit.preview(i).trim(),24,previewY+70,16,10,w-48);}
         else {int line=0;for(String row:i.code().split("\n")){fitted(row,24,previewY+46+line*22,18,7,w-48);line++;}}
         c.restore();
@@ -752,11 +763,12 @@ final class WorkshopView extends View {
         else if(i.fullPreview())key("X Lua",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
     }
     private void luaRecipePreview(LuaInsert i){
-        fitted(i.cameraRecipe()?i.item().title:i.motionRecipe()?"Движение · код":i.item().id.equals("move_call")?"Движение · вызов":"Область · код функции",16,75,22,14,w-32);
-        fitted(i.cameraRecipe()?(s.codeDraft.callEdit!=null?"Было / будет · только эта строка":i.item().id.equals("camera_reset")?"После мира · перед счётом и меню":"Перед миром · после cls()"):i.motionRecipe()?"Сначала X, затем Y · пиксели":i.item().id.equals("move_call")?"Новые X,Y · на месте курсора":"Карта: x,y,w,h в пикселях",16,100,16,6,w-32);
+        fitted(i.cameraRecipe()||i.doorRecipe()?i.item().title:i.motionRecipe()?"Движение · код":i.item().id.equals("move_call")?"Движение · вызов":"Область · код функции",16,75,22,14,w-32);
+        fitted(i.doorRecipe()?"В _update · после изменения X/Y":i.cameraRecipe()?(s.codeDraft.callEdit!=null?"Было / будет · только эта строка":i.item().id.equals("camera_reset")?"После мира · перед счётом и меню":"Перед миром · после cls()"):i.motionRecipe()?"Сначала X, затем Y · пиксели":i.item().id.equals("move_call")?"Новые X,Y · на месте курсора":"Карта: x,y,w,h в пикселях",16,100,16,6,w-32);
         java.util.ArrayList<String> rows=new java.util.ArrayList<>();
         LuaCall edit=s.codeDraft.callEdit;
         String preview=edit==null?i.code():"Было:\n"+edit.original+"\n\nБудет:\n"+edit.preview(i);
+        if(i.doorRecipe())preview="Вход A → начало B, B → A.\nПовтор — после выхода из обеих.\nПроверяется точка X/Y, не спрайт.\nРисование задаётся отдельно.\n\n"+preview;
         if(i.cameraRecipe()&&edit==null)preview+=(i.item().id.equals("camera_reset")?"\nДальше рисуй счёт и меню.\nОни останутся на экране.":"\nДальше рисуй карту и объекты.\nПеред счётом и меню добавь\n«Камера · экран».\nЭкран = мир − камера.");
         if(i.item().id.equals("camera_rooms"))preview+="\n\nКомната: 128×128 пикселей.\nПереход на X/Y = 128, 256…\nЗа краем — крайняя комната.\nКоординаты объектов прежние.";
         for(String line:preview.split("\n")){

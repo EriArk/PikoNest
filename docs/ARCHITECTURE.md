@@ -726,6 +726,16 @@ The official runtime remains the authority for execution semantics.
 
 ## 12. Mechanics representation
 
+Android lab 0.0.53 demonstrates a bounded paired-region transition through the
+shared Lua insertion catalogue: fields, code review, exact-block reopening,
+undo and recovery. It is a slice of mechanics tooling, not the completed M01/M05
+system. Its only game prerequisites are explicit coordinate variables and an
+independent latch; hero, sprite, map, camera and genre bindings are not required.
+Door/portal is an application of this recipe, not a mandatory domain object.
+Non-spatial conditions, score and state workflows remain separate M02 work.
+Do not model all events as movement/region entry, or treat more spatial recipes
+as completion of generic game creation. See [scope and evidence](design/android-transitions-53/README.md).
+
 A mechanic definition should conceptually contain:
 
 ```text

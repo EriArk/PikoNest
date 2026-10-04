@@ -22,14 +22,18 @@ public final class TileProbe {
         validateSource(source,name,false);
     }
     public static void validateSource(String source,String name,boolean area){
+        validateAvailableName(source,name);
+        LuaContext context=new LuaContext(source);
+        LuaSymbols symbols=new LuaSymbols(source);
+        for(String api:area?new String[]{"flr","mget","fget","ceil","min"}:new String[]{"flr","mget","fget"})if(symbols.shadows(api)||context.defines(api))
+            throw new IllegalArgumentException("Имя API "+api+" переопределено. Вставка не применена.");
+    }
+    static void validateAvailableName(String source,String name){
         LuaContext context=new LuaContext(source);String mask=context.masked();
         if(RESERVED.contains(" "+name+" "))throw new IllegalArgumentException("Выбери своё имя: "+name+" используется Lua/PICO-8.");
         if(used(mask,name))throw new IllegalArgumentException("Имя "+name+" уже встречается в коде. Выбери другое; исходник сохранён.");
         if(Pattern.compile("(?m)^\\s*#include\\b").matcher(mask).find()||used(mask,"_ENV")||used(mask,"_G"))
             throw new IllegalArgumentException("Для includes/изменённого окружения проверка имён пока недоступна. Исходник сохранён.");
-        LuaSymbols symbols=new LuaSymbols(source);
-        for(String api:area?new String[]{"flr","mget","fget","ceil","min"}:new String[]{"flr","mget","fget"})if(symbols.shadows(api)||context.defines(api))
-            throw new IllegalArgumentException("Имя API "+api+" переопределено. Вставка не применена.");
     }
     /** Half-open rectangle [x,x+w) x [y,y+h), including every overlapped tile. */
     public static String areaCode(String name,String flag,String width,String height,String outside){

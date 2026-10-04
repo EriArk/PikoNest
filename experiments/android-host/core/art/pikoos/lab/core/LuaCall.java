@@ -20,6 +20,7 @@ public final class LuaCall {
     }
     private static IllegalArgumentException unsupported(){return new IllegalArgumentException("Для этой строки формы пока нет. Вернись к коду и выбери «Ввод».");}
     public static LuaCall parse(String source,int start,int end){
+        LuaCall door=DoorTransition.find(source,start);if(door!=null)return door;
         LuaContext context=new LuaContext(source);
         if(start<0||end<start||end>source.length()||!context.allowsLine(start))throw unsupported();
         String raw=source.substring(start,end),mask=context.masked().substring(start,end);
@@ -93,6 +94,12 @@ public final class LuaCall {
     public String replacement(String source,LuaInsert proposal){
         if(end>source.length()||!source.substring(start,end).equals(original))throw new IllegalArgumentException("Строка уже изменилась. Открой параметры заново; правка не применена.");
         String changed=preview(proposal);
+        if(name.equals("door_pair")){
+            DoorTransition.validate(source.substring(0,start)+source.substring(end),proposal);
+            LuaCall check=DoorTransition.find(changed,0);
+            if(check==null||check.end!=changed.length())throw unsupported();
+            return source.substring(0,start)+changed+source.substring(end);
+        }
         if(proposal.cameraRecipe()){WorldCamera.validateSource(source,proposal.item().id);WorldCamera.validateForm(proposal);}
         // New delimiters must not escape the single call or silently add/remove arguments.
         LuaCall check=parse(changed,0,changed.length());

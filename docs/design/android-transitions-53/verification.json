@@ -1,0 +1,64 @@
+{
+  "host": "0.0.53",
+  "apk_bytes": 316324,
+  "apk_sha256": "4a201706834e0f6ba3ee9740399358de56123da7412bed4c3e0497158ed7c8c0",
+  "core_checks": 114,
+  "official_runtime_checks": 17,
+  "old_files_preserved": 35,
+  "project": "remix-0020",
+  "project_sha256": "e620830c21e90aad52371f34a8256ad0a9e9efcadd9ff1ba9b944823a9bd13de",
+  "non_lua_preserved": true,
+  "undo_redo_exact": true,
+  "edit_undo_exact": true,
+  "recovered_comparison_identical": true,
+  "hud_pixels": 150,
+  "hud_fixed": true,
+  "frames": {
+    "game-start": {
+      "point_screen": [
+        64.0,
+        64.0
+      ],
+      "world_background": 3,
+      "marker_pixels": 21
+    },
+    "game-arrived": {
+      "point_screen": [
+        32.0,
+        48.0
+      ],
+      "world_background": 2,
+      "marker_pixels": 21
+    },
+    "game-stayed": {
+      "point_screen": [
+        32.0,
+        48.0
+      ],
+      "world_background": 2,
+      "marker_pixels": 21
+    },
+    "game-exited": {
+      "point_screen": [
+        64.0,
+        48.0
+      ],
+      "world_background": 2,
+      "marker_pixels": 21
+    },
+    "game-returned": {
+      "point_screen": [
+        96.0,
+        48.0
+      ],
+      "world_background": 3,
+      "marker_pixels": 21
+    }
+  },
+  "media_muted": true,
+  "media_volume": 0,
+  "screens": [
+    "1240x1080",
+    "720x960"
+  ]
+}
