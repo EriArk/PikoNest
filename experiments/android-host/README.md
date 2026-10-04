@@ -1,5 +1,9 @@
 # PikoNest Android host experiment
 
+**0.0.62:** bounded sprite/map uses workflow from the workshop, without opening Lua.
+Create, select, edit, duplicate, remove, Undo/Redo, recover and Test known flat draw
+calls. [Device evidence, screenshots and limitations](../../docs/design/android-uses-62/README.md).
+
 Version 0.0.61 adds a complete bounded background-strip management workflow:
 thumbnail list, edit/return, add, duplicate, delete, reorder adjacent recognized
 blocks, preview, Undo/Redo and recovery. Arbitrary intervening Lua/comments are

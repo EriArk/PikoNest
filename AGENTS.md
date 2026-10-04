@@ -152,7 +152,8 @@ create/edit/save/reopen/use/Test workflows before expanding preset libraries or
 genre templates. Reuse existing operations; do not keep adding recipe variants
 to one tool while other core tools or connections remain absent. Design resource
 dependencies now, populate reusable content later. See `docs/CORE_TOOLS.md` for
-the current audit and the next bounded package, G04.2. N03.3 is deferred from the
+the current audit. The bounded G04.2 workflow exists in lab 0.0.62; next are basic
+map-region operations and shared gfx/map handling (G01/G03). N03.3 is deferred from the
 immediate queue. Preserve existing libraries, favorites and presets.
 
 Owner creation requirement (2026-10-04): a simple original game must be creatable
@@ -482,8 +483,9 @@ When a major decision is made:
 The foundation-first list below is the original bootstrap order. The launch,
 round-trip and bounded controller experiments now exist. Follow the current
 completion path in `docs/ROADMAP.md` and the basic-editor audit in `docs/CORE_TOOLS.md`:
-G04.2 connects sprite/map editing to creation and repeat editing of game uses,
-then finish basic editor workflows alongside the remaining runtime/storage work.
+G04.2 now connects sprite/map editing to bounded creation and repeat editing of game
+uses in 0.0.62. Next complete basic map-region/shared-memory operations (G01/G03),
+alongside the remaining runtime/storage work.
 Do not keep extending launcher polish or template-specific controls as a substitute
 for missing general tools. Close tasks with explicit
 scope/evidence, and keep owner acceptance separate from technical test results.

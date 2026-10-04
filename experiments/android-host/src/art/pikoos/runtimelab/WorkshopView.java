@@ -16,6 +16,7 @@ import art.pikoos.lab.core.WorkshopCartridge;
 import art.pikoos.lab.core.SpriteRegion;
 import art.pikoos.lab.core.MapEditor;
 import art.pikoos.lab.core.MapChange;
+import art.pikoos.lab.core.GameUses;
 import art.pikoos.lab.core.SpritePlacement;
 import art.pikoos.lab.core.SpriteAnimation;
 import art.pikoos.lab.core.SpriteMove;
@@ -133,7 +134,7 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        boolean draft=s.flagDraft!=null||s.mapEditor.pending()||s.codeDraft!=null||s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
+        boolean draft=(s.uses!=null&&(s.uses.screen==GameUses.Screen.FORM||s.uses.screen==GameUses.Screen.REVIEW||s.uses.screen==GameUses.Screen.PICK))||s.flagDraft!=null||s.mapEditor.pending()||s.codeDraft!=null||s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -141,6 +142,7 @@ final class WorkshopView extends View {
         if(s.mode==Mode.NAME){nameEditor();c.restore();return;}
         if(s.mode==Mode.ASSET_CATEGORY){assetCategories();c.restore();return;}
         if(s.mode==Mode.DIAGNOSTIC){diagnostic();c.restore();return;}
+        if(s.uses!=null&&(s.mode==Mode.USES||s.mode==Mode.ERROR)){gameUses();if(s.mode==Mode.ERROR)dialog();c.restore();return;}
         if(s.codeDraft!=null&&(s.mode==Mode.CODE||s.mode==Mode.ERROR)){
             luaEditor();if(s.mode==Mode.ERROR)dialog();c.restore();return;
         }
@@ -616,6 +618,68 @@ final class WorkshopView extends View {
         rect(0,bodyBottom,w,44,0);
         key(back()+(v.phase==0?" отмена":" назад"),12,bodyBottom,6,()->action(Action.CANCEL));
         fitted(v.phase==3?"Test — потом":"↑↓←→ двигать",w/2,bodyBottom+28,18,13,w/2-12);
+    }
+    private void gameUses(){
+        GameUses g=s.uses;hits.clear();
+        fitted("В игре · размещения",16,76,26,14,w-32);
+        if(g.screen==GameUses.Screen.PICK){
+            rect(0,46,w,bodyBottom-46,1);
+            regionPicker(g.picker,"Выбери область спрайт-листа");
+            button(ok()+" "+(g.picker.phase==0?"Первый угол":"Выбрать область"),16,bodyBottom-46,w-32,36,true,()->action(Action.CONFIRM));
+            rect(0,bodyBottom,w,44,0);key(back()+" назад",12,bodyBottom,6,()->action(Action.CANCEL));key("X шаг "+g.picker.step,w/2,bodyBottom,10,()->action(Action.CONTEXT));return;
+        }
+        if(g.screen==GameUses.Screen.MENU){
+            String[] items={"Добавить спрайт","Добавить карту","Дублировать выбранное","Убрать использование","Открыть Lua (по желанию)","К списку"};
+            for(int i=0;i<items.length;i++){final int n=i;button(items[i],16,106+i*44,w-32,38,g.menu==i,()->{g.menu=n;action(Action.CONFIRM);});}
+            fitted("Пиксели и тайлы при удалении остаются",16,bodyBottom-12,16,6,w-32);
+        }else if(g.screen==GameUses.Screen.LIST){
+            fitted(g.entries.size()+" использований · сохранены в игре",16,102,16,6,w-32);
+            if(!g.blocked.isEmpty()){
+                fitted("Отрисовка пока не поддержана этим списком",16,146,18,10,w-32);
+                fitted("Вложенные блоки, выражения или камера.",16,174,16,7,w-32);
+                fitted("Исходник сохранён. Lua доступен в меню.",16,202,16,6,w-32);
+            }else if(g.entries.isEmpty()){
+                fitted("Здесь появятся твои спрайты и карта",16,162,20,7,w-32);
+                fitted("Добавь ресурс, выбери место — и Test",16,194,18,6,w-32);
+            }
+            int count=Math.max(1,(int)((bodyBottom-184)/58)),first=Math.max(0,g.index-count+1);
+            for(int n=0;n<count&&first+n<g.entries.size();n++){
+                final int at=first+n;GameUses.Entry e=g.entries.get(at);float y=116+n*58;
+                rect(16,y,w-32,52,g.index==at?2:0);if(g.index==at)outline(16,y,w-32,52,10);
+                fitted((at+1)+" · "+e.title(),28,y+23,20,g.index==at?10:7,w-56);
+                fitted("X "+e.x()+" · Y "+e.y()+" · "+(e.call.name.equals("map")?"область карты":"область листа"),28,y+44,16,6,w-56);
+                hit(16,y,w-32,52,()->{g.index=at;action(Action.CONFIRM);});
+            }
+            button("R Добавить "+(s.tool==3?"карту":"спрайт"),16,bodyBottom-56,(w-40)/2,38,false,()->action(Action.NEXT));
+            button("Select Действия",24+(w-40)/2,bodyBottom-56,(w-40)/2,38,false,()->action(Action.MENU));
+        }else{
+            boolean review=g.screen==GameUses.Screen.REVIEW;
+            fitted(review?(g.deleting?"Убрать":g.creating?"Добавить":"Изменить")+" · "+(g.kind.equals("map")?"карту":"спрайт"):(g.kind.equals("map")?"Карта · область и положение":"Спрайт · область и положение"),16,102,18,10,w-32);
+            float size=Math.min(176,(w-48)*.44f),left=16,top=130,cell=size/128;
+            for(int y=0;y<128;y++)for(int x=0;x<128;x++)sceneBitmap.setPixel(x,y,COLORS[g.pixel(s.cart(),x-g.x(),y-g.y())]);
+            c.drawBitmap(sceneBitmap,null,new RectF(left,top,left+size,top+size),p);outline(left-2,top-2,size+4,size+4,13);
+            fitted("Эскиз элемента",16,top+size+22,16,6,size+8);
+            fitted("128 × 128",16,top+size+43,16,13,size+8);
+            String[] labels=g.kind.equals("map")?new String[]{"Тайл X","Тайл Y","X, px","Y, px","Шир., кл","Выс., кл"}:g.kind.equals("spr")?new String[]{"Тайл","X, px","Y, px"}:new String[]{"Лист X","Лист Y","Шир., px","Выс., px","X, px","Y, px"};float fx=left+size+16,fw=w-fx-16;
+            for(int i=0;i<labels.length;i++){
+                final int n=i;float fy=120+i*35;boolean focus=!review&&g.field==i;
+                rect(fx,fy,fw,32,focus?2:1);String value=Integer.toString(g.values[i]);float vw=width(value,18);
+                fitted(labels[i],fx+6,fy+23,16,focus?10:6,fw-vw-22);text(value,fx+fw-vw-6,fy+23,18,focus?10:7);
+                if(!review)hit(fx,fy,fw,32,()->{g.field=n;changed.run();invalidate();});
+            }
+            if(!review){
+                float by=bodyBottom-98;
+                button("−",fx,by,(fw-8)/2,34,false,()->action(Action.LEFT));button("+",fx+(fw+8)/2,by,(fw-8)/2,34,false,()->action(Action.RIGHT));
+                if(!g.kind.equals("map"))button("X Область",16,by,size,34,false,()->action(Action.CONTEXT));
+            }else{
+                fitted(g.deleting?"Пиксели и тайлы останутся":g.creating?g.target():"Меняется выбранный элемент",16,bodyBottom-78,16,6,w-32);
+                fitted("Y отменит сохранённую правку",16,bodyBottom-56,16,13,w-32);
+            }
+            button(ok()+" "+(review?g.deleting?"Убрать из игры":"Сохранить":"Просмотреть"),16,bodyBottom-44,w-32,34,true,()->action(Action.CONFIRM));
+        }
+        rect(0,bodyBottom,w,44,0);key(back()+" назад",12,bodyBottom,6,()->action(Action.CANCEL));
+        if(g.screen==GameUses.Screen.LIST){key("Start Test",w/2,bodyBottom,10,()->action(Action.TEST));}
+        else if(g.screen==GameUses.Screen.FORM)fitted("←→ ±1 · L/R ±8",w/2-12,bodyBottom+28,16,13,w/2);
     }
     private void diagnostic(){
         hits.clear();RuntimeDiagnostic d=s.diagnostic;
@@ -1359,7 +1423,7 @@ final class WorkshopView extends View {
     private void dialog() {
         hits.clear(); // Modal controls trap touch as well as controller focus.
         p.setColor(0xcc000000);c.drawRect(0,0,w,h,p);
-        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.HERO?400:s.mode==Mode.DRAW_TOOLS?444:s.mode==Mode.MENU?404:280,dy=Math.max(16,(h-dh)/2);
+        float dw=Math.min(480,w-32),dx=(w-dw)/2,dh=s.mode==Mode.HERO?400:s.mode==Mode.DRAW_TOOLS?444:s.mode==Mode.MENU?434:280,dy=Math.max(16,(h-dh)/2);
         rect(dx+6,dy+6,dw,dh,0);rect(dx,dy,dw,dh,1);outline(dx,dy,dw,dh,s.mode==Mode.ERROR?8:14);
         if(s.mode==Mode.HERO){
             HeroBinding hero=s.heroDraft;SpriteRegion r=hero.image;
@@ -1398,10 +1462,10 @@ final class WorkshopView extends View {
                 fitted((returning?"Вернуть":"Отменить")+" · "+count,x+10,dy+83,20,selected?(count>0?1:7):count>0?7:13,historyWidth-20);
                 hit(x,dy+54,historyWidth,44,()->{s.menuItem=0;s.menuRedo=returning;action(Action.CONFIRM);});
             }
-            String[] labels={"",s.swapAB?"B выбор / A назад":"A выбор / B назад",s.tool==3?"Инструменты карты":"Как это работает","Вернуться к проекту","Мои игры","Ресурсы · библиотека"};
-            for(int i=1;i<6;i++){final int n=i;button(labels[i],dx+16,dy+54+i*48,dw-32,44,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
-            text("Y отменить · R2 вернуть",dx+20,dy+361,16,6);
-            text("История — в текущем сеансе",dx+20,dy+386,16,13);
+            String[] labels={"",s.swapAB?"B выбор / A назад":"A выбор / B назад",s.tool==3?"Инструменты карты":"Как это работает","Вернуться к проекту","Мои игры","Ресурсы · библиотека","Размещения в игре",s.tool==3?"Использовать карту в игре":"Использовать спрайт в игре"};
+            for(int i=1;i<8;i++){final int n=i;button(labels[i],dx+16,dy+104+(i-1)*38,dw-32,34,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
+            text("Y отменить · R2 вернуть",dx+20,dy+398,16,6);
+            text("История — в текущем сеансе",dx+20,dy+422,16,13);
         } else if(s.mode==Mode.HELP) {
             if(s.tool==3){
                 text("Карта из тайлов",dx+20,dy+40,26,14);
@@ -1470,6 +1534,9 @@ final class WorkshopView extends View {
                 if(s.mapEditor.picking)s.mapEditor.choice=ty*16+tx;
                 else{s.mapEditor.point(mapLeft+tx,mapTop+ty);}
                 changed.run();invalidate();performClick();return true;
+            }
+            if(placementArea!=null&&placementArea.contains(x,y)&&s.mode==Mode.USES&&s.uses.picker!=null){
+                s.uses.picker.point((int)((x-placementArea.left)*128/placementArea.width()),(int)((y-placementArea.top)*128/placementArea.height()));changed.run();invalidate();return true;
             }
             if(placementArea!=null&&placementArea.contains(x,y)&&s.mode==Mode.CODE&&s.codeDraft.backgroundPicker!=null){
                 s.codeDraft.backgroundPicker.point((int)((x-placementArea.left)*128/placementArea.width()),(int)((y-placementArea.top)*128/placementArea.height()));

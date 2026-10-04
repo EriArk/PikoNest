@@ -200,6 +200,7 @@ public final class MainActivity extends Activity {
             prefs=getSharedPreferences(id+"-ui",MODE_PRIVATE);
             restoreUi();
             restoreCodeDraft();
+            restoreUses();
             try{session.restorePresets(prefs.getString("presetPanel",""));}catch(Exception e){session.fail(new Exception("Набор не восстановлен. Форма и исходник сохранены: "+e.getMessage()));}
             sessions.put(id,next);
         }else{
@@ -462,11 +463,13 @@ public final class MainActivity extends Activity {
         if(session==null)return;
         libraryPrefs.edit().putString("favoriteTools",toolCatalogue.encode()).putInt("toolCategory",toolCatalogue.category).apply();
         if(session.codeDraft!=null)codeRecoveryFailed.remove(activeId);
+        if(session.uses!=null)usesRecoveryFailed.remove(activeId);
         libraryPrefs.edit().putString("active",activeId).putBoolean("swapAB",session.swapAB).apply();
         prefs.edit().putInt("tool",session.tool).putInt("focus",session.focus)
             .putInt("mapX",session.mapEditor.x).putInt("mapY",session.mapEditor.y).putInt("mapTile",session.mapEditor.tile)
             .putString("mapTool",session.mapEditor.tool.name()).putString("mapDraft",session.mapEditor.encode())
             .putString("flagDraft",session.flagDraft==null?"":session.flagDraft.encode())
+            .putString("gameUses",session.uses==null?(usesRecoveryFailed.contains(activeId)?prefs.getString("gameUses",""):""):Base64.encodeToString(session.uses.encode(),Base64.NO_WRAP))
             .putString("luaDraft",session.codeDraft==null?(codeRecoveryFailed.contains(activeId)?prefs.getString("luaDraft",""):""):Base64.encodeToString(session.codeDraft.encode(),Base64.NO_WRAP))
             .putInt("line",session.codeLine).putInt("x",session.cursorX).putInt("y",session.cursorY)
             .putInt("codeColumn",session.codeColumn)
@@ -566,6 +569,12 @@ public final class MainActivity extends Activity {
                 }
             }catch(Exception e){session.fail(e);}
         }
+    }
+    private final java.util.Set<String> usesRecoveryFailed=new java.util.HashSet<>();
+    private void restoreUses(){
+        usesRecoveryFailed.remove(activeId);String encoded=prefs.getString("gameUses","");
+        if(!encoded.isEmpty())try{if(session.codeDraft!=null)throw new IllegalArgumentException("Сначала заверши восстановленный черновик кода");session.restoreUses(Base64.decode(encoded,Base64.NO_WRAP));}
+        catch(Exception e){usesRecoveryFailed.add(activeId);session.fail(e);}
     }
     private void restoreCodeDraft(){
         codeRecoveryFailed.remove(activeId);

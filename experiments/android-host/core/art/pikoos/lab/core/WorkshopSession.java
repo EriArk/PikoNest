@@ -7,7 +7,7 @@ import java.util.Arrays;
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, REDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS, CHECK }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE, DIAGNOSTIC, ASSET_CATEGORY }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE, DIAGNOSTIC, ASSET_CATEGORY, USES }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE, OVAL, FILLED_OVAL }
     // Keep existing operation entries 5/6 stable while adding brushes after them.
     public static int moveMenuIndex(){return DrawTool.values().length+2;}
@@ -38,6 +38,55 @@ public final class WorkshopSession {
     private final ArrayDeque<WorkshopCartridge> redo = new ArrayDeque<>();
     private final int[] toolFocus = new int[4];
     public final MapEditor mapEditor=new MapEditor();
+    public GameUses uses;
+    public void openUses(boolean create){
+        if(codeDraft!=null||pendingStroke()||mapEditor.modal()||flagDraft!=null)return;
+        try{uses=new GameUses(cart,tool);mode=Mode.USES;
+            if(create){if(tool==3)uses.addMap(mapEditor.x,mapEditor.y);else uses.addSprite(selection());}
+        }catch(Exception e){fail(e);}
+    }
+    public void restoreUses(byte[] bytes){uses=GameUses.restore(bytes,cart);tool=uses.returnTool;mode=Mode.USES;}
+    private void usesAction(Action action)throws Exception{
+        GameUses g=uses;
+        if(g.screen==GameUses.Screen.PICK){
+            if(action==Action.LEFT)g.picker.move(-1,0);if(action==Action.RIGHT)g.picker.move(1,0);
+            if(action==Action.UP)g.picker.move(0,-1);if(action==Action.DOWN)g.picker.move(0,1);
+            if(action==Action.CONTEXT)g.picker.toggleStep();
+            if(action==Action.CANCEL)g.back();if(action==Action.CONFIRM){if(g.picker.phase==0)g.picker.next();else g.picked();}return;
+        }
+        if(g.screen==GameUses.Screen.REVIEW){
+            if(action==Action.CANCEL)g.back();
+            if(action==Action.CONFIRM){int selected=g.creating?g.entries.size():g.index;save(g.proposal().candidate(cart),true);uses=new GameUses(cart,g.returnTool);uses.move(selected);}
+            return;
+        }
+        if(g.screen==GameUses.Screen.FORM){
+            if(action==Action.UP)g.field=Math.max(0,g.field-1);if(action==Action.DOWN)g.field=Math.min(g.values.length-1,g.field+1);
+            if(action==Action.LEFT)g.adjust(-1);if(action==Action.RIGHT)g.adjust(1);
+            if(action==Action.PREVIOUS)g.adjust(-8);if(action==Action.NEXT)g.adjust(8);
+            if(action==Action.CONTEXT)g.pick();if(action==Action.CONFIRM)g.review();if(action==Action.CANCEL)g.back();return;
+        }
+        if(g.screen==GameUses.Screen.MENU){
+            if(action==Action.UP)g.menu=Math.max(0,g.menu-1);if(action==Action.DOWN)g.menu=Math.min(5,g.menu+1);
+            if(action==Action.CANCEL||action==Action.MENU){g.screen=GameUses.Screen.LIST;return;}
+            if(action==Action.CONFIRM){
+                if(g.menu==0)g.addSprite(selection());if(g.menu==1)g.addMap(mapEditor.x,mapEditor.y);
+                if(g.menu==2)g.duplicate();if(g.menu==3)g.delete();
+                if(g.menu==4){GameUses.Entry e=g.current();int at=e==null?0:e.call.start;uses=null;tool=1;beginCode();codeDraft.point(g.source.substring(0,at).split("\r\n|\r|\n",-1).length-1,0);}
+                if(g.menu==5)g.screen=GameUses.Screen.LIST;
+            }return;
+        }
+        if(action==Action.UP)g.move(-1);if(action==Action.DOWN)g.move(1);
+        if(action==Action.CONFIRM){if(g.current()==null){if(tool==3)g.addMap(mapEditor.x,mapEditor.y);else g.addSprite(selection());}else g.edit();}
+        if(action==Action.NEXT){if(tool==3)g.addMap(mapEditor.x,mapEditor.y);else g.addSprite(selection());}
+        if(action==Action.MENU){g.screen=GameUses.Screen.MENU;g.menu=0;}
+        if(action==Action.TEST)port.launch(cart.bytes());
+        if(action==Action.CANCEL){uses=null;mode=tool==2&&browsingSprites?Mode.SHEET:Mode.NAVIGATE;}
+        if(action==Action.UNDO||action==Action.REDO){
+            mode=Mode.NAVIGATE;act(action);
+            if(mode==Mode.ERROR){overlayReturn=Mode.USES;return;}
+            uses=new GameUses(cart,g.returnTool);uses.move(g.index);mode=Mode.USES;
+        }
+    }
     public FlagDraft flagDraft;
     private WorkshopCartridge cart;
     public LuaDraft codeDraft;
@@ -583,7 +632,7 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = mode==Mode.CODE||mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE||mode==Mode.ASSET_CATEGORY?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = mode==Mode.USES||mode==Mode.CODE||mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE||mode==Mode.ASSET_CATEGORY?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
         if(pendingStroke())return;
@@ -689,6 +738,7 @@ public final class WorkshopSession {
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if(mode==Mode.USES){usesAction(action);return;}
             if(mode==Mode.DIAGNOSTIC){diagnosticAction(action);return;}
             if(mode==Mode.CODE){codeAction(action);return;}
             if(mode==Mode.MOVE){
@@ -854,8 +904,8 @@ public final class WorkshopSession {
             }
             if (mode == Mode.MENU) {
                 if (action == Action.UNDO || action == Action.REDO) { mode = overlayReturn; act(action); return; }
-                if (action == Action.UP) menuItem = clamp(menuItem - 1, 5);
-                if (action == Action.DOWN) menuItem = clamp(menuItem + 1, 5);
+                if (action == Action.UP) menuItem = clamp(menuItem - 1, 7);
+                if (action == Action.DOWN) menuItem = clamp(menuItem + 1, 7);
                 if (menuItem == 0 && action == Action.LEFT) menuRedo = false;
                 if (menuItem == 0 && action == Action.RIGHT) menuRedo = true;
                 if (action == Action.CANCEL || action == Action.MENU) mode = overlayReturn;
@@ -866,6 +916,7 @@ public final class WorkshopSession {
                     if (menuItem == 3) mode = overlayReturn;
                     if (menuItem == 4) { mode = overlayReturn; port.library(); }
                     if (menuItem == 5) { mode = overlayReturn; showAssets(); }
+                    if (menuItem == 6 || menuItem == 7) { mode = overlayReturn; openUses(menuItem == 7); }
                 }
                 return;
             }

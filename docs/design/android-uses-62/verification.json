@@ -1,0 +1,33 @@
+{
+  "build": "0.0.62",
+  "old_files": 44,
+  "after_files": 45,
+  "changed_old_files": [],
+  "added_files": [
+    "files/projects/blank-0008/game.p8"
+  ],
+  "cart_sha256": "05f8fbfdacbed8c0f7e4bd5867f8ad93c922601d90200ee162c0d9ec4d64d6c6",
+  "runtime": "official PICO-8 0.2.7 / Runtime Test 8",
+  "runtime_sampled_pixels": 16384,
+  "mismatches": 0,
+  "core_checks": 92,
+  "apk_sha256": "16576a18981eef889ebacc81cf125785b72cd73087c8461cddc40d9b024ee576",
+  "input": "ADB controller key events; no Lua editor or source-file injection in authored project",
+  "checked": [
+    "create blank",
+    "draw sprite",
+    "two placements",
+    "map painting and placement",
+    "selected-only edit",
+    "delete undo redo",
+    "pending form recovery",
+    "native and compact form",
+    "Test return"
+  ],
+  "limits": [
+    "bounded flat draw only",
+    "physical controller acceptance pending",
+    "cold start/display recreation opens Play; Workshop restores state",
+    "persistent undo not implemented"
+  ]
+}
