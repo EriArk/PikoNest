@@ -82,7 +82,7 @@ public final class WorkshopSession {
     }
     public void codeCommand(int command){
         if(mode!=Mode.CODE||codeDraft==null)return;
-        if(codeDraft.proposal()||codeDraft.panel==LuaDraft.Panel.NAVIGATION||codeDraft.panel==LuaDraft.Panel.SPRITE||codeDraft.panel==LuaDraft.Panel.ANIMATION)return;
+        if(codeDraft.proposal()||codeDraft.panel==LuaDraft.Panel.NAVIGATION||codeDraft.panel==LuaDraft.Panel.SPRITE||codeDraft.panel==LuaDraft.Panel.ANIMATION||codeDraft.panel==LuaDraft.Panel.BRANCHES)return;
         try{
             LuaDraft d=codeDraft;
             switch(command){
@@ -109,6 +109,7 @@ public final class WorkshopSession {
                 case 20:d.beginNavigation();return;
                 case 21:d.goBack();break;
                 case 22:d.panel=LuaDraft.Panel.CURSOR;diagnostic=null;diagnosticPending=false;diagnosticDetails=false;mode=Mode.DIAGNOSTIC;return;
+                case 23:d.beginBranches();return;
                 default:return;
             }
             d.panel=LuaDraft.Panel.CURSOR;
@@ -152,7 +153,11 @@ public final class WorkshopSession {
             if(action==Action.DOWN)toolCatalogue.move(1,i);
             if(action==Action.UNDO&&!toolCatalogue.items().isEmpty()){toolCatalogue.toggle(i.selected);toolCatalogue.normalize(i);}
             if(toolCatalogue.items().isEmpty()){if(action==Action.CANCEL)d.cancelInsert();return;}
-            if(action==Action.CONFIRM){if(i.item().id.equals("sspr"))d.beginSprite(selection());else if(i.item().id.equals("animation"))d.beginAnimation(selection());else i.screen=LuaInsert.Screen.FIELDS;}
+            if(action==Action.CONFIRM){
+                if(i.item().id.equals("branches"))d.beginBranches();
+                else if(d.branchInsertion()&&(i.item().id.equals("sspr")||i.item().id.equals("animation")))throw new IllegalArgumentException("Для визуального размещения сначала открой код ветви. Здесь доступна форма spr и другие действия.");
+                else if(i.item().id.equals("sspr"))d.beginSprite(selection());else if(i.item().id.equals("animation"))d.beginAnimation(selection());else i.screen=LuaInsert.Screen.FIELDS;
+            }
             if(action==Action.CANCEL)d.cancelInsert();
             return;
         }
@@ -200,6 +205,14 @@ public final class WorkshopSession {
             return;
         }
         if(d.proposal()){insertAction(action);return;}
+        if(d.panel==LuaDraft.Panel.BRANCHES){
+            if(action==Action.UP)d.branches.move(-1);if(action==Action.DOWN)d.branches.move(1);
+            if(action==Action.LEFT)d.branches.move(-5);if(action==Action.RIGHT)d.branches.move(5);
+            if(action==Action.CONFIRM)d.branchAction(false);
+            if(action==Action.CONTEXT)d.branchAction(true);
+            if(action==Action.CANCEL)d.cancelBranches();
+            return;
+        }
         if(d.panel==LuaDraft.Panel.NAVIGATION){
             LuaNavigation n=d.navigation;
             if(action==Action.UP)n.move(0,-1);if(action==Action.DOWN)n.move(0,1);

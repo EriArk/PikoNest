@@ -1,0 +1,75 @@
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+Lua insertion: 248 checks passed
+Lua symbols: 46 checks passed
+Lua call parameters: 120 checks passed
+Lua rule fields: 203 checks passed
+SpritePlacementTest: 40 checks passed
+MapWorkflowTest: 47 checks passed
+MapToolsTest: 12336 checks passed
+FlagsTest: 10443 checks passed
+TileProbeTest: 69 checks passed
+AreaProbeTest: 27 checks passed
+TileMotionTest: 33 checks passed
+SpriteAnimationTest: 52 checks passed
+AnimationEditTest: 156 checks passed
+WorldCameraTest: 69 checks passed
+RoomCameraTest: 69 checks passed
+DoorTransitionTest: 114 checks passed
+CatalogueTest: 114 checks passed
+LuaBranchesTest: 83 checks passed
+Lua navigation: 62 checks passed
+Runtime diagnostics: 29 checks passed
+Runtime menu: 11 checks passed
+Runtime session: 16 checks passed
+Lua editor: 122 checks passed
+FolderSetupTest: 15 checks passed
+LauncherPathTest passed: storage aliases, SD card, nested/unicode paths and escape rejection
+GameTreeTest: 15 checks passed
+PicoIncludesTest: 43 checks passed
+RuntimeFileSetTest: 47 checks passed
+RuntimeArchiveTest: 37 checks passed
+RuntimeProbeTest: 16 checks passed
+P8PngTest: 98361 checks passed
+PlayWorkflowTest: 16411 checks passed
+PASS: byte preservation, targeted edit, CRLF, unknown bytes, invalid fixtures, ownership
+Workshop: 799 checks passed (byte edits, controller workflows, failures)
+Sprite workflows: 2807 checks passed (safe copy, assignment, allocation, controller paths)
+LibraryWorkflowTest: 28 checks passed
+DrawingWorkflowTest: 4269 checks passed
+RegionWorkflowTest: 16422 checks passed
+HeroBindingTest: 42 checks passed
+HeroFreeTest: 100 checks passed
+CopyWorkflowTest: 49230 checks passed
+AssetLibraryTest: 49209 checks passed
+AssetNamingTest: 53 checks passed
+CartridgeImportTest: 29 checks passed
+CartridgeExportTest: 41 checks passed
+TransformWorkflowTest: 557588 checks passed
+RecolorWorkflowTest: 738035 checks passed
+RectangleWorkflowTest: 2949814 checks passed
+HistoryWorkflowTest: 397 checks passed
+MoveWorkflowTest: 393345 checks passed
+OvalWorkflowTest: 100573 checks passed; 5616 official runtime masks
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+3 warnings
+
+FullName                                                   Length
+--------                                                   ------
+D:\Projects\PikoOS\.local\artifacts\pikoos-runtime-lab.apk 324516
+
+
+
+
+Algorithm : SHA256
+Hash      : 72EBCC2BD79EC4CA68C18FC4ACA210D0A60F4387AD791754CA440DDD76333CFA
+Path      : D:\Projects\PikoOS\.local\artifacts\pikoos-runtime-lab.apk
+
+
+

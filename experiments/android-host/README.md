@@ -1,5 +1,11 @@
 # PIKOOS Android host experiment
 
+Version 0.0.55 adds a shared condition-branch picker: preview function/body,
+open an existing action, or insert an ordinary Lua action at the selected branch's
+end. Selection/proposals recover across process loss; insertion is one undo.
+Conservative syntax recognition leaves unsupported source untouched.
+[UI-to-runtime evidence and scope](../../docs/design/android-branches-55/README.md).
+
 Version 0.0.54 adds sprite-library categories, grouped Lua/parameter tools and
 cross-project favorites. It also adds an ordinary `if/else` form; a number game
 with both outcomes/reset was authored from blank through controller-event UI

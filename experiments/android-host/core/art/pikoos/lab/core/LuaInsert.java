@@ -47,7 +47,8 @@ public final class LuaInsert {
         new Item("camera_reset","Камера · экран","Возвращает экранные координаты (0,0). Вставляй после карты и объектов, перед счётом и меню в _draw. Положение объектов в мире не меняется.",false),
         new Item("camera_rooms","Камера · комнаты","Одна комната — экран 128×128. Камера переключается, когда точка пересекает границу комнаты. Задай число комнат по X/Y; начало мира (0,0). Перед HUD добавь «Камера · экран».",false,f("Точка X","x",Kind.EXPR),f("Точка Y","y",Kind.EXPR),f("Комнат X","2",Kind.ROOM_COLS),f("Комнат Y","2",Kind.ROOM_ROWS)),
         new Item("door_pair","Переход · пара областей","Две области одного размера. Точка попадает в начало другой области. Выйди из обеих, чтобы перейти снова. Вставляй в _update после изменения X/Y. Память — новое имя для этой пары и точки. Подходит для курсора, фигуры или другого объекта; спрайт не нужен.",false,f("Точка X","x",Kind.NAME),f("Точка Y","y",Kind.NAME),f("Память","gate_busy",Kind.NAME),f("A · X","96",Kind.WORLD_POINT),f("A · Y","48",Kind.WORLD_POINT),f("B · X","160",Kind.WORLD_POINT),f("B · Y","48",Kind.WORLD_POINT),f("Ширина","16",Kind.GATE_SIZE),f("Высота","32",Kind.GATE_SIZE)),
-        new Item("if_else","Условие · если / иначе","Сравни значения и добавь действия в две ветви. За один вызов выполняется только одна: после then, если условие истинно; после else — в остальных случаях. Счёт, состояние, меню и другие правила — обычные переменные Lua.",true,f("Слева","phase",Kind.EXPR),f("Сравнение","==",Kind.COMPARE),f("Справа","0",Kind.EXPR))
+        new Item("if_else","Условие · если / иначе","Сравни значения и добавь действия в две ветви. За один вызов выполняется только одна: после then, если условие истинно; после else — в остальных случаях. Счёт, состояние, меню и другие правила — обычные переменные Lua.",true,f("Слева","phase",Kind.EXPR),f("Сравнение","==",Kind.COMPARE),f("Справа","0",Kind.EXPR)),
+        new Item("branches","Условия · действия","Выбери ветвь существующего условия: открой её действия или добавь новое из каталога. Просмотр не меняет код.",false)
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
@@ -163,6 +164,7 @@ public final class LuaInsert {
     public void changePage(int delta){page=(page+delta+3)%3;key=Math.min(key,LuaDraft.PAGES[page].length()-1);}
     public String functionName(){return selected<3?new String[]{"_init","_update","_draw"}[selected]:item().id.equals("function")?values[0]:null;}
     public String code(){
+        if(item().id.equals("branches"))throw new IllegalArgumentException("Выбери ветвь в списке условий");
         if(item().id.equals("animation"))throw new IllegalArgumentException("Открой визуальный выбор кадров");
         if(item().id.equals("camera_reset"))return "camera()\n";
         for(int i=0;i<values.length;i++)validate(kind(i),values[i]);

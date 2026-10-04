@@ -8,12 +8,12 @@ import java.util.ArrayDeque;
 
 /** Portable literal-text editor with explicit snippet proposals; never normalizes unrelated Lua. */
 public final class LuaDraft {
-    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS, NAVIGATION, SPRITE, ANIMATION }
+    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS, NAVIGATION, SPRITE, ANIMATION, BRANCHES }
     public static final String[] PAGES={"abcdefghijklmnopqrstuvwxyz0123456789_ ",
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ ","()[]{}=+-*/%^#<>~!;:,.\"'\\|&?$@_ "};
     public static final String[] COMMANDS={"Сохранить и закрыть","Сохранить и тест","Новая строка","Пробел","Табуляция",
         "Стереть слева","Удалить справа","Начать / снять выделение","Выделить всё","Копировать","Вырезать","Вставить",
-        "Отменить правку","Вернуть правку","В начало строки","В конец строки","Закрыть черновик","Буквы / символы","Вставить конструкцию / API","Поля текущей строки","Перейти к функции / строке","Вернуться к месту перехода","Проверить запуск (4 секунды)"};
+        "Отменить правку","Вернуть правку","В начало строки","В конец строки","Закрыть черновик","Буквы / символы","Вставить конструкцию / API","Поля текущей строки","Перейти к функции / строке","Вернуться к месту перехода","Проверить запуск (4 секунды)","Действия условий"};
     private static final int LIMIT=2*1024*1024; // Lab memory guard, not a PICO-8 code budget.
     private final WorkshopCartridge original;
     private final int lua;
@@ -25,6 +25,24 @@ public final class LuaDraft {
     public LuaInsert insertion;
     public LuaCall callEdit;
     public LuaNavigation navigation;
+    public LuaBranches branches;
+    private int branchHeader=-1;
+    public boolean branchInsertion(){return branchHeader>=0;}
+    public LuaBranches.Branch insertionBranch(){return branchHeader<0?null:new LuaBranches(text,line()).atHeader(branchHeader);}
+    public void beginBranches(){
+        if(selectionStart()!=selectionEnd())throw new IllegalArgumentException("Сними выделение перед выбором ветви");
+        insertion=null;callEdit=null;branchHeader=-1;branches=new LuaBranches(text,line());panel=Panel.BRANCHES;
+    }
+    public void cancelBranches(){branches=null;panel=Panel.CURSOR;}
+    public void branchAction(boolean insert){
+        if(branches==null||branches.current()==null)return;
+        LuaBranches.Branch b=branches.current();
+        if(insert&&b.terminal)throw new IllegalArgumentException("Ветвь завершает return, break или goto. Открой её код и выбери место до выхода.");
+        int at=lineStart(insert?b.end:b.first);
+        if(at!=cursor){if(jumps.size()==32)jumps.removeLast();jumps.push(new int[]{cursor,anchor});cursor=at;anchor=-1;}
+        branches=null;panel=Panel.CURSOR;
+        if(insert){beginInsert();branchHeader=b.header;}
+    }
     public SpritePlacement placement;
     public SpriteAnimation animation;
     public AnimationEdit animationEdit;
@@ -178,7 +196,7 @@ public final class LuaDraft {
     public void beginInsert(){
         if(selectionStart()!=selectionEnd())throw new IllegalArgumentException("Сними выделение перед вставкой. Существующий текст не заменяется.");
         if(!new LuaContext(text).allowsLine(lineStart(line())))throw new IllegalArgumentException("Выбранная строка внутри текста или комментария. Перейди к строке Lua.");
-        insertion=new LuaInsert();panel=Panel.INSERT;
+        branchHeader=-1;insertion=new LuaInsert();panel=Panel.INSERT;
     }
     public void applyInsert(){
         if(insertion==null||!proposal()||(insertion.screen!=LuaInsert.Screen.FIELDS&&insertion.screen!=LuaInsert.Screen.PREVIEW))return;
@@ -190,6 +208,12 @@ public final class LuaDraft {
         }
         int at=lineStart(line());String current=lineText(line()),indent="";
         for(int i=0;i<current.length()&&(current.charAt(i)==' '||current.charAt(i)=='\t');i++)indent+=current.charAt(i);
+        if(branchInsertion()){
+            LuaBranches.Branch b=insertionBranch();
+            if(b==null||b.end!=line()||b.terminal)throw new IllegalArgumentException("Ветвь изменилась. Выбери её заново.");
+            if(insertion.functionName()!=null||insertion.tileRecipe())throw new IllegalArgumentException("Определение функции добавляется отдельно. Здесь выбери её вызов или другое действие.");
+            indent=b.indent;
+        }
         LuaContext context=new LuaContext(text);
         if(!context.allowsLine(at))throw new IllegalArgumentException("Выбранная строка внутри текста или комментария");
         String function=insertion.functionName();
@@ -213,10 +237,13 @@ public final class LuaDraft {
         for(String row:raw.split("\n"))inserted.append(indent).append(row).append(newline);
         String changed=text.substring(0,at)+inserted+text.substring(at);
         if(changed.getBytes(StandardCharsets.UTF_8).length>LIMIT)throw new IllegalArgumentException("Достигнут предел памяти черновика PIKOOS");
-        int caret=tileProbe?0:insertion.item().block?at+inserted.indexOf(newline)+newline.length()+indent.length()+2:at+inserted.length()+indent.length();
-        remember(undo);redo.clear();changeText(changed);cursor=caret;anchor=-1;insertion=null;panel=Panel.CURSOR;
+        int caret=tileProbe?0:insertion.item().block?at+inserted.indexOf(newline)+newline.length()+indent.length()+2:branchInsertion()?at+indent.length():at+inserted.length()+indent.length();
+        remember(undo);redo.clear();changeText(changed);cursor=caret;anchor=-1;insertion=null;branchHeader=-1;panel=Panel.CURSOR;
     }
-    public void cancelInsert(){insertion=null;callEdit=null;panel=Panel.CURSOR;}
+    public void cancelInsert(){
+        int previousBranch=branchHeader;insertion=null;callEdit=null;branchHeader=-1;panel=Panel.CURSOR;
+        if(previousBranch>=0){branches=new LuaBranches(text,previousBranch);for(int n=0;n<branches.entries.size();n++)if(branches.entries.get(n).header==previousBranch)branches.index=n;panel=Panel.BRANCHES;}
+    }
     public CartEdit edit(){
         P8Document doc=P8Document.parse(original.bytes());
         byte[] body=text.getBytes(StandardCharsets.UTF_8);
@@ -228,7 +255,8 @@ public final class LuaDraft {
     /** Recovery snapshot, including original bytes for stale-draft detection. History is session-only. */
     public byte[] encode(){
         try{ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
-            boolean navState=animation!=null||placement!=null||navigation!=null||!jumps.isEmpty();out.writeInt(animationEdit!=null?8:animation!=null?7:placement!=null?6:navState?5:4);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
+            boolean branchState=branches!=null||branchInsertion();
+            boolean navState=branchState||animation!=null||placement!=null||navigation!=null||!jumps.isEmpty();out.writeInt(branchState?9:animationEdit!=null?8:animation!=null?7:placement!=null?6:navState?5:4);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
             out.writeInt(cursor);out.writeInt(anchor);out.writeInt(page);out.writeInt(key);out.writeInt(panel.ordinal());out.writeInt(menu);
             write(out,clipboard.getBytes(StandardCharsets.UTF_8));out.writeBoolean(insertion!=null);if(insertion!=null)insertion.write(out);
             if(navState){
@@ -239,11 +267,12 @@ public final class LuaDraft {
             if(placement!=null)placement.write(out);
             if(animation!=null)animation.write(out);
             if(animationEdit!=null){out.writeInt(animationEdit.start);out.writeInt(animationEdit.end);out.writeBoolean(animationBefore);}
+            if(branchState){out.writeInt(branches==null?-1:branches.index);out.writeInt(branchHeader);}
             out.close();return bytes.toByteArray();
         }catch(IOException e){throw new IllegalStateException(e);}
     }
     public static LuaDraft restore(byte[] bytes){
-        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>8)throw new IOException("version");
+        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>9)throw new IOException("version");
             LuaDraft d=new LuaDraft(new WorkshopCartridge(read(in)),0);d.text=decode(read(in));
             d.cursor=in.readInt();d.anchor=in.readInt();d.page=in.readInt();d.key=in.readInt();int panel=in.readInt();d.menu=in.readInt();
             d.clipboard=decode(read(in));
@@ -258,7 +287,7 @@ public final class LuaDraft {
                 for(int n=0;n<count;n++){int at=in.readInt(),anchor=in.readInt();if(!d.boundary(at)||(anchor!=-1&&!d.boundary(anchor)))throw new IOException("jump");d.jumps.addLast(new int[]{at,anchor});}
             }
             if(version==6)d.placement=SpritePlacement.read(in);
-            if(version>=7)d.animation=SpriteAnimation.read(in);
+            if(version==7||version==8)d.animation=SpriteAnimation.read(in);
             if(version==8){
                 int start=in.readInt(),end=in.readInt();d.animationBefore=in.readBoolean();
                 d.animationEdit=AnimationEdit.find(d.text,start);
@@ -267,6 +296,17 @@ public final class LuaDraft {
             if((panel==Panel.ANIMATION.ordinal())!=(d.animation!=null))throw new IOException("animation panel");
             if((panel==Panel.SPRITE.ordinal())!=(d.placement!=null))throw new IOException("sprite panel");
             if((panel==Panel.NAVIGATION.ordinal())!=(d.navigation!=null))throw new IOException("navigation panel");
+            if(version==9){
+                if(!d.boundary(d.cursor))throw new IOException("branch cursor");
+                int choice=in.readInt();d.branchHeader=in.readInt();
+                if(choice< -1||d.branchHeader< -1||(choice>=0)==d.branchInsertion())throw new IOException("branch state");
+                if(choice>=0){d.branches=new LuaBranches(d.text,0);if(choice>=Math.max(1,d.branches.entries.size()))throw new IOException("branch choice");d.branches.index=choice;}
+                if(d.branchInsertion()){
+                    LuaBranches.Branch b=d.insertionBranch();
+                    if(panel!=Panel.INSERT.ordinal()||d.insertion==null||b==null||b.end!=d.line()||b.terminal)throw new IOException("branch target");
+                }
+            }
+            if((panel==Panel.BRANCHES.ordinal())!=(d.branches!=null))throw new IOException("branch panel");
             if(in.available()!=0||!d.boundary(d.cursor)||(d.anchor!=-1&&!d.boundary(d.anchor))||d.page<0||d.page>=PAGES.length
                 ||d.key<0||d.key>=PAGES[d.page].length()||panel<0||panel>=Panel.values().length||d.menu<0||d.menu>=COMMANDS.length)throw new IOException("state");
             d.panel=Panel.values()[panel];if(d.proposal()!=(d.insertion!=null))throw new IOException("insert state");

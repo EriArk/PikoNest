@@ -21,7 +21,7 @@ public final class LuaInsertTest {
     static void refused(Runnable run,String why){try{run.run();throw new AssertionError(why);}catch(IllegalArgumentException e){checks++;}}
     public static void main(String[] args)throws Exception{
         for(int item=0;item<LuaInsert.ITEMS.length;item++){
-            if(LuaInsert.ITEMS[item].id.equals("animation"))continue; // Visual proposal has its own workflow test.
+            if(LuaInsert.ITEMS[item].id.equals("animation")||LuaInsert.ITEMS[item].id.equals("branches"))continue; // Dedicated workflow tests.
             LuaDraft d=draft("  \r\n"+(LuaInsert.ITEMS[item].id.equals("move_call")?"function move_box(x,y,w,h,dx,dy) return x,y end\r\n":""));byte[] before=d.encode();String source=d.text();choose(d,item);
             check(d.text().equals(source),"preview not edit "+item);
             LuaDraft recovery=LuaDraft.restore(d.encode());check(recovery.insertion.item().id.equals(d.insertion.item().id),"proposal recovery "+item);

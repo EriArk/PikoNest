@@ -84,7 +84,7 @@ final class WorkshopView extends View {
             }
             return false;
         }
-        if(d.panel==LuaDraft.Panel.EXIT||d.panel==LuaDraft.Panel.MENU||d.panel==LuaDraft.Panel.NAVIGATION)return false;
+        if(d.panel==LuaDraft.Panel.EXIT||d.panel==LuaDraft.Panel.MENU||d.panel==LuaDraft.Panel.NAVIGATION||d.panel==LuaDraft.Panel.BRANCHES)return false;
         int key=event.getKeyCode(),command=-1;
         if(event.isCtrlPressed()){
             if(key==KeyEvent.KEYCODE_A)command=8;if(key==KeyEvent.KEYCODE_C)command=9;
@@ -425,6 +425,7 @@ final class WorkshopView extends View {
     }
     private void luaEditor(){
         LuaDraft d=s.codeDraft;
+        if(d.panel==LuaDraft.Panel.BRANCHES){luaBranches();return;}
         if(d.panel==LuaDraft.Panel.ANIMATION){animationEditor();return;}
         if(d.panel==LuaDraft.Panel.SPRITE){spritePlacement();return;}
         if(d.proposal()){luaInsertion();return;}
@@ -638,6 +639,32 @@ final class WorkshopView extends View {
         key(back()+(s.diagnosticPending?" отменить":" к коду"),12,bodyBottom,6,()->action(Action.CANCEL));
         if(d!=null)key("Select журнал",w/2,bodyBottom,14,()->action(Action.MENU));
     }
+    private void luaBranches(){
+        LuaDraft d=s.codeDraft;art.pikoos.lab.core.LuaBranches n=d.branches;hits.clear();
+        fitted("Условия · действия",16,75,24,14,w-32);
+        fitted(w<500?"↑↓ ветвь · ←→ страница":"Выбери ветвь · ↑↓ выбор · ←→ листать",16,100,16,6,w-32);
+        art.pikoos.lab.core.LuaBranches.Branch b=n.current();
+        if(b==null){
+            wrapped(n.warning.isEmpty()?"Условий пока нет. Добавь «если / иначе» в разделе «Правила».":n.warning,16,154,20,7,w-32,7);
+        }else{
+            float preview=bodyBottom-188;int rows=Math.max(1,(int)((preview-132)/36));
+            int first=Math.max(0,Math.min(n.index-rows/2,n.entries.size()-rows));
+            for(int r=0;r<rows&&first+r<n.entries.size();r++){
+                final int at=first+r;art.pikoos.lab.core.LuaBranches.Branch entry=n.entries.get(at);
+                button((entry.header+1)+" · "+entry.title,16,112+r*36,w-32,32,at==n.index,()->{n.index=at;changed.run();invalidate();});
+            }
+            rect(16,preview,w-32,118,0);
+            fitted(b.scope+" · "+(n.index+1)+" / "+n.entries.size(),24,preview+22,16,12,w-48);
+            if(b.first==b.header)fitted("Действий ещё нет",24,preview+50,18,6,w-48);
+            else for(int row=0;row<3&&b.first+row<b.end;row++)fitted(d.lineText(b.first+row).trim(),24,preview+48+row*22,18,7,w-48);
+            fitted(b.terminal?"Выход из ветви · правь в коде":w<500?"X: в конец ветви":"X: добавить в конец этой ветви",16,bodyBottom-46,16,6,w-32);
+            fitted(ok()+" код → L поля строки",16,bodyBottom-18,16,13,w-32);
+        }
+        rect(0,bodyBottom,w,44,0);
+        if(b!=null)key(ok()+" код",12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" назад",w/3,bodyBottom,6,()->action(Action.CANCEL));
+        if(b!=null&&!b.terminal)key(w<500?"X новое":"X добавить",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
+    }
     private void luaNavigation(){
         LuaDraft d=s.codeDraft;LuaNavigation n=d.navigation;hits.clear();
         fitted("Перейти / game.p8",16,75,24,14,w-32);
@@ -683,8 +710,8 @@ final class WorkshopView extends View {
         hits.clear();
         if(i.screen==LuaInsert.Screen.SYMBOLS){luaSymbols(i);return;}
         if(i.screen==LuaInsert.Screen.PREVIEW){luaRecipePreview(i);return;}
-        fitted(i.screen==LuaInsert.Screen.CATALOG?"+ Вставить Lua":d.callEdit!=null&&d.callEdit.name.equals("rule:elseif")?"elseif · иначе если":i.item().title,16,75,24,14,w-32);
-        fitted(i.tileRecipe()?"Начало Lua · x/y в пикселях":d.callEdit!=null?(i.item().id.equals("set")||i.item().id.equals("add")?"Имя и значение меняются только в этой строке":"Поля строки "+(d.line()+1)+" · "+back()+" отменить"):"Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
+        fitted(i.screen==LuaInsert.Screen.CATALOG?(d.branchInsertion()?"+ Действие в ветви":"+ Вставить Lua"):d.callEdit!=null&&d.callEdit.name.equals("rule:elseif")?"elseif · иначе если":i.item().title,16,75,24,14,w-32);
+        fitted(d.branchInsertion()?"Ветвь: "+d.insertionBranch().title:i.tileRecipe()?"Начало Lua · x/y в пикселях":d.callEdit!=null?(i.item().id.equals("set")||i.item().id.equals("add")?"Имя и значение меняются только в этой строке":"Поля строки "+(d.line()+1)+" · "+back()+" отменить"):"Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
         if(i.screen==LuaInsert.Screen.FIELDS&&i.cameraMode()){
             rect(0,80,w,26,1);
             fitted(i.item().id.equals("camera_rooms")?"Y следить · комната 128×128":"Y комнаты · сменить режим",16,100,16,6,w-32);
