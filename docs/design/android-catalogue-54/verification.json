@@ -1,0 +1,30 @@
+{
+  "version": "0.0.54",
+  "versionCode": 54,
+  "apkBytes": 320420,
+  "apkSha256": "a05a1f249356ff69f9083a497957b17e9004bd17f473b330a54957dc05a25f77",
+  "testedCartSha256": "d4fe72e865202d73207c905c0a35f6aa599a3edefbdc48296f6c2974f4bf1857",
+  "coreCatalogueChecks": 113,
+  "fullBuild": "passed",
+  "runtime": "user official PICO-8 0.2.7 / Runtime Test 8",
+  "device": "Retroid Pocket Classic",
+  "uiAuthoring": "ADB controller events through editor forms from blank-0007",
+  "runtimeCases": [
+    "score 0",
+    "target7: exact7",
+    "ended input frozen",
+    "O reset",
+    "target7: exceeded8",
+    "target form 7 to 8",
+    "undo 7 / redo8",
+    "target8: exact8"
+  ],
+  "resolutions": [
+    "1240x1080",
+    "720x960"
+  ],
+  "githubRelease": false,
+  "restoredPreviewPngIdentical": true,
+  "endedFramePngIdentical": true,
+  "mediaVolume": 0
+}

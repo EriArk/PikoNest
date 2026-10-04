@@ -33,6 +33,8 @@ public final class AssetLibraryTest {
         check(s.mode==Mode.ASSETS&&s.assets().isEmpty(),"menu reaches empty library with controller");
         s.act(Action.CONFIRM);check(s.mode==Mode.ASSET_SAVE&&p.stores==0,"empty library confirm previews current selection");
         s.act(Action.TEST);s.act(Action.NEXT);s.act(Action.UNDO);check(p.launches==0&&p.writes==0,"export preview traps runtime and mutations");
+        check(s.mode==Mode.ASSET_CATEGORY,"Y opens category without saving");s.act(Action.CANCEL);
+        check(s.mode==Mode.ASSET_SAVE&&shared.isEmpty(),"cancel category retains unsaved export");
         s.act(Action.CANCEL);check(s.mode==Mode.ASSETS&&shared.isEmpty(),"cancel export creates nothing");
         s.act(Action.CONTEXT);String id=s.assetDraft.id;p.failAsset=true;s.act(Action.CONFIRM);
         check(s.mode==Mode.ERROR&&s.assetDraft.id.equals(id)&&shared.isEmpty(),"failed export preserves draft for retry");

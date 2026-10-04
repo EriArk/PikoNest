@@ -46,7 +46,8 @@ public final class LuaInsert {
         new Item("camera_follow","Камера · следить","Точка мира будет в центре, пока камера не достигнет края поля. Выбери X/Y через «имена» или введи выражение. Поле начинается в (0,0); размеры — в клетках 8×8.",false,f("Точка X","x",Kind.EXPR),f("Точка Y","y",Kind.EXPR),f("Поле, шир.","32",Kind.MAP_WIDTH),f("Поле, выс.","32",Kind.MAP_HEIGHT)),
         new Item("camera_reset","Камера · экран","Возвращает экранные координаты (0,0). Вставляй после карты и объектов, перед счётом и меню в _draw. Положение объектов в мире не меняется.",false),
         new Item("camera_rooms","Камера · комнаты","Одна комната — экран 128×128. Камера переключается, когда точка пересекает границу комнаты. Задай число комнат по X/Y; начало мира (0,0). Перед HUD добавь «Камера · экран».",false,f("Точка X","x",Kind.EXPR),f("Точка Y","y",Kind.EXPR),f("Комнат X","2",Kind.ROOM_COLS),f("Комнат Y","2",Kind.ROOM_ROWS)),
-        new Item("door_pair","Переход · пара областей","Две области одного размера. Точка попадает в начало другой области. Выйди из обеих, чтобы перейти снова. Вставляй в _update после изменения X/Y. Память — новое имя для этой пары и точки. Подходит для курсора, фигуры или другого объекта; спрайт не нужен.",false,f("Точка X","x",Kind.NAME),f("Точка Y","y",Kind.NAME),f("Память","gate_busy",Kind.NAME),f("A · X","96",Kind.WORLD_POINT),f("A · Y","48",Kind.WORLD_POINT),f("B · X","160",Kind.WORLD_POINT),f("B · Y","48",Kind.WORLD_POINT),f("Ширина","16",Kind.GATE_SIZE),f("Высота","32",Kind.GATE_SIZE))
+        new Item("door_pair","Переход · пара областей","Две области одного размера. Точка попадает в начало другой области. Выйди из обеих, чтобы перейти снова. Вставляй в _update после изменения X/Y. Память — новое имя для этой пары и точки. Подходит для курсора, фигуры или другого объекта; спрайт не нужен.",false,f("Точка X","x",Kind.NAME),f("Точка Y","y",Kind.NAME),f("Память","gate_busy",Kind.NAME),f("A · X","96",Kind.WORLD_POINT),f("A · Y","48",Kind.WORLD_POINT),f("B · X","160",Kind.WORLD_POINT),f("B · Y","48",Kind.WORLD_POINT),f("Ширина","16",Kind.GATE_SIZE),f("Высота","32",Kind.GATE_SIZE)),
+        new Item("if_else","Условие · если / иначе","Сравни значения и добавь действия в две ветви. За один вызов выполняется только одна: после then, если условие истинно; после else — в остальных случаях. Счёт, состояние, меню и другие правила — обычные переменные Lua.",true,f("Слева","phase",Kind.EXPR),f("Сравнение","==",Kind.COMPARE),f("Справа","0",Kind.EXPR))
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
@@ -66,7 +67,8 @@ public final class LuaInsert {
         set(0,x);set(1,y);set(2,""+(toRooms?width/16:width*16));set(3,""+(toRooms?height/16:height*16));field=currentField;previewLine=0;
     }
     public boolean doorRecipe(){return item().id.equals("door_pair");}
-    public boolean fullPreview(){return areaRecipe()||motionRecipe()||item().id.equals("move_call")||cameraRecipe()||doorRecipe();}
+    public boolean conditionalBranches(){return item().id.equals("if_else");}
+    public boolean fullPreview(){return areaRecipe()||motionRecipe()||item().id.equals("move_call")||cameraRecipe()||doorRecipe()||conditionalBranches();}
     public void beginPreview(){screen=Screen.PREVIEW;previewLine=0;}
     public boolean replaceAll=true;
     public String input="";
@@ -167,6 +169,7 @@ public final class LuaInsert {
         String name=functionName();if(name!=null)return "function "+name+"()\n  \nend\n";
         String a=values[0];
         switch(item().id){
+            case "if_else":return "if "+a+values[1]+values[2]+" then\n  \nelse\n  \nend\n";
             case "door_pair":return DoorTransition.code(this);
             case "camera":return "camera("+join()+")\n";
             case "camera_follow":return WorldCamera.code(values[0],values[1],values[2],values[3]);

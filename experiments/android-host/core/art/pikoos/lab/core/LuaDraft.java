@@ -204,9 +204,9 @@ public final class LuaDraft {
             else TileProbe.validateSource(text,insertion.value(0),insertion.areaRecipe());
             at=0;indent="";
         }
-        if(insertion.item().id.equals("compare")){
+        if(insertion.item().id.equals("compare")||insertion.conditionalBranches()){
             String header=raw.substring(0,raw.indexOf('\n'));LuaCall parsed=LuaCall.parse(header,0,header.length());
-            if(parsed.form.selected!=insertion.selected)throw new IllegalArgumentException("Сложное выражение: заключи каждую сторону сравнения в скобки.");
+            if(!parsed.form.item().id.equals("compare"))throw new IllegalArgumentException("Сложное выражение: заключи каждую сторону сравнения в скобки.");
             for(int n=0;n<3;n++)if(!parsed.form.value(n).equals(insertion.value(n).trim()))throw new IllegalArgumentException("Выражение вышло за границы поля. Проверь сравнение.");
         }
         StringBuilder inserted=new StringBuilder();

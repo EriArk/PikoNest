@@ -6,10 +6,18 @@ import java.util.UUID;
 
 /** Independent indexed pixels, not a reference to a project's sprite number. */
 public final class SpriteAsset {
+    public enum Category {
+        UNFILED("Без категории"), TILES("Тайлы"), OBJECTS("Объекты"), CHARACTERS("Персонажи"), BACKGROUNDS("Фоны"), UI("Интерфейс"), OTHER("Прочее");
+        public final String title;Category(String title){this.title=title;}
+    }
+    public final Category category;
     public final String id,title,origin,sourceHash;
     public final int width,height,sourceX,sourceY;
     private final byte[] pixels;
     public SpriteAsset(String id,String title,String origin,String hash,int x,int y,int w,int h,byte[] pixels){
+        this(id,title,origin,hash,x,y,w,h,pixels,Category.UNFILED);
+    }
+    private SpriteAsset(String id,String title,String origin,String hash,int x,int y,int w,int h,byte[] pixels,Category category){
         if(id==null||!id.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))throw new IllegalArgumentException("Invalid asset ID");
         text(title,80);text(origin,160);
         if(hash==null||!hash.matches("[0-9a-f]{64}"))throw new IllegalArgumentException("Invalid source hash");
@@ -17,6 +25,7 @@ public final class SpriteAsset {
         if(pixels==null||pixels.length!=w*h)throw new IllegalArgumentException("Invalid pixel count");
         for(byte pixel:pixels)if(pixel<0||pixel>15)throw new IllegalArgumentException("Invalid palette index");
         this.id=id;this.title=title;this.origin=origin;sourceHash=hash;sourceX=x;sourceY=y;width=w;height=h;this.pixels=pixels.clone();
+        this.category=category;
     }
     private static void text(String s,int max){
         if(s==null||s.length()>max||s.isEmpty())throw new IllegalArgumentException("Invalid asset metadata");
@@ -34,25 +43,28 @@ public final class SpriteAsset {
     public int pixel(int x,int y){if(x<0||y<0||x>=width||y>=height)throw new IllegalArgumentException("Pixel outside asset");return pixels[y*width+x];}
     public SpriteAsset withTitle(String title){
         if(title==null||title.trim().isEmpty())throw new IllegalArgumentException("Название не должно быть пустым");
-        return new SpriteAsset(id,title.trim(),origin,sourceHash,sourceX,sourceY,width,height,pixels);
+        return new SpriteAsset(id,title.trim(),origin,sourceHash,sourceX,sourceY,width,height,pixels,category);
     }
+    public SpriteAsset withCategory(Category value){if(value==null)throw new IllegalArgumentException("Выбери категорию");return new SpriteAsset(id,title,origin,sourceHash,sourceX,sourceY,width,height,pixels,value);}
     public int[] colors(){int[] result=new int[pixels.length];for(int i=0;i<result.length;i++)result[i]=pixels[i];return result;}
     public byte[] encode(){
         try{
             ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
-            out.writeInt(0x504b5350);out.writeInt(1);out.writeUTF(id);out.writeUTF(title);out.writeUTF(origin);out.writeUTF(sourceHash);
-            out.writeInt(sourceX);out.writeInt(sourceY);out.writeInt(width);out.writeInt(height);out.write(pixels);out.flush();return bytes.toByteArray();
+            out.writeInt(0x504b5350);out.writeInt(category==Category.UNFILED?1:2);out.writeUTF(id);out.writeUTF(title);out.writeUTF(origin);out.writeUTF(sourceHash);
+            out.writeInt(sourceX);out.writeInt(sourceY);out.writeInt(width);out.writeInt(height);out.write(pixels);if(category!=Category.UNFILED)out.writeUTF(category.name());out.flush();return bytes.toByteArray();
         }catch(IOException e){throw new IllegalStateException(e);}
     }
     public static SpriteAsset decode(byte[] bytes)throws IOException{
         if(bytes==null||bytes.length>20000)throw new IOException("Invalid sprite record size");
         try{
             DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));
-            if(in.readInt()!=0x504b5350||in.readInt()!=1)throw new IOException("Unsupported sprite record version");
+            if(in.readInt()!=0x504b5350)throw new IOException("Unsupported sprite record");int version=in.readInt();
+            if(version!=1&&version!=2)throw new IOException("Unsupported sprite record version");
             String id=in.readUTF(),title=in.readUTF(),origin=in.readUTF(),hash=in.readUTF();
             int x=in.readInt(),y=in.readInt(),w=in.readInt(),h=in.readInt();new SpriteRegion(x,y,w,h);
-            byte[] pixels=new byte[w*h];in.readFully(pixels);if(in.read()!=-1)throw new IOException("Unexpected sprite record data");
-            return new SpriteAsset(id,title,origin,hash,x,y,w,h,pixels);
+            byte[] pixels=new byte[w*h];in.readFully(pixels);Category category=version==1?Category.UNFILED:Category.valueOf(in.readUTF());
+            if(in.read()!=-1)throw new IOException("Unexpected sprite record data");
+            return new SpriteAsset(id,title,origin,hash,x,y,w,h,pixels,category);
         }catch(IllegalArgumentException e){throw new IOException("Invalid sprite record",e);}
     }
 }

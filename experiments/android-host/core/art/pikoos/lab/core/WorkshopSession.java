@@ -7,7 +7,7 @@ import java.util.Arrays;
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, REDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS, CHECK }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE, DIAGNOSTIC }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE, DIAGNOSTIC, ASSET_CATEGORY }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE, OVAL, FILLED_OVAL }
     // Keep existing operation entries 5/6 stable while adding brushes after them.
     public static int moveMenuIndex(){return DrawTool.values().length+2;}
@@ -26,6 +26,7 @@ public final class WorkshopSession {
         default java.util.List<SpriteAsset> assets()throws Exception{return java.util.Collections.emptyList();}
         default void storeAsset(SpriteAsset asset)throws Exception{throw new Exception("Хранилище ресурсов не подключено");}
         default void renameAsset(SpriteAsset expected,String title)throws Exception{throw new Exception("Переименование не подключено");}
+        default void categorizeAsset(SpriteAsset expected,SpriteAsset.Category category)throws Exception{throw new Exception("Категории не подключены");}
         default String projectOrigin(){return "Проект";}
     }
     private final Port port;
@@ -36,6 +37,7 @@ public final class WorkshopSession {
     public FlagDraft flagDraft;
     private WorkshopCartridge cart;
     public LuaDraft codeDraft;
+    public ToolCatalogue toolCatalogue=new ToolCatalogue();
     public int codeColumn;
     public RuntimeDiagnostic diagnostic;
     public boolean diagnosticPending,diagnosticDetails,diagnosticStale;
@@ -143,8 +145,13 @@ public final class WorkshopSession {
             return;
         }
         if(i.screen==LuaInsert.Screen.CATALOG){
-            if(action==Action.UP)i.choose(Math.max(0,i.selected-1));
-            if(action==Action.DOWN)i.choose(Math.min(LuaInsert.ITEMS.length-1,i.selected+1));
+            toolCatalogue.normalize(i);
+            if(action==Action.LEFT||action==Action.PREVIOUS)toolCatalogue.change(-1,i);
+            if(action==Action.RIGHT||action==Action.NEXT)toolCatalogue.change(1,i);
+            if(action==Action.UP)toolCatalogue.move(-1,i);
+            if(action==Action.DOWN)toolCatalogue.move(1,i);
+            if(action==Action.UNDO&&!toolCatalogue.items().isEmpty()){toolCatalogue.toggle(i.selected);toolCatalogue.normalize(i);}
+            if(toolCatalogue.items().isEmpty()){if(action==Action.CANCEL)d.cancelInsert();return;}
             if(action==Action.CONFIRM){if(i.item().id.equals("sspr"))d.beginSprite(selection());else if(i.item().id.equals("animation"))d.beginAnimation(selection());else i.screen=LuaInsert.Screen.FIELDS;}
             if(action==Action.CANCEL)d.cancelInsert();
             return;
@@ -332,8 +339,26 @@ public final class WorkshopSession {
     public SpriteAsset nameTarget;
     public NameEditor nameEditor;
     public boolean namingNewAsset;
-    public java.util.List<SpriteAsset> assets(){return java.util.Collections.unmodifiableList(assets);}
-    public SpriteAsset currentAsset(){return assets.isEmpty()?null:assets.get(clamp(assetIndex,assets.size()-1));}
+    public int assetFilter,assetCategoryChoice;
+    private boolean categoryForDraft;
+    public String assetFilterTitle(){return assetFilter==0?"Все":SpriteAsset.Category.values()[assetFilter-1].title;}
+    public java.util.List<SpriteAsset> assets(){
+        java.util.List<SpriteAsset> result=new java.util.ArrayList<>();
+        for(SpriteAsset a:assets)if(assetFilter==0||a.category.ordinal()==assetFilter-1)result.add(a);
+        return java.util.Collections.unmodifiableList(result);
+    }
+    public SpriteAsset currentAsset(){java.util.List<SpriteAsset> list=assets();return list.isEmpty()?null:list.get(clamp(assetIndex,list.size()-1));}
+    private void beginCategory(){
+        categoryForDraft=mode==Mode.ASSET_SAVE;SpriteAsset a=categoryForDraft?assetDraft:currentAsset();
+        if(a==null)return;assetCategoryChoice=a.category.ordinal();mode=Mode.ASSET_CATEGORY;
+    }
+    public void restoreCategory(int choice){if((mode==Mode.ASSETS||mode==Mode.ASSET_SAVE)&&choice>=0&&choice<SpriteAsset.Category.values().length){beginCategory();assetCategoryChoice=choice;}}
+    private void finishCategory()throws Exception{
+        SpriteAsset a=categoryForDraft?assetDraft:currentAsset();SpriteAsset.Category category=SpriteAsset.Category.values()[assetCategoryChoice];
+        if(categoryForDraft)assetDraft=a.withCategory(category);
+        else if(a.category!=category){port.categorizeAsset(a,category);publishAsset(a.withCategory(category));}
+        mode=categoryForDraft?Mode.ASSET_SAVE:Mode.ASSETS;notice="Категория сохранена";
+    }
     public String assetsReturnMode(){return assetsReturn.name();}
     private void showAssets()throws Exception{
         String selected=currentAsset()==null?"":currentAsset().id;
@@ -341,7 +366,7 @@ public final class WorkshopSession {
         java.util.List<SpriteAsset> loaded=port.assets();assets.clear();assets.addAll(loaded);assetIndex=clamp(assetIndex,assets.size()-1);
         selectAssetId(selected);
     }
-    public void selectAssetId(String id){for(int i=0;i<assets.size();i++)if(assets.get(i).id.equals(id)){assetIndex=i;return;}}
+    public void selectAssetId(String id){java.util.List<SpriteAsset> list=assets();for(int i=0;i<list.size();i++)if(list.get(i).id.equals(id)){assetIndex=i;return;}assetIndex=clamp(assetIndex,list.size()-1);}
     private void publishAsset(SpriteAsset asset){
         boolean found=false;
         for(int i=0;i<assets.size();i++)if(assets.get(i).id.equals(asset.id)){assets.set(i,asset);found=true;break;}
@@ -369,7 +394,7 @@ public final class WorkshopSession {
         }
         mode=namingNewAsset?Mode.ASSET_SAVE:Mode.ASSETS;nameEditor=null;nameTarget=null;notice="Название сохранено";
     }
-    public void selectAsset(int index){if(mode!=Mode.ASSETS)return;assetIndex=clamp(index,assets.size()-1);act(Action.CONFIRM);}
+    public void selectAsset(int index){if(mode!=Mode.ASSETS)return;assetIndex=clamp(index,assets().size()-1);act(Action.CONFIRM);}
     public void restoreAssets(String returnMode,int index)throws Exception{
         Mode origin;
         try{origin=Mode.valueOf(returnMode);}catch(IllegalArgumentException e){return;}
@@ -476,7 +501,7 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = mode==Mode.CODE||mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = mode==Mode.CODE||mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE||mode==Mode.ASSET_CATEGORY?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
         if(pendingStroke())return;
@@ -633,21 +658,25 @@ public final class WorkshopSession {
                 return;
             }
             if(mode==Mode.ASSET_SAVE){
+                if(action==Action.UNDO){beginCategory();return;}
                 if(action==Action.CONTEXT)beginName();
                 if(action==Action.CANCEL){assetDraft=null;mode=Mode.ASSETS;notice="Сохранение ресурса отменено";}
                 if(action==Action.CONFIRM){
                     port.storeAsset(assetDraft);
-                    publishAsset(assetDraft);assetDraft=null;mode=Mode.ASSETS;notice="Спрайт в библиотеке";
+                    assetFilter=assetDraft.category.ordinal()+1;publishAsset(assetDraft);assetDraft=null;mode=Mode.ASSETS;notice="Спрайт в библиотеке";
                 }
                 return;
             }
             if(mode==Mode.ASSETS){
+                if(action==Action.PREVIOUS||action==Action.NEXT){assetFilter=Math.floorMod(assetFilter+(action==Action.NEXT?1:-1),SpriteAsset.Category.values().length+1);assetIndex=0;return;}
+                if(action==Action.MENU){beginCategory();return;}
                 if(action==Action.UNDO){beginName();return;}
                 if(action==Action.CANCEL){mode=assetsReturn;return;}
-                if(action==Action.LEFT||action==Action.UP)assetIndex=clamp(assetIndex-1,assets.size()-1);
-                if(action==Action.RIGHT||action==Action.DOWN)assetIndex=clamp(assetIndex+1,assets.size()-1);
+                if(action==Action.LEFT||action==Action.UP)assetIndex=clamp(assetIndex-1,assets().size()-1);
+                if(action==Action.RIGHT||action==Action.DOWN)assetIndex=clamp(assetIndex+1,assets().size()-1);
                 if(action==Action.CONFIRM){
                     if(currentAsset()!=null)beginInsertion(currentAsset());
+                    else if(assetFilter!=0){notice="Категория пуста · L/R другие категории";}
                     else if(tool==2)act(Action.CONTEXT);
                     else{mode=assetsReturn;switchTool(2);}
                 }
@@ -787,6 +816,13 @@ public final class WorkshopSession {
                     else{boolean differs=flagDraft.value!=flagDraft.original;save(flagDraft.candidate(cart),true);flagDraft=null;notice=differs?"Флаги сохранены · Y отмена":"Флаги не изменились";}
                 }
                 if(action==Action.CANCEL||action==Action.UNDO){flagDraft=null;notice="Без изменений";}
+                return;
+            }
+            if(mode==Mode.ASSET_CATEGORY){
+                if(action==Action.UP||action==Action.LEFT)assetCategoryChoice=clamp(assetCategoryChoice-1,SpriteAsset.Category.values().length-1);
+                if(action==Action.DOWN||action==Action.RIGHT)assetCategoryChoice=clamp(assetCategoryChoice+1,SpriteAsset.Category.values().length-1);
+                if(action==Action.CANCEL)mode=categoryForDraft?Mode.ASSET_SAVE:Mode.ASSETS;
+                if(action==Action.CONFIRM)finishCategory();
                 return;
             }
             if(tool==3&&mapEditor.choosingTool){

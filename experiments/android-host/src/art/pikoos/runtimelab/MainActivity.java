@@ -46,6 +46,7 @@ public final class MainActivity extends Activity {
     private PicoRuntimeBackend backend;
     private SharedPreferences prefs;
     private SharedPreferences libraryPrefs;
+    private final art.pikoos.lab.core.ToolCatalogue toolCatalogue=new art.pikoos.lab.core.ToolCatalogue();
     private ProjectStore store;
     private SpriteAssetStore assetStore;
     private LibrarySession library;
@@ -87,6 +88,7 @@ public final class MainActivity extends Activity {
         super.onCreate(saved);
         prefs=getSharedPreferences("moon-garden-ui",MODE_PRIVATE);
         libraryPrefs=getSharedPreferences("library-ui",MODE_PRIVATE);
+        toolCatalogue.restore(libraryPrefs.getString("favoriteTools",""),libraryPrefs.getInt("toolCategory",0));
         folderPrefs=getSharedPreferences("folder-setup",MODE_PRIVATE);
         playPrefs=getSharedPreferences("play-library",MODE_PRIVATE);
         activeId=libraryPrefs.getString("active","moon-garden");
@@ -185,6 +187,7 @@ public final class MainActivity extends Activity {
                 public java.util.List<SpriteAsset> assets()throws Exception{return assetStore.list();}
                 public void storeAsset(SpriteAsset asset)throws Exception{assetStore.create(asset);}
                 public void renameAsset(SpriteAsset expected,String title)throws Exception{assetStore.rename(expected,title);}
+                public void categorizeAsset(SpriteAsset expected,SpriteAsset.Category category)throws Exception{assetStore.categorize(expected,category);}
                 public String projectOrigin(){return projectTitle;}
             });
             activeId=id;session=next;
@@ -196,6 +199,7 @@ public final class MainActivity extends Activity {
             activeId=id;session=next;prefs=getSharedPreferences(id+"-ui",MODE_PRIVATE);
         }
         session.swapAB=libraryPrefs.getBoolean("swapAB",getSharedPreferences("moon-garden-ui",MODE_PRIVATE).getBoolean("swapAB",false));
+        session.toolCatalogue=toolCatalogue;
         libraryPrefs.edit().putString("active",id).apply();
         showWorkshop();
     }
@@ -449,6 +453,7 @@ public final class MainActivity extends Activity {
         if(showingLibrary&&library!=null&&library.current()!=null)
             libraryPrefs.edit().putString("selected",library.current().id).putInt("focus",library.focus).apply();
         if(session==null)return;
+        libraryPrefs.edit().putString("favoriteTools",toolCatalogue.encode()).putInt("toolCategory",toolCatalogue.category).apply();
         if(session.codeDraft!=null)codeRecoveryFailed.remove(activeId);
         libraryPrefs.edit().putString("active",activeId).putBoolean("swapAB",session.swapAB).apply();
         prefs.edit().putInt("tool",session.tool).putInt("focus",session.focus)
@@ -476,7 +481,8 @@ public final class MainActivity extends Activity {
             .putString("moveDraft",session.move==null?"":session.move.encode()).putString("moveReturn",session.moveReturnMode())
             .putInt("recolorFrom",session.recolorFrom()).putInt("recolorTo",session.recolorTo())
             .putInt("recolorField",session.recolorField()).putString("recolorReturn",session.recolorReturnMode())
-            .putBoolean("assets",session.mode==Mode.ASSETS||session.assetDraft!=null||session.copyAsset!=null||session.nameEditor!=null)
+            .putBoolean("assets",session.mode==Mode.ASSETS||session.mode==Mode.ASSET_CATEGORY||session.assetDraft!=null||session.copyAsset!=null||session.nameEditor!=null)
+            .putInt("assetFilter",session.assetFilter).putInt("assetCategoryChoice",session.mode==Mode.ASSET_CATEGORY?session.assetCategoryChoice:-1)
             .putInt("assetIndex",session.assetIndex).putString("assetsReturn",session.assetsReturnMode())
             .putString("assetId",session.currentAsset()==null?"":session.currentAsset().id)
             .putString("assetDraft",session.assetDraft==null?"":Base64.encodeToString(session.assetDraft.encode(),Base64.NO_WRAP))
@@ -536,10 +542,12 @@ public final class MainActivity extends Activity {
         if(!prefs.getString("moveDraft","").isEmpty())session.restoreMove(prefs.getString("moveDraft",""),prefs.getString("moveReturn",""));
         if(prefs.getBoolean("assets",false)){
             try{
+                session.assetFilter=Math.max(0,Math.min(SpriteAsset.Category.values().length,prefs.getInt("assetFilter",0)));
                 session.restoreAssets(prefs.getString("assetsReturn","NAVIGATE"),prefs.getInt("assetIndex",0));
                 session.selectAssetId(prefs.getString("assetId",""));
                 String saved=prefs.getString("assetDraft",""),copy=prefs.getString("copyAsset","");
                 if(!saved.isEmpty()&&session.mode==Mode.ASSETS){session.assetDraft=SpriteAsset.decode(Base64.decode(saved,Base64.NO_WRAP));session.mode=Mode.ASSET_SAVE;}
+                session.restoreCategory(prefs.getInt("assetCategoryChoice",-1));
                 if(!copy.isEmpty()&&session.mode==Mode.ASSETS)session.restoreInsertion(SpriteAsset.decode(Base64.decode(copy,Base64.NO_WRAP)),prefs.getInt("copyX",-1),prefs.getInt("copyY",-1));
                 String target=prefs.getString("nameTarget","");
                 if(!target.isEmpty()){

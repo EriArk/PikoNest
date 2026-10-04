@@ -136,6 +136,7 @@ final class WorkshopView extends View {
         rect(w-174,19,6,6,draft?10:11);
         if(s.mode!=Mode.NAME){text("≡",w-34,29,26,7);hit(w-48,0,48,44,()->action(Action.MENU));}
         if(s.mode==Mode.NAME){nameEditor();c.restore();return;}
+        if(s.mode==Mode.ASSET_CATEGORY){assetCategories();c.restore();return;}
         if(s.mode==Mode.DIAGNOSTIC){diagnostic();c.restore();return;}
         if(s.codeDraft!=null&&(s.mode==Mode.CODE||s.mode==Mode.ERROR)){
             luaEditor();if(s.mode==Mode.ERROR)dialog();c.restore();return;
@@ -198,6 +199,11 @@ final class WorkshopView extends View {
             return;
         }
         if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE){
+            if(s.mode==Mode.ASSETS&&s.currentAsset()==null&&s.assetFilter!=0){
+                key(back()+" назад",12,bodyBottom,6,()->action(Action.CANCEL));
+                if(s.tool==2)key("X сохранить",w-132,bodyBottom,14,()->action(Action.CONTEXT));
+                return;
+            }
             key(ok()+(s.mode==Mode.ASSET_SAVE||s.currentAsset()==null&&s.tool==2?" сохранить":s.currentAsset()==null?" спрайты":" вставить"),12,bodyBottom,10,()->action(Action.CONFIRM));
             key(back()+" назад",w<500?136:200,bodyBottom,6,()->action(Action.CANCEL));
             if(s.mode==Mode.ASSETS&&s.tool==2)key("X сохранить",w-132,bodyBottom,14,()->action(Action.CONTEXT));
@@ -689,15 +695,22 @@ final class WorkshopView extends View {
             fitted("A ↔ B · после выхода можно снова",16,100,16,6,w-32);
         }
         if(i.screen==LuaInsert.Screen.CATALOG){
+            s.toolCatalogue.normalize(i);
+            java.util.List<Integer> items=s.toolCatalogue.items();int selected=items.indexOf(i.selected);
+            rect(0,80,w,27,1);
+            fitted("← "+art.pikoos.lab.core.ToolCatalogue.CATEGORIES[s.toolCatalogue.category]+" →  · "+items.size(),16,100,16,6,w-32);
+            hit(16,80,(w-32)/2,28,()->action(Action.LEFT));hit(w/2,80,(w-32)/2,28,()->action(Action.RIGHT));
             int rows=Math.max(3,(int)((bodyBottom-220)/38));
-            int first=Math.max(0,Math.min(i.selected-rows/2,LuaInsert.ITEMS.length-rows));
-            for(int r=0;r<rows&&first+r<LuaInsert.ITEMS.length;r++){final int n=first+r;
-                button(LuaInsert.ITEMS[n].title,16,112+r*38,w-32,34,n==i.selected,()->{i.choose(n);action(Action.CONFIRM);});}
+            int first=Math.max(0,Math.min(selected-rows/2,items.size()-rows));
+            for(int r=0;r<rows&&first+r<items.size();r++){final int n=items.get(first+r);
+                button((s.toolCatalogue.favorite(n)?"* ":"")+LuaInsert.ITEMS[n].title,16,112+r*38,w-32,34,n==i.selected,()->{i.choose(n);action(Action.CONFIRM);});}
+            if(items.isEmpty())wrapped("Пока пусто. В другой категории выбери инструмент и нажми Y.",16,158,20,7,w-32,4);
             float y=bodyBottom-92;rect(16,y-18,w-32,2,14);
-            wrapped(i.item().help,16,y+8,18,7,w-32,3);
+            wrapped(items.isEmpty()?"Избранное общее для твоих проектов.":i.item().help,16,y+8,18,7,w-32,3);
             rect(0,bodyBottom,w,44,0);
             key(ok()+" выбрать",12,bodyBottom,10,()->action(Action.CONFIRM));
-            key(back()+" к коду",w/2,bodyBottom,6,()->action(Action.CANCEL));
+            key(back()+" назад",w/3,bodyBottom,6,()->action(Action.CANCEL));
+            if(!items.isEmpty())key(s.toolCatalogue.favorite(i.selected)?(w<500?"Y убрать":"Y убрать *"):"Y в *",w*2/3,bodyBottom,14,()->action(Action.UNDO));
             return;
         }
         if(i.screen==LuaInsert.Screen.TEXT){
@@ -763,11 +776,12 @@ final class WorkshopView extends View {
         else if(i.fullPreview())key("X Lua",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
     }
     private void luaRecipePreview(LuaInsert i){
-        fitted(i.cameraRecipe()||i.doorRecipe()?i.item().title:i.motionRecipe()?"Движение · код":i.item().id.equals("move_call")?"Движение · вызов":"Область · код функции",16,75,22,14,w-32);
-        fitted(i.doorRecipe()?"В _update · после изменения X/Y":i.cameraRecipe()?(s.codeDraft.callEdit!=null?"Было / будет · только эта строка":i.item().id.equals("camera_reset")?"После мира · перед счётом и меню":"Перед миром · после cls()"):i.motionRecipe()?"Сначала X, затем Y · пиксели":i.item().id.equals("move_call")?"Новые X,Y · на месте курсора":"Карта: x,y,w,h в пикселях",16,100,16,6,w-32);
+        fitted(i.cameraRecipe()||i.doorRecipe()||i.conditionalBranches()?i.item().title:i.motionRecipe()?"Движение · код":i.item().id.equals("move_call")?"Движение · вызов":"Область · код функции",16,75,22,14,w-32);
+        fitted(i.conditionalBranches()?"Одно сравнение → одна из ветвей":i.doorRecipe()?"В _update · после изменения X/Y":i.cameraRecipe()?(s.codeDraft.callEdit!=null?"Было / будет · только эта строка":i.item().id.equals("camera_reset")?"После мира · перед счётом и меню":"Перед миром · после cls()"):i.motionRecipe()?"Сначала X, затем Y · пиксели":i.item().id.equals("move_call")?"Новые X,Y · на месте курсора":"Карта: x,y,w,h в пикселях",16,100,16,6,w-32);
         java.util.ArrayList<String> rows=new java.util.ArrayList<>();
         LuaCall edit=s.codeDraft.callEdit;
         String preview=edit==null?i.code():"Было:\n"+edit.original+"\n\nБудет:\n"+edit.preview(i);
+        if(i.conditionalBranches())preview+="\nПосле вставки курсор под then.\nДобавь туда действия для «да».\nПод else — действия для «нет».\nL на if снова откроет сравнение.\nИзменение переменной внутри\nthen не запускает else тут же.";
         if(i.doorRecipe())preview="Вход A → начало B, B → A.\nПовтор — после выхода из обеих.\nПроверяется точка X/Y, не спрайт.\nРисование задаётся отдельно.\n\n"+preview;
         if(i.cameraRecipe()&&edit==null)preview+=(i.item().id.equals("camera_reset")?"\nДальше рисуй счёт и меню.\nОни останутся на экране.":"\nДальше рисуй карту и объекты.\nПеред счётом и меню добавь\n«Камера · экран».\nЭкран = мир − камера.");
         if(i.item().id.equals("camera_rooms"))preview+="\n\nКомната: 128×128 пикселей.\nПереход на X/Y = 128, 256…\nЗа краем — крайняя комната.\nКоординаты объектов прежние.";
@@ -922,15 +936,23 @@ final class WorkshopView extends View {
             fitted("Источник: "+a.origin,16,244+size,18,6,w-32);
             fitted("Самостоятельная копия пикселей.",16,272+size,20,7,w-32);
             fitted("Код, флаги и настройки палитры не переносятся.",16,300+size,16,13,w-32);
+            fitted("Y категория: "+a.category.title,16,bodyBottom-12,18,10,w-32);
+            hit(16,bodyBottom-40,w-32,36,()->action(Action.UNDO));
             return;
         }
+        fitted((w<500?"← ":"L ← ")+s.assetFilterTitle()+(w<500?" →":" → R"),16,199,18,6,w-110);
+        hit(16,176,(w-32)/2,32,()->action(Action.PREVIOUS));hit(w/2,176,(w-32)/2,32,()->action(Action.NEXT));
         SpriteAsset chosen=s.currentAsset();
         if(chosen==null){
-            text("Здесь будут твои спрайты",16,218,26,7);
-            fitted("Выбери область во вкладке «Спрайты».",16,258,20,6,w-32);
-            fitted("Затем: меню → Ресурсы → X в библиотеку.",16,290,18,6,w-32);
+            fitted(s.assetFilter==0?"Здесь будут твои спрайты":"Категория пуста",16,238,22,7,w-32);
+            if(s.assetFilter==0){
+                fitted("Выбери область во вкладке «Спрайты».",16,266,20,6,w-32);
+                fitted("Затем: меню → Ресурсы → X в библиотеку.",16,298,18,6,w-32);
+            }else{
+                fitted("L/R — другая категория",16,270,18,6,w-32);
+                wrapped("Выбери спрайт в «Все» и нажми Select, чтобы назначить ему категорию.",16,310,18,6,w-32,3);
+            }
         }else{
-            fitted("Общая для всех проектов",16,199,18,6,w-110);
             text((s.assetIndex+1)+" / "+s.assets().size(),w-84,199,18,10);
             int perPage=w>=500?3:2,first=(s.assetIndex/perPage)*perPage;
             float gap=12,cw=(w-32-gap*(perPage-1))/perPage,ch=Math.min(176,bodyBottom-304);
@@ -943,10 +965,21 @@ final class WorkshopView extends View {
             }
             float by=214+ch;
             fitted(chosen.width+" × "+chosen.height+" · "+chosen.origin,16,by+28,18,7,w-32);
-            fitted("Автор и лицензия: не указаны",16,by+52,16,13,w-32);
+            fitted("Select: "+chosen.category.title,16,by+52,16,13,w-32);
+            hit(16,by+32,w-32,26,()->action(Action.MENU));
             fitted("← → выбрать · Y название",16,by+78,18,6,w-32);
             hit(16,by+56,w-32,34,()->action(Action.UNDO));
         }
+    }
+    private void assetCategories(){
+        hits.clear();fitted("Категория спрайта",16,78,24,14,w-32);
+        fitted("Пиксели и использование не меняются",16,102,16,6,w-32);
+        SpriteAsset.Category[] categories=SpriteAsset.Category.values();
+        for(int n=0;n<categories.length;n++){final int index=n;
+            button(categories[n].title,16,120+n*36,w-32,32,n==s.assetCategoryChoice,()->{s.assetCategoryChoice=index;action(Action.CONFIRM);});
+        }
+        rect(0,bodyBottom,w,44,0);key(ok()+" сохранить",12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" отмена",w/2,bodyBottom,6,()->action(Action.CANCEL));
     }
     private void nameEditor(){
         NameEditor e=s.nameEditor;

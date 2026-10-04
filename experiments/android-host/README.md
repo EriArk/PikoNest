@@ -1,5 +1,12 @@
 # PIKOOS Android host experiment
 
+Version 0.0.54 adds sprite-library categories, grouped Lua/parameter tools and
+cross-project favorites. It also adds an ordinary `if/else` form; a number game
+with both outcomes/reset was authored from blank through controller-event UI
+actions and checked in official PICO-8. [Evidence and remaining scope](../../docs/design/android-catalogue-54/README.md).
+Saved parameter presets and favorites outside the insertion catalogue remain
+future work; no GitHub APK release is authorized yet.
+
 Version 0.0.42 adds visual sprite-region placement through Code → X → Sprite:
 two sheet corners, screen position, explicit ordinary `sspr` insertion, draft
 Undo/Redo, recovery and Test. Existing six-argument calls have editable fields.
