@@ -1,0 +1,47 @@
+{
+  "host_version": "0.0.49",
+  "host_sha256": "211b7c25747aa15f2552bdcc31254d332e6747e3e0ce68781b9ad5d959e4720f",
+  "host_bytes": 304036,
+  "core_checks": 52,
+  "official_runtime_checks": "16/16",
+  "project": "remix-0016",
+  "project_sha256": "1c264944019d875b57ae5ef96c3abe82604a7b9c8a01d4a16d26e1511e1cf325",
+  "old_files_preserved": 31,
+  "non_lua_sections_preserved": true,
+  "preexisting_lua_preserved": true,
+  "undo_redo_byte_exact": true,
+  "frames": [
+    {
+      "region": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "millis": 250
+    },
+    {
+      "region": [
+        8,
+        7,
+        8,
+        9
+      ],
+      "millis": 500
+    }
+  ],
+  "position": [
+    56,
+    8
+  ],
+  "loop": true,
+  "runtime_frame_pixels": "both matched; see runtime-frame-match.json",
+  "input": "ADB controller events, not physical acceptance",
+  "screen_sizes": [
+    "1240x1080",
+    "720x960"
+  ],
+  "runtime": "official user PICO-8 0.2.7 / Android Test 8",
+  "runtime_oracle_unchanged_in_final_build": true,
+  "release_created": false
+}

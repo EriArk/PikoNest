@@ -17,6 +17,7 @@ import art.pikoos.lab.core.SpriteRegion;
 import art.pikoos.lab.core.MapEditor;
 import art.pikoos.lab.core.MapChange;
 import art.pikoos.lab.core.SpritePlacement;
+import art.pikoos.lab.core.SpriteAnimation;
 import art.pikoos.lab.core.SpriteMove;
 import art.pikoos.lab.core.SpriteAsset;
 import art.pikoos.lab.core.NameEditor;
@@ -46,6 +47,7 @@ final class WorkshopView extends View {
     private long noticeUntil;
     private RectF spriteArea;
     private RectF placementArea;
+    private long animationClock;
     private RectF mapArea;
     private int mapLeft,mapTop;
     private static final String[] MAP_TOOLS={"Кисть","Прямоугольник","Заливка","Флаги тайла"};
@@ -68,7 +70,7 @@ final class WorkshopView extends View {
     boolean codeKey(KeyEvent event){
         if(s.mode!=Mode.CODE||s.codeDraft==null||(event.getSource()&InputDevice.SOURCE_GAMEPAD)==InputDevice.SOURCE_GAMEPAD)return false;
         LuaDraft d=s.codeDraft;
-        if(d.panel==LuaDraft.Panel.SPRITE)return false;
+        if(d.panel==LuaDraft.Panel.SPRITE||d.panel==LuaDraft.Panel.ANIMATION)return false;
         if(d.proposal()){
             if(d.insertion.screen!=LuaInsert.Screen.TEXT)return false;
             int k=event.getKeyCode();
@@ -416,6 +418,7 @@ final class WorkshopView extends View {
     }
     private void luaEditor(){
         LuaDraft d=s.codeDraft;
+        if(d.panel==LuaDraft.Panel.ANIMATION){animationEditor();return;}
         if(d.panel==LuaDraft.Panel.SPRITE){spritePlacement();return;}
         if(d.proposal()){luaInsertion();return;}
         if(d.panel==LuaDraft.Panel.NAVIGATION){luaNavigation();return;}
@@ -491,6 +494,79 @@ final class WorkshopView extends View {
             key(ok()+" выбрать",16,bodyBottom,10,()->action(Action.CONFIRM));
             key(back()+" к коду",w/2,bodyBottom,6,()->action(Action.CANCEL));
         }
+    }
+    @Override protected void onWindowVisibilityChanged(int visibility){super.onWindowVisibilityChanged(visibility);animationClock=0;}
+    private void animationImage(SpriteRegion r,float left,float top,float size){
+        animationImage(r,left,top,size,r.width,r.height);
+    }
+    private void animationImage(SpriteRegion r,float left,float top,float size,int canvasWidth,int canvasHeight){
+        for(int yy=0;yy<128;yy++)for(int xx=0;xx<128;xx++){int color=s.cart().sheetPixel(xx,yy);sceneBitmap.setPixel(xx,yy,color==0?0:COLORS[color]);}
+        rect(left,top,size,size,0);
+        for(int yy=0;yy<4;yy++)for(int xx=0;xx<4;xx++)if((xx+yy)%2==0)rect(left+xx*size/4,top+yy*size/4,size/4,size/4,5);
+        float zoom=size/Math.max(canvasWidth,canvasHeight),ox=left+(size-canvasWidth*zoom)/2,oy=top+(size-canvasHeight*zoom)/2;
+        c.drawBitmap(sceneBitmap,new android.graphics.Rect(r.x,r.y,r.x+r.width,r.y+r.height),new RectF(ox,oy,ox+r.width*zoom,oy+r.height*zoom),p);
+    }
+    private void animationEditor(){
+        LuaDraft d=s.codeDraft;SpriteAnimation a=d.animation;hits.clear();
+        if(a.picker!=null){animationClock=0;animationPicker(a);return;}
+        if(a.review){animationClock=0;animationReview(a);return;}
+        long now=SystemClock.uptimeMillis();
+        if(a.playing&&s.mode==Mode.CODE&&getWindowVisibility()==VISIBLE){if(animationClock!=0)a.advance((int)Math.min(100,now-animationClock));animationClock=now;if(a.playing)postInvalidateDelayed(16);}
+        else animationClock=0;
+        fitted("Анимация · кадры",16,75,24,14,w-32);
+        fitted(w<500?"Просмотр без кода игры":"Предпросмотр · без кода игры",16,100,16,6,w-32);
+        animationImage(a.frame(a.visibleFrame()).region,16,112,96,a.previewWidth(),a.previewHeight());
+        fitted((a.playing?"Играет ":"Пауза ")+(a.visibleFrame()+1),128,130,18,10,w-144);
+        int firstThumb=Math.max(0,Math.min(a.selected-1,a.count()-3));float thumb=Math.min(48,(w-160)/3);
+        for(int n=0;n<3&&firstThumb+n<a.count();n++){
+            final int index=firstThumb+n;float left=128+n*(thumb+6);animationImage(a.frame(index).region,left,142,thumb);
+            outline(left-1,141,thumb+2,thumb+2,index==a.selected?10:13);
+            fitted(""+(index+1),left,154+thumb,14,index==a.selected?10:6,thumb);
+            hit(left,142,thumb,thumb,()->{a.select(index);changed.run();invalidate();});
+        }
+        int rows=Math.max(2,(int)((bodyBottom-290)/34));int first=Math.max(0,Math.min(a.field-rows/2,9-rows));
+        for(int n=0;n<rows&&first+n<9;n++){final int row=first+n;
+            button(a.label(row),16,228+n*34,w-32,30,a.field==row,()->{a.field=row;action(Action.CONFIRM);});}
+        fitted(w<500?"↑↓ поля · ←→ · L/R кадр":"↑↓ поле · ←→ менять · L/R кадр",16,bodyBottom-44,16,13,w-32);
+        fitted("Y стоп · "+a.duration()+" мс всего",16,bodyBottom-20,16,6,w-32);
+        hit(16,bodyBottom-38,w-32,32,()->action(Action.UNDO));
+        rect(0,bodyBottom,w,44,0);
+        key(ok()+" выбор",12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" отмена",w/3,bodyBottom,6,()->action(Action.CANCEL));
+        key(a.playing?"X пауза":"X пуск",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
+    }
+    private void animationPicker(SpriteAnimation a){
+        SpritePlacement v=a.picker;SpriteRegion r=v.source();
+        fitted(v.phase==2?"Место анимации":"Область кадра "+(a.selected+1),16,75,24,14,w-32);
+        fitted(v.phase==0?"Первый угол · A дальше":v.phase==1?"Второй угол · A готово":"Внутри _draw после cls()",16,100,18,7,w-32);
+        float size=Math.min(256,Math.min(w-32,bodyBottom-256)),left=(w-size)/2,top=112,cell=size/128;
+        placementArea=new RectF(left,top,left+size,top+size);
+        for(int yy=0;yy<128;yy++)for(int xx=0;xx<128;xx++)sceneBitmap.setPixel(xx,yy,COLORS[v.phase<2?s.cart().sheetPixel(xx,yy):v.pixel(s.cart(),xx,yy)]);
+        c.drawBitmap(sceneBitmap,null,placementArea,p);outline(left-2,top-2,size+4,size+4,13);
+        c.save();c.clipRect(left-2,top-2,left+size+2,top+size+2);
+        outline(left+(v.phase<2?r.x:v.x)*cell,top+(v.phase<2?r.y:v.y)*cell,r.width*cell,r.height*cell,10);
+        if(v.phase<2)outline(left+(v.phase==0?v.ax:v.bx)*cell-2,top+(v.phase==0?v.ay:v.by)*cell-2,5,5,14);c.restore();
+        fitted(v.phase<2?r.x+", "+r.y+" · "+r.width+" × "+r.height:"X "+v.x+" · Y "+v.y,16,top+size+24,18,10,w-32);
+        fitted(v.phase<2&&r.sharesMap()?"Общая память с картой":"Лист и карта не изменяются",16,top+size+46,16,6,w-32);
+        button("X Шаг: "+v.step+" пикс.",16,bodyBottom-82,w-32,32,false,()->action(Action.CONTEXT));
+        button(ok()+(v.phase==0?" Второй угол":" Готово"),16,bodyBottom-42,w-32,32,true,()->action(Action.CONFIRM));
+        rect(0,bodyBottom,w,44,0);key(back()+" назад",12,bodyBottom,6,()->action(Action.CANCEL));
+        fitted("↑↓←→ двигать",w/2,bodyBottom+28,16,13,w/2-12);
+    }
+    private void animationReview(SpriteAnimation a){
+        fitted("Анимация · Lua",16,75,24,14,w-32);
+        fitted("В _draw · от запуска игры",16,100,16,6,w-32);
+        ArrayList<String> rows=new ArrayList<>();
+        for(String line:a.code().split("\n")){
+            if(line.isEmpty()){rows.add("");continue;}
+            while(!line.isEmpty()){int n=line.length();while(n>1&&width(line.substring(0,n),18)>w-48)n--;rows.add(line.substring(0,n));line=line.substring(n);}
+        }
+        int visible=Math.max(1,(int)((bodyBottom-162)/22));a.previewLine=Math.min(a.previewLine,Math.max(0,rows.size()-visible));
+        rect(16,112,w-32,visible*22+8,0);
+        for(int n=0;n<visible&&a.previewLine+n<rows.size();n++)text(rows.get(a.previewLine+n),24,134+n*22,18,7);
+        fitted((a.previewLine+1)+"–"+Math.min(rows.size(),a.previewLine+visible)+"/"+rows.size()+(w<500?" · ↑↓ · ←→":" · ↑↓ читать · ←→ листать"),16,bodyBottom-12,16,6,w-32);
+        rect(0,bodyBottom,w,44,0);key(ok()+" вставить",12,bodyBottom,10,()->action(Action.CONFIRM));key(back()+" кадры",w/2,bodyBottom,6,()->action(Action.CANCEL));
+        hit(16,112,(w-32)/2,visible*22+8,()->action(Action.LEFT));hit(w/2,112,(w-32)/2,visible*22+8,()->action(Action.RIGHT));
     }
     private void spritePlacement(){
         LuaDraft d=s.codeDraft;SpritePlacement v=d.placement;SpriteRegion r=v.source();hits.clear();
@@ -1128,6 +1204,10 @@ final class WorkshopView extends View {
             }
             if(placementArea!=null&&placementArea.contains(x,y)&&s.mode==Mode.CODE&&s.codeDraft.panel==LuaDraft.Panel.SPRITE){
                 s.codeDraft.placement.point((int)((x-placementArea.left)*128/placementArea.width()),(int)((y-placementArea.top)*128/placementArea.height()));
+                changed.run();invalidate();performClick();return true;
+            }
+            if(placementArea!=null&&placementArea.contains(x,y)&&s.mode==Mode.CODE&&s.codeDraft.panel==LuaDraft.Panel.ANIMATION&&s.codeDraft.animation.picker!=null){
+                s.codeDraft.animation.picker.point((int)((x-placementArea.left)*128/placementArea.width()),(int)((y-placementArea.top)*128/placementArea.height()));
                 changed.run();invalidate();performClick();return true;
             }
             if(spriteArea!=null && spriteArea.contains(x,y) && (s.mode==Mode.NAVIGATE||s.mode==Mode.CANVAS)) {

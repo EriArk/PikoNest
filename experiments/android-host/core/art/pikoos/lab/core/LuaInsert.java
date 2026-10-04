@@ -40,7 +40,8 @@ public final class LuaInsert {
         ,new Item("solid","Препятствие · точка карты","Создаёт функцию в начале Lua. solid_at(x,y): true, если точка на тайле с флагом. x/y — пиксели от начала карты, не экрана.",false,f("Имя","solid_at",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Ширина, кл","128",Kind.MAP_WIDTH),f("Высота, кл","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE)),
         new Item("solid_box","Препятствие · область","solid_box(x,y,w,h): точка начала и размеры в пикселях карты. Проверяет все клетки области. Касание края не считается пересечением.",false,f("Имя","solid_box",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Карта, шир.","128",Kind.MAP_WIDTH),f("Карта, выс.","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE)),
         new Item("move_box","Движение · стены","Создаёт движение по флагам: сначала X, затем Y. Проверяет весь путь шага. После вставки выбери «Движение · вызов» в _update.",false,f("Имя","move_box",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Карта, шир.","128",Kind.MAP_WIDTH),f("Карта, выс.","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE)),
-        new Item("move_call","Движение · вызов","Выбери функцию движения, переменные координат, размер и шаг в пикселях. Вставляй в _update. Функцию сначала добавь через «Движение · стены».",false,f("Функция","move_box",Kind.NAME),f("Коорд. X","x",Kind.NAME),f("Коорд. Y","y",Kind.NAME),f("Ширина, px","8",Kind.EXPR),f("Высота, px","8",Kind.EXPR),f("Шаг X","1",Kind.EXPR),f("Шаг Y","0",Kind.EXPR))
+        new Item("move_call","Движение · вызов","Выбери функцию движения, переменные координат, размер и шаг в пикселях. Вставляй в _update. Функцию сначала добавь через «Движение · стены».",false,f("Функция","move_box",Kind.NAME),f("Коорд. X","x",Kind.NAME),f("Коорд. Y","y",Kind.NAME),f("Ширина, px","8",Kind.EXPR),f("Высота, px","8",Kind.EXPR),f("Шаг X","1",Kind.EXPR),f("Шаг Y","0",Kind.EXPR)),
+        new Item("animation","Анимация · кадры","Выбери области листа, порядок и время каждого кадра. Просмотри анимацию и вставь Lua внутри _draw после cls().",false)
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
@@ -131,6 +132,7 @@ public final class LuaInsert {
     public void changePage(int delta){page=(page+delta+3)%3;key=Math.min(key,LuaDraft.PAGES[page].length()-1);}
     public String functionName(){return selected<3?new String[]{"_init","_update","_draw"}[selected]:item().id.equals("function")?values[0]:null;}
     public String code(){
+        if(item().id.equals("animation"))throw new IllegalArgumentException("Открой визуальный выбор кадров");
         for(int i=0;i<values.length;i++)validate(kind(i),values[i]);
         String name=functionName();if(name!=null)return "function "+name+"()\n  \nend\n";
         String a=values[0];
@@ -183,6 +185,7 @@ public final class LuaInsert {
             ||insert.key<0||insert.key>=LuaDraft.PAGES[insert.page].length()||insert.input.length()>256
             ||(screen==Screen.TEXT.ordinal()&&insert.field==insert.values.length))throw new IOException("snippet state");
         insert.screen=Screen.values()[screen];for(int i=0;i<insert.values.length;i++)insert.set(i,in.readUTF());
+        if(id.equals("animation")&&insert.screen!=Screen.CATALOG)throw new IOException("visual animation proposal");
         if(browserState){insert.symbolGroup=in.readInt();insert.symbolIndex=in.readInt();}
         if(insert.screen==Screen.PREVIEW){
             insert.previewLine=in.readInt();

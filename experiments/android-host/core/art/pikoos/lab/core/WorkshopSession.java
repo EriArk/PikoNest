@@ -80,7 +80,7 @@ public final class WorkshopSession {
     }
     public void codeCommand(int command){
         if(mode!=Mode.CODE||codeDraft==null)return;
-        if(codeDraft.proposal()||codeDraft.panel==LuaDraft.Panel.NAVIGATION||codeDraft.panel==LuaDraft.Panel.SPRITE)return;
+        if(codeDraft.proposal()||codeDraft.panel==LuaDraft.Panel.NAVIGATION||codeDraft.panel==LuaDraft.Panel.SPRITE||codeDraft.panel==LuaDraft.Panel.ANIMATION)return;
         try{
             LuaDraft d=codeDraft;
             switch(command){
@@ -145,7 +145,7 @@ public final class WorkshopSession {
         if(i.screen==LuaInsert.Screen.CATALOG){
             if(action==Action.UP)i.choose(Math.max(0,i.selected-1));
             if(action==Action.DOWN)i.choose(Math.min(LuaInsert.ITEMS.length-1,i.selected+1));
-            if(action==Action.CONFIRM){if(i.item().id.equals("sspr"))d.beginSprite(selection());else i.screen=LuaInsert.Screen.FIELDS;}
+            if(action==Action.CONFIRM){if(i.item().id.equals("sspr"))d.beginSprite(selection());else if(i.item().id.equals("animation"))d.beginAnimation(selection());else i.screen=LuaInsert.Screen.FIELDS;}
             if(action==Action.CANCEL)d.cancelInsert();
             return;
         }
@@ -159,6 +159,27 @@ public final class WorkshopSession {
     }
     private void codeAction(Action action)throws Exception{
         LuaDraft d=codeDraft;
+        if(d.panel==LuaDraft.Panel.ANIMATION){
+            SpriteAnimation a=d.animation;
+            if(a.picker!=null){
+                if(action==Action.LEFT)a.picker.move(-1,0);if(action==Action.RIGHT)a.picker.move(1,0);
+                if(action==Action.UP)a.picker.move(0,-1);if(action==Action.DOWN)a.picker.move(0,1);
+                if(action==Action.CONTEXT||action==Action.PREVIOUS||action==Action.NEXT)a.picker.toggleStep();
+                if(action==Action.CONFIRM)a.acceptPick();if(action==Action.CANCEL)a.cancelPick();
+            }else if(a.review){
+                if(action==Action.UP)a.previewLine=Math.max(0,a.previewLine-1);if(action==Action.DOWN)a.previewLine=Math.min(a.code().length(),a.previewLine+1);
+                if(action==Action.LEFT||action==Action.PREVIOUS)a.previewLine=Math.max(0,a.previewLine-6);
+                if(action==Action.RIGHT||action==Action.NEXT)a.previewLine=Math.min(a.code().length(),a.previewLine+6);
+                if(action==Action.CANCEL)a.review=false;if(action==Action.CONFIRM)d.applyAnimation();
+            }else{
+                if(action==Action.UP)a.field=Math.max(0,a.field-1);if(action==Action.DOWN)a.field=Math.min(8,a.field+1);
+                if(action==Action.LEFT)a.change(-1);if(action==Action.RIGHT)a.change(1);
+                if(action==Action.PREVIOUS)a.select(a.selected-1);if(action==Action.NEXT)a.select(a.selected+1);
+                if(action==Action.CONTEXT)a.toggle();if(action==Action.UNDO)a.stop();
+                if(action==Action.CONFIRM)a.choose();if(action==Action.CANCEL)d.cancelAnimation();
+            }
+            return;
+        }
         if(d.panel==LuaDraft.Panel.SPRITE){
             SpritePlacement p=d.placement;
             if(action==Action.LEFT)p.move(-1,0);if(action==Action.RIGHT)p.move(1,0);

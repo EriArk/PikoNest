@@ -8,7 +8,7 @@ import java.util.ArrayDeque;
 
 /** Portable literal-text editor with explicit snippet proposals; never normalizes unrelated Lua. */
 public final class LuaDraft {
-    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS, NAVIGATION, SPRITE }
+    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS, NAVIGATION, SPRITE, ANIMATION }
     public static final String[] PAGES={"abcdefghijklmnopqrstuvwxyz0123456789_ ",
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ ","()[]{}=+-*/%^#<>~!;:,.\"'\\|&?$@_ "};
     public static final String[] COMMANDS={"Сохранить и закрыть","Сохранить и тест","Новая строка","Пробел","Табуляция",
@@ -26,6 +26,19 @@ public final class LuaDraft {
     public LuaCall callEdit;
     public LuaNavigation navigation;
     public SpritePlacement placement;
+    public SpriteAnimation animation;
+    public void beginAnimation(SpriteRegion region){beginInsert();insertion=null;animation=new SpriteAnimation(region);panel=Panel.ANIMATION;}
+    public void cancelAnimation(){animation=null;panel=Panel.CURSOR;}
+    public void applyAnimation(){
+        if(animation==null||!animation.review)return;
+        SpriteAnimation.validateSource(text);
+        if(!new LuaContext(text).allowsLine(lineStart(line())))throw new IllegalArgumentException("Выбери строку Lua");
+        String row=lineText(line()),indent="";for(int n=0;n<row.length()&&(row.charAt(n)==' '||row.charAt(n)=='\t');n++)indent+=row.charAt(n);
+        StringBuilder insert=new StringBuilder();for(String part:animation.code().split("\n"))insert.append(indent).append(part).append(newline);
+        int at=lineStart(line());String changed=text.substring(0,at)+insert+text.substring(at);
+        if(changed.getBytes(StandardCharsets.UTF_8).length>LIMIT)throw new IllegalArgumentException("Достигнут предел памяти черновика PIKOOS");
+        remember(undo);redo.clear();changeText(changed);cursor=at+insert.length()+indent.length();anchor=-1;cancelAnimation();
+    }
     public void beginSprite(SpriteRegion region){
         beginInsert();insertion=null;placement=new SpritePlacement(region);panel=Panel.SPRITE;
     }
@@ -200,7 +213,7 @@ public final class LuaDraft {
     /** Recovery snapshot, including original bytes for stale-draft detection. History is session-only. */
     public byte[] encode(){
         try{ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
-            boolean navState=placement!=null||navigation!=null||!jumps.isEmpty();out.writeInt(placement!=null?6:navState?5:4);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
+            boolean navState=animation!=null||placement!=null||navigation!=null||!jumps.isEmpty();out.writeInt(animation!=null?7:placement!=null?6:navState?5:4);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
             out.writeInt(cursor);out.writeInt(anchor);out.writeInt(page);out.writeInt(key);out.writeInt(panel.ordinal());out.writeInt(menu);
             write(out,clipboard.getBytes(StandardCharsets.UTF_8));out.writeBoolean(insertion!=null);if(insertion!=null)insertion.write(out);
             if(navState){
@@ -209,11 +222,12 @@ public final class LuaDraft {
                 out.writeInt(jumps.size());for(int[] at:jumps){out.writeInt(at[0]);out.writeInt(at[1]);}
             }
             if(placement!=null)placement.write(out);
+            if(animation!=null)animation.write(out);
             out.close();return bytes.toByteArray();
         }catch(IOException e){throw new IllegalStateException(e);}
     }
     public static LuaDraft restore(byte[] bytes){
-        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>6)throw new IOException("version");
+        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>7)throw new IOException("version");
             LuaDraft d=new LuaDraft(new WorkshopCartridge(read(in)),0);d.text=decode(read(in));
             d.cursor=in.readInt();d.anchor=in.readInt();d.page=in.readInt();d.key=in.readInt();int panel=in.readInt();d.menu=in.readInt();
             d.clipboard=decode(read(in));
@@ -228,6 +242,8 @@ public final class LuaDraft {
                 for(int n=0;n<count;n++){int at=in.readInt(),anchor=in.readInt();if(!d.boundary(at)||(anchor!=-1&&!d.boundary(anchor)))throw new IOException("jump");d.jumps.addLast(new int[]{at,anchor});}
             }
             if(version==6)d.placement=SpritePlacement.read(in);
+            if(version==7)d.animation=SpriteAnimation.read(in);
+            if((panel==Panel.ANIMATION.ordinal())!=(d.animation!=null))throw new IOException("animation panel");
             if((panel==Panel.SPRITE.ordinal())!=(d.placement!=null))throw new IOException("sprite panel");
             if((panel==Panel.NAVIGATION.ordinal())!=(d.navigation!=null))throw new IOException("navigation panel");
             if(in.available()!=0||!d.boundary(d.cursor)||(d.anchor!=-1&&!d.boundary(d.anchor))||d.page<0||d.page>=PAGES.length
