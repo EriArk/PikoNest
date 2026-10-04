@@ -147,6 +147,22 @@ product rule. A template-only parameter adapter is not the general tool itself.
 
 ### Controller-first
 
+Owner priority clarification (2026-10-04): complete the basic editors and their
+create/edit/save/reopen/use/Test workflows before expanding preset libraries or
+genre templates. Reuse existing operations; do not keep adding recipe variants
+to one tool while other core tools or connections remain absent. Design resource
+dependencies now, populate reusable content later. See `docs/CORE_TOOLS.md` for
+the current audit and the next bounded package, G04.2. N03.3 is deferred from the
+immediate queue. Preserve existing libraries, favorites and presets.
+
+Owner creation requirement (2026-10-04): a simple original game must be creatable
+from a blank cart, editable, testable and exportable without opening or editing Lua.
+Resource placement, input, state, conditions/actions, basic animation/audio and
+restart must connect through controller-first tools. Do not require users to find
+callback lines or wire generated snippets manually. Code inspection, learning and
+advanced edits remain optional and accessible; output stays ordinary PICO-8 Lua.
+This is a completion criterion, not a claim that the current lab already meets it.
+
 Owner clarification (2026-10-03): everyday play is a primary use case. The
 default Play library must support attractive cartridge browsing, recent launches,
 favorites and direct controller launch/return. Workshop is a separate entrance.
@@ -464,11 +480,12 @@ When a major decision is made:
 ## 15. Near-term priority order
 
 The foundation-first list below is the original bootstrap order. The launch,
-round-trip and bounded controller experiments now exist. Follow the audited
-completion path in `docs/ROADMAP.md`: the next creator gap is general Lua editing
-and a real blank-cart creation loop (A01/A02 → C01/C02), alongside the remaining
-runtime/storage work. Do not keep extending launcher polish or template-specific
-controls as a substitute for missing general tools. Close tasks with explicit
+round-trip and bounded controller experiments now exist. Follow the current
+completion path in `docs/ROADMAP.md` and the basic-editor audit in `docs/CORE_TOOLS.md`:
+G04.2 connects sprite/map editing to creation and repeat editing of game uses,
+then finish basic editor workflows alongside the remaining runtime/storage work.
+Do not keep extending launcher polish or template-specific controls as a substitute
+for missing general tools. Close tasks with explicit
 scope/evidence, and keep owner acceptance separate from technical test results.
 
 Until the foundations are proven, prioritize:
