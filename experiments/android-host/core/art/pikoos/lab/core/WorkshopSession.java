@@ -960,10 +960,29 @@ public final class WorkshopSession {
                 return;
             }
             if(tool==3&&mapEditor.choosingTool){
-                if(action==Action.UP||action==Action.LEFT)mapEditor.toolChoice=clamp(mapEditor.toolChoice-1,3);
-                if(action==Action.DOWN||action==Action.RIGHT)mapEditor.toolChoice=clamp(mapEditor.toolChoice+1,3);
-                if(action==Action.CONFIRM){if(mapEditor.toolChoice==3)flagDraft=new FlagDraft(cart,mapEditor.tile);else mapEditor.tool=MapEditor.Tool.values()[mapEditor.toolChoice];mapEditor.choosingTool=false;}
+                if(action==Action.UP||action==Action.LEFT)mapEditor.toolChoice=clamp(mapEditor.toolChoice-1,6);
+                if(action==Action.DOWN||action==Action.RIGHT)mapEditor.toolChoice=clamp(mapEditor.toolChoice+1,6);
+                if(action==Action.CONFIRM){
+                    if(mapEditor.toolChoice==3)flagDraft=new FlagDraft(cart,mapEditor.tile);
+                    else if(mapEditor.toolChoice>=4)mapEditor.region=new MapRegion(cart,MapRegion.Operation.values()[mapEditor.toolChoice-4],mapEditor.x,mapEditor.y);
+                    else mapEditor.tool=MapEditor.Tool.values()[mapEditor.toolChoice];
+                    mapEditor.choosingTool=false;
+                }
                 if(action==Action.CANCEL)mapEditor.choosingTool=false;
+                return;
+            }
+            if(tool==3&&mapEditor.region!=null){
+                MapRegion r=mapEditor.region;
+                if(action==Action.LEFT)r.move(-1,0);if(action==Action.RIGHT)r.move(1,0);
+                if(action==Action.UP)r.move(0,-1);if(action==Action.DOWN)r.move(0,1);
+                if(action==Action.PREVIOUS)r.move(-8,0);if(action==Action.NEXT)r.move(8,0);
+                if(action==Action.CHECK)r.move(0,-8);if(action==Action.REDO)r.move(0,8);
+                if((action==Action.CANCEL&&r.back())||action==Action.UNDO){mapEditor.region=null;notice="Область не изменена";}
+                if(action==Action.CONFIRM&&r.confirm()){
+                    boolean differs=r.proposal().count>0;save(r.candidate(cart),true);
+                    mapEditor.x=r.dx;mapEditor.y=r.dy;mapEditor.region=null;
+                    notice=differs?"Область сохранена · Y отмена":"Клетки не изменились";
+                }
                 return;
             }
             if(tool==3&&mapEditor.pending()){

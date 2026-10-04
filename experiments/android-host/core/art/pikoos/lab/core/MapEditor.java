@@ -4,6 +4,7 @@ package art.pikoos.lab.core;
 public final class MapEditor {
     public enum Tool { BRUSH, RECTANGLE, FILL }
     public Tool tool=Tool.BRUSH;
+    public MapRegion region;
     public boolean choosingTool;
     public int toolChoice,phase,anchorX,anchorY,peekX,peekY;
     private String base="";
@@ -17,7 +18,7 @@ public final class MapEditor {
         else{x=clamp(x+dx,127);y=clamp(y+dy,phase>0?31:63);}
     }
     public boolean pending(){return phase>0;}
-    public boolean modal(){return picking||choosingTool||pending();}
+    public boolean modal(){return picking||choosingTool||pending()||region!=null;}
     public void tools(){if(!modal()){toolChoice=tool.ordinal();choosingTool=true;}}
     public void start(WorkshopCartridge cart){
         if(tool==Tool.BRUSH||modal())return;
@@ -36,9 +37,10 @@ public final class MapEditor {
     public void clear(){phase=0;base="";}
     public void back(){if(phase==2&&tool==Tool.RECTANGLE)phase=1;else clear();}
     public void point(int px,int py){if(phase==2){peekX=clamp(px,127);peekY=clamp(py,31);}else{x=clamp(px,127);y=clamp(py,pending()?31:63);}}
-    public String encode(){return pending()?"1;"+tool.name()+";"+phase+";"+x+";"+y+";"+tile+";"+anchorX+";"+anchorY+";"+base+";"+peekX+";"+peekY:"";}
+    public String encode(){return region!=null?region.encode():pending()?"1;"+tool.name()+";"+phase+";"+x+";"+y+";"+tile+";"+anchorX+";"+anchorY+";"+base+";"+peekX+";"+peekY:"";}
     public void restore(String encoded,WorkshopCartridge cart){
         if(encoded.isEmpty())return;
+        if(encoded.startsWith("2;")){region=MapRegion.restore(encoded,cart);clear();picking=choosingTool=false;return;}
         try{
             String[] f=encoded.split(";",-1);if(f.length!=11||!f[0].equals("1"))throw new IllegalArgumentException();
             Tool t=Tool.valueOf(f[1]);int p=Integer.parseInt(f[2]),px=Integer.parseInt(f[3]),py=Integer.parseInt(f[4]),v=Integer.parseInt(f[5]),ax=Integer.parseInt(f[6]),ay=Integer.parseInt(f[7]);
@@ -47,7 +49,7 @@ public final class MapEditor {
             cart.map();tool=t;phase=p;x=px;y=py;tile=v;anchorX=ax;anchorY=ay;base=f[8];peekX=vx;peekY=vy;picking=choosingTool=false;
         }catch(Exception e){throw new IllegalArgumentException("Не удалось восстановить правку карты. Картридж сохранён; выбери область заново.");}
     }
-    private static String hash(byte[] bytes){
+    static String hash(byte[] bytes){
         try{byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(bytes);StringBuilder b=new StringBuilder();for(byte v:digest)b.append(String.format(java.util.Locale.ROOT,"%02x",v&255));return b.toString();}
         catch(java.security.NoSuchAlgorithmException e){throw new IllegalStateException(e);}
     }

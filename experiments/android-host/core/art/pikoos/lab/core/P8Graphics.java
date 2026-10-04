@@ -50,6 +50,15 @@ public final class P8Graphics {
         return result;
     }
     private static void color(int value){if(value<0||value>15)throw new IllegalArgumentException("Color out of range");}
+    /** Sparse batch: -1 keeps a pixel, 0..15 replaces it. Sharing policy belongs to the workflow. */
+    public P8Document withPixels(int[] values){
+        if(values==null||values.length!=16384)throw new IllegalArgumentException("Invalid pixel batch");
+        int[] resolved=values.clone();
+        for(int i=0;i<resolved.length;i++){
+            if(resolved[i]==-1)resolved[i]=pixel(i%128,i/128);else color(resolved[i]);
+        }
+        return write(new SpriteRegion(0,0,128,128),resolved);
+    }
     private P8Document write(SpriteRegion r,int[] values){
         int last=count-1;boolean differs=false;
         for(int y=0;y<r.height;y++)for(int x=0;x<r.width;x++){

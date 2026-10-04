@@ -1,5 +1,10 @@
 # PikoNest Android host experiment
 
+**0.0.63:** rectangular map copy/move/clear across the default 128x64 map.
+Snapshot-based overlap, preview/cancel, one Undo/Redo, draft recovery and explicit
+before/after confirmation for shared graphics. Ordinary map brushes and shared
+sprite painting remain limited. [Evidence and screenshots](../../docs/design/android-map-regions-63/README.md).
+
 **0.0.62:** bounded sprite/map uses workflow from the workshop, without opening Lua.
 Create, select, edit, duplicate, remove, Undo/Redo, recover and Test known flat draw
 calls. [Device evidence, screenshots and limitations](../../docs/design/android-uses-62/README.md).

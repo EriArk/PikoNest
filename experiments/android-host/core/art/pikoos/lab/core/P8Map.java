@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-/** Default 128x64 PICO-8 map. Only the independent upper 32 rows are writable. */
+/** Default 128x64 PICO-8 map. Rows 32..63 alias the lower half of gfx. */
 public final class P8Map {
     private final P8Document document;
     private final int section,count;
@@ -49,8 +49,26 @@ public final class P8Map {
     /** Atomic bulk edit: serialize once, preserve all digits outside changed cells. */
     public P8Document withTiles(boolean[] mask,int value){
         if(mask==null||mask.length!=4096||value<0||value>255)throw new IllegalArgumentException("Invalid map edit");
+        int[] values=new int[8192];Arrays.fill(values,-1);
+        for(int i=0;i<4096;i++)if(mask[i])values[i]=value;
+        return withCells(values);
+    }
+    /** One heterogeneous edit, including shared memory. -1 keeps a cell.
+     * Callers must show shared-gfx consequences before committing this document. */
+    public P8Document withCells(int[] values){
+        if(values==null||values.length!=8192)throw new IllegalArgumentException("Invalid map batch");
+        for(int value:values)if(value < -1||value>255)throw new IllegalArgumentException("Invalid map tile");
+        P8Document upper=withUpper(values);
+        int[] pixels=new int[16384];Arrays.fill(pixels,-1);boolean shared=false;
+        for(int i=4096;i<8192;i++)if(values[i]>=0&&tile(i%128,i/128)!=values[i]){
+            int offset=8192+(i-4096)*2;
+            pixels[offset]=values[i]&15;pixels[offset+1]=values[i]>>4;shared=true;
+        }
+        return shared?new P8Graphics(upper).withPixels(pixels):upper;
+    }
+    private P8Document withUpper(int[] values){
         int last=-1;
-        for(int i=0;i<4096;i++)if(mask[i]&&tile(i%128,i/128)!=value)last=i/128;
+        for(int i=0;i<4096;i++)if(values[i]>=0&&tile(i%128,i/128)!=values[i])last=i/128;
         if(last<0)return document;
         ByteArrayOutputStream out=new ByteArrayOutputStream();out.write(body,0,body.length);
         int[] offsets=rows.clone();
@@ -62,7 +80,8 @@ public final class P8Map {
             }
         }
         byte[] changed=out.toByteArray();String hex="0123456789abcdef";
-        for(int i=0;i<4096;i++)if(mask[i]&&tile(i%128,i/128)!=value){
+        for(int i=0;i<4096;i++)if(values[i]>=0&&tile(i%128,i/128)!=values[i]){
+            int value=values[i];
             int offset=offsets[i/128]+i%128*2;
             changed[offset]=(byte)hex.charAt(value>>4);changed[offset+1]=(byte)hex.charAt(value&15);
         }

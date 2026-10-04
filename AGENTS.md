@@ -152,8 +152,10 @@ create/edit/save/reopen/use/Test workflows before expanding preset libraries or
 genre templates. Reuse existing operations; do not keep adding recipe variants
 to one tool while other core tools or connections remain absent. Design resource
 dependencies now, populate reusable content later. See `docs/CORE_TOOLS.md` for
-the current audit. The bounded G04.2 workflow exists in lab 0.0.62; next are basic
-map-region operations and shared gfx/map handling (G01/G03). N03.3 is deferred from the
+the current audit. Bounded G04.2 exists in lab 0.0.62; map-region copy/move/clear
+with explicit shared-gfx review (G03.4) exists in 0.0.63. Next is existing-animation
+management and resource-use integration (N01/G04), followed by camera N02. Shared
+sprite painting and map brushes remain unfinished G01/G03 work. N03.3 is deferred from the
 immediate queue. Preserve existing libraries, favorites and presets.
 
 Owner creation requirement (2026-10-04): a simple original game must be creatable

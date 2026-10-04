@@ -16,6 +16,7 @@ import art.pikoos.lab.core.WorkshopCartridge;
 import art.pikoos.lab.core.SpriteRegion;
 import art.pikoos.lab.core.MapEditor;
 import art.pikoos.lab.core.MapChange;
+import art.pikoos.lab.core.MapRegion;
 import art.pikoos.lab.core.GameUses;
 import art.pikoos.lab.core.SpritePlacement;
 import art.pikoos.lab.core.SpriteAnimation;
@@ -43,6 +44,7 @@ final class WorkshopView extends View {
     private final String projectTitle;
     private final Paint p = new Paint();
     private final Bitmap sceneBitmap=Bitmap.createBitmap(128,128,Bitmap.Config.ARGB_8888);
+    private final Bitmap sharedAfterBitmap=Bitmap.createBitmap(128,128,Bitmap.Config.ARGB_8888);
     private final ArrayList<Hit> hits = new ArrayList<>();
     private Canvas c;
     private float scale, w, h, bodyBottom, downX, downY;
@@ -54,7 +56,7 @@ final class WorkshopView extends View {
     private long animationClock;
     private RectF mapArea;
     private int mapLeft,mapTop;
-    private static final String[] MAP_TOOLS={"Кисть","Прямоугольник","Заливка","Флаги тайла"};
+    private static final String[] MAP_TOOLS={"Кисть","Прямоугольник","Заливка","Флаги тайла","Копировать область","Перенести область","Очистить область"};
     private int viewX,viewY,viewWidth,viewHeight;
     private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка","Прямоугольник","Прямоуг. с заливкой","Овал","Овал с заливкой"};
     private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из спрайта","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из спрайта","Контур: выбери два противоположных угла","Закрашенная фигура по двум углам","Контур овала внутри рамки по двум углам","Закрашенный овал внутри выбранной рамки"};
@@ -135,6 +137,7 @@ final class WorkshopView extends View {
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
         boolean draft=(s.uses!=null&&(s.uses.screen==GameUses.Screen.FORM||s.uses.screen==GameUses.Screen.REVIEW||s.uses.screen==GameUses.Screen.PICK))||s.flagDraft!=null||s.mapEditor.pending()||s.codeDraft!=null||s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
+        draft|=s.mapEditor.region!=null;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -142,6 +145,7 @@ final class WorkshopView extends View {
         if(s.mode==Mode.NAME){nameEditor();c.restore();return;}
         if(s.mode==Mode.ASSET_CATEGORY){assetCategories();c.restore();return;}
         if(s.mode==Mode.DIAGNOSTIC){diagnostic();c.restore();return;}
+        if(s.tool==3&&s.mapEditor.region!=null){mapRegionEditor();if(s.mode==Mode.ERROR)dialog();c.restore();return;}
         if(s.uses!=null&&(s.mode==Mode.USES||s.mode==Mode.ERROR)){gameUses();if(s.mode==Mode.ERROR)dialog();c.restore();return;}
         if(s.codeDraft!=null&&(s.mode==Mode.CODE||s.mode==Mode.ERROR)){
             luaEditor();if(s.mode==Mode.ERROR)dialog();c.restore();return;
@@ -240,16 +244,77 @@ final class WorkshopView extends View {
         if(w<500)label=label.replace(" выбрать"," выбор").replace(" сохранить"," сохр.").replace("START готово","START OK");
         text(label,x,y+28,18,color);hit(x,y,width(label,18)+8,44,run);
     }
+    private void mapRegionEditor(){
+        MapRegion r=s.mapEditor.region;
+        String title=r.operation==MapRegion.Operation.COPY?"КОПИЯ ОБЛАСТИ":r.operation==MapRegion.Operation.MOVE?"ПЕРЕНОС ОБЛАСТИ":"ОЧИСТКА ОБЛАСТИ";
+        fitted(title,16,78,24,14,w-32);
+        fitted(r.phase==0?"1 · Выбери второй угол":r.phase==1?"2 · Выбери новое место":r.phase==3?"Спрайты тоже изменятся":"Проверь результат",16,108,20,r.phase==3?9:7,w-32);
+        MapRegion.Proposal proposal=r.phase==0?null:r.proposal();
+        if(r.phase==3){
+            fitted("Карта 32–63 и спрайты 128–255",16,138,18,7,w-32);
+            float sw=Math.min(256,(w-48)/2),sy=182,sh=w<500?96:128;
+            text("СЕЙЧАС",16,168,18,6);text("ПОСЛЕ",32+sw,168,18,10);
+            int minX=127,minY=127,maxX=0,maxY=64;
+            for(int py=64;py<128;py++)for(int px=0;px<128;px++)if(r.original().sheetPixel(px,py)!=proposal.cart.sheetPixel(px,py)){
+                minX=Math.min(minX,px);minY=Math.min(minY,py);maxX=Math.max(maxX,px);maxY=Math.max(maxY,py);
+            }
+            SpriteRegion crop=new SpriteRegion(minX/8*8,minY/8*8,(maxX/8-minX/8+1)*8,(maxY/8-minY/8+1)*8);
+            sharedSheet(r.original(),sceneBitmap,crop,16,sy,sw,sh);sharedSheet(proposal.cart,sharedAfterBitmap,crop,32+sw,sy,sw,sh);
+            float by=sy+sh+30;
+            fitted("Изменится пикселей: "+proposal.pixels,16,by,20,9,w-32);
+            fitted("Клеток карты: "+proposal.sharedCells,16,by+30,18,7,w-32);
+            fitted("Лист: X "+crop.x+"–"+(crop.x+crop.width-1)+" · Y "+crop.y+"–"+(crop.y+crop.height-1),16,by+62,18,6,w-32);
+            fitted("Undo отменяет оба изменения.",16,by+86,18,6,w-32);
+        }else{
+            float size=Math.min(w<500?192:288,bodyBottom-244);size=Math.max(128,(int)(size/16)*16);
+            float bx=16,by=144,cell=size/16,right=bx+size+16,rw=w-right-16;
+            mapLeft=r.viewLeft();mapTop=r.viewTop();
+            WorkshopCartridge shown=proposal==null?r.original():proposal.cart;
+            art.pikoos.lab.core.P8Map map=shown.map();
+            for(int py=0;py<128;py++)for(int px=0;px<128;px++){
+                int tile=map.tile(mapLeft+px/8,mapTop+py/8);
+                int color=tile==0?0:shown.sheetPixel(tile%16*8+px%8,tile/16*8+py%8);
+                sceneBitmap.setPixel(px,py,COLORS[color==0?1:color]);
+            }
+            rect(bx-4,by-4,size+8,size+8,0);c.drawBitmap(sceneBitmap,null,new RectF(bx,by,bx+size,by+size),p);
+            for(int i=0;i<=16;i++){rect(bx+i*cell,by,1,size,0);rect(bx,by+i*cell,size,1,0);}
+            c.save();c.clipRect(bx,by,bx+size,by+size);
+            outline(bx+(r.left()-mapLeft)*cell,by+(r.top()-mapTop)*cell,r.width()*cell,r.height()*cell,12);
+            if(r.phase>0&&r.operation!=MapRegion.Operation.CLEAR)outline(bx+(r.dx-mapLeft)*cell,by+(r.dy-mapTop)*cell,r.width()*cell,r.height()*cell,10);
+            if(proposal!=null)for(int yy=0;yy<16;yy++)for(int xx=0;xx<16;xx++)if(proposal.changes(mapLeft+xx,mapTop+yy))rect(bx+xx*cell+2,by+yy*cell+2,3,3,14);
+            if(mapTop<=32&&mapTop+16>32)rect(bx,by+(32-mapTop)*cell,size,2,9);
+            c.restore();mapArea=new RectF(bx,by,bx+size,by+size);
+            fitted(r.width()+" × "+r.height(),right,164,22,10,rw);
+            text("ОТКУДА",right,200,18,12);fitted(r.left()+", "+r.top(),right,224,20,7,rw);
+            text(r.operation==MapRegion.Operation.CLEAR?"УБРАТЬ":"КУДА",right,260,18,10);
+            fitted(r.operation==MapRegion.Operation.CLEAR?r.width()*r.height()+" кл.":r.phase==0?"Далее":r.dx+", "+r.dy,right,284,20,7,rw);
+            fitted("Вид: "+mapLeft+","+mapTop+" — "+(mapLeft+15)+","+(mapTop+15),16,by+size+25,18,6,w-32);
+            String info=proposal==null?"Голубая рамка: источник":proposal.count==0?"Нет изменений": (w<500?"Правка: ":"Изменится клеток: ")+proposal.count+" · замена: "+proposal.overwritten;
+            fitted(info,16,by+size+51,18,proposal==null?12:7,w-32);
+            fitted(proposal!=null&&proposal.sharedCells>0?"Далее: спрайт-лист":r.phase<2?"L/R: ±8 X · L2/R2: ±8 Y":w<500?"Розовый: изменённые клетки":"Розовые точки — изменённые клетки",16,by+size+77,18,proposal!=null&&proposal.sharedCells>0?9:6,w-32);
+        }
+        rect(0,bodyBottom,w,44,0);
+        String verb=r.phase==0?(r.operation==MapRegion.Operation.CLEAR?" обзор":" место"):r.phase==1?" обзор":r.phase==2&&proposal.sharedCells>0?" спрайты":" сохранить";
+        key(ok()+verb,12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" назад",w<500?148:222,bodyBottom,6,()->action(Action.CANCEL));
+        key("Y отмена",w-104,bodyBottom,14,()->action(Action.UNDO));
+    }
+    private void sharedSheet(WorkshopCartridge cart,Bitmap bitmap,SpriteRegion crop,float x,float y,float width,float height){
+        for(int py=0;py<crop.height;py++)for(int px=0;px<crop.width;px++)bitmap.setPixel(px,py,COLORS[cart.sheetPixel(crop.x+px,crop.y+py)]);
+        float zoom=Math.min(width/crop.width,height/crop.height),bw=crop.width*zoom,bh=crop.height*zoom;
+        rect(x-2,y-2,width+4,height+4,13);rect(x,y,width,height,0);
+        c.drawBitmap(bitmap,new android.graphics.Rect(0,0,crop.width,crop.height),new RectF(x,y,x+bw,y+bh),p);
+    }
     private void mapEditor(){
         art.pikoos.lab.core.MapEditor m=s.mapEditor;
         if(s.flagDraft!=null){flagEditor();return;}
         if(m.choosingTool){
             text("ИНСТРУМЕНТ КАРТЫ",16,174,22,14);
-            for(int i=0;i<4;i++){final int n=i;button(MAP_TOOLS[i],16,184+i*42,w-32,38,m.toolChoice==i,()->{m.toolChoice=n;action(Action.CONFIRM);});}
-            String[] help={"Одна клетка — один тайл.","Выбери два угла.","Соседние одинаковые тайлы.","Для всех клеток с тайлом."};
-            fitted(help[m.toolChoice],16,370,18,7,w-32);
-            fitted(m.toolChoice==3?"Смысл задаёт Lua игры.":m.toolChoice==0?"Y отмена · R2 вернуть":"Обзор → готово · Y отмена",16,396,18,7,w-32);
-            fitted(m.toolChoice==3?"Номера флагов: 0–7.":"Правки — в строках 0–31.",16,422,18,6,w-32);return;
+            int visible=Math.max(3,Math.min(7,(int)((bodyBottom-240)/42)));
+            int first=Math.max(0,Math.min(7-visible,m.toolChoice-visible+1));
+            for(int row=0;row<visible;row++){final int n=first+row;button(MAP_TOOLS[n],16,184+row*42,w-32,38,m.toolChoice==n,()->{m.toolChoice=n;action(Action.CONFIRM);});}
+            String[] help={"Одна клетка — один тайл.","Выбери два угла.","Соседние одинаковые тайлы.","Для всех клеток с тайлом.","Два угла → место → обзор.","Область переедет целиком.","Убрать тайлы внутри рамки."};
+            fitted((m.toolChoice+1)+"/7 · "+help[m.toolChoice],16,bodyBottom-16,18,7,w-32);return;
         }
         boolean narrow=w<500;float size=Math.min(narrow?192:320,bodyBottom-230);size=Math.max(128,(int)(size/16)*16);
         float x=16,y=186,right=x+size+16,rw=w-right-16;
@@ -297,7 +362,7 @@ final class WorkshopView extends View {
             button("X тайл",right,330,rw,40,false,()->action(Action.CONTEXT));
             button(narrow?"L2 кисти":"L2 инструменты",right,378,rw,40,false,()->action(Action.DRAW_TOOLS));
         }
-        String label=m.picking?"Тайл из листа":m.phase==2?"↑↓←→ обзор":m.y>=32?"Только просмотр":"↑↓←→ клетка";
+        String label=m.picking?"Тайл из листа":m.phase==2?"↑↓←→ обзор":m.y>=32?"L2: правка области":"↑↓←→ клетка";
         fitted(label,16,y+size+27,18,m.y>=32&&!m.picking?9:6,size);
         if(!narrow&&bodyBottom>470){
             fitted(m.picking?"0 — пустая клетка":m.pending()?"Верх карты · строки 0–31":"Y отмена · Select меню",right,448,18,6,rw);
@@ -1531,7 +1596,8 @@ final class WorkshopView extends View {
             if(Math.abs(x-downX)>20||Math.abs(y-downY)>20)return true;
             if(mapArea!=null&&mapArea.contains(x,y)&&s.tool==3&&s.mode==Mode.NAVIGATE){
                 int tx=(int)((x-mapArea.left)*16/mapArea.width()),ty=(int)((y-mapArea.top)*16/mapArea.height());
-                if(s.mapEditor.picking)s.mapEditor.choice=ty*16+tx;
+                if(s.mapEditor.region!=null)s.mapEditor.region.point(mapLeft+tx,mapTop+ty);
+                else if(s.mapEditor.picking)s.mapEditor.choice=ty*16+tx;
                 else{s.mapEditor.point(mapLeft+tx,mapTop+ty);}
                 changed.run();invalidate();performClick();return true;
             }
