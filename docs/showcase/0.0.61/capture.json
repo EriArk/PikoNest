@@ -1,0 +1,39 @@
+{
+  "version": "0.0.61",
+  "source_commit": "0ca31f4",
+  "captured": "2026-10-04",
+  "device": "Retroid Pocket Classic",
+  "resolution": "1240x1080",
+  "capture": "adb exec-out screencap -p",
+  "images": "Original PNG; no retouching, crop or resizing",
+  "files": [
+    {
+      "name": "01-play-library.png",
+      "sha256": "f4f551614f0433f79a9f0da8f5266813ec861ba85b7288f9ad8c22f853367cd0"
+    },
+    {
+      "name": "02-sprite-editor.png",
+      "sha256": "87c81a2aedb93bc265291be270d9e4e40416095d6b58a7a5ce7715abee08273b"
+    },
+    {
+      "name": "03-sprite-sheet.png",
+      "sha256": "dab2b0a94afd86a35ae669e62f208fc4c7f46575e73eeef415192f553175eeb6"
+    },
+    {
+      "name": "04-tool-catalogue.png",
+      "sha256": "c612d521bb8b7107dd09831a4e07aac9c08a69b4faf6dafc0ecdbff7cab399c9"
+    },
+    {
+      "name": "05-background-layers.png",
+      "sha256": "d811612f07d003a282c12d1b3cd68aec1e2dbd336cdf8fa4f15a1d4c89db6ffc"
+    },
+    {
+      "name": "06-asset-library.png",
+      "sha256": "87b77ee0fa2734c5b58b0082ecd9b324664c87a4f92920110cfcb74ea4f8608e"
+    },
+    {
+      "name": "07-game-runtime.png",
+      "sha256": "9c94f7589b38e9c03861feefc74ce21e62a83bbfa8b7e70422ce64dbaaeec90e"
+    }
+  ]
+}
