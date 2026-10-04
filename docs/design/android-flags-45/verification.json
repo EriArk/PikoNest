@@ -1,0 +1,12 @@
+{
+  "original_sections_unchanged_by_flags": true,
+  "gfx_map_flags_unchanged_by_test_code": true,
+  "nonzero_flags": {
+    "17": 129,
+    "255": 64
+  },
+  "preserved_old_files": 27,
+  "new_files": [
+    "files/projects/remix-0012/game.p8"
+  ]
+}

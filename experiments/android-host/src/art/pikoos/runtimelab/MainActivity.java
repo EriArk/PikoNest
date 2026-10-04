@@ -454,6 +454,7 @@ public final class MainActivity extends Activity {
         prefs.edit().putInt("tool",session.tool).putInt("focus",session.focus)
             .putInt("mapX",session.mapEditor.x).putInt("mapY",session.mapEditor.y).putInt("mapTile",session.mapEditor.tile)
             .putString("mapTool",session.mapEditor.tool.name()).putString("mapDraft",session.mapEditor.encode())
+            .putString("flagDraft",session.flagDraft==null?"":session.flagDraft.encode())
             .putString("luaDraft",session.codeDraft==null?(codeRecoveryFailed.contains(activeId)?prefs.getString("luaDraft",""):""):Base64.encodeToString(session.codeDraft.encode(),Base64.NO_WRAP))
             .putInt("line",session.codeLine).putInt("x",session.cursorX).putInt("y",session.cursorY)
             .putInt("codeColumn",session.codeColumn)
@@ -526,6 +527,9 @@ public final class MainActivity extends Activity {
         }
         if(session.tool==2&&prefs.getString("mode","").equals("HERO"))session.previewHero();
         if(session.tool==3)try{session.mapEditor.restore(prefs.getString("mapDraft",""),session.cart());}catch(IllegalArgumentException e){session.fail(e);}
+        if(session.tool==3&&!session.mapEditor.pending()&&!prefs.getString("flagDraft","").isEmpty())try{
+            session.flagDraft=art.pikoos.lab.core.FlagDraft.restore(prefs.getString("flagDraft",""),session.cart());
+        }catch(IllegalArgumentException e){session.fail(e);}
         if(prefs.getBoolean("copying",false))session.restoreCopy(prefs.getInt("copyX",-1),prefs.getInt("copyY",-1),prefs.getString("copyReturn",""));
         if(prefs.getBoolean("transforming",false))session.restoreTransform(prefs.getString("transformOperation",""),prefs.getString("transformReturn",""));
         if(prefs.getBoolean("recoloring",false))session.restoreRecolor(prefs.getInt("recolorFrom",-1),prefs.getInt("recolorTo",-1),prefs.getInt("recolorField",-1),prefs.getString("recolorReturn",""));

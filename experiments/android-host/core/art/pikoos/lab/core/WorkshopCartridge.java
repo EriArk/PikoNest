@@ -24,6 +24,8 @@ public final class WorkshopCartridge {
     public int pixel(SpriteRegion region,int x,int y){return graphics.pixel(region,x,y);}
     public int sheetPixel(int x,int y){return graphics.pixel(x,y);}
     public P8Map map(){return new P8Map(document);}
+    public int flags(int tile){return new P8Flags(document).get(tile);}
+    public WorkshopCartridge withFlags(int tile,int value){return edited(new P8Flags(document).withFlags(tile,value));}
     public WorkshopCartridge withTile(int x,int y,int tile){return edited(map().withTile(x,y,tile));}
     public WorkshopCartridge withMapChange(MapChange change){return edited(change.apply(map()));}
     public WorkshopCartridge insert(SpriteAsset asset,SpriteRegion target){return edited(graphics.insert(asset,target));}

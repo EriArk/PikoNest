@@ -33,6 +33,7 @@ public final class WorkshopSession {
     private final ArrayDeque<WorkshopCartridge> redo = new ArrayDeque<>();
     private final int[] toolFocus = new int[4];
     public final MapEditor mapEditor=new MapEditor();
+    public FlagDraft flagDraft;
     private WorkshopCartridge cart;
     public LuaDraft codeDraft;
     public int codeColumn;
@@ -447,7 +448,7 @@ public final class WorkshopSession {
     public void switchTool(int next) {
         if(pendingStroke())return;
         if (mode != Mode.NAVIGATE && mode != Mode.CANVAS && mode != Mode.SHEET) return;
-        if(mapEditor.modal())return;
+        if(mapEditor.modal()||flagDraft!=null)return;
         if (tool == Math.floorMod(next,4)) return;
         toolFocus[tool] = focus;
         tool = Math.floorMod(next,4); focus = toolFocus[tool]; mode = tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE;
@@ -743,10 +744,22 @@ public final class WorkshopSession {
                 if (action == Action.CANCEL) mode = paletteReturn;
                 return;
             }
+            if(flagDraft!=null){
+                if(action==Action.UP)flagDraft.move(0,-1);
+                if(action==Action.DOWN)flagDraft.move(0,1);
+                if(action==Action.LEFT)flagDraft.move(-1,0);
+                if(action==Action.RIGHT)flagDraft.move(1,0);
+                if(action==Action.CONFIRM){
+                    if(flagDraft.focus<8)flagDraft.toggle();
+                    else{boolean differs=flagDraft.value!=flagDraft.original;save(flagDraft.candidate(cart),true);flagDraft=null;notice=differs?"Флаги сохранены · Y отмена":"Флаги не изменились";}
+                }
+                if(action==Action.CANCEL||action==Action.UNDO){flagDraft=null;notice="Без изменений";}
+                return;
+            }
             if(tool==3&&mapEditor.choosingTool){
-                if(action==Action.UP||action==Action.LEFT)mapEditor.toolChoice=clamp(mapEditor.toolChoice-1,2);
-                if(action==Action.DOWN||action==Action.RIGHT)mapEditor.toolChoice=clamp(mapEditor.toolChoice+1,2);
-                if(action==Action.CONFIRM){mapEditor.tool=MapEditor.Tool.values()[mapEditor.toolChoice];mapEditor.choosingTool=false;}
+                if(action==Action.UP||action==Action.LEFT)mapEditor.toolChoice=clamp(mapEditor.toolChoice-1,3);
+                if(action==Action.DOWN||action==Action.RIGHT)mapEditor.toolChoice=clamp(mapEditor.toolChoice+1,3);
+                if(action==Action.CONFIRM){if(mapEditor.toolChoice==3)flagDraft=new FlagDraft(cart,mapEditor.tile);else mapEditor.tool=MapEditor.Tool.values()[mapEditor.toolChoice];mapEditor.choosingTool=false;}
                 if(action==Action.CANCEL)mapEditor.choosingTool=false;
                 return;
             }

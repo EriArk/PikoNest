@@ -48,7 +48,7 @@ final class WorkshopView extends View {
     private RectF placementArea;
     private RectF mapArea;
     private int mapLeft,mapTop;
-    private static final String[] MAP_TOOLS={"Кисть","Прямоугольник","Заливка"};
+    private static final String[] MAP_TOOLS={"Кисть","Прямоугольник","Заливка","Флаги тайла"};
     private int viewX,viewY,viewWidth,viewHeight;
     private static final String[] DRAW_NAMES={"Кисть","Ластик","Заливка","Линия","Пипетка","Прямоугольник","Прямоуг. с заливкой","Овал","Овал с заливкой"};
     private static final String[] DRAW_HELP={"Один пиксель выбранным цветом","Убрать пиксель из спрайта","Закрасить связанную область","Выбрать начало и конец линии","Взять цвет из спрайта","Контур: выбери два противоположных угла","Закрашенная фигура по двум углам","Контур овала внутри рамки по двум углам","Закрашенный овал внутри выбранной рамки"};
@@ -127,7 +127,7 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PIKOOS",16,30,28,7);
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
-        boolean draft=s.mapEditor.pending()||s.codeDraft!=null||s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
+        boolean draft=s.flagDraft!=null||s.mapEditor.pending()||s.codeDraft!=null||s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -166,6 +166,10 @@ final class WorkshopView extends View {
     private void footer() {
         rect(0,bodyBottom,w,44,0);
         if(s.tool==3&&s.mode==Mode.NAVIGATE){
+            if(s.flagDraft!=null){
+                key(ok()+(s.flagDraft.focus==8?" сохранить":" вкл/выкл"),12,bodyBottom,10,()->action(Action.CONFIRM));
+                key(back()+" отмена",w-126,bodyBottom,6,()->action(Action.CANCEL));return;
+            }
             MapEditor m=s.mapEditor;
             String verb=m.picking||m.choosingTool?" выбор":m.phase==2?" готово":m.phase==1?" обзор":m.tool==MapEditor.Tool.RECTANGLE?" угол":m.tool==MapEditor.Tool.FILL?" обзор":" тайл";
             key(ok()+verb,12,bodyBottom,10,()->action(Action.CONFIRM));
@@ -224,13 +228,14 @@ final class WorkshopView extends View {
     }
     private void mapEditor(){
         art.pikoos.lab.core.MapEditor m=s.mapEditor;
+        if(s.flagDraft!=null){flagEditor();return;}
         if(m.choosingTool){
             text("ИНСТРУМЕНТ КАРТЫ",16,174,22,14);
-            for(int i=0;i<3;i++){final int n=i;button(MAP_TOOLS[i],16,192+i*52,w-32,44,m.toolChoice==i,()->{m.toolChoice=n;action(Action.CONFIRM);});}
-            String[] help={"Одна клетка — один тайл.","Выбери два угла.","Соседние одинаковые тайлы."};
+            for(int i=0;i<4;i++){final int n=i;button(MAP_TOOLS[i],16,184+i*42,w-32,38,m.toolChoice==i,()->{m.toolChoice=n;action(Action.CONFIRM);});}
+            String[] help={"Одна клетка — один тайл.","Выбери два угла.","Соседние одинаковые тайлы.","Для всех клеток с тайлом."};
             fitted(help[m.toolChoice],16,370,18,7,w-32);
-            fitted(m.toolChoice==0?"Y отмена · R2 вернуть":"Обзор → готово · Y отмена",16,396,18,7,w-32);
-            fitted("Правки — в строках 0–31.",16,422,18,6,w-32);return;
+            fitted(m.toolChoice==3?"Смысл задаёт Lua игры.":m.toolChoice==0?"Y отмена · R2 вернуть":"Обзор → готово · Y отмена",16,396,18,7,w-32);
+            fitted(m.toolChoice==3?"Номера флагов: 0–7.":"Правки — в строках 0–31.",16,422,18,6,w-32);return;
         }
         boolean narrow=w<500;float size=Math.min(narrow?192:320,bodyBottom-230);size=Math.max(128,(int)(size/16)*16);
         float x=16,y=186,right=x+size+16,rw=w-right-16;
@@ -284,6 +289,22 @@ final class WorkshopView extends View {
             fitted(m.picking?"0 — пустая клетка":m.pending()?"Верх карты · строки 0–31":"Y отмена · Select меню",right,448,18,6,rw);
             if(!m.picking)text(m.pending()?"Одна правка в истории":"map(0,0,0,0,16,16)",right,474,18,7);
         }
+    }
+    private void flagEditor(){
+        art.pikoos.lab.core.FlagDraft d=s.flagDraft;
+        text("ФЛАГИ · ТАЙЛ "+d.tile,16,170,22,14);
+        for(int y=0;y<8;y++)for(int x=0;x<8;x++)rect(16+x*6,184+y*6,6,6,s.cart().sheetPixel(d.tile%16*8+x,d.tile/16*8+y));
+        text("Для всех клеток",80,203,18,7);text("с этим тайлом.",80,227,18,6);
+        float cw=(w-32)/4;
+        for(int n=0;n<8;n++){
+            final int flag=n;float x=16+n%4*cw,y=248+n/4*42;
+            button(n+(d.bit(n)?" +":" -"),x,y,cw-4,36,d.focus==n,()->{d.focus=flag;action(Action.CONFIRM);});
+            rect(x+2,y+32,cw-8,3,d.bit(n)?11:13);
+        }
+        String call=d.focus<8?"fget("+d.tile+","+d.focus+") = "+(d.bit(d.focus)?"true":"false"):"fget("+d.tile+") = "+d.value;
+        fitted(call,16,350,18,10,w-32);
+        fitted("Смысл задаёт Lua игры.",16,374,18,6,w-32);
+        button("Сохранить флаги",16,bodyBottom-54,w-32,40,d.focus==8,()->{d.focus=8;action(Action.CONFIRM);});
     }
     private void workshop() {
         if(!s.cart().hasHero()){resources();return;}
