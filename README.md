@@ -31,8 +31,8 @@ PikoNest is designed around a gamepad instead of pretending a four-inch handheld
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/showcase/0.0.61/02-sprite-editor.png" alt="PikoNest sprite editor"></td>
-    <td width="50%"><img src="docs/showcase/0.0.61/03-sprite-sheet.png" alt="PikoNest sprite sheet"></td>
+    <td width="50%"><img src="docs/showcase/0.0.65-en/02-sprite-editor.png" alt="PikoNest sprite editor with two cat sprites"></td>
+    <td width="50%"><img src="docs/showcase/0.0.65-en/03-sheet-region.png" alt="PikoNest sprite sheet selection"></td>
   </tr>
   <tr>
     <td align="center"><sub>Draw and edit your own sprites.</sub></td>
@@ -41,6 +41,20 @@ PikoNest is designed around a gamepad instead of pretending a four-inch handheld
 </table>
 
 The finished Workshop is meant to cover the whole little-game loop: **sprites, maps, animation, camera, rooms, backgrounds, effects, SFX, music, rules and code**.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/showcase/0.0.65-en/04-map-editor.png" alt="A tile map with grass, flowers and a winding path"></td>
+    <td width="50%"><img src="docs/showcase/0.0.65-en/05-animation-editor.png" alt="Two heart frames in the animation editor"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Build a world, one tile at a time.</sub></td>
+    <td align="center"><sub>Arrange frames and set their timing.</sub></td>
+  </tr>
+</table>
+
+Editor images show the 0.0.65 English capture build; Play shows the regular 0.0.66
+build. [Browse the complete English website gallery and download the image pack](docs/showcase/README.md).
 
 Start from a blank cartridge if you know what you want. Start from a small template if you do not. The tools are the same either way — PikoNest is not built around one genre, one hero, or one kind of game.
 
@@ -52,12 +66,12 @@ PikoNest can present common game logic as small, controller-friendly tools: cond
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/showcase/0.0.61/04-tool-catalogue.png" alt="PikoNest tool catalogue"></td>
-    <td width="50%"><img src="docs/showcase/0.0.61/05-background-layers.png" alt="PikoNest background layers"></td>
+    <td width="50%"><img src="docs/showcase/0.0.65-en/06-camera-preview.png" alt="PikoNest camera resource preview"></td>
+    <td width="50%"><img src="docs/showcase/0.0.65-en/07-background-layers.png" alt="PikoNest background layers"></td>
   </tr>
   <tr>
-    <td align="center"><sub>Rules and Lua structures made comfortable on a controller.</sub></td>
-    <td align="center"><sub>Build moving and parallax backgrounds as part of the same game.</sub></td>
+    <td align="center"><sub>Preview how the camera frames placed resources.</sub></td>
+    <td align="center"><sub>Arrange background strips and adjust their movement.</sub></td>
   </tr>
 </table>
 
@@ -77,8 +91,8 @@ PikoNest is growing a shared library for reusable parts of your games, so useful
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/showcase/0.0.61/06-asset-library.png" alt="PikoNest asset library"></td>
-    <td width="50%"><img src="docs/showcase/0.0.61/07-game-runtime.png" alt="PikoNest game running in PICO-8"></td>
+    <td width="50%"><img src="docs/showcase/0.0.65-en/08-asset-library.png" alt="PikoNest sprite library with a star, cat and glowing tile"></td>
+    <td width="50%"><img src="docs/showcase/0.0.65-en/09-official-runtime.png" alt="Moon Garden running in official PICO-8"></td>
   </tr>
   <tr>
     <td align="center"><sub>Your own little shelf of reusable pieces.</sub></td>
@@ -129,7 +143,7 @@ Larger projects will be able to use multiple cartridges without making the begin
 
 PikoNest is **not ready for a general release yet**.
 
-The screenshots on this page are from the current Android build, not mockups. A lot of the Workshop already works, but several parts of the full experience — especially sound/music creation, effects, deeper remix workflows, first-run setup and final controller/device polish — are still being finished.
+The screenshots on this page are real captures from Android development builds 0.0.65 and 0.0.66. The editor captures use an isolated English presentation build; the regular app's full localization is still in progress. A lot of the Workshop already works, but several parts of the full experience — especially sound/music creation, effects, deeper remix workflows, first-run setup and final controller/device polish — are still being finished.
 
 Android gaming handhelds are the first target. Linux handhelds are planned later.
 
