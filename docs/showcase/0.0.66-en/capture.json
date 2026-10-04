@@ -1,0 +1,68 @@
+{
+  "version": "0.0.66",
+  "captured_local_date": "2026-10-05",
+  "base_commit": "f50f378",
+  "build": "regular development APK; no capture-only translations",
+  "apk_sha256": "6354dc5c3c380632f3b44869a9c218a7c56c37a61994546b51ee10f6ac43b3da",
+  "environment": "isolated read-only Android 15 x86_64 emulator, 320 dpi",
+  "capture": "adb exec-out screencap -p; original PNG, no image edits",
+  "screens": [
+    {
+      "name": "01-play-library.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "893d68a4ea2e5dbfc6142aa0270332fe09d553f3dbd30b6309b4d0b6ae3ebee0"
+    },
+    {
+      "name": "02-favorites.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "517427b7f3965ef22ed269b9d3953bf401939f3ff6e2704b136e46492573fcad"
+    },
+    {
+      "name": "03-workshop.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "ac80aab5eeb472545d96006ab50a1e4d6c9ac3f252358d7d1b16ea4d95ea0329"
+    },
+    {
+      "name": "04-project-actions.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "09de373e81e53bf42735ac7156e36c52864888e5af4d99a9483073e5366a06e0"
+    },
+    {
+      "name": "05-new-project.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "dd8320ba8e6a6436a26db1ef3f835116bdcc3e66f9456b20851626560bf4dfdb"
+    },
+    {
+      "name": "06-copy-project.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "be6bc70abc8d23f826e9763beeb31c09b5a417ae083b3eaca2dbc893a2d32a11"
+    },
+    {
+      "name": "07-compact-workshop.png",
+      "width": 720,
+      "height": 960,
+      "sha256": "eb28106671362a4cd9e13da0cebcd126e3128f43d277e184ba9175cb2e5d27b7"
+    }
+  ],
+  "physical_device": "Retroid Pocket Classic; final APK installed without clearing data",
+  "physical_ui_runtime_acceptance": "not performed; existing unknown runtime session was not bypassed or stopped",
+  "project_and_asset_files_before": 48,
+  "project_and_asset_files_after": 48,
+  "changed_project_and_asset_files": [],
+  "demo_copy_matches_original": true,
+  "focused_checks": {
+    "LibraryWorkflowTest": 31,
+    "HeroFreeTest": 100,
+    "PlayWorkflowTest": 16411,
+    "CartridgeImportTest": 29,
+    "CartridgeExportTest": 41
+  },
+  "english_scope": "Play/project shelves and create/copy/import/export dialogs; remaining editors, settings, help and errors pending",
+  "github_apk_release": false
+}

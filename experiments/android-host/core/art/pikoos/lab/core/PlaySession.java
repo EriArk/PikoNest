@@ -17,8 +17,11 @@ public final class PlaySession {
     public interface Port {
         void launch(Game game);void refresh();void workshop();void folders();
         void favorite(Game game,boolean value)throws Exception;
+        default void exit(){}
     }
     private final Port port;
+    public final ShelfMenu menu=new ShelfMenu(ShelfMenu.Command.WORKSHOP,ShelfMenu.Command.FILTER,
+        ShelfMenu.Command.REFRESH,ShelfMenu.Command.FOLDERS);
     private List<Game> all=new ArrayList<>(),visible=new ArrayList<>();
     public int selected,filter,columns=3;
     public boolean busy;
@@ -37,17 +40,25 @@ public final class PlaySession {
     public void select(int index){if(!busy&&!visible.isEmpty()){selected=Math.max(0,Math.min(visible.size()-1,index));error="";}}
     public void fail(String message){busy=false;error=message;}
     public void act(Action a){
-        if(a==Action.NEXT){port.workshop();return;}
-        if(a==Action.MENU){port.folders();return;}
-        if(a==Action.CANCEL){if(!error.isEmpty())error="";return;}
+        if(menu.open){
+            ShelfMenu.Command command=menu.act(a);
+            if(command==ShelfMenu.Command.WORKSHOP)port.workshop();
+            if(command==ShelfMenu.Command.FOLDERS)port.folders();
+            if(command==ShelfMenu.Command.REFRESH&&!busy)port.refresh();
+            if(command==ShelfMenu.Command.FILTER&&!busy)act(Action.UNDO);
+            return;
+        }
+        if(a==Action.MENU){menu.show();return;}
+        if(a==Action.CANCEL){if(!error.isEmpty())error="";else port.exit();return;}
         if(busy)return;
-        if(a==Action.PREVIOUS){port.refresh();return;}
         Game g=current();
+        if(a==Action.PREVIOUS)select(selected-columns);
+        if(a==Action.NEXT)select(selected+columns);
         if(a==Action.LEFT)select(selected-1);if(a==Action.RIGHT)select(selected+1);
         if(a==Action.UP)select(selected-columns);if(a==Action.DOWN)select(selected+columns);
         if(a==Action.UNDO){filter=(filter+1)%3;rebuild(g==null?"":g.id);error="";}
         if(a==Action.CONTEXT&&g!=null){
-            try{port.favorite(g,!g.favorite);g.favorite=!g.favorite;rebuild(g.id);}catch(Exception e){fail("Не удалось сохранить избранное");}
+            try{port.favorite(g,!g.favorite);g.favorite=!g.favorite;rebuild(g.id);}catch(Exception e){fail("Could not save favorite. Try again.");}
         }
         if((a==Action.CONFIRM||a==Action.TEST)&&g!=null){
             if(!g.problem.isEmpty()){fail(g.problem);return;}

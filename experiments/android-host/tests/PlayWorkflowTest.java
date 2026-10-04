@@ -31,7 +31,9 @@ public class PlayWorkflowTest {
         s.act(Action.CONFIRM);check(port.launches==0&&!s.error.isEmpty(),"unsupported launch explicit");
         s.act(Action.LEFT);s.act(Action.CONFIRM);check(port.launches==1&&s.busy,"one launch");
         s.act(Action.CONFIRM);s.act(Action.RIGHT);check(port.launches==1&&s.current()==a,"busy prevents double launch/navigation");
-        s.act(Action.NEXT);s.act(Action.MENU);check(port.workshops==1&&port.folders==1,"slow worker escape routes");
+        s.act(Action.MENU);s.act(Action.CONFIRM);
+        s.act(Action.MENU);s.act(Action.DOWN);s.act(Action.DOWN);s.act(Action.DOWN);s.act(Action.CONFIRM);
+        check(port.workshops==1&&port.folders==1,"slow worker escape routes through shared menu");
         s.fail("read failed");s.act(Action.CANCEL);check(s.error.isEmpty()&&!s.busy,"failure recovery");
         port.fail=true;s.act(Action.CONTEXT);check(!a.favorite,"failed favorite write unchanged");
         port.fail=false;s.act(Action.CONTEXT);check(a.favorite&&port.favorites==1,"favorite saved");

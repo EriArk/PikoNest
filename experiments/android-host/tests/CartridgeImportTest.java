@@ -49,7 +49,7 @@ public final class CartridgeImportTest {
         rejects(()->CartridgeImport.decode(Arrays.copyOf(record,record.length+1)),"trailing data");
         record[0]=0;rejects(()->CartridgeImport.decode(record),"unknown snapshot version");
         Port port=new Port();port.files.put("moon-garden",original.clone());LibrarySession s=new LibrarySession(port,original);s.refresh("moon-garden");
-        s.act(Action.DOWN);s.act(Action.DOWN);s.act(Action.CONFIRM);
+        s.act(Action.MENU);s.act(Action.DOWN);s.act(Action.DOWN);s.act(Action.CONFIRM);
         check(s.focus==3&&port.picks==1,"controller reaches file selection");
         s.stageImport(draft);s.act(Action.TEST);s.act(Action.CONTEXT);
         check(port.writes==0&&port.opens==0,"preview never auto-launches or bypasses confirm");

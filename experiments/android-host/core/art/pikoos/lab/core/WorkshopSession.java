@@ -1104,6 +1104,7 @@ public final class WorkshopSession {
             }
             if (action == Action.CANCEL) {
                 if (tool == 2) showSheet();
+                else if(tool==0){port.library();}
                 else { overlayReturn = mode; mode = Mode.MENU; menuItem = 3; }
                 return;
             }

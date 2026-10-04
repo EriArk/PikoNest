@@ -113,7 +113,8 @@ public final class MainActivity extends Activity {
                 public byte[] read(String id)throws Exception{return store.read(id);}
                 public void create(String id,byte[] bytes)throws Exception{store.create(id,bytes);}
                 public void open(String id,WorkshopCartridge cart)throws Exception{openProject(id,cart);}
-                public void resume(){if(session!=null)showWorkshop();}
+                public void resume(){showPlay();}
+                public void folders(){showFolders(false);}
                 public String title(String id)throws Exception{return store.title(id);}
                 public void pickImport(){
                     importGeneration++;
@@ -224,7 +225,7 @@ public final class MainActivity extends Activity {
     private void showLibrary(String preferred,int focus)throws Exception{
         showingPlay=false;showingFolders=false;playGeneration++;
         persistUi();library.refresh(preferred);
-        if(!library.entries().isEmpty())library.focus=Math.max(0,Math.min(4,focus));
+        if(!library.entries().isEmpty())library.focus=0;
         showingLibrary=true;
         shelf=new LibraryView(this,library,activeId,session!=null&&session.swapAB,()->persistUi(),()->showFolders(),()->showPlay());
         setContentView(shelf);shelf.requestFocus();immersive();persistUi();
@@ -233,8 +234,9 @@ public final class MainActivity extends Activity {
         persistUi();showingPlay=true;showingFolders=false;showingLibrary=false;
         play=new PlaySession(new PlaySession.Port(){
             public void launch(PlaySession.Game game){launchGame(game);}
+            public void exit(){moveTaskToBack(true);}
             public void refresh(){scanGames();}
-            public void workshop(){try{showLibrary();}catch(Exception e){play.fail("Не удалось открыть мастерскую");}}
+            public void workshop(){try{showLibrary();}catch(Exception e){play.fail("Could not open Workshop.");}}
             public void folders(){showFolders();}
             public void favorite(PlaySession.Game game,boolean value)throws Exception{
                 if(!playPrefs.edit().putBoolean("favorite:"+game.id,value).commit())throw new Exception("Cannot save favorite");
@@ -252,21 +254,21 @@ public final class MainActivity extends Activity {
     private void scanGames(){
         final int generation=++playGeneration;final PlaySession target=play;
         final String location=folderPrefs.getString("GAMES.uri","");
-        if(location.isEmpty()){target.replace(java.util.Collections.emptyList(),"");target.notice="Select — выбери папку готовых игр";playView.invalidate();return;}
+        if(location.isEmpty()){target.replace(java.util.Collections.emptyList(),"");target.notice="Select: choose your games folder";playView.invalidate();return;}
         target.busy=true;target.error="";playView.invalidate();
         final android.content.ContentResolver resolver=getApplicationContext().getContentResolver();
         new Thread(()->{
             GameFolder.Listing result=null;String failure=null;
             try{result=GameFolder.list(resolver,location,playPrefs,()->generation!=playGeneration);}
             catch(java.util.concurrent.CancellationException e){return;}
-            catch(Exception e){failure="Папка недоступна · Select: подключить снова";Log.w(TAG,"Game scan failed",e);}
+            catch(Exception e){failure="Folder unavailable. Select: reconnect";Log.w(TAG,"Game scan failed",e);}
             final GameFolder.Listing ready=result;final String error=failure;
             runOnUiThread(()->{
                 if(isDestroyed()||!showingPlay||generation!=playGeneration||target!=play)return;
                 if(error!=null){target.replace(java.util.Collections.emptyList(),"");target.fail(error);}
                 else{
                     target.replace(ready.games,playPrefs.getString("selected",""));
-                    target.notice=ready.limited?"Часть игр не показана · выбери папку точнее":ready.unreadable>0?"Не прочитано подпапок: "+ready.unreadable+" · L: повторить":"Игры из папки и подпапок · оригиналы сохранены";
+                    target.notice=ready.limited?"Some games are hidden. Choose a smaller folder.":ready.unreadable>0?"Unreadable folders: "+ready.unreadable+" · Menu: retry":"Your games, ready to play";
                 }
                 playView.invalidate();
             });
@@ -284,21 +286,21 @@ public final class MainActivity extends Activity {
                 bytes=ready.bytes;files=ready.files;
             }catch(java.util.concurrent.CancellationException e){return;}
             catch(IllegalArgumentException e){failure=e.getMessage();}
-            catch(Exception e){failure="Не удалось прочитать игру · L: обновить полку";}
+            catch(Exception e){failure="Could not read game. Menu: refresh";}
             final byte[] snapshot=bytes;final String error=failure;
             final art.pikoos.lab.core.RuntimeFileSet fileSet=files;
             runOnUiThread(()->{
                 if(isDestroyed()||!showingPlay||generation!=playGeneration||target!=play)return;
                 if(error!=null){target.fail(error);playView.invalidate();return;}
                 try{
-                    if(!backend.detect().launcherPresent)throw new Exception("Сначала подключи PICO-8 · оболочка не найдена");
+                    if(!backend.detect().launcherPresent)throw new Exception("Connect PICO-8 first. Runtime wrapper not found.");
                     persistPlay();
-                    if(!playPrefs.edit().putBoolean("runtime",true).putString("selected",game.id).commit())throw new Exception("Не удалось сохранить место на полке");
+                    if(!playPrefs.edit().putBoolean("runtime",true).putString("selected",game.id).commit())throw new Exception("Could not save library selection.");
                     awaitingReturn=true;leftForRuntime=false;
-                    if(!libraryPrefs.edit().putBoolean("awaitingReturn",true).commit())throw new Exception("Не удалось сохранить состояние запуска");
+                    if(!libraryPrefs.edit().putBoolean("awaitingReturn",true).commit())throw new Exception("Could not save launch state.");
                     if(fileSet!=null)backend.launch(fileSet);else backend.launch(snapshot,game.format);
                     game.recent=System.currentTimeMillis();playPrefs.edit().putLong("recent:"+game.id,game.recent).apply();
-                }catch(Exception e){awaitingReturn=false;playPrefs.edit().putBoolean("runtime",false).apply();libraryPrefs.edit().putBoolean("awaitingReturn",false).apply();target.fail(e.getMessage()==null?"Не удалось запустить PICO-8":e.getMessage());}
+                }catch(Exception e){awaitingReturn=false;playPrefs.edit().putBoolean("runtime",false).apply();libraryPrefs.edit().putBoolean("awaitingReturn",false).apply();target.fail(e.getMessage()==null?"Could not launch PICO-8.":e.getMessage());}
                 playView.invalidate();
             });
         },"pikoos-game-launch").start();
@@ -451,7 +453,7 @@ public final class MainActivity extends Activity {
         awaitingReturn=true;leftForRuntime=false;
         try{
             persistUi();
-            if(!libraryPrefs.edit().putBoolean("awaitingReturn",true).putBoolean("shelf",false).commit())throw new IllegalStateException("Не удалось сохранить состояние запуска");
+            if(!libraryPrefs.edit().putBoolean("awaitingReturn",true).putBoolean("shelf",false).commit())throw new IllegalStateException("Could not save launch state.");
             backend.launch(bytes);
             Log.i(TAG,"launch_requested project="+activeId);
         }catch(Exception e){awaitingReturn=false;libraryPrefs.edit().putBoolean("awaitingReturn",false).commit();throw e;}
@@ -612,7 +614,7 @@ public final class MainActivity extends Activity {
             getSharedPreferences("moon-garden-ui",MODE_PRIVATE).edit().putBoolean("awaitingReturn",false).apply();
             if(playPrefs.getBoolean("runtime",false)){
                 playPrefs.edit().putBoolean("runtime",false).apply();
-                if(!showingPlay)showPlay();else{play.busy=false;play.notice="Снова на полке · выбери, во что играть";playView.invalidate();}
+                if(!showingPlay)showPlay();else{play.busy=false;play.notice="Back in Play. Choose your next game.";playView.invalidate();}
             }else{session.notice="Сохранено";surface.invalidate();}
             Log.i(TAG,"host_resumed tool="+session.tool+" focus="+session.focus+" result=unknown");
         }

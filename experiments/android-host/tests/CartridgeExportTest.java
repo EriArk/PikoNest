@@ -52,7 +52,7 @@ public final class CartridgeExportTest {
         Port port=new Port();port.files.put("moon-garden",template.clone());port.files.put("puzzle-0001",template.clone());
         LibrarySession s=new LibrarySession(port,template);s.refresh("puzzle-0001");
         port.files.put("puzzle-0001",original.clone()); // Newer saved bytes than thumbnail.
-        s.act(Action.UNDO);check(s.mode==LibrarySession.Mode.EXPORT&&port.saved!=null&&port.picks==0,"Y opens preview, not file creation");
+        s.command(4);check(s.mode==LibrarySession.Mode.EXPORT&&port.saved!=null&&port.picks==0,"export action opens preview, not file creation");
         check(Arrays.equals(s.exporting.cart.bytes(),original),"selected project's latest canonical bytes, not active cart or thumbnail");
         s.act(Action.TEST);s.act(Action.CONTEXT);s.act(Action.NEXT);
         check(port.creates==0&&port.opens==0&&port.picks==0,"preview does not run, switch or copy a project");
@@ -75,11 +75,11 @@ public final class CartridgeExportTest {
         port.failPick=false;port.failClear=true;s.act(Action.CANCEL);check(s.mode==LibrarySession.Mode.ERROR&&s.exporting!=null,"failed cleanup retains draft");
         s.act(Action.CANCEL);port.failClear=false;s.act(Action.CANCEL);check(s.mode==LibrarySession.Mode.SHELF,"cleanup retry safe");
         check(Arrays.equals(port.files.get("moon-garden"),template)&&Arrays.equals(port.files.get("puzzle-0001"),template),"export never mutates source projects");
-        s.refresh("puzzle-0001");s.act(Action.DOWN);s.act(Action.RIGHT);s.act(Action.DOWN);
-        check(s.focus==4,"spatial D-pad route reaches export");
-        s.act(Action.LEFT);check(s.focus==3,"same row reaches import");
-        s.act(Action.RIGHT);s.act(Action.UP);check(s.focus==2,"up preserves column");
-        port.files.put("puzzle-0001",new byte[]{1,2});s.act(Action.UNDO);
+        s.refresh("puzzle-0001");s.act(Action.MENU);s.act(Action.DOWN);s.act(Action.DOWN);s.act(Action.DOWN);
+        check(s.menu.selected==3,"D-pad menu reaches export without shoulders");
+        s.act(Action.UP);check(s.menu.selected==2,"previous command is import");
+        s.act(Action.CANCEL);check(!s.menu.open&&s.current().id.equals("puzzle-0001"),"cancel retains selected project");
+        port.files.put("puzzle-0001",new byte[]{1,2});s.command(4);
         check(s.mode==LibrarySession.Mode.ERROR&&port.picks==3,"unreadable cart not silently exported as a template");
         System.out.println("CartridgeExportTest: "+checks+" checks passed");
     }

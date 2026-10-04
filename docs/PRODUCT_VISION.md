@@ -6,7 +6,9 @@ Workshop contexts. Play does not require project import; inspecting/remixing
 preserves the source game and explicitly creates an editable copy. Test returns
 to the same project/tool/resource/focus. Splore uses official PICO-8; browser-assisted
 publishing follows [issue #1](https://github.com/EriArk/PikoNest/issues/1).
-This direction is documented for owner review, not claimed implemented or accepted.
+The owner approved proceeding with the interface first, in English. Lab 0.0.66
+starts the shared shelves/actions; specific visuals still need owner acceptance,
+and the full editor/settings translation remains incomplete.
 [UX_DIRECTION](UX_DIRECTION.md) owns the shared navigation, visual roles, terminology
 and controller grammar; [UX_AUDIT](UX_AUDIT.md) records evidence and bounded slices.
 

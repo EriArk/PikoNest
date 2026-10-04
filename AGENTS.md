@@ -158,8 +158,11 @@ sprite-use conversion (N01.3/G04) exist in 0.0.64 for recognized flat draw block
 Camera entry/management (N02.3/G04) exists in 0.0.65 for those flat draw blocks,
 with explicit world/screen order. Issue #2 now has a documented UX audit/proposal
 in `docs/UX_AUDIT.md` and the shared contract in `docs/UX_DIRECTION.md` (owner
-review pending; no UI implementation claimed). Follow bounded UX02 shared
-navigation/lists, then UX03 animation/camera forms and draft/Test/return, then
+direction work approved; individual screens still need visual acceptance). Owner
+clarification: repair the interface first and make the new interface English.
+Lab 0.0.66 starts UX02 with shared English Play/project shelves, actions and safe
+copy confirmation; remaining editors/settings/localization are not yet migrated.
+Continue UX03 animation/camera forms and draft/Test/return, then
 UX04 existing background layers in the same workshop path (N03/G04), followed
 by connected M1/M2 workflows. Carry UX05 with remaining core tools rather than
 blocking them on a cosmetic rewrite. Shared

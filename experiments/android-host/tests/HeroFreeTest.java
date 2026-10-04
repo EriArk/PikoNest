@@ -73,7 +73,7 @@ public final class HeroFreeTest {
         lib.act(Action.CONFIRM);lib.act(Action.CONFIRM);check(lp.opened.equals("blank-0001"),"blank creation controller path");same(blank,lp.cart.bytes(),"blank created exact");
         lib.refresh(lp.opened);lib.command(1);lib.act(Action.RIGHT);lib.act(Action.CONFIRM);
         check(lp.opened.equals("puzzle-0001"),"puzzle creation controller path");same(puzzle,lp.cart.bytes(),"puzzle created exact");
-        lib.refresh(lp.opened);lib.act(Action.CONTEXT);same(puzzle,lp.cart.bytes(),"hero-free cart copy exact");
+        lib.refresh(lp.opened);lib.command(2);lib.act(Action.CONFIRM);same(puzzle,lp.cart.bytes(),"hero-free cart copy exact");
         check(lp.opened.equals("remix-0001"),"copy uses independent ID");
         check(new WorkshopCartridge(garden).hasHero(),"existing platformer binding retained");
         System.out.println("HeroFreeTest: "+checks+" checks passed");

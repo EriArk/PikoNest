@@ -10,7 +10,7 @@ Play your cartridges like a normal handheld library. Open one up when curiosity 
 **Play it → open it → change it → make your own.**
 
 <p align="center">
-  <img src="docs/showcase/0.0.61/01-play-library.png" width="760" alt="PikoNest game library">
+  <img src="docs/showcase/0.0.66-en/01-play-library.png" width="760" alt="PikoNest English Play library, lab 0.0.66">
 </p>
 
 ## Your PICO-8 shelf
@@ -144,7 +144,8 @@ For implementation status, roadmap and the rather obsessive acceptance checks:
 - [Current status](docs/STATUS.md)
 - [Roadmap](docs/ROADMAP.md)
 - [End-to-end acceptance](docs/ACCEPTANCE.md)
-- [English website screenshot pack — 0.0.65](docs/showcase/0.0.65-en/README.md)
+- [New English shelves and website screenshot pack — 0.0.66](docs/showcase/0.0.66-en/README.md)
+- [English editor screenshot pack — 0.0.65](docs/showcase/0.0.65-en/README.md)
 - [Original screenshot set — 0.0.61](docs/showcase/0.0.61/README.md)
 - [Project rename and planned identifier migration](docs/PROJECT_NAME.md)
 
