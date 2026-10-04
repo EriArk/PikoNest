@@ -21,6 +21,8 @@ import art.pikoos.lab.core.SpriteAnimation;
 import art.pikoos.lab.core.SpriteMove;
 import art.pikoos.lab.core.SpriteAsset;
 import art.pikoos.lab.core.NameEditor;
+import art.pikoos.lab.core.PresetPanel;
+import art.pikoos.lab.core.ParameterPreset;
 import art.pikoos.lab.core.LuaDraft;
 import art.pikoos.lab.core.LuaInsert;
 import art.pikoos.lab.core.LuaCall;
@@ -69,6 +71,7 @@ final class WorkshopView extends View {
     }
     void action(Action a) { s.act(a); changed.run(); invalidate(); }
     boolean codeKey(KeyEvent event){
+        if(s.presets!=null)return false;
         if(s.mode!=Mode.CODE||s.codeDraft==null||(event.getSource()&InputDevice.SOURCE_GAMEPAD)==InputDevice.SOURCE_GAMEPAD)return false;
         LuaDraft d=s.codeDraft;
         if(d.panel==LuaDraft.Panel.SPRITE||d.panel==LuaDraft.Panel.ANIMATION)return false;
@@ -424,6 +427,7 @@ final class WorkshopView extends View {
         }
     }
     private void luaEditor(){
+        if(s.presets!=null){presetLibrary();return;}
         LuaDraft d=s.codeDraft;
         if(d.panel==LuaDraft.Panel.BRANCHES){luaBranches();return;}
         if(d.panel==LuaDraft.Panel.ANIMATION){animationEditor();return;}
@@ -639,6 +643,41 @@ final class WorkshopView extends View {
         key(back()+(s.diagnosticPending?" отменить":" к коду"),12,bodyBottom,6,()->action(Action.CANCEL));
         if(d!=null)key("Select журнал",w/2,bodyBottom,14,()->action(Action.MENU));
     }
+    private void presetLibrary(){
+        PresetPanel panel=s.presets;LuaInsert form=s.codeDraft.insertion;hits.clear();
+        if(panel.page==PresetPanel.Page.NAME){nameEditor(panel.name,"Название набора");return;}
+        fitted(panel.page==PresetPanel.Page.REVIEW?(panel.saving?"Сохранить настройки":"Применить настройки"):"Наборы параметров",16,75,24,14,w-32);
+        fitted(form.item().title,16,100,18,7,w-32);
+        if(panel.page==PresetPanel.Page.LIST){
+            java.util.List<ParameterPreset> items=panel.items();
+            fitted("← "+(panel.favorites?"Избранные":"Все наборы")+" → · "+items.size(),16,126,16,12,w-32);
+            hit(16,108,w-32,27,()->action(Action.RIGHT));
+            int rows=Math.max(2,(int)((bodyBottom-270)/38));int first=Math.max(0,Math.min(panel.index-rows/2,items.size()+1-rows));
+            for(int r=0;r<rows&&first+r<=items.size();r++){
+                final int at=first+r;String label=at==0?"+ Сохранить текущие":(items.get(at-1).favorite?"* ":"")+items.get(at-1).title;
+                button(label,16,144+r*38,w-32,34,at==panel.index,()->{panel.index=at;action(Action.CONFIRM);});
+            }
+            float y=bodyBottom-112;rect(16,y-16,w-32,2,13);
+            ParameterPreset selected=panel.selected();
+            wrapped(selected==null?(panel.notice.isEmpty()?"Сохрани настройки для других проектов. Имена и ссылки останутся в проекте.":panel.notice):"Источник: "+selected.origin,16,y+8,18,7,w-32,3);
+            fitted("Y избранное · L/R фильтр",16,bodyBottom-14,16,6,w-32);
+            rect(0,bodyBottom,w,44,0);key(ok()+" выбрать",12,bodyBottom,10,()->action(Action.CONFIRM));key(back()+" к форме",w/2,bodyBottom,6,()->action(Action.CANCEL));
+            return;
+        }
+        ParameterPreset preset=panel.review;
+        fitted(preset.title,16,128,18,12,w-32);
+        int rows=Math.max(1,(int)((bodyBottom-226)/54));
+        for(int r=0;r<rows&&panel.scroll+r<form.item().fields.length;r++){
+            int n=panel.scroll+r;float y=145+r*54;boolean change=panel.saving?preset.value(n)!=null:preset.replaces(form,n);
+            rect(16,y,w-32,50,0);
+            fitted((n+1)+" · "+(change?"":"Остаётся: ")+form.item().fields[n].label,24,y+19,16,change?12:6,w-48);
+            String value=change?(panel.saving?preset.value(n):form.value(n)+" → "+preset.value(n)):(panel.saving?"Не входит в набор":form.value(n));
+            fitted(value,24,y+41,18,change?10:7,w-48);
+        }
+        fitted("↑↓ все поля · "+(panel.scroll+1)+" / "+form.item().fields.length,16,bodyBottom-64,16,6,w-32);
+        wrapped(panel.saving?"Сохранится набор. Код не изменится.":"Сначала в форму. Код — после её подтверждения.",16,bodyBottom-40,16,7,w-32,2);
+        rect(0,bodyBottom,w,44,0);key(ok()+(panel.saving?" сохранить":" в форму"),12,bodyBottom,10,()->action(Action.CONFIRM));key(back()+" назад",w/2,bodyBottom,6,()->action(Action.CANCEL));
+    }
     private void luaBranches(){
         LuaDraft d=s.codeDraft;art.pikoos.lab.core.LuaBranches n=d.branches;hits.clear();
         fitted("Условия · действия",16,75,24,14,w-32);
@@ -795,7 +834,7 @@ final class WorkshopView extends View {
         else if(d.callEdit!=null){fitted("Было: "+d.callEdit.original.trim(),24,previewY+46,16,6,w-48);fitted("Будет: "+d.callEdit.preview(i).trim(),24,previewY+70,16,10,w-48);}
         else {int line=0;for(String row:i.code().split("\n")){fitted(row,24,previewY+46+line*22,18,7,w-48);line++;}}
         c.restore();
-        fitted(w<500?"↑↓ поле  ←→ менять  "+ok()+" ввод":"↑↓ поле · ←→ значение · "+ok()+" ввод / "+(d.callEdit!=null?"правка":"вставка"),16,bodyBottom-12,16,6,w-32);
+        fitted("↑↓ поле · ←→ менять · Select наборы",16,bodyBottom-12,16,6,w-32);
         rect(0,bodyBottom,w,44,0);
         key(ok()+" выбрать",12,bodyBottom,10,()->action(Action.CONFIRM));
         key(back()+" назад",w/3,bodyBottom,6,()->action(Action.CANCEL));
@@ -1009,8 +1048,10 @@ final class WorkshopView extends View {
         key(back()+" отмена",w/2,bodyBottom,6,()->action(Action.CANCEL));
     }
     private void nameEditor(){
-        NameEditor e=s.nameEditor;
-        text("Название спрайта",16,78,26,14);
+        nameEditor(s.nameEditor,"Название спрайта");
+    }
+    private void nameEditor(NameEditor e,String title){
+        text(title,16,78,26,14);
         text(e.text().length()+" / 80",w-92,78,18,6);
         rect(16,96,w-32,48,e.replaceAll?10:0);outline(16,96,w-32,48,10);
         String shown=e.text();p.setTextSize(PixelText.size(26));

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="art.pikoos.runtimelab" android:versionCode="55" android:versionName="0.0.55">
+    package="art.pikoos.runtimelab" android:versionCode="56" android:versionName="0.0.56">
     <uses-permission android:name="art.pikoos.runtimeexperiment.PROBE" />
     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
     <queries><intent><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent><package android:name="io.wip.pico8" /><package android:name="art.pikoos.runtimeexperiment" /></queries>

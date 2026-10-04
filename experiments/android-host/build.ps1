@@ -46,6 +46,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RoomCameraTest
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'DoorTransitionTest',(Join-Path $pikoArtifacts 'door-tests.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'CatalogueTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaBranchesTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'ParameterPresetTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaNavigationTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeDiagnosticTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeMenuTest')

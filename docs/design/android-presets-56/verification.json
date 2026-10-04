@@ -1,0 +1,23 @@
+{
+  "version": "0.0.56",
+  "date": "2026-10-04",
+  "apk_sha256": "987cb055059fdc5a7bfafd60db8ea1a6c484a8b42df3c546b8ade5d77e8b9337",
+  "apk_bytes": 328612,
+  "tested_cart_sha256": "032f11c7cb01563581afed48f3aefd10d8f0da046864d35597254ae82221b848",
+  "parameter_preset_checks": 47,
+  "build": "Full build.ps1 passed; see build-final.log",
+  "device": "Retroid Pocket Classic; ADB controller events",
+  "installed_version_code": 56,
+  "runtime": "user-supplied official PICO-8 0.2.7",
+  "screens": [
+    "1240x1080 native",
+    "720x960 override; native restored"
+  ],
+  "media_volume": 0,
+  "old_files_unchanged": 38,
+  "new_files": [
+    "files/asset-library/parameters/7ec7991f-26a5-4527-af89-e5b57286cd40.pkpr",
+    "files/projects/remix-0022/game.p8"
+  ],
+  "release_published": false
+}

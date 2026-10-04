@@ -1,5 +1,10 @@
 # PIKOOS Android host experiment
 
+Version 0.0.56 adds named parameter presets inside each tool's form (Select):
+save/review, favorites, cross-project reuse and recovery. Project names, expressions
+and resource references stay in the target; applying fills a proposal before the
+normal Lua confirmation. [Evidence and remaining scope](../../docs/design/android-presets-56/README.md).
+
 Version 0.0.55 adds a shared condition-branch picker: preview function/body,
 open an existing action, or insert an ordinary Lua action at the selected branch's
 end. Selection/proposals recover across process loss; insertion is one undo.
@@ -10,8 +15,8 @@ Version 0.0.54 adds sprite-library categories, grouped Lua/parameter tools and
 cross-project favorites. It also adds an ordinary `if/else` form; a number game
 with both outcomes/reset was authored from blank through controller-event UI
 actions and checked in official PICO-8. [Evidence and remaining scope](../../docs/design/android-catalogue-54/README.md).
-Saved parameter presets and favorites outside the insertion catalogue remain
-future work; no GitHub APK release is authorized yet.
+Saved parameter presets follow in 0.0.56; favorites for other resource editors
+remain future work. No GitHub APK release is authorized yet.
 
 Version 0.0.42 adds visual sprite-region placement through Code → X → Sprite:
 two sheet corners, screen position, explicit ordinary `sspr` insertion, draft

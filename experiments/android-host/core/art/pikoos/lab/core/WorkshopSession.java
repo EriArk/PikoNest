@@ -28,6 +28,9 @@ public final class WorkshopSession {
         default void renameAsset(SpriteAsset expected,String title)throws Exception{throw new Exception("Переименование не подключено");}
         default void categorizeAsset(SpriteAsset expected,SpriteAsset.Category category)throws Exception{throw new Exception("Категории не подключены");}
         default String projectOrigin(){return "Проект";}
+        default java.util.List<ParameterPreset> presets()throws Exception{return java.util.Collections.emptyList();}
+        default void storePreset(ParameterPreset preset)throws Exception{throw new Exception("Библиотека наборов не подключена");}
+        default void updatePreset(ParameterPreset expected,ParameterPreset next)throws Exception{throw new Exception("Библиотека наборов не подключена");}
     }
     private final Port port;
     private final ArrayDeque<WorkshopCartridge> undo = new ArrayDeque<>();
@@ -37,6 +40,8 @@ public final class WorkshopSession {
     public FlagDraft flagDraft;
     private WorkshopCartridge cart;
     public LuaDraft codeDraft;
+    public PresetPanel presets;
+    public void restorePresets(String encoded)throws Exception{if(!encoded.isEmpty()&&codeDraft!=null)presets=PresetPanel.restore(encoded,codeDraft.insertion,port);}
     public ToolCatalogue toolCatalogue=new ToolCatalogue();
     public int codeColumn;
     public RuntimeDiagnostic diagnostic;
@@ -81,6 +86,7 @@ public final class WorkshopSession {
         else{codeLine=codeDraft.line();codeColumn=codeDraft.column();codeDraft=null;mode=Mode.NAVIGATE;}
     }
     public void codeCommand(int command){
+        if(presets!=null)return;
         if(mode!=Mode.CODE||codeDraft==null)return;
         if(codeDraft.proposal()||codeDraft.panel==LuaDraft.Panel.NAVIGATION||codeDraft.panel==LuaDraft.Panel.SPRITE||codeDraft.panel==LuaDraft.Panel.ANIMATION||codeDraft.panel==LuaDraft.Panel.BRANCHES)return;
         try{
@@ -115,9 +121,9 @@ public final class WorkshopSession {
             d.panel=LuaDraft.Panel.CURSOR;
         }catch(Exception e){fail(e);}
     }
-    public void codeText(String value){if(mode==Mode.CODE&&codeDraft!=null&&(codeDraft.panel==LuaDraft.Panel.CURSOR||codeDraft.panel==LuaDraft.Panel.KEYS))try{codeDraft.replace(value);}catch(Exception e){fail(e);}}
+    public void codeText(String value){if(presets==null&&mode==Mode.CODE&&codeDraft!=null&&(codeDraft.panel==LuaDraft.Panel.CURSOR||codeDraft.panel==LuaDraft.Panel.KEYS))try{codeDraft.replace(value);}catch(Exception e){fail(e);}}
     public void insertText(String value){if(mode==Mode.CODE&&codeDraft!=null&&codeDraft.insertion!=null&&codeDraft.insertion.screen==LuaInsert.Screen.TEXT)try{codeDraft.insertion.type(value);}catch(Exception e){fail(e);}}
-    private void insertAction(Action action){
+    private void insertAction(Action action)throws Exception{
         LuaDraft d=codeDraft;LuaInsert i=d.insertion;
         if(i.screen==LuaInsert.Screen.PREVIEW){
             if(action==Action.UP)i.previewLine=Math.max(0,i.previewLine-1);
@@ -162,6 +168,7 @@ public final class WorkshopSession {
             return;
         }
         if(action==Action.UP)i.field=Math.max(0,i.field-1);
+        if(action==Action.MENU){presets=new PresetPanel(i,port);return;}
         if(action==Action.DOWN)i.field=Math.min(i.item().fields.length,i.field+1);
         if(action==Action.LEFT)i.step(-1);if(action==Action.RIGHT)i.step(1);
         if(action==Action.UNDO&&i.cameraMode())i.switchCameraMode();
@@ -171,6 +178,7 @@ public final class WorkshopSession {
         // Start is intentionally not a launch/commit shortcut while reviewing a proposal.
     }
     private void codeAction(Action action)throws Exception{
+        if(presets!=null){presets.act(action);if(presets.closed)presets=null;return;}
         LuaDraft d=codeDraft;
         if(d.panel==LuaDraft.Panel.ANIMATION){
             SpriteAnimation a=d.animation;
@@ -391,7 +399,7 @@ public final class WorkshopSession {
         namingNewAsset=mode==Mode.ASSET_SAVE;nameTarget=namingNewAsset?assetDraft:currentAsset();
         if(nameTarget==null)return;nameEditor=new NameEditor(nameTarget.title);mode=Mode.NAME;
     }
-    public void typeName(int index){if(mode==Mode.NAME)nameEditor.type(index);}
+    public void typeName(int index){if(mode==Mode.CODE&&presets!=null&&presets.page==PresetPanel.Page.NAME)presets.name.type(index);else if(mode==Mode.NAME)nameEditor.type(index);}
     public void restoreName(SpriteAsset target,boolean isNew,NameEditor editor){
         if(mode!=Mode.ASSETS&&mode!=Mode.ASSET_SAVE)return;
         nameTarget=target;namingNewAsset=isNew;nameEditor=editor;

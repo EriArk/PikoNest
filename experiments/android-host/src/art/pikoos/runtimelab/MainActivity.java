@@ -49,6 +49,7 @@ public final class MainActivity extends Activity {
     private final art.pikoos.lab.core.ToolCatalogue toolCatalogue=new art.pikoos.lab.core.ToolCatalogue();
     private ProjectStore store;
     private SpriteAssetStore assetStore;
+    private ParameterPresetStore presetStore;
     private LibrarySession library;
     private LibraryView shelf;
     private SharedPreferences folderPrefs;
@@ -101,6 +102,7 @@ public final class MainActivity extends Activity {
         try {
             store=new ProjectStore(getFilesDir());
             assetStore=new SpriteAssetStore(getFilesDir());
+            presetStore=new ParameterPresetStore(getFilesDir());
             importDraft=new AtomicFile(new File(getFilesDir(),"pending-import.bin"));
             exportDraft=new AtomicFile(new File(getFilesDir(),"pending-export.bin"));
             byte[] template;
@@ -189,11 +191,15 @@ public final class MainActivity extends Activity {
                 public void renameAsset(SpriteAsset expected,String title)throws Exception{assetStore.rename(expected,title);}
                 public void categorizeAsset(SpriteAsset expected,SpriteAsset.Category category)throws Exception{assetStore.categorize(expected,category);}
                 public String projectOrigin(){return projectTitle;}
+                public java.util.List<art.pikoos.lab.core.ParameterPreset> presets()throws Exception{return presetStore.list();}
+                public void storePreset(art.pikoos.lab.core.ParameterPreset p)throws Exception{presetStore.create(p);}
+                public void updatePreset(art.pikoos.lab.core.ParameterPreset a,art.pikoos.lab.core.ParameterPreset b)throws Exception{presetStore.update(a,b);}
             });
             activeId=id;session=next;
             prefs=getSharedPreferences(id+"-ui",MODE_PRIVATE);
             restoreUi();
             restoreCodeDraft();
+            try{session.restorePresets(prefs.getString("presetPanel",""));}catch(Exception e){session.fail(new Exception("Набор не восстановлен. Форма и исходник сохранены: "+e.getMessage()));}
             sessions.put(id,next);
         }else{
             activeId=id;session=next;prefs=getSharedPreferences(id+"-ui",MODE_PRIVATE);
@@ -463,6 +469,7 @@ public final class MainActivity extends Activity {
             .putString("luaDraft",session.codeDraft==null?(codeRecoveryFailed.contains(activeId)?prefs.getString("luaDraft",""):""):Base64.encodeToString(session.codeDraft.encode(),Base64.NO_WRAP))
             .putInt("line",session.codeLine).putInt("x",session.cursorX).putInt("y",session.cursorY)
             .putInt("codeColumn",session.codeColumn)
+            .putString("presetPanel",session.presets==null?"":session.presets.encode())
             .putInt("color",session.color).putString("drawTool",session.drawTool.name()).putBoolean("swapAB",session.swapAB)
             .putString("pickerReturn",session.pickerReturn.name())
             .putInt("lineX",session.pendingStroke()?session.lineX:-1).putInt("lineY",session.pendingStroke()?session.lineY:-1)
