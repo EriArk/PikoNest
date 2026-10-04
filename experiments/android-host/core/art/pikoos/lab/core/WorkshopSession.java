@@ -48,6 +48,15 @@ public final class WorkshopSession {
     public void restoreUses(byte[] bytes){uses=GameUses.restore(bytes,cart);tool=uses.returnTool;mode=Mode.USES;}
     private void usesAction(Action action)throws Exception{
         GameUses g=uses;
+        if(g.screen==GameUses.Screen.CAMERA){
+            CameraUse camera=g.camera;
+            if(action==Action.UP)camera.field=Math.max(0,camera.field-1);if(action==Action.DOWN)camera.field=Math.min(camera.rows()-1,camera.field+1);
+            if(action==Action.LEFT)camera.change(-1);if(action==Action.RIGHT)camera.change(1);
+            if(action==Action.PREVIOUS)camera.change(-8);if(action==Action.NEXT)camera.change(8);
+            if(action==Action.CONTEXT)camera.symbol();
+            if(action==Action.CONFIRM){if(camera.field==camera.rows()-1)g.review();else camera.change(1);}
+            if(action==Action.CANCEL)g.back();return;
+        }
         if(g.screen==GameUses.Screen.ANIMATION){
             SpriteAnimation a=g.animation;
             if(a.picker!=null){
@@ -72,7 +81,7 @@ public final class WorkshopSession {
         }
         if(g.screen==GameUses.Screen.REVIEW){
             if(action==Action.CANCEL)g.back();
-            if(action==Action.CONFIRM){int selected=g.creating?g.entries.size():g.index;save(g.proposal().candidate(cart),true);uses=new GameUses(cart,g.returnTool);uses.move(selected);}
+            if(action==Action.CONFIRM){int selected=g.camera!=null?g.index:g.creating?(g.copyAfter?g.index+1:g.entries.size()):g.index;save(g.proposal().candidate(cart),true);uses=new GameUses(cart,g.returnTool);uses.move(selected);}
             return;
         }
         if(g.screen==GameUses.Screen.FORM){
@@ -82,7 +91,7 @@ public final class WorkshopSession {
             if(action==Action.CONTEXT)g.pick();if(action==Action.CONFIRM)g.review();if(action==Action.CANCEL)g.back();return;
         }
         if(g.screen==GameUses.Screen.MENU){
-            if(action==Action.UP)g.menu=Math.max(0,g.menu-1);if(action==Action.DOWN)g.menu=Math.min(7,g.menu+1);
+            if(action==Action.UP)g.menu=Math.max(0,g.menu-1);if(action==Action.DOWN)g.menu=Math.min(9,g.menu+1);
             if(action==Action.CANCEL||action==Action.MENU){g.screen=GameUses.Screen.LIST;return;}
             if(action==Action.CONFIRM){
                 if(g.menu==0)g.addSprite(selection());if(g.menu==1)g.addMap(mapEditor.x,mapEditor.y);
@@ -90,6 +99,7 @@ public final class WorkshopSession {
                 if(g.menu==4){GameUses.Entry e=g.current();int at=e==null?0:e.start();uses=null;tool=1;beginCode();codeDraft.point(g.source.substring(0,at).split("\r\n|\r|\n",-1).length-1,0);}
                 if(g.menu==5)g.screen=GameUses.Screen.LIST;
                 if(g.menu==6)g.addAnimation(selection());if(g.menu==7)g.animateSelected();
+                if(g.menu==8)g.addCamera(false);if(g.menu==9)g.addCamera(true);
             }return;
         }
         if(action==Action.UP)g.move(-1);if(action==Action.DOWN)g.move(1);

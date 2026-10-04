@@ -18,6 +18,7 @@ import art.pikoos.lab.core.MapEditor;
 import art.pikoos.lab.core.MapChange;
 import art.pikoos.lab.core.MapRegion;
 import art.pikoos.lab.core.GameUses;
+import art.pikoos.lab.core.CameraUse;
 import art.pikoos.lab.core.SpritePlacement;
 import art.pikoos.lab.core.SpriteAnimation;
 import art.pikoos.lab.core.SpriteMove;
@@ -139,6 +140,7 @@ final class WorkshopView extends View {
         boolean draft=(s.uses!=null&&(s.uses.screen==GameUses.Screen.FORM||s.uses.screen==GameUses.Screen.REVIEW||s.uses.screen==GameUses.Screen.PICK))||s.flagDraft!=null||s.mapEditor.pending()||s.codeDraft!=null||s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
         draft|=s.mapEditor.region!=null;
         draft|=s.uses!=null&&s.uses.screen==GameUses.Screen.ANIMATION;
+        draft|=s.uses!=null&&s.uses.screen==GameUses.Screen.CAMERA;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -703,8 +705,36 @@ final class WorkshopView extends View {
         button(ok()+(g.deleting?" Убрать из игры":" Сохранить"),16,bodyBottom-48,w-32,38,true,()->action(Action.CONFIRM));
         rect(0,bodyBottom,w,44,0);key(back()+" назад",12,bodyBottom,6,()->action(Action.CANCEL));
     }
+    private void cameraUse(){
+        GameUses g=s.uses;CameraUse camera=g.camera;boolean review=g.screen==GameUses.Screen.REVIEW;hits.clear();
+        fitted(g.deleting?"Убрать настройку камеры?":review?"Камера · проверь результат":"Камера · мир и экран",16,78,24,14,w-32);
+        fitted(review?CameraUse.title(camera.form):"←→ значение · L/R ±8 · X имя",16,108,18,review?10:6,w-32);
+        if(!review){
+            int count=Math.max(2,(int)((bodyBottom-214)/38));int first=Math.max(0,Math.min(camera.rows()-count,camera.field-count+1));
+            for(int n=0;n<count&&first+n<camera.rows();n++){final int row=first+n;button(camera.label(row),16,126+n*38,w-32,34,camera.field==row,()->{camera.field=row;action(Action.CONFIRM);});}
+            fitted(camera.scope(),16,bodyBottom-64,16,7,w-32);
+            fitted(camera.ranged()?"Команды между ними тоже сдвигаются":"Действует до следующей камеры",16,bodyBottom-38,16,6,w-32);
+        }else{
+            int[] pixels=camera.preview(g.deleting);float size=Math.min(224,Math.min((w-48)*.58f,bodyBottom-282)),top=132;
+            if(!camera.dynamicPreview){
+                for(int y=0;y<128;y++)for(int x=0;x<128;x++)sceneBitmap.setPixel(x,y,COLORS[pixels[y*128+x]]);
+                c.drawBitmap(sceneBitmap,null,new RectF(16,top,16+size,top+size),p);outline(14,top-2,size+4,size+4,13);
+                fitted("Эскиз ресурсов",16,top+size+24,16,6,w-32);
+            }else{rect(16,top,size,size,0);fitted("Точка из игры",24,top+40,18,10,size-16);fitted("Проверь в Test",24,top+70,16,7,size-16);}
+            float right=32+size,rw=w-right-16;int[] offset=g.deleting?CameraUse.offset(g.current().view):CameraUse.offset(camera.form);
+            fitted("СДВИГ",right,156,18,14,rw);
+            fitted(offset==null?"Из игры":"X "+offset[0],right,190,18,7,rw);
+            if(offset!=null)fitted("Y "+offset[1],right,222,18,7,rw);
+            fitted(camera.scope(),16,bodyBottom-94,16,7,w-32);
+            fitted(g.deleting?"Следующие элементы изменят координаты":"Текст и фигуры проверяются в Test",16,bodyBottom-68,16,6,w-32);
+            button(ok()+(g.deleting?" Убрать":" Сохранить"),16,bodyBottom-48,w-32,38,true,()->action(Action.CONFIRM));
+        }
+        rect(0,bodyBottom,w,44,0);key(back()+" назад",12,bodyBottom,6,()->action(Action.CANCEL));
+        if(!review)key(ok()+" выбор",w/2,bodyBottom,10,()->action(Action.CONFIRM));
+    }
     private void gameUses(){
         GameUses g=s.uses;hits.clear();
+        if(g.camera!=null&&(g.screen==GameUses.Screen.CAMERA||g.screen==GameUses.Screen.REVIEW)){cameraUse();return;}
         if(g.screen==GameUses.Screen.ANIMATION){animationEditor();return;}
         if(g.screen==GameUses.Screen.REVIEW&&g.animation!=null){animationUseReview();return;}
         fitted("В игре · размещения",16,76,26,14,w-32);
@@ -715,7 +745,7 @@ final class WorkshopView extends View {
             rect(0,bodyBottom,w,44,0);key(back()+" назад",12,bodyBottom,6,()->action(Action.CANCEL));key("X шаг "+g.picker.step,w/2,bodyBottom,10,()->action(Action.CONTEXT));return;
         }
         if(g.screen==GameUses.Screen.MENU){
-            String[] items={"Добавить спрайт","Добавить карту","Дублировать выбранное","Убрать использование","Открыть Lua (по желанию)","К списку","Добавить анимацию","Оживить выбранный спрайт"};
+            String[] items={"Добавить спрайт","Добавить карту","Дублировать выбранное","Убрать использование","Открыть Lua (по желанию)","К списку","Добавить анимацию","Оживить выбранный спрайт","Камера для размещений","Экран с выбранного места"};
             int count=Math.max(3,(int)((bodyBottom-144)/44)),first=Math.max(0,Math.min(items.length-count,g.menu-count+1));
             for(int row=0;row<count&&first+row<items.length;row++){final int n=first+row;button(items[n],16,106+row*44,w-32,38,g.menu==n,()->{g.menu=n;action(Action.CONFIRM);});}
             fitted("Пиксели и тайлы при удалении остаются",16,bodyBottom-12,16,6,w-32);
@@ -723,7 +753,7 @@ final class WorkshopView extends View {
             fitted(g.entries.size()+" использований · сохранены в игре",16,102,16,6,w-32);
             if(!g.blocked.isEmpty()){
                 fitted("Отрисовка пока не поддержана этим списком",16,146,18,10,w-32);
-                fitted("Вложенные блоки, выражения или камера.",16,174,16,7,w-32);
+                fitted("Неизвестные блоки или выражения.",16,174,16,7,w-32);
                 fitted("Исходник сохранён. Lua доступен в меню.",16,202,16,6,w-32);
             }else if(g.entries.isEmpty()){
                 fitted("Здесь появятся твои спрайты и карта",16,162,20,7,w-32);
@@ -734,7 +764,8 @@ final class WorkshopView extends View {
                 final int at=first+n;GameUses.Entry e=g.entries.get(at);float y=116+n*58;
                 rect(16,y,w-32,52,g.index==at?2:0);if(g.index==at)outline(16,y,w-32,52,10);
                 fitted((at+1)+" · "+e.title(),28,y+23,20,g.index==at?10:7,w-56);
-                fitted("X "+e.x()+" · Y "+e.y()+" · "+(e.kind().equals("map")?"область карты":e.animation!=null?(e.animation.initial.loop?"по кругу":"один раз"):"область листа"),28,y+44,16,6,w-56);
+                String context=e.view==null||e.view.form.item().id.equals("camera_reset")?"экран":"мир";
+                fitted(e.isCamera()?(e.call.form.item().fields.length==0?"Следующие элементы неподвижны":"X "+e.call.form.value(0)+" · Y "+e.call.form.value(1)):"X "+e.x()+" · Y "+e.y()+" · "+context,28,y+44,16,6,w-56);
                 hit(16,y,w-32,52,()->{g.index=at;action(Action.CONFIRM);});
             }
             button("R Добавить "+(s.tool==3?"карту":"спрайт"),16,bodyBottom-56,(w-40)/2,38,false,()->action(Action.NEXT));

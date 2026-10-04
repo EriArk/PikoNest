@@ -1,5 +1,11 @@
 # PikoNest Android host experiment
 
+**0.0.65:** camera management from the common game-use list. Reuse position,
+follow/room forms, apply to a range with an explicit restore, switch following
+draws to screen coordinates, reopen/remove/Undo/recover without a Lua cursor.
+Copies keep their current camera. Resource sketches do not execute Lua; dynamic
+points require Test. [Evidence and limitations](../../docs/design/android-camera-uses-65/README.md).
+
 **0.0.64:** recognized animations in the common game-use list. Create from a sheet
 region or animate an existing sprite placement; edit frames, duplicate/remove,
 review, recover and Undo/Redo without opening Lua. Ordinary draw blocks retain

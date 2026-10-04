@@ -1,0 +1,50 @@
+{
+  "build": "0.0.65",
+  "core_checks": 76,
+  "old_files": 47,
+  "after_files": 48,
+  "changed_old_files": [],
+  "added_files": [
+    "files/projects/remix-0029/game.p8"
+  ],
+  "cart_sha256": "1b472f5a7059a8088c825aa552e2fd7c859e2b0b7bab373a534e930316cbd640",
+  "apk_sha256": "331f13f4bbb18f19d7d95474211742ab85a7e414e6241549af065096c89951e9",
+  "runtime": "official PICO-8 0.2.7 / Runtime Test 8",
+  "runtime_frames_checked": 8,
+  "pixels_per_frame": 16384,
+  "mismatches": 0,
+  "observed_animation_frames": [
+    1,
+    2,
+    1,
+    2,
+    1,
+    1,
+    2,
+    1
+  ],
+  "resource_sections_byte_identical": true,
+  "input": "ADB controller events; project copied and all camera edits through UI, no Lua editor or source injection",
+  "checked": [
+    "camera range with restore",
+    "cold recovery on compact screen",
+    "atomic Undo/Redo",
+    "repeat edit",
+    "duplicate inside camera range",
+    "delete copy exact inverse",
+    "screen reset",
+    "delete reset cancel/Undo",
+    "official world and screen coordinates",
+    "Test return",
+    "old files preserved"
+  ],
+  "limits": [
+    "recognized flat draw only",
+    "resource sketch does not execute Lua",
+    "dynamic camera expression requires Test",
+    "range override of dynamic prior camera refused",
+    "Undo in memory",
+    "cold start opens Play",
+    "physical controller acceptance pending"
+  ]
+}

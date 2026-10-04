@@ -30,7 +30,6 @@ public final class GameUsesTest {
             "function _draw()\n if true then\n spr(1,0,0)\n end\nend\n",
             "function outer()\nfunction _draw()\ncls(1)\nend\nend\n",
             "function _draw()\n cls(1)\n spr(1,x,0)\nend\n",
-            "function _draw()\n camera(10,10)\n spr(1,0,0)\nend\n",
             "function _draw()\n spr(1,0,0)\n cls(1)\nend\n",
             "function _draw() cls(1) end\n",
             "_draw=function()\n cls(1)\nend\n",

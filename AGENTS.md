@@ -155,7 +155,9 @@ dependencies now, populate reusable content later. See `docs/CORE_TOOLS.md` for
 the current audit. Bounded G04.2 exists in lab 0.0.62; map-region copy/move/clear
 with explicit shared-gfx review (G03.4) exists in 0.0.63. Animation management and
 sprite-use conversion (N01.3/G04) exist in 0.0.64 for recognized flat draw blocks.
-Next is camera entry/management (N02/G04), then the connected M2 workflow. Shared
+Camera entry/management (N02.3/G04) exists in 0.0.65 for those flat draw blocks,
+with explicit world/screen order. Next connect existing background layers to the
+same workshop path (N03/G04), then the connected M2 workflow. Shared
 sprite painting and map brushes remain unfinished G01/G03 work. N03.3 is deferred from the
 immediate queue. Preserve existing libraries, favorites and presets.
 
@@ -488,7 +490,8 @@ round-trip and bounded controller experiments now exist. Follow the current
 completion path in `docs/ROADMAP.md` and the basic-editor audit in `docs/CORE_TOOLS.md`:
 G04.2 connects sprite/map editing to game uses in 0.0.62; G03.4 adds map-region/shared
 review in 0.0.63 and N01.3 connects recognized animations to those uses in 0.0.64.
-Next complete the camera entry/management path N02/G04, alongside remaining
+N02.3 connects camera management in 0.0.65. Next connect existing background layers
+without requiring a Lua cursor (N03/G04), alongside remaining
 runtime/storage work. Do not mistake time-since-run animations for state/event bindings.
 Do not keep extending launcher polish or template-specific controls as a substitute
 for missing general tools. Close tasks with explicit
