@@ -1,0 +1,56 @@
+{
+  "version": "0.0.65 English capture build",
+  "source_commit": "8dd3815ae7185dd76d0114077ec145a6e297232b",
+  "captured": "2026-10-04",
+  "device": "Retroid Pocket Classic",
+  "resolution": "1240x1080",
+  "capture": "adb exec-out screencap -p",
+  "images": "Original device PNG; no text overlay, retouching, crop or resizing",
+  "presentation_changes": "Isolated rendering-label translation and PikoNest display name; domain, project contents and controls unchanged",
+  "localization_status": "Selected showcase surfaces only; no complete English product release or language selector",
+  "english_apk_sha256": "0c08244b7c4141458d6b5cd80211f620f973685a42496381f0de3c648e314aa7",
+  "restored_apk_sha256": "331f13f4bbb18f19d7d95474211742ab85a7e414e6241549af065096c89951e9",
+  "project_and_asset_files_before": 48,
+  "project_and_asset_files_after": 48,
+  "changed_project_and_asset_files": [],
+  "preferences_restored_byte_identical": true,
+  "github_apk_release": false,
+  "files": [
+    {
+      "name": "01-play-library.png",
+      "sha256": "3fae26dcf7169c24753f84ddd32b09ac55f4f7ddffb15e49fa17100b07170cec"
+    },
+    {
+      "name": "02-sprite-editor.png",
+      "sha256": "048fb52ce0b5e89170bb686b04351c31bcf1c5b6c6fd06586a7093b064c343e7"
+    },
+    {
+      "name": "03-sheet-region.png",
+      "sha256": "27bc3b7e25b49f4f6136366e0a438718cbcc3c550929e8e42fd5e81516cd5058"
+    },
+    {
+      "name": "04-map-editor.png",
+      "sha256": "2de66ca09d40130c253ea109bd28f1feda9cb66318a0bbd0750920403b6c14f4"
+    },
+    {
+      "name": "05-animation-editor.png",
+      "sha256": "bf2ea9486d376823b5d528a62fca60729635b7b9ed80c51b4a0a78302ccf8db8"
+    },
+    {
+      "name": "06-camera-preview.png",
+      "sha256": "fc8aa1c8a7320fa98d6aa821e488442d704a0aedb2bb959213516b3c930c360d"
+    },
+    {
+      "name": "07-background-layers.png",
+      "sha256": "03cc60b5ef0282884396dd4c0b2feb3380376b9dc1004c6f1ea81cedfe845b3b"
+    },
+    {
+      "name": "08-asset-library.png",
+      "sha256": "29bfba2e94e096a816e86da7a8a1e590aba3a1af5ceeba87239d8756608c4409"
+    },
+    {
+      "name": "09-official-runtime.png",
+      "sha256": "9c94f7589b38e9c03861feefc74ce21e62a83bbfa8b7e70422ce64dbaaeec90e"
+    }
+  ]
+}

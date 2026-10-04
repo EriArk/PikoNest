@@ -144,7 +144,8 @@ For implementation status, roadmap and the rather obsessive acceptance checks:
 - [Current status](docs/STATUS.md)
 - [Roadmap](docs/ROADMAP.md)
 - [End-to-end acceptance](docs/ACCEPTANCE.md)
-- [Current screenshot set](docs/showcase/0.0.61/README.md)
+- [English website screenshot pack — 0.0.65](docs/showcase/0.0.65-en/README.md)
+- [Original screenshot set — 0.0.61](docs/showcase/0.0.61/README.md)
 - [Project rename and planned identifier migration](docs/PROJECT_NAME.md)
 
 PikoNest was previously called PIKOOS. The original 0.0.61 screenshots and
