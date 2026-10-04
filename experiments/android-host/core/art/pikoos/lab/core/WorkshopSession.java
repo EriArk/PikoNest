@@ -152,8 +152,8 @@ public final class WorkshopSession {
         if(action==Action.UP)i.field=Math.max(0,i.field-1);
         if(action==Action.DOWN)i.field=Math.min(i.item().fields.length,i.field+1);
         if(action==Action.LEFT)i.step(-1);if(action==Action.RIGHT)i.step(1);
-        if(action==Action.CONTEXT){if(i.areaRecipe())i.beginPreview();else i.beginSymbols(d.text());}
-        if(action==Action.CONFIRM){if(i.field==i.item().fields.length){if(i.areaRecipe())i.beginPreview();else d.applyInsert();}else i.beginText();}
+        if(action==Action.CONTEXT){if(i.fullPreview()&&!i.canBrowse())i.beginPreview();else i.beginSymbols(d.text());}
+        if(action==Action.CONFIRM){if(i.field==i.item().fields.length){if(i.fullPreview())i.beginPreview();else d.applyInsert();}else i.beginText();}
         if(action==Action.CANCEL){if(d.callEdit!=null)d.cancelInsert();else i.screen=LuaInsert.Screen.CATALOG;}
         // Start is intentionally not a launch/commit shortcut while reviewing a proposal.
     }

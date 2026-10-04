@@ -38,13 +38,17 @@ public final class LuaInsert {
         new Item("sspr","Спрайт · разместить","Выбери область своего листа и место на экране. Вставляй внутри _draw после очистки кадра.",false,f("На листе X","0",Kind.EXPR),f("На листе Y","0",Kind.EXPR),f("Ширина","8",Kind.EXPR),f("Высота","8",Kind.EXPR),f("Экран X","60",Kind.EXPR),f("Экран Y","60",Kind.EXPR)) ,
         new Item("map","map · показать карту","Рисует тайлы карты. Вставляй в _draw после cls(). Размер задаётся в клетках 8×8, положение на экране — в пикселях.",false,f("Карта X","0",Kind.EXPR),f("Карта Y","0",Kind.EXPR),f("Экран X","0",Kind.EXPR),f("Экран Y","0",Kind.EXPR),f("Ширина, кл","16",Kind.EXPR),f("Высота, кл","16",Kind.EXPR))
         ,new Item("solid","Препятствие · точка карты","Создаёт функцию в начале Lua. solid_at(x,y): true, если точка на тайле с флагом. x/y — пиксели от начала карты, не экрана.",false,f("Имя","solid_at",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Ширина, кл","128",Kind.MAP_WIDTH),f("Высота, кл","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE)),
-        new Item("solid_box","Препятствие · область","solid_box(x,y,w,h): точка начала и размеры в пикселях карты. Проверяет все клетки области. Касание края не считается пересечением.",false,f("Имя","solid_box",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Карта, шир.","128",Kind.MAP_WIDTH),f("Карта, выс.","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE))
+        new Item("solid_box","Препятствие · область","solid_box(x,y,w,h): точка начала и размеры в пикселях карты. Проверяет все клетки области. Касание края не считается пересечением.",false,f("Имя","solid_box",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Карта, шир.","128",Kind.MAP_WIDTH),f("Карта, выс.","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE)),
+        new Item("move_box","Движение · стены","Создаёт движение по флагам: сначала X, затем Y. Проверяет весь путь шага. После вставки выбери «Движение · вызов» в _update.",false,f("Имя","move_box",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Карта, шир.","128",Kind.MAP_WIDTH),f("Карта, выс.","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE)),
+        new Item("move_call","Движение · вызов","Выбери функцию движения, переменные координат, размер и шаг в пикселях. Вставляй в _update. Функцию сначала добавь через «Движение · стены».",false,f("Функция","move_box",Kind.NAME),f("Коорд. X","x",Kind.NAME),f("Коорд. Y","y",Kind.NAME),f("Ширина, px","8",Kind.EXPR),f("Высота, px","8",Kind.EXPR),f("Шаг X","1",Kind.EXPR),f("Шаг Y","0",Kind.EXPR))
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
     public int previewLine;
-    public boolean tileRecipe(){return item().id.equals("solid")||areaRecipe();}
+    public boolean tileRecipe(){return item().id.equals("solid")||areaRecipe()||motionRecipe();}
     public boolean areaRecipe(){return item().id.equals("solid_box");}
+    public boolean motionRecipe(){return item().id.equals("move_box");}
+    public boolean fullPreview(){return areaRecipe()||motionRecipe()||item().id.equals("move_call");}
     public void beginPreview(){screen=Screen.PREVIEW;previewLine=0;}
     public boolean replaceAll=true;
     public String input="";
@@ -133,6 +137,9 @@ public final class LuaInsert {
         switch(item().id){
             case "solid":return TileProbe.code(a,values[1],values[2],values[3],values[4]);
             case "solid_box":return TileProbe.areaCode(a,values[1],values[2],values[3],values[4]);
+            case "move_box":return TileMotion.code(a,values[1],values[2],values[3],values[4]);
+            case "move_call":
+                return values[1]+","+values[2]+"="+a+"(\n "+values[1]+","+values[2]+",\n ("+values[3]+"),("+values[4]+"),\n ("+values[5]+"),("+values[6]+"))\n";
             case "if":return "if "+a+" then\n  \nend\n";
             case "compare":return "if "+a+values[1]+values[2]+" then\n  \nend\n";
             case "for":return "for "+a+"="+values[1]+","+values[2]+","+values[3]+" do\n  \nend\n";
@@ -179,7 +186,7 @@ public final class LuaInsert {
         if(browserState){insert.symbolGroup=in.readInt();insert.symbolIndex=in.readInt();}
         if(insert.screen==Screen.PREVIEW){
             insert.previewLine=in.readInt();
-            if(!browserState||editing||!insert.areaRecipe()||insert.previewLine<0||insert.previewLine>insert.code().length())throw new IOException("preview state");
+            if(!browserState||editing||!insert.fullPreview()||insert.previewLine<0||insert.previewLine>insert.code().length())throw new IOException("preview state");
         }
         if(insert.symbolGroup<0||insert.symbolGroup>1||insert.symbolIndex<0||insert.symbolIndex>100000
             ||(insert.screen==Screen.SYMBOLS&&(!browserState||!insert.canBrowse()||(insert.symbolGroup==1&&!insert.canBrowseApi()))))throw new IOException("symbol state");

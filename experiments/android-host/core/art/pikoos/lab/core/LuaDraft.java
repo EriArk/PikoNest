@@ -169,8 +169,13 @@ public final class LuaDraft {
         String function=insertion.functionName();
         if(function!=null&&context.defines(function))throw new IllegalArgumentException("Функция "+function+" уже задана. Перейди к её телу; существующий код не заменён.");
         String raw=insertion.code();
+        if(insertion.item().id.equals("move_call"))TileMotion.validateCall(text,insertion.value(0),insertion.value(1),insertion.value(2));
         boolean tileProbe=insertion.tileRecipe();
-        if(tileProbe){TileProbe.validateSource(text,insertion.value(0),insertion.areaRecipe());at=0;indent="";}
+        if(tileProbe){
+            if(insertion.motionRecipe())TileMotion.validateSource(text,insertion.value(0));
+            else TileProbe.validateSource(text,insertion.value(0),insertion.areaRecipe());
+            at=0;indent="";
+        }
         if(insertion.item().id.equals("compare")){
             String header=raw.substring(0,raw.indexOf('\n'));LuaCall parsed=LuaCall.parse(header,0,header.length());
             if(parsed.form.selected!=insertion.selected)throw new IllegalArgumentException("Сложное выражение: заключи каждую сторону сравнения в скобки.");

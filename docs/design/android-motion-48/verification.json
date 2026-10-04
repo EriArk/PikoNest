@@ -1,0 +1,35 @@
+{
+  "host_version": "0.0.48",
+  "host_sha256": "c22240b02f4b1781e49f8ecef1b6b5186ddc01e70508c35b645300e0ac10417d",
+  "host_bytes": 299940,
+  "core_checks": 33,
+  "official_runtime_checks": "22/22",
+  "project": "remix-0015",
+  "project_sha256": "4075a6d860d7bfdaedced13135ea51f5fa579ad0b1364b7695e72377e0dbcf2f",
+  "old_files_preserved": 30,
+  "non_lua_sections_preserved": true,
+  "movement_bundle_matches_runtime_oracle": true,
+  "undo_redo_byte_exact": true,
+  "runtime_positions_observed": [
+    [
+      16,
+      40
+    ],
+    [
+      24,
+      40
+    ],
+    [
+      24,
+      120
+    ]
+  ],
+  "input": "ADB controller events; runtime uses --longpress for btn()",
+  "screen_sizes": [
+    "1240x1080",
+    "720x960"
+  ],
+  "runtime": "official user PICO-8 0.2.7 / Android Test 8",
+  "volume": 0,
+  "release_created": false
+}

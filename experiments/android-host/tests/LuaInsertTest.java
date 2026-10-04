@@ -21,12 +21,12 @@ public final class LuaInsertTest {
     static void refused(Runnable run,String why){try{run.run();throw new AssertionError(why);}catch(IllegalArgumentException e){checks++;}}
     public static void main(String[] args)throws Exception{
         for(int item=0;item<LuaInsert.ITEMS.length;item++){
-            LuaDraft d=draft("  \r\n");byte[] before=d.encode();String source=d.text();choose(d,item);
+            LuaDraft d=draft("  \r\n"+(LuaInsert.ITEMS[item].id.equals("move_call")?"function move_box(x,y,w,h,dx,dy) return x,y end\r\n":""));byte[] before=d.encode();String source=d.text();choose(d,item);
             check(d.text().equals(source),"preview not edit "+item);
             LuaDraft recovery=LuaDraft.restore(d.encode());check(recovery.insertion.item().id.equals(d.insertion.item().id),"proposal recovery "+item);
             recovery.applyInsert();d.applyInsert();check(d.text().equals(recovery.text()),"same recovered insertion "+item);
             check(d.text().contains("\r\n")&&!d.text().replace("\r\n","").contains("\n"),"CRLF retained "+item);
-            check(d.column()==(LuaInsert.ITEMS[item].id.startsWith("solid")?0:LuaInsert.ITEMS[item].block?4:2),"caret placed at editable next location "+item);
+            check(d.column()==(LuaInsert.ITEMS[item].id.startsWith("solid")||LuaInsert.ITEMS[item].id.equals("move_box")?0:LuaInsert.ITEMS[item].block?4:2),"caret placed at editable next location "+item);
             d.history(false);check(d.text().equals(source)&&d.cursor()==0,"one-step exact undo including cursor "+item);
             d.history(true);check(!d.text().equals(source),"redo complete insertion "+item);
         }

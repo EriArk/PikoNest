@@ -644,7 +644,7 @@ final class WorkshopView extends View {
         int first=Math.max(0,Math.min(i.field-rows/2,count+1-rows));
         for(int r=0;r<rows&&first+r<=count;r++){
             final int index=first+r;float y=112+r*36;boolean focus=index==i.field;
-            if(index==count){button(i.areaRecipe()?"Просмотреть Lua":d.callEdit!=null?"Применить правку":"+ Вставить в черновик",16,y,w-32,32,focus,()->{i.field=index;action(Action.CONFIRM);});continue;}
+            if(index==count){button(i.fullPreview()?"Просмотреть Lua":d.callEdit!=null?"Применить правку":"+ Вставить в черновик",16,y,w-32,32,focus,()->{i.field=index;action(Action.CONFIRM);});continue;}
             rect(16,y,w-32,32,focus?10:0);
             float labelWidth=Math.min(152,w*.38f);
             fitted(i.item().fields[index].label,24,y+23,18,focus?1:6,labelWidth-12);
@@ -653,7 +653,7 @@ final class WorkshopView extends View {
             hit(16,y,w-32,32,()->{i.field=index;action(Action.CONFIRM);});
         }
         float previewY=124+rows*36;
-        text(i.areaRecipe()?"Начало Lua · X весь код":d.callEdit!=null?"Изменение Lua":"Lua после вставки",16,previewY+14,18,14);
+        text(i.fullPreview()?"Начало Lua":d.callEdit!=null?"Изменение Lua":"Lua после вставки",16,previewY+14,18,14);
         rect(16,previewY+24,w-32,bodyBottom-previewY-62,0);
         c.save();c.clipRect(16,previewY+24,w-16,bodyBottom-34);
         if(longCall){codePreview("Было: "+d.callEdit.original.trim(),24,previewY+46,6,w-48);codePreview("Будет: "+d.callEdit.preview(i).trim(),24,previewY+90,10,w-48);}
@@ -665,11 +665,11 @@ final class WorkshopView extends View {
         key(ok()+" выбрать",12,bodyBottom,10,()->action(Action.CONFIRM));
         key(back()+" назад",w/3,bodyBottom,6,()->action(Action.CANCEL));
         if(i.canBrowse())key("X имена",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
-        else if(i.areaRecipe())key("X Lua",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
+        else if(i.fullPreview())key("X Lua",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
     }
     private void luaRecipePreview(LuaInsert i){
-        fitted("Область · код функции",16,75,22,14,w-32);
-        fitted("Карта: x,y,w,h в пикселях",16,100,16,6,w-32);
+        fitted(i.motionRecipe()?"Движение · код":i.item().id.equals("move_call")?"Движение · вызов":"Область · код функции",16,75,22,14,w-32);
+        fitted(i.motionRecipe()?"Сначала X, затем Y · пиксели":i.item().id.equals("move_call")?"Новые X,Y · на месте курсора":"Карта: x,y,w,h в пикселях",16,100,16,6,w-32);
         java.util.ArrayList<String> rows=new java.util.ArrayList<>();
         for(String line:i.code().split("\n")){
             if(line.isEmpty()){rows.add("");continue;}
