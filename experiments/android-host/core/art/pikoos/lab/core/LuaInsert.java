@@ -4,7 +4,7 @@ import java.io.*;
 
 /** Small editable catalogue of ordinary Lua. No bindings or extra runtime components. */
 public final class LuaInsert {
-    public enum Screen { CATALOG, FIELDS, TEXT, SYMBOLS }
+    public enum Screen { CATALOG, FIELDS, TEXT, SYMBOLS, PREVIEW }
     public enum Kind { NAME, EXPR, STRING, COLOR, BUTTON, INPUT, COMPARE, FLAG, MAP_WIDTH, MAP_HEIGHT, OUTSIDE }
     public static final String[] COMPARISONS={"==","~=","!=","<","<=",">",">="};
     public static final class Field {
@@ -37,10 +37,15 @@ public final class LuaInsert {
         new Item("compare","if · сравнить значения","Сравнивает два значения. Если сравнение истинно, выполняется тело условия.",true,f("Слева","score",Kind.EXPR),f("Сравнение",">=",Kind.COMPARE),f("Справа","5",Kind.EXPR)),
         new Item("sspr","Спрайт · разместить","Выбери область своего листа и место на экране. Вставляй внутри _draw после очистки кадра.",false,f("На листе X","0",Kind.EXPR),f("На листе Y","0",Kind.EXPR),f("Ширина","8",Kind.EXPR),f("Высота","8",Kind.EXPR),f("Экран X","60",Kind.EXPR),f("Экран Y","60",Kind.EXPR)) ,
         new Item("map","map · показать карту","Рисует тайлы карты. Вставляй в _draw после cls(). Размер задаётся в клетках 8×8, положение на экране — в пикселях.",false,f("Карта X","0",Kind.EXPR),f("Карта Y","0",Kind.EXPR),f("Экран X","0",Kind.EXPR),f("Экран Y","0",Kind.EXPR),f("Ширина, кл","16",Kind.EXPR),f("Высота, кл","16",Kind.EXPR))
-        ,new Item("solid","Препятствие · точка карты","Создаёт функцию в начале Lua. solid_at(x,y): true, если точка на тайле с флагом. x/y — пиксели от начала карты, не экрана.",false,f("Имя","solid_at",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Ширина, кл","128",Kind.MAP_WIDTH),f("Высота, кл","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE))
+        ,new Item("solid","Препятствие · точка карты","Создаёт функцию в начале Lua. solid_at(x,y): true, если точка на тайле с флагом. x/y — пиксели от начала карты, не экрана.",false,f("Имя","solid_at",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Ширина, кл","128",Kind.MAP_WIDTH),f("Высота, кл","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE)),
+        new Item("solid_box","Препятствие · область","solid_box(x,y,w,h): точка начала и размеры в пикселях карты. Проверяет все клетки области. Касание края не считается пересечением.",false,f("Имя","solid_box",Kind.NAME),f("Флаг","0",Kind.FLAG),f("Карта, шир.","128",Kind.MAP_WIDTH),f("Карта, выс.","32",Kind.MAP_HEIGHT),f("За краем","true",Kind.OUTSIDE))
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
+    public int previewLine;
+    public boolean tileRecipe(){return item().id.equals("solid")||areaRecipe();}
+    public boolean areaRecipe(){return item().id.equals("solid_box");}
+    public void beginPreview(){screen=Screen.PREVIEW;previewLine=0;}
     public boolean replaceAll=true;
     public String input="";
     private String[] values;
@@ -127,6 +132,7 @@ public final class LuaInsert {
         String a=values[0];
         switch(item().id){
             case "solid":return TileProbe.code(a,values[1],values[2],values[3],values[4]);
+            case "solid_box":return TileProbe.areaCode(a,values[1],values[2],values[3],values[4]);
             case "if":return "if "+a+" then\n  \nend\n";
             case "compare":return "if "+a+values[1]+values[2]+" then\n  \nend\n";
             case "for":return "for "+a+"="+values[1]+","+values[2]+","+values[3]+" do\n  \nend\n";
@@ -159,6 +165,7 @@ public final class LuaInsert {
         out.writeUTF(item().id);out.writeInt(screen.ordinal());out.writeInt(field);out.writeInt(page);out.writeInt(key);
         out.writeBoolean(replaceAll);out.writeUTF(input);for(String value:values)out.writeUTF(value);
         out.writeInt(symbolGroup);out.writeInt(symbolIndex);
+        if(screen==Screen.PREVIEW)out.writeInt(previewLine);
     }
     public static LuaInsert read(DataInputStream in,boolean browserState,boolean editing)throws IOException{
         LuaInsert insert=new LuaInsert();String id=in.readUTF();int found=-1;
@@ -170,6 +177,10 @@ public final class LuaInsert {
             ||(screen==Screen.TEXT.ordinal()&&insert.field==insert.values.length))throw new IOException("snippet state");
         insert.screen=Screen.values()[screen];for(int i=0;i<insert.values.length;i++)insert.set(i,in.readUTF());
         if(browserState){insert.symbolGroup=in.readInt();insert.symbolIndex=in.readInt();}
+        if(insert.screen==Screen.PREVIEW){
+            insert.previewLine=in.readInt();
+            if(!browserState||editing||!insert.areaRecipe()||insert.previewLine<0||insert.previewLine>insert.code().length())throw new IOException("preview state");
+        }
         if(insert.symbolGroup<0||insert.symbolGroup>1||insert.symbolIndex<0||insert.symbolIndex>100000
             ||(insert.screen==Screen.SYMBOLS&&(!browserState||!insert.canBrowse()||(insert.symbolGroup==1&&!insert.canBrowseApi()))))throw new IOException("symbol state");
         return insert;

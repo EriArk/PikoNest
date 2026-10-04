@@ -26,7 +26,7 @@ public final class LuaInsertTest {
             LuaDraft recovery=LuaDraft.restore(d.encode());check(recovery.insertion.item().id.equals(d.insertion.item().id),"proposal recovery "+item);
             recovery.applyInsert();d.applyInsert();check(d.text().equals(recovery.text()),"same recovered insertion "+item);
             check(d.text().contains("\r\n")&&!d.text().replace("\r\n","").contains("\n"),"CRLF retained "+item);
-            check(d.column()==(LuaInsert.ITEMS[item].id.equals("solid")?0:LuaInsert.ITEMS[item].block?4:2),"caret placed at editable next location "+item);
+            check(d.column()==(LuaInsert.ITEMS[item].id.startsWith("solid")?0:LuaInsert.ITEMS[item].block?4:2),"caret placed at editable next location "+item);
             d.history(false);check(d.text().equals(source)&&d.cursor()==0,"one-step exact undo including cursor "+item);
             d.history(true);check(!d.text().equals(source),"redo complete insertion "+item);
         }

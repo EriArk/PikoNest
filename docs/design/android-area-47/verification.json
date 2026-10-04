@@ -1,0 +1,13 @@
+{
+  "old_files_preserved": 29,
+  "new_files": [
+    "files/projects/remix-0014/game.p8"
+  ],
+  "non_lua_sections_unchanged": true,
+  "area_helper_matches_official_test": true,
+  "official_point_checks": 21,
+  "official_area_checks": 36,
+  "ui_point_result": false,
+  "ui_area_result": true,
+  "sha256": "6744413c02cca2e27257cb292a89286dbd23adfb2e9a71a37c03bf8800bcc9b9"
+}

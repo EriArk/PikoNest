@@ -116,6 +116,15 @@ public final class WorkshopSession {
     public void insertText(String value){if(mode==Mode.CODE&&codeDraft!=null&&codeDraft.insertion!=null&&codeDraft.insertion.screen==LuaInsert.Screen.TEXT)try{codeDraft.insertion.type(value);}catch(Exception e){fail(e);}}
     private void insertAction(Action action){
         LuaDraft d=codeDraft;LuaInsert i=d.insertion;
+        if(i.screen==LuaInsert.Screen.PREVIEW){
+            if(action==Action.UP)i.previewLine=Math.max(0,i.previewLine-1);
+            if(action==Action.DOWN)i.previewLine=Math.min(i.code().length(),i.previewLine+1);
+            if(action==Action.LEFT||action==Action.PREVIOUS)i.previewLine=Math.max(0,i.previewLine-6);
+            if(action==Action.RIGHT||action==Action.NEXT)i.previewLine=Math.min(i.code().length(),i.previewLine+6);
+            if(action==Action.CANCEL)i.screen=LuaInsert.Screen.FIELDS;
+            if(action==Action.CONFIRM)d.applyInsert();
+            return;
+        }
         if(i.screen==LuaInsert.Screen.SYMBOLS){
             if(action==Action.UP)i.symbolMove(-1);if(action==Action.DOWN)i.symbolMove(1);
             if(action==Action.LEFT)i.symbolMove(-6);if(action==Action.RIGHT)i.symbolMove(6);
@@ -143,8 +152,8 @@ public final class WorkshopSession {
         if(action==Action.UP)i.field=Math.max(0,i.field-1);
         if(action==Action.DOWN)i.field=Math.min(i.item().fields.length,i.field+1);
         if(action==Action.LEFT)i.step(-1);if(action==Action.RIGHT)i.step(1);
-        if(action==Action.CONTEXT)i.beginSymbols(d.text());
-        if(action==Action.CONFIRM){if(i.field==i.item().fields.length)d.applyInsert();else i.beginText();}
+        if(action==Action.CONTEXT){if(i.areaRecipe())i.beginPreview();else i.beginSymbols(d.text());}
+        if(action==Action.CONFIRM){if(i.field==i.item().fields.length){if(i.areaRecipe())i.beginPreview();else d.applyInsert();}else i.beginText();}
         if(action==Action.CANCEL){if(d.callEdit!=null)d.cancelInsert();else i.screen=LuaInsert.Screen.CATALOG;}
         // Start is intentionally not a launch/commit shortcut while reviewing a proposal.
     }

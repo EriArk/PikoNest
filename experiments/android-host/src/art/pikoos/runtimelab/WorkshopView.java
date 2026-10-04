@@ -597,8 +597,9 @@ final class WorkshopView extends View {
         LuaDraft d=s.codeDraft;LuaInsert i=d.insertion;
         hits.clear();
         if(i.screen==LuaInsert.Screen.SYMBOLS){luaSymbols(i);return;}
+        if(i.screen==LuaInsert.Screen.PREVIEW){luaRecipePreview(i);return;}
         fitted(i.screen==LuaInsert.Screen.CATALOG?"+ Вставить Lua":d.callEdit!=null&&d.callEdit.name.equals("rule:elseif")?"elseif · иначе если":i.item().title,16,75,24,14,w-32);
-        fitted(i.item().id.equals("solid")?"Начало Lua · x/y в пикселях":d.callEdit!=null?(i.item().id.equals("set")||i.item().id.equals("add")?"Имя и значение меняются только в этой строке":"Поля строки "+(d.line()+1)+" · "+back()+" отменить"):"Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
+        fitted(i.tileRecipe()?"Начало Lua · x/y в пикселях":d.callEdit!=null?(i.item().id.equals("set")||i.item().id.equals("add")?"Имя и значение меняются только в этой строке":"Поля строки "+(d.line()+1)+" · "+back()+" отменить"):"Перед строкой "+(d.line()+1)+" · исходник не заменяется",16,100,16,6,w-32);
         if(i.screen==LuaInsert.Screen.CATALOG){
             int rows=Math.max(3,(int)((bodyBottom-220)/38));
             int first=Math.max(0,Math.min(i.selected-rows/2,LuaInsert.ITEMS.length-rows));
@@ -639,11 +640,11 @@ final class WorkshopView extends View {
         }
         boolean longCall=d.callEdit!=null&&(i.item().id.equals("sspr")||i.item().id.equals("map"))&&w<500;
         int count=i.item().fields.length,rows=Math.min(count+1,Math.max(2,(int)((bodyBottom-(longCall?298:254))/36)));
-        if(i.item().id.equals("solid"))rows=2;
+        if(i.tileRecipe())rows=2;
         int first=Math.max(0,Math.min(i.field-rows/2,count+1-rows));
         for(int r=0;r<rows&&first+r<=count;r++){
             final int index=first+r;float y=112+r*36;boolean focus=index==i.field;
-            if(index==count){button(d.callEdit!=null?"Применить правку":"+ Вставить в черновик",16,y,w-32,32,focus,()->{i.field=index;action(Action.CONFIRM);});continue;}
+            if(index==count){button(i.areaRecipe()?"Просмотреть Lua":d.callEdit!=null?"Применить правку":"+ Вставить в черновик",16,y,w-32,32,focus,()->{i.field=index;action(Action.CONFIRM);});continue;}
             rect(16,y,w-32,32,focus?10:0);
             float labelWidth=Math.min(152,w*.38f);
             fitted(i.item().fields[index].label,24,y+23,18,focus?1:6,labelWidth-12);
@@ -652,7 +653,7 @@ final class WorkshopView extends View {
             hit(16,y,w-32,32,()->{i.field=index;action(Action.CONFIRM);});
         }
         float previewY=124+rows*36;
-        text(d.callEdit!=null?"Изменение Lua":"Lua после вставки",16,previewY+14,18,14);
+        text(i.areaRecipe()?"Начало Lua · X весь код":d.callEdit!=null?"Изменение Lua":"Lua после вставки",16,previewY+14,18,14);
         rect(16,previewY+24,w-32,bodyBottom-previewY-62,0);
         c.save();c.clipRect(16,previewY+24,w-16,bodyBottom-34);
         if(longCall){codePreview("Было: "+d.callEdit.original.trim(),24,previewY+46,6,w-48);codePreview("Будет: "+d.callEdit.preview(i).trim(),24,previewY+90,10,w-48);}
@@ -664,6 +665,29 @@ final class WorkshopView extends View {
         key(ok()+" выбрать",12,bodyBottom,10,()->action(Action.CONFIRM));
         key(back()+" назад",w/3,bodyBottom,6,()->action(Action.CANCEL));
         if(i.canBrowse())key("X имена",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
+        else if(i.areaRecipe())key("X Lua",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
+    }
+    private void luaRecipePreview(LuaInsert i){
+        fitted("Область · код функции",16,75,22,14,w-32);
+        fitted("Карта: x,y,w,h в пикселях",16,100,16,6,w-32);
+        java.util.ArrayList<String> rows=new java.util.ArrayList<>();
+        for(String line:i.code().split("\n")){
+            if(line.isEmpty()){rows.add("");continue;}
+            while(!line.isEmpty()){
+                int n=line.length();while(n>1&&width(line.substring(0,n),18)>w-48)n--;
+                rows.add(line.substring(0,n));line=line.substring(n);
+            }
+        }
+        int visible=Math.max(1,(int)((bodyBottom-162)/22));
+        i.previewLine=Math.min(i.previewLine,Math.max(0,rows.size()-visible));
+        rect(16,112,w-32,visible*22+8,0);
+        for(int n=0;n<visible&&i.previewLine+n<rows.size();n++)text(rows.get(i.previewLine+n),24,134+n*22,18,7);
+        fitted((i.previewLine+1)+"–"+Math.min(rows.size(),i.previewLine+visible)+"/"+rows.size()+(w<500?" · ↑↓ · ←→":" · ↑↓ читать · ←→ листать"),16,bodyBottom-12,16,6,w-32);
+        rect(0,bodyBottom,w,44,0);
+        key(ok()+" вставить",12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" поля",w/2,bodyBottom,6,()->action(Action.CANCEL));
+        hit(16,112,(w-32)/2,visible*22+8,()->action(Action.LEFT));
+        hit(w/2,112,(w-32)/2,visible*22+8,()->action(Action.RIGHT));
     }
     private void luaSymbols(LuaInsert i){
         fitted("Выбрать значение",16,75,24,14,w-32);

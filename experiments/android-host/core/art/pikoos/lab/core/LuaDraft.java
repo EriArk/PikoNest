@@ -155,7 +155,7 @@ public final class LuaDraft {
         insertion=new LuaInsert();panel=Panel.INSERT;
     }
     public void applyInsert(){
-        if(insertion==null||!proposal()||insertion.screen!=LuaInsert.Screen.FIELDS)return;
+        if(insertion==null||!proposal()||(insertion.screen!=LuaInsert.Screen.FIELDS&&insertion.screen!=LuaInsert.Screen.PREVIEW))return;
         if(callEdit!=null){
             String changed=callEdit.replacement(text,insertion);
             if(changed.getBytes(StandardCharsets.UTF_8).length>LIMIT)throw new IllegalArgumentException("Достигнут предел памяти черновика PIKOOS");
@@ -169,8 +169,8 @@ public final class LuaDraft {
         String function=insertion.functionName();
         if(function!=null&&context.defines(function))throw new IllegalArgumentException("Функция "+function+" уже задана. Перейди к её телу; существующий код не заменён.");
         String raw=insertion.code();
-        boolean tileProbe=insertion.item().id.equals("solid");
-        if(tileProbe){TileProbe.validateSource(text,insertion.value(0));at=0;indent="";}
+        boolean tileProbe=insertion.tileRecipe();
+        if(tileProbe){TileProbe.validateSource(text,insertion.value(0),insertion.areaRecipe());at=0;indent="";}
         if(insertion.item().id.equals("compare")){
             String header=raw.substring(0,raw.indexOf('\n'));LuaCall parsed=LuaCall.parse(header,0,header.length());
             if(parsed.form.selected!=insertion.selected)throw new IllegalArgumentException("Сложное выражение: заключи каждую сторону сравнения в скобки.");
