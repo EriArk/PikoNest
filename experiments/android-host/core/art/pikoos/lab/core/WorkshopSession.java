@@ -170,7 +170,9 @@ public final class WorkshopSession {
                 if(action==Action.UP)a.previewLine=Math.max(0,a.previewLine-1);if(action==Action.DOWN)a.previewLine=Math.min(a.code().length(),a.previewLine+1);
                 if(action==Action.LEFT||action==Action.PREVIOUS)a.previewLine=Math.max(0,a.previewLine-6);
                 if(action==Action.RIGHT||action==Action.NEXT)a.previewLine=Math.min(a.code().length(),a.previewLine+6);
-                if(action==Action.CANCEL)a.review=false;if(action==Action.CONFIRM)d.applyAnimation();
+                if(action==Action.CONTEXT&&d.animationEdit!=null){d.animationBefore=!d.animationBefore;a.previewLine=0;}
+                if(action==Action.CANCEL){a.review=false;d.animationBefore=false;}
+                if(action==Action.CONFIRM){if(d.animationBefore){d.animationBefore=false;a.previewLine=0;}else d.applyAnimation();}
             }else{
                 if(action==Action.UP)a.field=Math.max(0,a.field-1);if(action==Action.DOWN)a.field=Math.min(8,a.field+1);
                 if(action==Action.LEFT)a.change(-1);if(action==Action.RIGHT)a.change(1);

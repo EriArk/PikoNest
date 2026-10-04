@@ -1,0 +1,48 @@
+{
+  "host_version": "0.0.50",
+  "host_sha256": "3c9dfdb2fd774d7d3f7fc33eeade94b8c53bfef6112fa4b0ba76cccddc59ab48",
+  "host_bytes": 308132,
+  "new_core_checks": 156,
+  "project": "remix-0017",
+  "project_sha256": "5513ac30495655e46c2c480e12d33ed87d41c9643bc2dc4927e43d74e47c9063",
+  "old_files_preserved": 32,
+  "non_lua_sections_preserved": true,
+  "lua_outside_target_preserved": true,
+  "one_animation_block": true,
+  "undo_redo_byte_exact": true,
+  "frames": [
+    {
+      "region": [
+        8,
+        7,
+        8,
+        9
+      ],
+      "millis": 750
+    },
+    {
+      "region": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "millis": 500
+    }
+  ],
+  "position": [
+    72,
+    8
+  ],
+  "loop": true,
+  "runtime": "official user PICO-8 0.2.7 / Android Test 8",
+  "runtime_frame_pixels": "both matched at new position; old position background only",
+  "input": "ADB controller events; physical user acceptance remains",
+  "screen_sizes": [
+    "1240x1080",
+    "720x960"
+  ],
+  "manual_logic_change_refused": true,
+  "proposal_recovery_with_before_after": true,
+  "release_created": false
+}

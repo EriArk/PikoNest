@@ -513,8 +513,8 @@ final class WorkshopView extends View {
         long now=SystemClock.uptimeMillis();
         if(a.playing&&s.mode==Mode.CODE&&getWindowVisibility()==VISIBLE){if(animationClock!=0)a.advance((int)Math.min(100,now-animationClock));animationClock=now;if(a.playing)postInvalidateDelayed(16);}
         else animationClock=0;
-        fitted("Анимация · кадры",16,75,24,14,w-32);
-        fitted(w<500?"Просмотр без кода игры":"Предпросмотр · без кода игры",16,100,16,6,w-32);
+        fitted(d.animationEdit==null?"Анимация · кадры":"Анимация · правка",16,75,24,14,w-32);
+        fitted(d.animationEdit!=null?"Блок "+d.animationEdit.firstLine+"–"+d.animationEdit.lastLine:w<500?"Просмотр без кода игры":"Предпросмотр · без кода игры",16,100,16,6,w-32);
         animationImage(a.frame(a.visibleFrame()).region,16,112,96,a.previewWidth(),a.previewHeight());
         fitted((a.playing?"Играет ":"Пауза ")+(a.visibleFrame()+1),128,130,18,10,w-144);
         int firstThumb=Math.max(0,Math.min(a.selected-1,a.count()-3));float thumb=Math.min(48,(w-160)/3);
@@ -554,10 +554,12 @@ final class WorkshopView extends View {
         fitted("↑↓←→ двигать",w/2,bodyBottom+28,16,13,w/2-12);
     }
     private void animationReview(SpriteAnimation a){
-        fitted("Анимация · Lua",16,75,24,14,w-32);
-        fitted("В _draw · от запуска игры",16,100,16,6,w-32);
+        LuaDraft d=s.codeDraft;boolean editing=d.animationEdit!=null;
+        fitted(editing?d.animationBefore?"Анимация · было":"Анимация · будет":"Анимация · Lua",16,75,24,14,w-32);
+        fitted(editing?"X было / будет":"В _draw · от запуска игры",16,100,16,6,w-32);
+        if(editing)hit(16,82,w-32,24,()->action(Action.CONTEXT));
         ArrayList<String> rows=new ArrayList<>();
-        for(String line:a.code().split("\n")){
+        for(String line:(editing&&d.animationBefore?d.animationEdit.initial.code():a.code()).split("\n")){
             if(line.isEmpty()){rows.add("");continue;}
             while(!line.isEmpty()){int n=line.length();while(n>1&&width(line.substring(0,n),18)>w-48)n--;rows.add(line.substring(0,n));line=line.substring(n);}
         }
@@ -565,7 +567,7 @@ final class WorkshopView extends View {
         rect(16,112,w-32,visible*22+8,0);
         for(int n=0;n<visible&&a.previewLine+n<rows.size();n++)text(rows.get(a.previewLine+n),24,134+n*22,18,7);
         fitted((a.previewLine+1)+"–"+Math.min(rows.size(),a.previewLine+visible)+"/"+rows.size()+(w<500?" · ↑↓ · ←→":" · ↑↓ читать · ←→ листать"),16,bodyBottom-12,16,6,w-32);
-        rect(0,bodyBottom,w,44,0);key(ok()+" вставить",12,bodyBottom,10,()->action(Action.CONFIRM));key(back()+" кадры",w/2,bodyBottom,6,()->action(Action.CANCEL));
+        rect(0,bodyBottom,w,44,0);key(ok()+(editing?d.animationBefore?" будет":" заменить":" вставить"),12,bodyBottom,10,()->action(Action.CONFIRM));key(back()+" кадры",w/2,bodyBottom,6,()->action(Action.CANCEL));
         hit(16,112,(w-32)/2,visible*22+8,()->action(Action.LEFT));hit(w/2,112,(w-32)/2,visible*22+8,()->action(Action.RIGHT));
     }
     private void spritePlacement(){

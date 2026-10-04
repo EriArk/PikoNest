@@ -17,6 +17,10 @@ public final class SpriteAnimation {
     private int elapsed;
     public SpritePlacement picker;
     public SpriteAnimation(SpriteRegion region){frames.add(new Frame(region,250));x=(128-region.width)/2;y=(128-region.height)/2;}
+    static SpriteAnimation fromFrames(List<Frame> frames,int x,int y,boolean loop){
+        SpriteAnimation a=new SpriteAnimation(frames.get(0).region);a.frames.clear();a.frames.addAll(frames);a.x=x;a.y=y;a.loop=loop;return a;
+    }
+    public SpriteAnimation copy(){return fromFrames(frames,x,y,loop);}
     public int count(){return frames.size();}
     public Frame frame(int index){return frames.get(index);}
     public int previewWidth(){int size=1;for(Frame f:frames)size=Math.max(size,f.region.width);return size;}

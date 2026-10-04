@@ -40,6 +40,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'TileProbeTest'
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'AreaProbeTest',(Join-Path $pikoArtifacts 'area-probe-tests.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'TileMotionTest',(Join-Path $pikoArtifacts 'motion-tests.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'SpriteAnimationTest',(Join-Path $pikoArtifacts 'animation-tests.p8'))
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'AnimationEditTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaNavigationTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeDiagnosticTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeMenuTest')
