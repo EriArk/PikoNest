@@ -1,5 +1,11 @@
 # PIKOOS Android host experiment
 
+Version 0.0.59 adds Select → move up/down or delete in the branch action list.
+Each operation previews before/after, restores after restart, and applies as one
+undoable edit. Only simple recognized branches are supported; local declarations,
+nested/custom source and ambiguous standalone comments keep their source-editor
+path. [Evidence and limits](../../docs/design/android-actions-59/README.md).
+
 Version 0.0.58 adds individual action selection inside a condition branch. A opens
 supported parameter forms and returns to the same action on apply/cancel; X opens
 source. Nested/custom code stays intact. Action lists and pending forms recover

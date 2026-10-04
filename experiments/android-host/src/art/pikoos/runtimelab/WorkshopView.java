@@ -680,6 +680,7 @@ final class WorkshopView extends View {
         rect(0,bodyBottom,w,44,0);key(ok()+(panel.saving?" сохранить":" в форму"),12,bodyBottom,10,()->action(Action.CONFIRM));key(back()+" назад",w/2,bodyBottom,6,()->action(Action.CANCEL));
     }
     private void luaActions(){
+        if(s.codeDraft.actionMenu>=0){luaActionOptions();return;}
         art.pikoos.lab.core.LuaBranchActions a=s.codeDraft.actions;hits.clear();
         fitted("Действия ветви",16,75,24,14,w-32);
         fitted(a.scope+" · "+a.title,16,100,16,6,w-32);
@@ -696,12 +697,46 @@ final class WorkshopView extends View {
             fitted((a.index+1)+" / "+a.entries.size()+" · "+(selected.fields?"Параметры доступны":"Открывается в Lua"),24,preview+22,16,12,w-48);
             String[] lines=selected.source.split("\\r\\n|\\r|\\n");for(int n=0;n<3&&n<lines.length;n++)fitted(lines[n].trim(),24,preview+48+n*22,18,7,w-48);
             fitted("↑↓ выбор · ←→ страница",16,bodyBottom-46,16,6,w-32);
-            fitted(selected.fields?"Форма → обратно к действию":"Вложенный / незнакомый Lua: в код",16,bodyBottom-18,16,13,w-32);
+            key("Select: порядок / удалить",16,bodyBottom-40,13,()->action(Action.MENU));
         }
         rect(0,bodyBottom,w,44,0);
         if(selected!=null)key(ok()+(selected.fields?" поля":" код"),12,bodyBottom,10,()->action(Action.CONFIRM));
         key(back()+" ветви",w/3,bodyBottom,6,()->action(Action.CANCEL));
         if(selected!=null)key("X код",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
+    }
+    private void luaActionOptions(){
+        LuaDraft d=s.codeDraft;hits.clear();
+        art.pikoos.lab.core.LuaActionChange change=d.actionChange;
+        fitted(change==null?"Изменить действие":change.title,16,75,24,14,w-32);
+        fitted(d.actions.scope+" · "+d.actions.title,16,100,16,6,w-32);
+        if(change==null){
+            fitted(d.actions.current().title,16,135,18,10,w-32);
+            String[] choices={"Поднять на одно место","Опустить на одно место","Удалить действие"};
+            for(int n=0;n<3;n++){final int index=n;button(choices[n],16,158+n*42,w-32,36,n==d.actionMenu,()->{d.actionMenu=index;action(Action.CONFIRM);});}
+            wrapped("Сначала просмотр, затем подтверждение. B вернёт к списку без изменений.",16,bodyBottom-112,18,6,w-32,4);
+        }else{
+            fitted((d.actionBefore?"Было · ":"Будет · ")+d.actions.current().title,16,136,20,d.actionBefore?6:10,w-32);
+            rect(16,152,w-32,bodyBottom-226,0);
+            String source=d.actionBefore?change.before:change.after;
+            if(source.isEmpty()){
+                wrapped("Удалится только эта строка:",24,184,18,14,w-48,3);
+                String removed=change.before.trim();removed=removed.substring(Math.min(d.actionColumn,removed.length()));
+                fitted("− "+removed,24,258,18,7,w-48);
+            }
+            else{
+                String[] rows=source.split("\\r\\n|\\r|\\n");int count=Math.max(1,(int)((bodyBottom-250)/26));
+                int first=Math.min(d.actionScroll,Math.max(0,rows.length-1));
+                for(int n=0;n<count&&first+n<rows.length;n++){
+                    String row=rows[first+n];row=row.substring(Math.min(d.actionColumn,row.length()));
+                    fitted((change.firstLine+first+n+1)+" "+row,24,180+n*26,18,7,w-48);
+                }
+            }
+            key(d.actionBefore?"X показать результат":"X показать исходник",16,bodyBottom-76,12,()->action(Action.CONTEXT));
+            fitted("↑↓ строки · ←→ по строке",16,bodyBottom-18,16,6,w-32);
+        }
+        rect(0,bodyBottom,w,44,0);
+        key(ok()+(change==null?" просмотр":" применить"),12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" отмена",w/2,bodyBottom,6,()->action(Action.CANCEL));
     }
     private void luaBranches(){
         LuaDraft d=s.codeDraft;art.pikoos.lab.core.LuaBranches n=d.branches;hits.clear();

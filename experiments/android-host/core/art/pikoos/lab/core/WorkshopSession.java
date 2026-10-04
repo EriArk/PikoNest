@@ -223,10 +223,27 @@ public final class WorkshopSession {
             return;
         }
         if(d.panel==LuaDraft.Panel.ACTIONS){
+            if(d.actionChange!=null){
+                if(action==Action.UP)d.actionScroll=Math.max(0,d.actionScroll-1);
+                if(action==Action.DOWN)d.actionScroll=Math.min(d.actionChange.before.split("\\r\\n|\\r|\\n").length-1,d.actionScroll+1);
+                if(action==Action.LEFT)d.actionColumn=Math.max(0,d.actionColumn-8);
+                if(action==Action.RIGHT)d.actionColumn=Math.min(Math.max(d.actionChange.before.length(),d.actionChange.after.length()),d.actionColumn+8);
+                if(action==Action.CONTEXT){d.actionBefore=!d.actionBefore;d.actionScroll=d.actionColumn=0;}
+                if(action==Action.CONFIRM)d.applyAction();
+                if(action==Action.CANCEL){d.actionChange=null;d.actionBefore=false;d.actionScroll=d.actionColumn=0;}
+                return;
+            }
+            if(d.actionMenu>=0){
+                if(action==Action.UP)d.actionMenu=Math.max(0,d.actionMenu-1);
+                if(action==Action.DOWN)d.actionMenu=Math.min(2,d.actionMenu+1);
+                if(action==Action.CONFIRM)d.reviewAction();if(action==Action.CANCEL)d.actionMenu=-1;
+                return;
+            }
             if(action==Action.UP)d.actions.move(-1);if(action==Action.DOWN)d.actions.move(1);
             if(action==Action.LEFT)d.actions.move(-5);if(action==Action.RIGHT)d.actions.move(5);
             if(action==Action.CONFIRM)d.openAction(false);if(action==Action.CONTEXT)d.openAction(true);
             if(action==Action.CANCEL)d.actionsToBranches();
+            if(action==Action.MENU)d.actionOptions();
             return;
         }
         if(d.panel==LuaDraft.Panel.NAVIGATION){

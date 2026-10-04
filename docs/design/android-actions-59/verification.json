@@ -1,0 +1,17 @@
+{
+  "version": "0.0.59",
+  "date": "2026-10-04",
+  "build": "passed",
+  "new_test_checks": 82,
+  "apk_sha256": "62a028ed3c63c71ab1291096bf37f8780844a14c5de2bfce6a49e0022e377317",
+  "device": "Retroid Pocket Classic",
+  "input": "ADB controller events, not physical owner acceptance",
+  "screens": [
+    "1240x1080",
+    "720x960"
+  ],
+  "runtime": "Official PICO-8 0.2.7: removed blue remainder, green score 0 -> 2",
+  "volume": "[V] will control stream=3 (STREAM_MUSIC)\r\n[V] will get volume\r\n[V] Connecting to AudioService\r\n[V] volume is 0 in range [0..15]",
+  "display": "Physical size: 1080x1240",
+  "release_created": false
+}
