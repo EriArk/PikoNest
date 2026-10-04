@@ -8,7 +8,7 @@ versionName `1.6.6-pikoos.2`. APK SHA-256:
 
 ## Reproduction and cause
 
-Start Little Lights from PIKOOS Play. Four seconds later, deliver another game
+Start Little Lights from PikoNest Play. Four seconds later, deliver another game
 request to LaunchActivity. The host correctly refuses to overwrite the active
 snapshot. Dismiss with B and return to the booting runtime.
 
@@ -39,7 +39,7 @@ or make intentional hot replacement/crash recovery reliable.
 Actual screenshots:
 
 - [Input after interrupted boot](boot-resumed.png).
-- [Return to PIKOOS Play](play-return.png).
+- [Return to PikoNest Play](play-return.png).
 - [Beacon resume with preserved move](beacon-resumed.png), [return to Beacon](beacon-return.png).
 - [Return to Retroid Launcher](retroid-return.png).
 

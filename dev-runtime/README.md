@@ -14,7 +14,7 @@ The archives retain the original license and documentation. `SHA256SUMS` beside
 them records the SHA-256 hashes verified against the supplied attachments.
 
 These files are private development inputs. Do not include this directory in
-application packages or public releases. PIKOOS still requires each end user
+application packages or public releases. PikoNest still requires each end user
 to import their own official PICO-8 runtime, as specified in
 [`PICO8_COMPATIBILITY.md`](../docs/PICO8_COMPATIBILITY.md).
 

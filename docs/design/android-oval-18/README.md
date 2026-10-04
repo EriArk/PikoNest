@@ -17,7 +17,7 @@ remains a prototype limit, not a PICO-8 sprite capacity rule.
 
 The [official manual](https://www.lexaloffle.com/dl/docs/pico-8_manual.html#Sprite_Editor)
 describes outlined/filled oval tools and bounding-rectangle `oval`/`ovalfill` calls.
-PIKOOS stores normal indexed gfx pixels; it does not insert calls or introduce
+PikoNest stores normal indexed gfx pixels; it does not insert calls or introduce
 runtime dependencies. The reference output below targets the owner's version 0.2.7.
 
 ## Independent raster reference

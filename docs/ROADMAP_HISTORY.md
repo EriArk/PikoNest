@@ -7,7 +7,7 @@ not completed features or release commitments.
 
 ---
 
-# PIKOOS Roadmap
+# PikoNest Roadmap
 
 ## Purpose
 
@@ -61,7 +61,7 @@ on first resume. Beacon/Retroid flows are checked again.
 [Device evidence](design/android-resume-25/README.md).
 
 Previous bounded lab step (0.0.25): select a cart in Beacon or Retroid Launcher →
-PIKOOS external entry → official runtime → return to the calling shelf. Scoped
+PikoNest external entry → official runtime → return to the calling shelf. Scoped
 file access, picker recovery, duplicate-request protection and process-loss return
 are covered. Interrupting native boot exposed the wrapper hang addressed above.
 Integrated runtime setup, dependencies and crash observation remain
@@ -158,11 +158,11 @@ starts and missing access/setup, before Android release. Portable boundaries rem
 | --- | --- | --- |
 | 1. Production foundations | Confirm framework/layer tradeoffs; keep domain/workflows portable. Complete runtime import/validation/launch behind the Android backend. First-run setup chooses games, Splore downloads, own projects and data/library folders; explain and automatically prepare the supported purchased PICO-8 archive. | Fresh installation reaches a playable cart and returns reliably, without terminal/manual extraction; folders remain usable after reboot, permission loss has recovery. |
 | 1b. Play-first launcher | Default Play library, separate Workshop entrance, cartridge covers, recent launches, favorites and direct controller launch/return from the connected games folder. Indexing remains separate from editable projects; preserve originals and report unsupported/dependent carts accurately. | Browse → play → return to the same selection, without importing a project or entering an editor. Verify runtime availability, offline play and restarts. |
-| 2. Project ownership and safety | Unify create/open/import/remix/save/export; persistent user folders, names, recovery, backups and persistent history. Add `.p8.png` and linked-file/multicart-aware import with lossless preservation. | A project can move between PIKOOS and ordinary PICO-8, survive app updates/interruption, and be restored from a backup with its dependencies. |
+| 2. Project ownership and safety | Unify create/open/import/remix/save/export; persistent user folders, names, recovery, backups and persistent history. Add `.p8.png` and linked-file/multicart-aware import with lossless preservation. | A project can move between PikoNest and ordinary PICO-8, survive app updates/interruption, and be restored from a backup with its dependencies. |
 | 3. Graphics and world tools | Finish sprite selection/allocation/flags, animation frames/timing, tile/map editing, backgrounds and camera/parallax tools. Handle shared map/gfx memory explicitly. | Create and animate original resources, construct a scrolling scene and test it; no mandatory hero or template. |
 | 4. Code, mechanics and learning | Controller-oriented Lua editing, completion, structural insertion and parameter panels; ordinary-Lua mechanics for movement, puzzles, objects, enemies, events, effects/particles. Contextual explanations and PICO-8 reference/help. | Build actual behavior from a blank cart without a physical keyboard; generated code stays inspectable/editable and unfamiliar code is preserved. |
 | 5. SFX and music | Sound effects, instruments/envelopes supported by PICO-8, note/pattern editing, audition, sequencing, loop control and game-event bindings. | Compose an effect and short soundtrack on the handheld, hear them in the game and reopen in official PICO-8. |
-| 6. Reuse and larger games | Extend the library to animations, tiles/maps, SFX/music and reusable mechanics; extract/import with provenance, dependencies and safe placement. Add genre starters, multicart chapters and shared resources. All tools remain available in every game. | Reuse resources across independent projects/chapters without missing references or hidden PIKOOS runtime dependencies. |
+| 6. Reuse and larger games | Extend the library to animations, tiles/maps, SFX/music and reusable mechanics; extract/import with provenance, dependencies and safe placement. Add genre starters, multicart chapters and shared resources. All tools remain available in every game. | Reuse resources across independent projects/chapters without missing references or hidden PikoNest runtime dependencies. |
 | 7. Integrated Android release | Complete several small games of different genres from blank through export. Polish navigation, adaptive layouts, remapping, performance, resource budgets, diagnostics, runtime return, sleep/restart, project recovery and documentation. | A new user completes the whole create/test/share loop; physical-controller acceptance on representative devices and preservation/compatibility checks pass. This is the stable local Android 1.0 gate. |
 | 8. Linux port | Replace runtime/storage/input/platform adapters; package and validate fullscreen, sound, controller and suspend/resume on Linux handhelds. | The same editable projects and core workflows work on both platforms. |
 | 9. Optional online extensions | Independently prove Link Play and the runtime bridge; then personalized carts, server-checked PIN/token binding, revocation, clean sharing/reset, discovery/account services. | Each experiment has demonstrated transport/lifecycle/security behavior and an explicit capability boundary; standard carts keep working without it. |
@@ -238,7 +238,7 @@ Test on at least one real Android handheld as early as possible.
 - mechanics;
 - tutorials.
 
-The only question is: **can PIKOOS reliably treat official PICO-8 as its runtime on Android?**
+The only question is: **can PikoNest reliably treat official PICO-8 as its runtime on Android?**
 
 ## 0.0B — `.p8` round-trip proof
 
@@ -298,7 +298,7 @@ Do not over-design visuals yet. Validate ergonomics.
 
 ---
 
-# 0.1 — PIKOOS Shell
+# 0.1 — PikoNest Shell
 
 ## Goal
 
@@ -315,13 +315,13 @@ Features:
 - Favorites;
 - Last played;
 - launch Splore if practical through the imported runtime;
-- clean return from PICO-8 to PIKOOS;
+- clean return from PICO-8 to PikoNest;
 - input mapping/settings;
 - adaptive layout for multiple handheld aspect ratios.
 
 ### Definition of done
 
-A user can install PIKOOS, provide official PICO-8, import carts and comfortably use the device as a PICO-8 handheld without touching a terminal or filesystem manager.
+A user can install PikoNest, provide official PICO-8, import carts and comfortably use the device as a PICO-8 handheld without touching a terminal or filesystem manager.
 
 ---
 
@@ -448,7 +448,7 @@ still require design and validation.
 
 ## Goal
 
-Make PIKOOS genuinely different from a small-screen code editor.
+Make PikoNest genuinely different from a small-screen code editor.
 
 ## Mechanics Library v1
 
@@ -545,7 +545,7 @@ sound workflows, preservation rules and unresolved preview implementation.
 
 ## Goal
 
-Make PIKOOS useful beyond tiny first projects.
+Make PikoNest useful beyond tiny first projects.
 
 Features:
 
@@ -623,7 +623,7 @@ Do not commit the core architecture to this feature until the prototype proves i
 
 ## Goal
 
-Prove that an official PICO-8 runtime launched by PIKOOS can exchange small structured messages with a host bridge/server without modifying the proprietary PICO-8 binary.
+Prove that an official PICO-8 runtime launched by PikoNest can exchange small structured messages with a host bridge/server without modifying the proprietary PICO-8 binary.
 
 Prototype requirements:
 
@@ -672,7 +672,7 @@ A clean cart can genuinely become a personal cart, then be reset to a clean cart
 
 ## Goal
 
-A coherent, polished version of the core PIKOOS experience on Android handhelds.
+A coherent, polished version of the core PikoNest experience on Android handhelds.
 
 Must-have qualities:
 
@@ -700,7 +700,7 @@ Experimental Link/Online features may remain clearly marked beta if they are not
 
 ## Goal
 
-Bring the same PIKOOS core and product experience to Linux handhelds.
+Bring the same PikoNest core and product experience to Linux handhelds.
 
 Reference future targets may include devices in the RG DS class and other ARM Linux gaming handhelds.
 
@@ -741,7 +741,7 @@ These are intentionally outside the near-term core:
 - profiler overlays;
 - full persistent online worlds;
 - online trading/social spaces;
-- public PIKOOS game services;
+- public PikoNest game services;
 - specialized dual-screen editing layouts;
 - desktop companion/editor mode.
 
@@ -755,4 +755,4 @@ When choosing between two features, prefer the one that improves this loop:
 
 > **make a tiny change → test it immediately → understand what happened → want to change something else**
 
-That loop is the heart of PIKOOS.
+That loop is the heart of PikoNest.

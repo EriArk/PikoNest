@@ -1,8 +1,8 @@
-# PIKOOS — PICO-8 Compatibility Rules
+# PikoNest — PICO-8 Compatibility Rules
 
 ## Purpose
 
-PIKOOS should make PICO-8 easier and more playful without quietly creating a different fantasy console.
+PikoNest should make PICO-8 easier and more playful without quietly creating a different fantasy console.
 
 This document defines the compatibility contract.
 
@@ -14,18 +14,18 @@ For normal projects, the canonical game artifact is a standard PICO-8 cartridge:
 game.p8
 ```
 
-PIKOOS may keep optional metadata beside it, but that metadata must not be required for the standard cart to open and run in ordinary PICO-8.
+PikoNest may keep optional metadata beside it, but that metadata must not be required for the standard cart to open and run in ordinary PICO-8.
 
 ## 2. Standard project invariant
 
-A standard PIKOOS project must be able to follow this path:
+A standard PikoNest project must be able to follow this path:
 
 ```text
-Create/edit in PIKOOS
+Create/edit in PikoNest
         ↓
 Save game.p8
         ↓
-Open game.p8 in official PICO-8 outside PIKOOS
+Open game.p8 in official PICO-8 outside PikoNest
         ↓
 Continue editing/running normally
 ```
@@ -35,7 +35,7 @@ And the reverse should also be supported as safely as practical:
 ```text
 Existing PICO-8 cart
         ↓
-Import/open in PIKOOS
+Import/open in PikoNest
         ↓
 Edit
         ↓
@@ -46,7 +46,7 @@ Still works in official PICO-8
 
 ## 3. Official PICO-8 is authoritative
 
-PIKOOS may implement analysis, syntax help, preview tools and diagnostics, but the user-provided **official PICO-8 runtime** is the authoritative compatibility target.
+PikoNest may implement analysis, syntax help, preview tools and diagnostics, but the user-provided **official PICO-8 runtime** is the authoritative compatibility target.
 
 A future alternative preview engine must never redefine compatibility.
 
@@ -99,14 +99,14 @@ drawing edits until explicitly reassigned. Changed owned movement functions are
 refused by the binding adapter rather than rewritten speculatively.
 
 An operation may remain unsupported while the editor grows. Label that as a
-PIKOOS editing limitation, preserve the cartridge and avoid destructive fallback
+PikoNest editing limitation, preserve the cartridge and avoid destructive fallback
 or conversion. Lack of editor support alone does not make a valid cart
 `Incompatible / Error`. Conversely, do not hide extra resources or altered
 runtime behavior behind a standard-project label.
 
 The interface may offer different layouts, controller workflows, names and
 high-level tools. Their game output must retain ordinary PICO-8 semantics;
-optional PIKOOS extensions remain explicit and separable.
+optional PikoNest extensions remain explicit and separable.
 
 ## 4. No custom Lua dialect for standard carts
 
@@ -135,11 +135,11 @@ Coyote time: on
 
 But `Add to game` should produce understandable normal Lua/data.
 
-Once inserted, the game does not require a hidden PIKOOS movement engine.
+Once inserted, the game does not require a hidden PikoNest movement engine.
 
 The generated code should remain editable by the user.
 
-## 6. PIKOOS metadata stays outside the cart by default
+## 6. PikoNest metadata stays outside the cart by default
 
 Normal editor/workshop data belongs in:
 
@@ -162,7 +162,7 @@ Do not put editor metadata into the cart merely because there is spare cart spac
 
 ## 7. Preserve imported carts conservatively
 
-PIKOOS should avoid damaging or unnecessarily rewriting existing carts.
+PikoNest should avoid damaging or unnecessarily rewriting existing carts.
 
 Priorities:
 
@@ -195,7 +195,7 @@ Round-trip failures are release-blocking for the editor portions that touch thos
 
 ## 9. `.p8.png`
 
-PIKOOS should eventually support convenient cartridge image import/export if implementation effort is reasonable.
+PikoNest should eventually support convenient cartridge image import/export if implementation effort is reasonable.
 
 However, do not delay the core editor architecture on `.p8.png` support. Text `.p8` is the first-class editable format for early milestones.
 
@@ -203,7 +203,7 @@ When `.p8.png` support is added, decoded data must pass through the same canonic
 
 ## 10. Resource limits
 
-PIKOOS should teach and display real PICO-8 limits rather than pretending they do not exist.
+PikoNest should teach and display real PICO-8 limits rather than pretending they do not exist.
 
 The UI can show a friendly summary first, but advanced details should expose actual resource usage.
 
@@ -216,13 +216,13 @@ Examples include:
 - music usage;
 - memory/CPU observations where available.
 
-Do not invent a “PIKOOS standard cart” with larger hidden limits and call it PICO-8 compatible.
+Do not invent a “PikoNest standard cart” with larger hidden limits and call it PICO-8 compatible.
 
 ## 11. Multicart
 
 Large projects should use normal PICO-8-compatible multicart techniques.
 
-PIKOOS may simplify this concept in the beginner UI as:
+PikoNest may simplify this concept in the beginner UI as:
 
 - Add Region;
 - Add Chapter;
@@ -237,40 +237,40 @@ Suggested states:
 
 ### `Standard / Verified`
 
-Runs successfully through the imported official runtime and has no declared PIKOOS-only feature dependency.
+Runs successfully through the imported official runtime and has no declared PikoNest-only feature dependency.
 
 ### `Standard / Unverified`
 
-No known PIKOOS-only dependency, but has not been verified after the latest changes.
+No known PikoNest-only dependency, but has not been verified after the latest changes.
 
 ### `Enhanced`
 
-Valid `.p8`, but intentionally uses optional PIKOOS bridge/services for part of its behavior.
+Valid `.p8`, but intentionally uses optional PikoNest bridge/services for part of its behavior.
 
 ### `Incompatible / Error`
 
 Known parse/resource/runtime issue that prevents ordinary PICO-8 behavior.
 
-Avoid overclaiming automatic verification if PIKOOS cannot observe the full runtime result.
+Avoid overclaiming automatic verification if PikoNest cannot observe the full runtime result.
 
 ## 13. Enhanced carts
 
-PIKOOS-enhanced carts are allowed, but must be visibly different from standard projects.
+PikoNest-enhanced carts are allowed, but must be visibly different from standard projects.
 
 Examples of optional enhanced capabilities:
 
 - online bridge;
-- PIKOOS Link Play-specific support;
+- PikoNest Link Play-specific support;
 - external service integration;
-- PIKOOS achievement hooks;
+- PikoNest achievement hooks;
 - personalized online-cart binding.
 
-A cart may still be syntactically valid PICO-8 while its enhanced features are unavailable outside PIKOOS.
+A cart may still be syntactically valid PICO-8 while its enhanced features are unavailable outside PikoNest.
 
 Where practical, enhanced carts should degrade gracefully:
 
 ```text
-Online features require PIKOOS.
+Online features require PikoNest.
 [Play Offline]
 ```
 
@@ -278,7 +278,7 @@ instead of simply crashing.
 
 ## 14. Online-cart exception
 
-Personalized online cartridges deliberately store a PIKOOS account-binding token **inside the cartridge file**.
+Personalized online cartridges deliberately store a PikoNest account-binding token **inside the cartridge file**.
 
 That is a product feature rather than ordinary editor metadata.
 
@@ -295,11 +295,11 @@ See `ONLINE_CARTRIDGES.md`.
 
 ## 15. Never bundle PICO-8
 
-PIKOOS must not redistribute the official proprietary PICO-8 runtime.
+PikoNest must not redistribute the official proprietary PICO-8 runtime.
 
 The installation flow should ask the user to import/select a runtime they obtained legitimately.
 
-PIKOOS may validate files/version/capabilities after import.
+PikoNest may validate files/version/capabilities after import.
 
 ## 16. Runtime versions
 
@@ -315,7 +315,7 @@ runtimePlatformBuild
 
 Compatibility warnings can then distinguish:
 
-- a PIKOOS bug;
+- a PikoNest bug;
 - an unsupported runtime version;
 - a cart feature requiring a newer PICO-8 version.
 
@@ -328,7 +328,7 @@ If a convenience feature has two possible designs:
 
 prefer the second for standard projects.
 
-The value of PIKOOS is making the real system approachable, not hiding a different engine behind a PICO-8 skin.
+The value of PikoNest is making the real system approachable, not hiding a different engine behind a PICO-8 skin.
 
 ## 18. Temporary linked-file launch preparation
 

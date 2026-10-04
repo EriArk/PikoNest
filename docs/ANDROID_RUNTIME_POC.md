@@ -14,7 +14,7 @@ ownership, reliable warm restart and detailed input acceptance remain open.
 
 Establish an official PICO-8 runtime baseline on the owner's Retroid Pocket
 Classic using the upstream Android wrapper. This is the first investigation
-within roadmap 0.0A, followed by an isolated PIKOOS host using that wrapper.
+within roadmap 0.0A, followed by an isolated PikoNest host using that wrapper.
 Success does not establish a production backend or choose the application's
 framework.
 
@@ -38,9 +38,9 @@ layouts must remain portable to other Android handhelds and Linux.
    or failure to return. Programmatic input does not establish physical-button
    acceptance; an audio stream does not establish audible output.
 5. **Evidence and next boundary.** Record observed results and remaining manual
-   gates. Identify how a PIKOOS host could launch a specified cart and restore
+   gates. Identify how a PikoNest host could launch a specified cart and restore
    its context. Keep upstream-wrapper success separate from an integrated
-   PIKOOS backend proof.
+   PikoNest backend proof.
 
 ## Initial device observations
 
@@ -131,7 +131,7 @@ and Godot messages about a missing default `bg_color` setting and duplicate
 - **Graceful exit:** injected Ctrl+Q closed the official runtime and wrapper;
   no matching PICO-8/proot processes remained, and Android focus returned to
   `com.radikal.gamelauncher`. This was repeated successfully. The later host
-  experiment also demonstrated return into PIKOOS; see below.
+  experiment also demonstrated return into PikoNest; see below.
 - **Cold relaunch after editing:** displayed the changed v2 cart successfully.
   Restored the canonical v1 cart and relaunched it successfully.
 
@@ -151,7 +151,7 @@ per-button or lifecycle test. Remaining checks:
 - Audio behavior after sleep/resume and long unplugged suspend.
 - Comfortable handheld orientation and controller-based exit.
 
-### PIKOOS host: edit/run/return demonstrated
+### PikoNest host: edit/run/return demonstrated
 
 Source and build instructions: [`../experiments/android-host/README.md`](../experiments/android-host/README.md).
 

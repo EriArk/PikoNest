@@ -1,4 +1,4 @@
-# PIKOOS Architecture
+# PikoNest Architecture
 
 ## Status
 
@@ -172,7 +172,7 @@ brush, while `drawTool` continues to persist its enum name. Portable `restoreStr
 checks mode, bounds, tool and the lab shared-map restriction before restoring a
 read-only draft. Menu indices are mapped explicitly so existing transform/recolor
 entries retain positions 5/6 and newly appended brushes cannot collide with them.
-No Lua shape calls or PIKOOS-specific runtime data are generated.
+No Lua shape calls or PikoNest-specific runtime data are generated.
 [Device evidence](design/android-rectangle-16/README.md).
 
 ### Android lab 0.0.16: selected-region color replacement
@@ -266,7 +266,7 @@ rewritten. Sources: [Android SAF](https://developer.android.com/training/data-st
 
 ## 1. Architectural goals
 
-PIKOOS must satisfy several constraints that pull in different directions:
+PikoNest must satisfy several constraints that pull in different directions:
 
 1. use the user's official PICO-8 runtime as the authoritative execution engine;
 2. provide a much friendlier handheld-first creation environment around it;
@@ -275,7 +275,7 @@ PIKOOS must satisfy several constraints that pull in different directions:
 5. remain portable to Linux handhelds later;
 6. support devices with different screens and control layouts;
 7. function without a physical keyboard;
-8. keep optional PIKOOS-only experiments from contaminating the standard project path.
+8. keep optional PikoNest-only experiments from contaminating the standard project path.
 
 The architecture should therefore be modular, with the PICO-8 project model and editor logic above a replaceable platform/runtime layer.
 
@@ -283,7 +283,7 @@ The architecture should therefore be modular, with the PICO-8 project model and 
 
 ```text
 ┌──────────────────────────────────────────────┐
-│                 PIKOOS UI                    │
+│                 PikoNest UI                  │
 │ Library · Create · Learn · Editors · Play   │
 └──────────────────────────────────────────────┘
                        │
@@ -339,7 +339,7 @@ This is one of the most important correctness-sensitive modules.
 
 Responsibilities:
 
-- represent a PIKOOS project;
+- represent a PikoNest project;
 - map canonical carts to optional `.pikoos/` metadata;
 - represent multicart relationships;
 - manage project identity without changing the cart unnecessarily;
@@ -399,7 +399,7 @@ Responsibilities:
 - skill-book progress;
 - mappings from editor actions/mechanics/errors to learning concepts.
 
-Learning state is PIKOOS metadata, not part of the game cart unless explicitly chosen for a game feature.
+Learning state is PikoNest metadata, not part of the game cart unless explicitly chosen for a game feature.
 
 ### `core/library`
 
@@ -449,7 +449,7 @@ the export preview for a separate save. Cart bytes and cart undo stay untouched.
 
 Responsibilities:
 
-- standard vs PIKOOS-enhanced capability classification;
+- standard vs PikoNest-enhanced capability classification;
 - required extensions;
 - resource warnings;
 - verification results;
@@ -498,12 +498,12 @@ Experimental features should check capabilities rather than assume them.
 
 The user imports their own official ARM64/Raspberry Pi PICO-8 distribution.
 
-PIKOOS stores/validates the imported runtime in app-controlled storage and launches it through a small Linux compatibility environment, likely using a proot-style setup and any required shim/adaptation.
+PikoNest stores/validates the imported runtime in app-controlled storage and launches it through a small Linux compatibility environment, likely using a proot-style setup and any required shim/adaptation.
 
 Conceptually:
 
 ```text
-PIKOOS Android app
+PikoNest Android app
         │
         ▼
 Android runtime adapter
@@ -531,11 +531,11 @@ Before depending on this architecture, prove:
 - gamepad mappings;
 - filesystem paths;
 - launching a specified cart;
-- clean exit/return to PIKOOS;
+- clean exit/return to PikoNest;
 - suspend/resume behavior;
 - lifecycle when Android backgrounds the app;
 - whether an LD_PRELOAD/native shim is necessary;
-- whether the wrapper can later expose a safe PIKOOS bridge.
+- whether the wrapper can later expose a safe PikoNest bridge.
 
 ## 6. Linux runtime backend
 
@@ -546,7 +546,7 @@ On compatible handhelds it may be able to launch a user-provided official PICO-8
 Conceptually:
 
 ```text
-PIKOOS Linux app
+PikoNest Linux app
       │
       ▼
 LinuxRuntimeBackend
@@ -621,7 +621,7 @@ Abstract:
 
 ## 8. Responsive handheld UI
 
-PIKOOS must support very different display shapes.
+PikoNest must support very different display shapes.
 
 Examples may include:
 
@@ -674,7 +674,7 @@ May contain information such as:
 - learning/help preferences;
 - mechanic provenance metadata;
 - test definitions;
-- PIKOOS extension declarations.
+- PikoNest extension declarations.
 
 Do not store data in `project.json` when it is part of the actual game and belongs in the cart.
 
@@ -711,7 +711,7 @@ This makes targeted edits safer than regenerating the entire file from a normali
 
 ## 11. Lua understanding
 
-PIKOOS does not need a full compiler to deliver its first editor, but it benefits from gradually understanding more structure.
+PikoNest does not need a full compiler to deliver its first editor, but it benefits from gradually understanding more structure.
 
 Possible stages:
 
@@ -830,7 +830,7 @@ Official PICO-8
   └─ exit
        │
        ▼
-PIKOOS restores previous editor context
+PikoNest restores previous editor context
 ```
 
 Persist enough editor state that a test run does not feel like leaving the application.
@@ -843,13 +843,13 @@ Persist enough editor state that a test run does not feel like leaving the appli
 - run it through the official runtime;
 - present runtime errors/logs when available;
 - show compatibility/resource analysis;
-- distinguish PIKOOS-enhanced features from standard PICO-8 support.
+- distinguish PikoNest-enhanced features from standard PICO-8 support.
 
 Do not label a project “compatible” merely because a custom preview engine accepted it.
 
 ## 17. Multicart project model
 
-PIKOOS may represent several `.p8` carts under one project.
+PikoNest may represent several `.p8` carts under one project.
 
 Example:
 
@@ -873,11 +873,11 @@ Each project/cart can declare or be detected as one of:
 
 ### Standard
 
-No PIKOOS runtime extensions required.
+No PikoNest runtime extensions required.
 
 ### Enhanced
 
-Uses explicit PIKOOS services such as an online bridge.
+Uses explicit PikoNest services such as an online bridge.
 
 Example metadata:
 
@@ -897,7 +897,7 @@ official PICO-8
       ↕
 platform shim / bridge endpoint
       ↕
-PIKOOS BridgeService
+PikoNest BridgeService
       ↕
 network / second handheld / services
 ```
@@ -927,7 +927,7 @@ Standard projects must work when `available() == false`.
 
 If online cartridges are implemented, separate:
 
-- PIKOOS application account/services, if any;
+- PikoNest application account/services, if any;
 - game-specific server/account data;
 - cartridge token binding;
 - routine PIN authentication.
@@ -950,7 +950,7 @@ For online games:
 
 ## 22. Data migration/versioning
 
-Version all PIKOOS-owned metadata formats from the beginning.
+Version all PikoNest-owned metadata formats from the beginning.
 
 Examples:
 

@@ -1,4 +1,4 @@
-# PIKOOS Android host experiment
+# PikoNest Android host experiment
 
 Version 0.0.61 adds a complete bounded background-strip management workflow:
 thumbnail list, edit/return, add, duplicate, delete, reorder adjacent recognized
@@ -182,7 +182,7 @@ the whole traversal, 2 MiB per cart. Partial results are explicitly reported.
 Simple includes and literal sibling text-cart loads use the preparers above.
 Computed paths, PNG dependencies and durable file writes remain unsupported.
 Conservative lexical inspection is not complete Lua dependency analysis.
-These are PIKOOS lab limits, not PICO-8 limits. Recent means
+These are PikoNest lab limits, not PICO-8 limits. Recent means
 accepted launch, not a running-game save state or verified completion. Physical
 controller ergonomics and runtime setup remain separate acceptance work.
 [Device evidence](../../docs/design/android-play-21/README.md).
@@ -561,7 +561,7 @@ remain future work. [Device captures and checks](../../docs/design/android-drawi
   including non-tile-aligned rectangles. Lower-half sharing is explicitly
   exposed by `sharesMap()`. This UI deliberately selects only the upper 128×64,
   in 8-pixel increments, until map-aware editing is designed. These are current
-  PIKOOS editing restrictions, not PICO-8 limits.
+  PikoNest editing restrictions, not PICO-8 limits.
 - A rectangle is a view of existing sheet pixels, not a new owned resource or
   reservation. Overlapping selections see the same pixels. Blank margins are
   not automatically allocated. The legacy New/Copy/Assign operations remain

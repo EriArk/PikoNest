@@ -24,7 +24,7 @@ The original PNG, fixed provider snapshot and runtime intake have the same binar
 transport path; device SHA-256 of source and `files/run.p8.png` both equals
 `11bb25685b0811ae858c9a8f7265c96a83a0f1d253008c0e10d6b485ab8f791e`.
 The explicit send intent uses `image/png`, `pikoos-lab.p8.png`, read-only stream
-permission and a matching ClipData URI. PIKOOS never re-encodes the image.
+permission and a matching ClipData URI. PikoNest never re-encodes the image.
 
 During PNG play, `am kill` removed the background host process (PID absent).
 Ctrl+Q returned to a recreated Play screen with the same selection and recency.

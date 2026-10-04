@@ -52,7 +52,7 @@ Retroid Pocket Classic для разработки; GitHub Release не созд
 
 Использованы реальные `if/then/else/end`, переменные, `btnp`, `_init/_update/_draw`,
 как описано в [мануале PICO-8](https://www.lexaloffle.com/dl/docs/pico-8_manual.html#_Lua_Syntax_Primer).
-Никаких скрытых компонентов или API PIKOOS в игре нет. Расположение действий
+Никаких скрытых компонентов или API PikoNest в игре нет. Расположение действий
 в ветвях пока выбирается курсором Lua; это явный UX-долг M02.2, а не готовый
 визуальный редактор правил.
 

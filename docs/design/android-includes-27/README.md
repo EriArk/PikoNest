@@ -18,7 +18,7 @@ uses three native include forms:
 Copied that directory into `Documents/PIKOOS/Games/include-garden` for device
 testing. First launched the unchanged source directly through the wrapper's raw
 file entry, so official PICO-8 performed its own includes. Then launched through
-PIKOOS's external LaunchActivity and through Play, exercising SAF preparation.
+PikoNest's external LaunchActivity and through Play, exercising SAF preparation.
 The temporary snapshot contained ordinary Lua and retained no include directives.
 
 The initial direct, external-entry and Play screenshots were byte-identical. After
@@ -27,7 +27,7 @@ Both final 1240×1080 captures have SHA-256:
 `12e467c18661baeadcff654a802b4fecb8f53c87f7ebfc3c23b7bffcac8eecec`.
 
 - [Original sources, official native include processing](direct.png)
-- [Prepared cart through PIKOOS](prepared.png)
+- [Prepared cart through PikoNest](prepared.png)
 - [One input changes the flower and move counter](recovered.png)
 - [Missing dependency reported before runtime launch](missing.png)
 - [Return to selected Play card](returned.png)

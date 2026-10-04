@@ -1,4 +1,4 @@
-# PIKOOS Product Vision
+# PikoNest Product Vision
 
 Owner additions: a persistent [asset library](ASSET_LIBRARY.md) for user-created
 and extracted sprites, backgrounds, SFX and music reusable across projects and
@@ -24,7 +24,7 @@ dedicated text-cart launcher; 0.0.23 adds PNG launch and covers. Dependency stag
 production runtime setup and full lifecycle acceptance remain open. Lab 0.0.24
 fixes a reproduced audio restart race in a separate development adapter.
 
-PIKOOS is a handheld-first environment for the full PICO-8 creative loop:
+PikoNest is a handheld-first environment for the full PICO-8 creative loop:
 
 > **Play → inspect → remix → create → learn → test → share**
 
@@ -36,11 +36,11 @@ The key promise is simple:
 
 > A person should be able to start by playing with games and end up learning real Lua and real PICO-8 almost by accident.
 
-## 2. What makes PIKOOS different
+## 2. What makes PikoNest different
 
 ### Games with and without characters
 
-Owner clarification (2026-10-03): PIKOOS must support games without a hero,
+Owner clarification (2026-10-03): PikoNest must support games without a hero,
 including puzzles and falling-block games. Sprites can depict enemies, items,
 environment pieces, puzzle pieces or interface elements. A resource's role is
 contextual, not a fixed type inferred from its pixels or position on the sheet.
@@ -52,7 +52,7 @@ a puzzle may expose a board, pieces and rules. These are examples for tool
 design, not a requirement to introduce objects, physics or a scene graph into
 every game. Genre templates remain later work; genre independence is a base rule.
 
-PIKOOS is not only a launcher and not only an editor.
+PikoNest is not only a launcher and not only an editor.
 
 The useful distinction is that the same object — a PICO-8 cartridge — can move smoothly between different modes of interaction:
 
@@ -70,7 +70,7 @@ The boundary between **player** and **creator** should feel intentionally thin.
 
 ## 3. Emotional target
 
-PIKOOS should feel:
+PikoNest should feel:
 
 - cute;
 - compact;
@@ -118,7 +118,7 @@ One first-session example using the platformer template is:
 4. press `Play`;
 5. change one visible parameter such as speed or jump height;
 6. play again;
-7. PIKOOS reveals the tiny piece of Lua responsible for that behavior.
+7. PikoNest reveals the tiny piece of Lua responsible for that behavior.
 
 The first reward is the changed game, not a badge for completing a lesson.
 
@@ -128,7 +128,7 @@ Learning is contextual.
 
 Example: the user adds health.
 
-PIKOOS can say:
+PikoNest can say:
 
 > We need somewhere to remember the player's health. Let's make `hp`.
 
@@ -169,7 +169,7 @@ or:
 
 ## 8. Skill Book
 
-PIKOOS may maintain a lightweight record of programming/game-making concepts the user has actually encountered.
+PikoNest may maintain a lightweight record of programming/game-making concepts the user has actually encountered.
 
 Example:
 
@@ -223,7 +223,7 @@ A new project should be startable from:
 - puzzle;
 - another lightweight starting point.
 
-These are normal `.p8` projects, not proprietary templates that require a PIKOOS runtime.
+These are normal `.p8` projects, not proprietary templates that require a PikoNest runtime.
 
 ### DISCOVER
 
@@ -283,7 +283,7 @@ The interface does not need to copy the stock PICO-8 editor. It should improve e
 
 Most handhelds have excellent game controls and poor text input.
 
-PIKOOS should treat that as a design constraint rather than an inconvenience.
+PikoNest should treat that as a design constraint rather than an inconvenience.
 
 The code editor can know:
 
@@ -305,11 +305,11 @@ Instead of typing every character, the user can insert structures such as:
 
 Free-form keyboard input is still available for variable names, strings, comments and unrestricted editing.
 
-An external keyboard should work well when present, but PIKOOS must remain useful without one.
+An external keyboard should work well when present, but PikoNest must remain useful without one.
 
 ## 13. Mechanics Library
 
-The Mechanics Library is one of the core reasons PIKOOS can work on a keyboard-less handheld.
+The Mechanics Library is one of the core reasons PikoNest can work on a keyboard-less handheld.
 
 It contains compact, understandable implementations of common game mechanics.
 
@@ -366,7 +366,7 @@ Examples:
 - dialogue box
 - hearts/UI
 
-The implementations are written specifically for PIKOOS, informed by useful patterns found throughout PICO-8 development culture.
+The implementations are written specifically for PikoNest, informed by useful patterns found throughout PICO-8 development culture.
 
 ## 14. A mechanic is also a lesson
 
@@ -412,7 +412,7 @@ return to the same working context are required. See
 [PICO-8 learning resources](PICO8_LEARNING_RESOURCES.md) for the owner-requested
 direction, initial sources and future acceptance scenario.
 
-PIKOOS should never trap users inside generated blocks.
+PikoNest should never trap users inside generated blocks.
 
 If a mechanic generates:
 
@@ -426,7 +426,7 @@ that is exactly what the code editor should eventually show.
 
 The user may rewrite it however they like.
 
-This matters because the end goal is not dependence on PIKOOS. The end goal is confidence with PICO-8 itself.
+This matters because the end goal is not dependence on PikoNest. The end goal is confidence with PICO-8 itself.
 
 ## 16. Sprites and maps
 
@@ -447,7 +447,7 @@ The sound tools should initially make common actions simple rather than expose e
 
 A beginner may start with playful controls and presets, then reveal the real PICO-8 SFX/music structure as they go deeper.
 
-As elsewhere, PIKOOS should progressively expose the underlying system rather than replace it.
+As elsewhere, PikoNest should progressively expose the underlying system rather than replace it.
 
 The owner explicitly confirmed sound-effect and music creation on 2026-10-02.
 Plan for controller-first note/phrase editing, editable effect presets,
@@ -474,7 +474,7 @@ Reducing friction in this loop matters more than adding dozens of advanced edito
 
 PICO-8 constraints are part of its identity.
 
-PIKOOS should show them in a friendly form first, with detailed numbers available when requested.
+PikoNest should show them in a friendly form first, with detailed numbers available when requested.
 
 Example:
 
@@ -487,7 +487,7 @@ Still some room!
 
 Expanded view can show real budgets such as tokens, map/sprite use, SFX and music.
 
-When the project approaches a limit, PIKOOS should explain what is consuming space and introduce optimization/multicart concepts gently.
+When the project approaches a limit, PikoNest should explain what is consuming space and introduce optimization/multicart concepts gently.
 
 ## 20. Multicart without unnecessary jargon
 
@@ -500,7 +500,7 @@ A beginner-facing project tree may call carts:
 - Dungeon
 - Episode
 
-PIKOOS can handle the underlying file relationships while still allowing an advanced user to see the real carts and code.
+PikoNest can handle the underlying file relationships while still allowing an advanced user to see the real carts and code.
 
 ## 21. Remix as a first-class workflow
 
@@ -510,7 +510,7 @@ A useful flow:
 
 1. play an interesting cart;
 2. press `Remix`;
-3. PIKOOS creates a working copy;
+3. PikoNest creates a working copy;
 4. offer entry points supported by this cart's resources and known bindings:
    - edit a sprite, tile or music;
    - change a board or piece where the puzzle binding is known;
@@ -523,7 +523,7 @@ Remix should feel like opening a toy to see what is inside.
 
 Raw Lua/PICO-8 errors can be confusing to beginners.
 
-PIKOOS should translate common failures into contextual explanations while keeping the real error visible.
+PikoNest should translate common failures into contextual explanations while keeping the real error visible.
 
 Example:
 
@@ -555,29 +555,29 @@ These are useful, but they are not prerequisites for the first usable creator.
 
 A long-term experiment is transparent handheld-to-handheld play for carts that already behave as local multiplayer PICO-8 games.
 
-The cart sees normal player input; PIKOOS transports one player's input from another handheld.
+The cart sees normal player input; PikoNest transports one player's input from another handheld.
 
 The goal is to add a handheld capability without creating a new Lua language.
 
 The feasibility and exact synchronization design still require proof-of-concept work.
 
-## 25. PIKOOS-enhanced online cartridges
+## 25. PikoNest-enhanced online cartridges
 
-A special cart may opt into PIKOOS network features.
+A special cart may opt into PikoNest network features.
 
 Conceptually:
 
 ```text
 PICO-8 cart
     ↕
-PIKOOS bridge
+PikoNest bridge
     ↕
 Internet
     ↕
 Game server
 ```
 
-The cart remains a standard `.p8` file, but its online features may only work when a PIKOOS bridge is present.
+The cart remains a standard `.p8` file, but its online features may only work when a PikoNest bridge is present.
 
 A server-driven persistent game could keep most persistent world/account state on the server while the cart contains the renderer, controls, UI, local effects and client rules.
 
@@ -592,7 +592,7 @@ Initial flow:
 1. create/login to account;
 2. create/select character;
 3. server returns a unique cartridge token;
-4. PIKOOS writes that token into a reserved part of the cart;
+4. PikoNest writes that token into a reserved part of the cart;
 5. user chooses a short PIN for routine authentication.
 
 Subsequent use can feel like inserting a personal game cartridge:
@@ -609,7 +609,7 @@ A `Share Clean Cartridge` action produces a copy without the personal token.
 
 ## 27. Product scope discipline
 
-PIKOOS can eventually contain many powerful features, but the first usable product must stay focused.
+PikoNest can eventually contain many powerful features, but the first usable product must stay focused.
 
 The core experience is successful if it can do these things well:
 
@@ -649,11 +649,11 @@ Write a custom function.
 
 Open an unfamiliar cart and understand a meaningful part of it.
 
-At that point PIKOOS has succeeded: a person who arrived to play with little games has become someone who can actually create with PICO-8.
+At that point PikoNest has succeeded: a person who arrived to play with little games has become someone who can actually create with PICO-8.
 
 ## 29. Summary
 
-PIKOOS is simultaneously:
+PikoNest is simultaneously:
 
 - a console;
 - a workshop;

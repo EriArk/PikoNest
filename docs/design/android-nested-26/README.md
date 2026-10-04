@@ -73,4 +73,4 @@ This adds discovery, not dependent-file staging. Includes, multicart and other
 linked files are still a separate runtime/storage workflow; conservative text
 hints remain unchanged, and PNG Lua dependencies are not decoded. Next work is
 dependency-aware staging, then integrated first-run runtime setup. The limits here
-belong to the PIKOOS experiment, not to PICO-8.
+belong to the PikoNest experiment, not to PICO-8.

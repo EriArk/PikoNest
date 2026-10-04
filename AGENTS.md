@@ -1,4 +1,4 @@
-# AGENTS.md — PIKOOS contributor instructions
+# AGENTS.md — PikoNest contributor instructions
 
 This repository contains a working Android lab and product/architecture documents;
 it is not yet a complete creator. Treat this file as the primary implementation
@@ -9,9 +9,15 @@ Current planning entry points: `docs/STATUS.md` records demonstrated scope,
 and status, and `docs/ACCEPTANCE.md` defines end-to-end acceptance. Historical lab
 version notes are evidence, not current task order or completed-product claims.
 
+Owner naming decision (2026-10-04): the product and repository are **PikoNest**.
+Technical identifiers will be migrated later with data preservation. Keep existing
+package IDs, `.pikoos/` metadata and integration strings until that coordinated
+migration; see `docs/PROJECT_NAME.md`. Historical screenshots retain their original
+branding, and documented installed-app labels must remain accurate.
+
 ## 1. Product in one sentence
 
-PIKOOS is a **cute, handheld-first PICO-8 workshop** for playing, creating, remixing, learning, testing and eventually sharing PICO-8 games, using the user's **official PICO-8 runtime** as the authoritative execution engine.
+PikoNest is a **cute, handheld-first PICO-8 workshop** for playing, creating, remixing, learning, testing and eventually sharing PICO-8 games, using the user's **official PICO-8 runtime** as the authoritative execution engine.
 
 The intended emotional experience is closer to a creative toy than to a desktop IDE.
 
@@ -31,12 +37,12 @@ that release. Continuing development, passing tests, installing local test APKs,
 or pushing source commits is not release approval. Keep development builds local;
 do not create/upload a GitHub APK release or prerelease before that confirmation.
 
-Support both the PIKOOS Play shelf and game launch from third-party Android
-launchers through PIKOOS. External play must not require editor/project import.
+Support both the PikoNest Play shelf and game launch from third-party Android
+launchers through PikoNest. External play must not require editor/project import.
 Adaptive screen/controller support and external-launch acceptance are part of the
 Android release scope; see `docs/ANDROID_APP.md` for requirements and pending design.
 
-Do **not** architect PIKOOS around the Retroid Pocket Classic or any other single device. Devices will vary in:
+Do **not** architect PikoNest around the Retroid Pocket Classic or any other single device. Devices will vary in:
 
 - display aspect ratio and resolution;
 - touch availability;
@@ -60,14 +66,14 @@ Use a replaceable platform/runtime boundary from the beginning.
 ## 3. Non-negotiable compatibility rules
 
 1. **`.p8` is the canonical editable project format.**
-2. Standard PIKOOS projects must remain valid ordinary PICO-8 projects.
+2. Standard PikoNest projects must remain valid ordinary PICO-8 projects.
 3. Do not invent custom Lua syntax for normal projects.
 4. Do not silently depend on a custom runtime API in normal projects.
 5. Mechanics/templates must emit ordinary PICO-8 Lua/data.
 6. The user-supplied official PICO-8 runtime is the authoritative compatibility test.
-7. A project that passes normal verification should continue to run when opened outside PIKOOS in ordinary PICO-8.
-8. Optional PIKOOS extensions (network bridge, achievements, etc.) must be explicit and separable from standard compatibility.
-9. PIKOOS must never bundle proprietary PICO-8 binaries. The user imports their own purchased runtime.
+7. A project that passes normal verification should continue to run when opened outside PikoNest in ordinary PICO-8.
+8. Optional PikoNest extensions (network bridge, achievements, etc.) must be explicit and separable from standard compatibility.
+9. PikoNest must never bundle proprietary PICO-8 binaries. The user imports their own purchased runtime.
 10. **The base product follows the real PICO-8 rules.** Its resource model,
     editing operations, generated code and validation must respect the official
     PICO-8 semantics and limits for the targeted runtime version.
@@ -79,19 +85,19 @@ Owner-confirmed requirement (2026-10-02): design the base around PICO-8 itself.
 - Before designing or extending a tool, check the relevant official manual/API,
   resource layout and limits. Verify implemented behavior with focused data tests
   and the user's official runtime where applicable; document remaining uncertainty.
-- Do not turn a temporary PIKOOS restriction into a claimed PICO-8 restriction
+- Do not turn a temporary PikoNest restriction into a claimed PICO-8 restriction
   or a permanent domain-model invariant. For example, the experiment's eight
   16×16 images are a bounded editor slice, not PICO-8's sprite size or capacity.
   Larger and rectangular images must fit the standard sprite-sheet model.
 - Partial implementation is allowed. Identify unsupported editing operations
-  as PIKOOS limitations, preserve their source data, and refuse unsafe edits.
+  as PikoNest limitations, preserve their source data, and refuse unsafe edits.
   A valid PICO-8 feature missing from our editor is not an incompatible cartridge.
 - Do not silently expand or shrink console limits, change API behavior, or invent
   a different graphics, map, audio or execution model for standard projects.
 - Improve the controller-first interface freely within that contract. Friendly
   objects, templates and tools must map to ordinary PICO-8 Lua/data; matching the
   original desktop editor's layout or keyboard workflow is not required.
-- PIKOOS-only behavior remains an explicit, separable extension, never an
+- PikoNest-only behavior remains an explicit, separable extension, never an
   accidental requirement of the base creation workflow.
 
 See `docs/PICO8_COMPATIBILITY.md`.
@@ -170,20 +176,20 @@ External Bluetooth/USB keyboards may be supported, but never make them the requi
 
 ## 5. Learning is part of creation
 
-PIKOOS should teach Lua/PICO-8 **through real work**, not by forcing a course before creation.
+PikoNest should teach Lua/PICO-8 **through real work**, not by forcing a course before creation.
 
 Pattern:
 
 1. user wants to do something;
-2. PIKOOS helps them do it;
-3. PIKOOS reveals the real Lua/PICO-8 concept behind it;
+2. PikoNest helps them do it;
+3. PikoNest reveals the real Lua/PICO-8 concept behind it;
 4. user can inspect and edit the generated code;
 5. a tiny optional challenge can reinforce the idea.
 
 Example:
 
 - user adds player health;
-- PIKOOS introduces `hp` as a variable;
+- PikoNest introduces `hp` as a variable;
 - it briefly explains what a variable is;
 - user changes the value and immediately sees the result.
 
@@ -300,25 +306,25 @@ Do not assume the first Android implementation is the permanent architecture.
 
 ## 9. Standard vs extended cartridges
 
-PIKOOS has two conceptual capability levels.
+PikoNest has two conceptual capability levels.
 
 ### Standard cartridge
 
 - ordinary PICO-8;
-- no PIKOOS-specific runtime dependency;
+- no PikoNest-specific runtime dependency;
 - must verify in official PICO-8;
 - preferred/default project type.
 
-### PIKOOS-enhanced cartridge
+### PikoNest-enhanced cartridge
 
-May optionally use PIKOOS bridge features such as:
+May optionally use PikoNest bridge features such as:
 
 - network services;
 - Link Play infrastructure;
 - achievements/integration hooks;
 - personalized online cartridge account data.
 
-The file should still remain a valid `.p8`, but enhanced behavior may only function inside PIKOOS.
+The file should still remain a valid `.p8`, but enhanced behavior may only function inside PikoNest.
 
 Never make enhanced behavior an accidental dependency of standard projects.
 
@@ -326,7 +332,7 @@ Never make enhanced behavior an accidental dependency of standard projects.
 
 The intended online-cart model is unusual and deliberate.
 
-After account/character creation, the server returns a high-entropy **cartridge token**. PIKOOS writes that token into a reserved data area of that user's personalized cart.
+After account/character creation, the server returns a high-entropy **cartridge token**. PikoNest writes that token into a reserved data area of that user's personalized cart.
 
 The exact encoding/location inside a standard `.p8` is **not decided yet**. Do not prematurely lock it to gfx/map/code comments until a round-trip-safe design has been tested.
 
@@ -354,7 +360,7 @@ See `docs/ONLINE_CARTRIDGES.md`.
 
 Use normal PICO-8 multicart mechanisms rather than inventing a different game packaging model.
 
-PIKOOS should hide unnecessary complexity for beginners. The UI may present multiple carts as:
+PikoNest should hide unnecessary complexity for beginners. The UI may present multiple carts as:
 
 - regions;
 - chapters;
@@ -379,7 +385,7 @@ Confirmed principles include:
 Research/experimental areas include:
 
 - exact Android official-runtime wrapper implementation;
-- native bridge between a running official PICO-8 process and PIKOOS;
+- native bridge between a running official PICO-8 process and PikoNest;
 - transparent Link Play;
 - online-cart transport;
 - exact reserved token encoding inside `.p8`;
@@ -446,7 +452,7 @@ Use accurate user-facing names: sprite, animation frame, tile, map, background,
 SFX and music. Do not call every visual resource a generic "drawing". Background
 describes a role; retain its actual sprite/map/layer representation underneath.
 Library insertion must materialize ordinary PICO-8 data/code in the target cart;
-standard carts must not require the external PIKOOS asset library at runtime.
+standard carts must not require the external PikoNest asset library at runtime.
 
 When a major decision is made:
 

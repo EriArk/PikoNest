@@ -19,16 +19,16 @@ The direct baseline used temporary, hash-checked copies of the three owned
 files in the runtime's existing cart root. The upstream wrapper otherwise uses
 its configured cart root, not the external cart's parent, for runtime loads.
 Those three baseline copies were removed after the comparison, leaving only
-the pre-existing `demos` and `pikoos-tests` root directories. The PIKOOS Games
+the pre-existing `demos` and `pikoos-tests` root directories. The PikoNest Games
 sources stayed in `Games/petal-gate/` throughout.
 
-PIKOOS external VIEW entry and Play both reached the garden, loaded the night
+PikoNest external VIEW entry and Play both reached the garden, loaded the night
 chapter/data and returned to the garden. Thus the prepared run could not silently
 read the baseline copies. Native and prepared night captures are byte-identical:
 SHA-256 `10822ab9ea6f220fc3b9b243af1ca5b5c4ba160237cab0cca1b3af81eb86515e`.
 
 - [Direct official-runtime chapter](direct-night.png)
-- [PIKOOS-prepared chapter and linked data](prepared-night.png)
+- [PikoNest-prepared chapter and linked data](prepared-night.png)
 - [Return to garden through native load](prepared-back.png)
 - [Return to selected Play card](returned.png)
 - [Missing source file reported on Play](missing.png)

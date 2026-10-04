@@ -13,13 +13,13 @@ Installed host versionCode 25; final APK SHA-256:
 
 | Entry | Observed result |
 | --- | --- |
-| Beacon 1.8.10, custom PIKOOS platform, Little-Lights (png) | Official game appears; Ctrl+Q returns to Beacon with the same PNG selected. Repeated on the final APK. |
-| Retroid Launcher beta 1.16-2025-0618-1139, PIKOOS platform, Little-Lights text cart | Safely Open reaches official game; Ctrl+Q returns to Retroid with the same text cart selected. Repeated on the final APK. |
+| Beacon 1.8.10, custom PikoNest platform, Little-Lights (png) | Official game appears; Ctrl+Q returns to Beacon with the same PNG selected. Repeated on the final APK. |
+| Retroid Launcher beta 1.16-2025-0618-1139, PikoNest platform, Little-Lights text cart | Safely Open reaches official game; Ctrl+Q returns to Retroid with the same text cart selected. Repeated on the final APK. |
 | VIEW of a path outside the authorized Games tree | Clear access message; no runtime dispatch. A opens the system picker; choosing the PNG reaches official PICO-8. |
 | Host process loss during that recovered game | PID 13961 disappears after `am kill`; runtime continues. Exit recreates host PID 14268, clears the dispatch journal and returns to Retroid without launching again. |
 | A second, different external request during an active PNG game | Existing runtime PID 11220 and staged PNG hash remain unchanged; existing game remains visible. Tested before the final recovery-label/background-read refinements. |
 | Empty request → picker → cancel → B | Returns to caller; journal stays false. No project import. |
-| Normal PIKOOS Play regression | Text cart runs, one injected move changes the board, exit restores the selected Play card. |
+| Normal PikoNest Play regression | Text cart runs, one injected move changes the board, exit restores the selected Play card. |
 | External request while Play's runtime is still booting | New request is rejected and both snapshot hashes stay unchanged. Returning to the wrapper exposed the startup-interruption failure described below. |
 
 Screenshots:
@@ -31,10 +31,10 @@ Screenshots:
 The two launcher profiles are separate additions. Existing Beacon platforms,
 including its PICO8/RetroArch configuration, remain untouched; Beacon remains
 default HOME. A Beacon backup was saved before profile changes to
-`/storage/7E6D-FA36/PIKOOS-Launcher-Backups/beacon_backup_2026-10-03_11_47.zip`
+`/storage/7E6D-FA36/PikoNest-Launcher-Backups/beacon_backup_2026-10-03_11_47.zip`
 (808,631,622 bytes). Retroid was initially empty; its new platform indexes four
 sample carts. Metadata matching failed for the homebrew samples, so third-party
-launcher covers remain empty. PIKOOS's own Play shelf already uses cartridge
+launcher covers remain empty. PikoNest's own Play shelf already uses cartridge
 labels. No launcher APKs, backups or proprietary runtime files enter this repo.
 
 See [exact profile settings](../../ANDROID_APP.md#tested-lab-entry-0025).

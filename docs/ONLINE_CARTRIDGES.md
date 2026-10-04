@@ -1,4 +1,4 @@
-# PIKOOS Online Cartridges
+# PikoNest Online Cartridges
 
 ## Status
 
@@ -6,14 +6,14 @@ Experimental product direction. The user-facing behavior is defined here; transp
 
 ## 1. Idea
 
-A PIKOOS online cartridge is still a `.p8` cartridge, but PIKOOS provides an optional bridge between that cart and an online game server.
+A PikoNest online cartridge is still a `.p8` cartridge, but PikoNest provides an optional bridge between that cart and an online game server.
 
 Conceptually:
 
 ```text
 PICO-8 cart
     ↕
-PIKOOS bridge
+PikoNest bridge
     ↕
 Internet
     ↕
@@ -77,12 +77,12 @@ RETURNING PLAYER
 
 Possible flow:
 
-1. user launches a clean online cart in PIKOOS;
-2. cart/PIKOOS requests account creation or login;
+1. user launches a clean online cart in PikoNest;
+2. cart/PikoNest requests account creation or login;
 3. user creates/selects a character;
 4. server creates a unique high-entropy **cartridge token**;
 5. user chooses a short PIN for routine launches;
-6. PIKOOS writes the cartridge token into a reserved area of this copy of the `.p8`;
+6. PikoNest writes the cartridge token into a reserved area of this copy of the `.p8`;
 7. the cart is now personalized.
 
 Result:
@@ -158,7 +158,7 @@ Possible approaches must be evaluated against:
 
 - standard `.p8` validity;
 - no accidental use by ordinary game assets/code;
-- reliable round-trip through PIKOOS;
+- reliable round-trip through PikoNest;
 - predictable capacity;
 - ability to identify the reserved block;
 - safe clean/reset operation;
@@ -215,7 +215,7 @@ CARTRIDGE SETTINGS
   → FACTORY RESET CARTRIDGE
 ```
 
-After confirmation PIKOOS:
+After confirmation PikoNest:
 
 - clears the token/binding block;
 - clears cart-local binding metadata;
@@ -236,7 +236,7 @@ Primary sharing action:
 SHARE CLEAN CARTRIDGE
 ```
 
-PIKOOS creates a copy with the binding area returned to its clean state.
+PikoNest creates a copy with the binding area returned to its clean state.
 
 The user's personal cart remains unchanged.
 
@@ -257,7 +257,7 @@ A token must not be permanent and irrevocable.
 
 ## 14. Multiple cartridges/accounts
 
-Do not assume one PIKOOS device equals one account.
+Do not assume one PikoNest device equals one account.
 
 Because identity lives partly in the personalized cart, the system should allow:
 
@@ -332,7 +332,7 @@ Possible modes:
 ### Online required
 
 ```text
-This cartridge needs PIKOOS Online.
+This cartridge needs PikoNest Online.
 ```
 
 ### Offline demo
@@ -349,14 +349,14 @@ The cart should fail clearly rather than silently behaving incorrectly.
 
 The cart file should remain syntactically valid standard PICO-8.
 
-When opened outside PIKOOS, the bridge will not exist.
+When opened outside PikoNest, the bridge will not exist.
 
 The program should detect/unambiguously handle that situation where the chosen bridge design allows it.
 
 Preferred user experience:
 
 ```text
-PIKOOS ONLINE NOT FOUND
+PikoNest ONLINE NOT FOUND
 
 This cart uses online features.
 [OFFLINE MODE]
@@ -368,7 +368,7 @@ rather than crashing.
 
 The desired product behavior does **not** prove the transport mechanism yet.
 
-Research is required to determine how the official PICO-8 runtime launched through PIKOOS can communicate with the host without modifying the official binary.
+Research is required to determine how the official PICO-8 runtime launched through PikoNest can communicate with the host without modifying the official binary.
 
 Potential investigation areas include the runtime wrapper/shim and standard PICO-8 host I/O facilities.
 
@@ -392,7 +392,7 @@ For online game servers:
 
 ## 22. Factory-reset guarantee
 
-The clean version of an online cart should be deterministic enough that PIKOOS can confidently answer:
+The clean version of an online cart should be deterministic enough that PikoNest can confidently answer:
 
 > Does this file currently contain a personal binding?
 
@@ -415,16 +415,16 @@ service=...
 token=...
 ```
 
-The exact encoding is TBD; the important point is that future PIKOOS versions can identify and migrate/reset older bindings safely.
+The exact encoding is TBD; the important point is that future PikoNest versions can identify and migrate/reset older bindings safely.
 
 ## 24. First prototype success criteria
 
 Before building a full game, prove:
 
 1. a clean `.p8` can declare/reserve a binding area;
-2. PIKOOS can write a random token into that area;
+2. PikoNest can write a random token into that area;
 3. official PICO-8 can still open/run the cart;
-4. PIKOOS can read the same token back after normal cart use;
+4. PikoNest can read the same token back after normal cart use;
 5. Factory Reset restores the binding area without damaging the cart;
 6. Share Clean creates a token-free copy;
 7. a bridge POC can exchange at least small messages with a server while the official runtime is being used.

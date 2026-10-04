@@ -1,4 +1,4 @@
-# PIKOOS UX study 01
+# PikoNest UX study 01
 
 **Accepted visual baseline; browser behavior remains a simulation.** Created
 after the owner rejected the native runtime lab's appearance, then approved
@@ -56,7 +56,7 @@ small-screen readability or owner design acceptance is claimed.
 
 ## Assets
 
-- `app.js` scene/sprite graphics and inline pixel icons: original PIKOOS study.
+- `app.js` scene/sprite graphics and inline pixel icons: original PikoNest study.
 - PICO-8 palette: [official FAQ](https://www.lexaloffle.com/pico-8.php?page=faq).
 - `assets/Tiny5-Regular.ttf`: Google Fonts `ofl/tiny5`, downloaded 2026-10-02
   from <https://github.com/google/fonts/tree/main/ofl/tiny5>.

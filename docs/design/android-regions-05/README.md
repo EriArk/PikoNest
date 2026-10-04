@@ -62,7 +62,7 @@ input isolation, failed-save retention, complete undo including appended rows,
 controller selection/zoom and expanded runtime snapshots.
 
 The data model covers the ordinary 128×128 sheet. The current selector exposes
-only upper 128×64 pixels with corners on 8×8 cells; this is PIKOOS scope, not a
+only upper 128×64 pixels with corners on 8×8 cells; this is PikoNest scope, not a
 PICO-8 limit. Map-aware lower-half editing, large-image hero binding/hitboxes,
 named resources and safe copy placement are future steps. A selection is not
 an allocation and can overlap other selections. The eight old 16×16 cards

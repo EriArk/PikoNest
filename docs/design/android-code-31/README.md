@@ -41,7 +41,7 @@ Clipboard is internal to this draft, not the Android system clipboard.
   character per step: undoing two typed hyphens once left one hyphen and produced
   [a real line-4 syntax error](runtime-error.png). Returned, deleted it using the
   controller menu, and relaunched successfully. Error text was read in PICO-8;
-  PIKOOS does not yet capture/navigate that diagnostic automatically.
+  PikoNest does not yet capture/navigate that diagnostic automatically.
 - [Compact menu](compact-menu.png) and [horizontal caret scroll](compact-scroll.png)
   were checked at a 720×960 rendered override (360×480 logical viewport), alongside
   the usual 1240×1080 display. Override reset afterward. These are layout checks

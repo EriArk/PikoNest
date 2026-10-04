@@ -41,7 +41,7 @@ written to the ordinary cartridge.
 Simple quoted strings get a text field; changed text is escaped as a Lua literal.
 Complex escape sequences, long strings and concatenations remain literal expressions.
 Color expressions and non-base color values remain expressions; base integer colors
-can still be stepped through the palette. PIKOOS does not impose 0–15 as a universal
+can still be stepped through the palette. PikoNest does not impose 0–15 as a universal
 PICO-8 color-expression limit.
 
 Other valid call arities, optional arguments, wider `spr` calls, multiple statements,

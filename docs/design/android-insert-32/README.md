@@ -96,7 +96,7 @@ Proposal recovery format 2 reads format 1; undo history is still session-only.
 No general P8SCII input, syntax diagnosis, full API browser or scope-aware
 completion is claimed. Explanations are our own short contextual text based on the
 official [0.2.7 manual](https://www.lexaloffle.com/dl/docs/pico-8_manual.html), not a
-completed H01 reference/learning system. Standard carts gain no PIKOOS dependency.
+completed H01 reference/learning system. Standard carts gain no PikoNest dependency.
 
 Next: C03 context/project-symbol selection, followed by safe editing of existing
 parameters and C06/R03 to complete the first authoring acceptance scenario.

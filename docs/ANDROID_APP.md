@@ -4,7 +4,7 @@
 
 ## Current delivery target
 
-PIKOOS is currently developed and delivered as an installable Android APK.
+PikoNest is currently developed and delivered as an installable Android APK.
 Retroid Pocket Classic is the available physical reference device. Linux handhelds
 are occupied by the owner's TrainerOS development: Linux implementation/testing
 is deferred, not an Android completion gate. Portable core and replaceable
@@ -44,7 +44,7 @@ needed for this stage.
 ## External launcher requirement
 
 The owner wants to select a game in a third-party Android launcher and have
-PIKOOS run it using the user's official PICO-8. The ordinary PIKOOS app icon still
+PikoNest run it using the user's official PICO-8. The ordinary PikoNest app icon still
 opens Play. External play must bypass shelf selection and editor import, preserve
 the original `.p8` / `.p8.png`, and reuse the same runtime launch workflow.
 
@@ -73,9 +73,13 @@ and [file sharing](https://developer.android.com/training/secure-file-sharing/sh
 Lab 0.0.25 implements the explicit entry and scoped path adapter described below.
 Do not assume every launcher supplies the same request or that an absolute path
 grants access. Scope any path adapter to existing authorized storage. Do not
-register PIKOOS indiscriminately for all pictures merely because carts use PNG.
+register PikoNest indiscriminately for all pictures merely because carts use PNG.
 
 ## Tested lab entry (0.0.25)
+
+The project is now PikoNest. Installed APK labels and launcher profiles below
+still use PIKOOS; keep those exact names and identifiers until the separate
+[migration](PROJECT_NAME.md).
 
 Explicit component: `art.pikoos.runtimelab/art.pikoos.runtimelab.LaunchActivity`.
 It is separate from the app's Play/editor task. It accepts VIEW/MAIN with a
@@ -109,7 +113,7 @@ the wrapper's [frontend documentation](https://github.com/Macs75/pico8-android/w
 
 ### Retroid Launcher beta 1.16 (2025-0618-1139)
 
-Create a custom PIKOOS platform/configuration:
+Create a custom PikoNest platform/configuration:
 
 | Field | Value |
 | --- | --- |
@@ -123,9 +127,9 @@ Create a custom PIKOOS platform/configuration:
 Add the Games directory, select it in Synchronize and scan. These fields were
 confirmed against the installed launcher and actual launches. Retroid extracts
 the final extension, so `p8.png` is not a suffix here; unrelated PNGs can appear,
-and PIKOOS still validates their format. Unknown homebrew metadata may report
+and PikoNest still validates their format. Unknown homebrew metadata may report
 matching failures even though the game files were indexed. Choose **Safely Open**
-when Retroid reports the PIKOOS process already running. Force Open is unnecessary
+when Retroid reports the PikoNest process already running. Force Open is unnecessary
 and is not part of the tested workflow.
 
 Both real launcher shelves now reach official PICO-8 and return to their selected
@@ -182,7 +186,7 @@ requirements, not optional post-release Linux work.
 
 ### Controller return — lab 0.0.37 / adapter 6
 
-For sessions dispatched by this host, Select or Android Back opens the PIKOOS
+For sessions dispatched by this host, Select or Android Back opens the PikoNest
 game menu. D-pad or vertical hat/stick selects Continue/Finish; A confirms and B
 cancels (following the workshop's A/B preference). Touch buttons and keyboard
 Enter/Escape are alternatives. The initial selection always continues the game.

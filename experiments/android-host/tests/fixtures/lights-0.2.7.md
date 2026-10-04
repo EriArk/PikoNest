@@ -12,7 +12,7 @@ SHA-256: `11bb25685b0811ae858c9a8f7265c96a83a0f1d253008c0e10d6b485ab8f791e`.
 PNG dimensions 160×205, RGBA8, data version 43. Label starts at (16,24).
 `P8PngTest` compares every cover RGB pixel against JDK ImageIO, independently
 checks all five filter types, and rejects corrupt/unsupported/budget-exceeding data.
-The PNG was also launched unchanged via PIKOOS on the device and played.
+The PNG was also launched unchanged via PikoNest on the device and played.
 
 The [official manual](https://www.lexaloffle.com/dl/docs/pico-8_manual.html)
 documents PNG carts, label capture and EXPORT. The

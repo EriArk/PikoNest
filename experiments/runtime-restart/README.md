@@ -3,7 +3,7 @@
 2026-10-03. Bounded bootstrap fix for the upstream Android wrapper
 ([Macs75/pico8-android](https://github.com/Macs75/pico8-android), release 1.6.6).
 This remains a separate Android research adapter, not a production runtime
-architecture or a new framework choice for PIKOOS.
+architecture or a new framework choice for PikoNest.
 
 Revision 8 (`1.6.6-pikoos.8`, host 0.0.41) changes only our menu typography to
 Monocraft/OFL and shortens two explanations to fit. Session/input/exit behavior
@@ -211,7 +211,7 @@ Install the test APK alongside `io.wip.pico8`; do not uninstall or replace the
 original wrapper. Grant storage access and import the user's archive. Both use
 the existing `Documents/pico8` public data directory, so run only one at a time.
 The original app's private settings are not migrated or replaced. First-run
-copies/preparation are still upstream behavior, not the PIKOOS setup wizard.
+copies/preparation are still upstream behavior, not the PikoNest setup wizard.
 Upstream caches bootstrap version 26 in private storage. Updating this APK alone
 does not guarantee replacement of previously extracted scripts: verify their
 hashes when developing a later patch. This build was first installed under a new
