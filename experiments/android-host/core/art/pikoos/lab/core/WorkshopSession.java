@@ -89,6 +89,7 @@ public final class WorkshopSession {
     public void codeCommand(int command){
         if(presets!=null)return;
         if(mode!=Mode.CODE||codeDraft==null)return;
+        if(codeDraft.panel==LuaDraft.Panel.LAYERS)return;
         if(codeDraft.proposal()||codeDraft.panel==LuaDraft.Panel.NAVIGATION||codeDraft.panel==LuaDraft.Panel.SPRITE||codeDraft.panel==LuaDraft.Panel.ANIMATION||codeDraft.panel==LuaDraft.Panel.BRANCHES||codeDraft.panel==LuaDraft.Panel.ACTIONS)return;
         try{
             LuaDraft d=codeDraft;
@@ -117,6 +118,7 @@ public final class WorkshopSession {
                 case 21:d.goBack();break;
                 case 22:d.panel=LuaDraft.Panel.CURSOR;diagnostic=null;diagnosticPending=false;diagnosticDetails=false;mode=Mode.DIAGNOSTIC;return;
                 case 23:d.beginBranches();return;
+                case 24:d.beginLayers();return;
                 default:return;
             }
             d.panel=LuaDraft.Panel.CURSOR;
@@ -162,6 +164,7 @@ public final class WorkshopSession {
             if(toolCatalogue.items().isEmpty()){if(action==Action.CANCEL)d.cancelInsert();return;}
             if(action==Action.CONFIRM){
                 if(i.item().id.equals("branches"))d.beginBranches();
+                else if(i.item().id.equals("background_layers"))d.beginLayers();
                 else if(d.branchInsertion()&&(i.item().id.equals("sspr")||i.item().id.equals("animation")))throw new IllegalArgumentException("Для визуального размещения сначала открой код ветви. Здесь доступна форма spr и другие действия.");
                 else if(i.item().id.equals("sspr"))d.beginSprite(selection());else if(i.item().id.equals("animation"))d.beginAnimation(selection());else {if(i.backgroundRecipe())BackgroundLayer.setRegion(i,selection());i.screen=LuaInsert.Screen.FIELDS;}
             }
@@ -180,12 +183,33 @@ public final class WorkshopSession {
         if(action==Action.UNDO&&i.cameraMode())i.switchCameraMode();
         if(action==Action.CONTEXT){if(i.fullPreview()&&!i.canBrowse())i.beginPreview();else i.beginSymbols(d.text());}
         if(action==Action.CONFIRM){if(i.field==i.item().fields.length){if(i.fullPreview())i.beginPreview();else d.applyInsert();}else i.beginText();}
-        if(action==Action.CANCEL){if(d.callEdit!=null)d.cancelInsert();else i.screen=LuaInsert.Screen.CATALOG;}
+        if(action==Action.CANCEL){if(d.callEdit!=null||d.layerForm())d.cancelInsert();else i.screen=LuaInsert.Screen.CATALOG;}
         // Start is intentionally not a launch/commit shortcut while reviewing a proposal.
     }
     private void codeAction(Action action)throws Exception{
         if(presets!=null){presets.act(action);if(presets.closed)presets=null;return;}
         LuaDraft d=codeDraft;
+        if(d.panel==LuaDraft.Panel.LAYERS){
+            if(d.layerChange!=null){
+                if(action==Action.CONTEXT)d.layerBefore=!d.layerBefore;
+                if(action==Action.CONFIRM)d.applyLayer();
+                if(action==Action.CANCEL){d.layerChange=null;d.layerBefore=false;}
+                return;
+            }
+            if(d.layerMenu>=0){
+                if(action==Action.UP)d.layerMenu=Math.max(0,d.layerMenu-1);if(action==Action.DOWN)d.layerMenu=Math.min(4,d.layerMenu+1);
+                if(action==Action.CONFIRM){if(d.layerMenu==4)d.newLayer(selection());else d.reviewLayer();}if(action==Action.CANCEL)d.layerMenu=-1;
+                return;
+            }
+            if(action==Action.UP)d.layers.move(-1);if(action==Action.DOWN)d.layers.move(1);
+            if(action==Action.LEFT)d.layers.move(-4);if(action==Action.RIGHT)d.layers.move(4);
+            if(action==Action.CONFIRM)d.openLayer(false);if(action==Action.CONTEXT)d.openLayer(true);
+            if(action==Action.MENU&&d.layers.current()!=null)d.layerMenu=0;
+            if(action==Action.NEXT)d.newLayer(selection());
+            if(action==Action.UNDO)d.layerHistory(false);if(action==Action.REDO)d.layerHistory(true);
+            if(action==Action.CANCEL)d.cancelLayers();
+            return;
+        }
         if(d.backgroundPicker!=null){
             SpritePlacement pick=d.backgroundPicker;
             if(action==Action.LEFT)pick.move(-1,0);if(action==Action.RIGHT)pick.move(1,0);if(action==Action.UP)pick.move(0,-1);if(action==Action.DOWN)pick.move(0,1);

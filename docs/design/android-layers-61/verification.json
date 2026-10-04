@@ -1,0 +1,15 @@
+{
+  "version": "0.0.61",
+  "version_code": 61,
+  "apk_sha256": "956c8f8f1e65c6736b4cae590972c630acbb55a3e1a3c4c16dd9583b042a93c1",
+  "apk_bytes": 344996,
+  "device": "Retroid Pocket Classic",
+  "serial": "MC94516AQF040305380",
+  "official_runtime": "0.2.7",
+  "scenario": "Controller events: create, duplicate, edit, reorder, remove, undo/redo, restart; overlapping layers before/after in official runtime",
+  "core_tests": 95,
+  "release": false,
+  "physical_acceptance": false,
+  "display": "Physical size: 1080x1240",
+  "music_volume_state": "STREAM_MUSIC:\r\n   Muted: true\r\n   Muted Internally: false\r\n   Min: 0\r\n   Max: 15\r\n   streamVolume:0\r\n   Current: 2 (speaker): 9, 100 (bt_a2dp_hp): 1, 4000000 (usb_headset): 1, 20000000 (ble_headset): 1, 20000002 (ble_broadcast): 1, 40000000 (default): 5\r\n   Devices: speaker(2)\r\n   Volume Group: AUDIO_STREAM_M"
+}

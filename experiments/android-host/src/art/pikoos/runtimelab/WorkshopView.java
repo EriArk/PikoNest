@@ -428,6 +428,7 @@ final class WorkshopView extends View {
     }
     private void luaEditor(){
         if(s.presets!=null){presetLibrary();return;}
+        if(s.codeDraft.panel==LuaDraft.Panel.LAYERS){backgroundLayers();return;}
         if(s.codeDraft.backgroundPicker!=null){hits.clear();regionPicker(s.codeDraft.backgroundPicker,"Область фонового слоя");return;}
         if(s.codeDraft.panel==LuaDraft.Panel.ACTIONS){luaActions();return;}
         LuaDraft d=s.codeDraft;
@@ -682,6 +683,59 @@ final class WorkshopView extends View {
         fitted("↑↓ все поля · "+(panel.scroll+1)+" / "+form.item().fields.length,16,bodyBottom-64,16,6,w-32);
         wrapped(panel.saving?"Сохранится набор. Код не изменится.":"Сначала в форму. Код — после её подтверждения.",16,bodyBottom-40,16,7,w-32,2);
         rect(0,bodyBottom,w,44,0);key(ok()+(panel.saving?" сохранить":" в форму"),12,bodyBottom,10,()->action(Action.CONFIRM));key(back()+" назад",w/2,bodyBottom,6,()->action(Action.CANCEL));
+    }
+    private void backgroundLayerCard(art.pikoos.lab.core.BackgroundLayers list,int index,float y,boolean selected,boolean interactive){
+        LuaInsert form=list.entries.get(index).form;
+        rect(16,y,w-32,70,selected?2:0);
+        animationImage(art.pikoos.lab.core.BackgroundLayer.region(form),22,y+7,56);
+        fitted(list.title(index),88,y+25,20,selected?10:7,w-112);
+        fitted(list.detail(index),88,y+51,16,6,w-112);
+        if(interactive)hit(16,y,w-32,70,()->{s.codeDraft.layers.index=index;changed.run();invalidate();});
+    }
+    private void backgroundLayers(){
+        LuaDraft d=s.codeDraft;art.pikoos.lab.core.BackgroundLayers list=d.layers;hits.clear();
+        fitted("Фон · слои",16,75,24,14,w-32);
+        fitted("Порядок кода: позже — спереди",16,100,16,6,w-32);
+        boolean review=d.layerChange!=null;
+        if(review){
+            art.pikoos.lab.core.BackgroundLayers.Change change=d.layerChange;
+            art.pikoos.lab.core.BackgroundLayers shown=d.layerBefore?list:new art.pikoos.lab.core.BackgroundLayers(change.result,change.point);
+            String operation=change.direction==2?"Копия слоя "+(change.from+1):change.direction==3?"Удалить слой "+(change.from+1):"Слой "+(change.from+1)+" → "+(change.to+1);
+            fitted((d.layerBefore?"Было":"Будет")+" · "+operation,16,138,20,d.layerBefore?6:10,w-32);
+            int first=Math.max(0,Math.min(Math.min(change.from,change.to),shown.entries.size()-2));
+            for(int n=0;n<2&&first+n<shown.entries.size();n++)backgroundLayerCard(shown,first+n,154+n*78,shown.index==first+n,false);
+            if(shown.entries.isEmpty())fitted("Фоновых полос не останется",16,190,20,14,w-32);
+            String explanation=change.direction==2?"Копия появится сразу за выбранным слоем.":change.direction==3?"Удалится только этот блок Lua. Ресурсы сохранятся.":"Эти полосы поменяются местами. Остальной код сохранится.";
+            wrapped(explanation,16,324,16,7,w-32,2);
+            key(d.layerBefore?"X результат":"X исходный порядок",16,bodyBottom-60,12,()->action(Action.CONTEXT));
+        }else if(d.layerMenu>=0){
+            fitted("Слой "+(list.index+1)+" · порядок",16,142,20,10,w-32);
+            String[] options={"На слой назад","На слой вперёд","Дублировать","Удалить","Добавить новый"};
+            for(int n=0;n<5;n++){final int choice=n;button(options[n],16,156+n*38,w-32,32,d.layerMenu==n,()->{d.layerMenu=choice;action(Action.CONFIRM);});}
+            String reason=d.layerMenu==4?"":list.blocked(d.layerMenu==0?-1:d.layerMenu);
+            wrapped(reason.isEmpty()?d.layerMenu==4?"Откроется форма нового слоя. Вставка — после выбранного.":"Сначала просмотр, затем подтверждение.":reason,16,354,16,reason.isEmpty()?7:14,w-32,3);
+        }else if(list.current()==null){
+            wrapped("Известных фоновых полос пока нет. R откроет форму нового слоя у курсора Lua. Выбирай место в _draw после очистки и камеры.",16,156,20,7,w-32,7);
+            key("R добавить слой",16,bodyBottom-96,12,()->action(Action.NEXT));
+            key("Y отменить",16,bodyBottom-58,6,()->action(Action.UNDO));
+            key("R2 повтор",w/2,bodyBottom-58,6,()->action(Action.REDO));
+        }else{
+            int rows=Math.max(1,(int)((bodyBottom-230)/78));
+            int first=Math.max(0,Math.min(list.index-rows/2,list.entries.size()-rows));
+            for(int n=0;n<rows&&first+n<list.entries.size();n++)backgroundLayerCard(list,first+n,116+n*78,first+n==list.index,true);
+            fitted((list.index+1)+" / "+list.entries.size()+" · строка "+list.line(list.index),16,bodyBottom-94,16,12,w-32);
+            fitted("↑↓ выбор · Select: действия",16,bodyBottom-68,16,6,w-32);
+            hit(16,bodyBottom-87,w-32,26,()->action(Action.MENU));
+            fitted("R новый · Y отмена · R2 повтор",16,bodyBottom-42,16,6,w-32);
+            hit(16,bodyBottom-60,(w-32)/3,24,()->action(Action.NEXT));
+            hit(16+(w-32)/3,bodyBottom-60,(w-32)/3,24,()->action(Action.UNDO));
+            hit(16+2*(w-32)/3,bodyBottom-60,(w-32)/3,24,()->action(Action.REDO));
+            fitted("Распознанные полосы из Lua",16,bodyBottom-16,16,13,w-32);
+        }
+        rect(0,bodyBottom,w,44,0);
+        if(list.current()!=null)key(ok()+(review?" применить":d.layerMenu>=0?" просмотр":" поля"),12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" назад",d.layerMenu>=0?w/2:w/3,bodyBottom,6,()->action(Action.CANCEL));
+        if(d.layerMenu<0&&list.current()!=null)key("X Lua",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
     }
     private void luaActions(){
         if(s.codeDraft.actionMenu>=0){luaActionOptions();return;}

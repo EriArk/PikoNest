@@ -15,7 +15,7 @@ public final class ToolCatalogue {
         this.category=Math.max(0,Math.min(CATEGORIES.length-1,category));
     }
     private int group(String id){
-        if(id.startsWith("camera")||id.equals("background"))return 8;
+        if(id.startsWith("camera")||id.startsWith("background"))return 8;
         if(id.equals("animation"))return 7;
         if(id.equals("move_box")||id.equals("move_call")||id.equals("door_pair"))return 6;
         if(id.equals("map")||id.equals("solid")||id.equals("solid_box"))return 5;

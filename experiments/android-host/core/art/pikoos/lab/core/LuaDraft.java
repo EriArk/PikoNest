@@ -8,12 +8,12 @@ import java.util.ArrayDeque;
 
 /** Portable literal-text editor with explicit snippet proposals; never normalizes unrelated Lua. */
 public final class LuaDraft {
-    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS, NAVIGATION, SPRITE, ANIMATION, BRANCHES, ACTIONS }
+    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS, NAVIGATION, SPRITE, ANIMATION, BRANCHES, ACTIONS, LAYERS }
     public static final String[] PAGES={"abcdefghijklmnopqrstuvwxyz0123456789_ ",
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ ","()[]{}=+-*/%^#<>~!;:,.\"'\\|&?$@_ "};
     public static final String[] COMMANDS={"Сохранить и закрыть","Сохранить и тест","Новая строка","Пробел","Табуляция",
         "Стереть слева","Удалить справа","Начать / снять выделение","Выделить всё","Копировать","Вырезать","Вставить",
-        "Отменить правку","Вернуть правку","В начало строки","В конец строки","Закрыть черновик","Буквы / символы","Вставить конструкцию / API","Поля текущей строки","Перейти к функции / строке","Вернуться к месту перехода","Проверить запуск (4 секунды)","Действия условий"};
+        "Отменить правку","Вернуть правку","В начало строки","В конец строки","Закрыть черновик","Буквы / символы","Вставить конструкцию / API","Поля текущей строки","Перейти к функции / строке","Вернуться к месту перехода","Проверить запуск (4 секунды)","Действия условий","Фоновые слои"};
     private static final int LIMIT=2*1024*1024; // Lab memory guard, not a PICO-8 code budget.
     private final WorkshopCartridge original;
     private final int lua;
@@ -84,6 +84,48 @@ public final class LuaDraft {
     }
     public SpritePlacement placement;
     public SpritePlacement backgroundPicker;
+    public BackgroundLayers layers;
+    public BackgroundLayers.Change layerChange;
+    public int layerMenu=-1;
+    public boolean layerBefore;
+    private int layerReturn=-1;
+    public boolean layerForm(){return layerReturn>=0;}
+    public void beginLayers(){
+        if(selectionStart()!=selectionEnd())throw new IllegalArgumentException("Сними выделение перед списком слоёв");
+        insertion=null;callEdit=null;branchHeader=-1;layers=new BackgroundLayers(text,cursor);
+        layerMenu=-1;layerChange=null;layerBefore=false;layerReturn=-1;panel=Panel.LAYERS;
+    }
+    public void cancelLayers(){layers=null;layerMenu=-1;layerChange=null;layerBefore=false;panel=Panel.CURSOR;}
+    public void openLayer(boolean code){
+        if(layers==null||layers.current()==null)return;
+        if(!layers.source.equals(text))throw new IllegalArgumentException("Код изменился. Открой список заново.");
+        LuaCall call=layers.current();
+        if(cursor!=call.start||anchor>=0){if(jumps.size()==32)jumps.removeLast();jumps.push(new int[]{cursor,anchor});cursor=call.start;anchor=-1;}
+        layers=null;layerMenu=-1;layerChange=null;
+        if(code){panel=Panel.CURSOR;return;}
+        layerReturn=cursor;callEdit=call;insertion=call.form;panel=Panel.PARAMETERS;
+    }
+    public void reviewLayer(){if(layers!=null&&layerMenu>=0&&layerMenu<4){layerChange=layers.change(layerMenu==0?-1:layerMenu);layerBefore=false;}}
+    public void newLayer(SpriteRegion region){
+        if(layers==null)return;
+        LuaCall selected=layers.current();int at=cursor;
+        if(selected!=null){
+            if(selected.end>=text.length())throw new IllegalArgumentException("После слоя нет новой строки. Добавь её в Lua, затем открой список снова.");
+            at=next(selected.end);
+        }
+        point(lineOf(at),0);beginInsert();
+        layers=null;layerMenu=-1;layerChange=null;layerBefore=false;layerReturn=cursor;
+        for(int n=0;n<LuaInsert.ITEMS.length;n++)if(LuaInsert.ITEMS[n].id.equals("background"))insertion.choose(n);
+        BackgroundLayer.setRegion(insertion,region);insertion.screen=LuaInsert.Screen.FIELDS;
+    }
+    private int lineOf(int at){return text.substring(0,at).split("\r\n|\r|\n",-1).length-1;}
+    public void layerHistory(boolean returning){history(returning);beginLayers();}
+    public void applyLayer(){
+        if(layerChange==null)return;
+        if(!text.equals(layerChange.original))throw new IllegalArgumentException("Код изменился. Открой просмотр заново.");
+        if(!text.equals(layerChange.result)){remember(undo);redo.clear();changeText(layerChange.result);}
+        cursor=layerChange.point;anchor=-1;beginLayers();
+    }
     public void beginBackgroundPick(){if(insertion!=null&&insertion.backgroundRecipe())backgroundPicker=new SpritePlacement(BackgroundLayer.region(insertion));}
     public void acceptBackgroundPick(){if(backgroundPicker.phase==0){backgroundPicker.next();return;}BackgroundLayer.setRegion(insertion,backgroundPicker.source());backgroundPicker=null;}
     public void cancelBackgroundPick(){if(backgroundPicker.phase==1)backgroundPicker.phase=0;else backgroundPicker=null;}
@@ -282,9 +324,15 @@ public final class LuaDraft {
         String changed=text.substring(0,at)+inserted+text.substring(at);
         if(changed.getBytes(StandardCharsets.UTF_8).length>LIMIT)throw new IllegalArgumentException("Достигнут предел памяти черновика PIKOOS");
         int caret=tileProbe?0:insertion.item().block?at+inserted.indexOf(newline)+newline.length()+indent.length()+2:branchInsertion()?at+indent.length():at+inserted.length()+indent.length();
-        remember(undo);redo.clear();changeText(changed);cursor=caret;anchor=-1;insertion=null;branchHeader=-1;panel=Panel.CURSOR;
+        remember(undo);redo.clear();changeText(changed);cursor=caret;anchor=-1;
+        if(layerReturn>=0){layerReturn=at;cancelInsert();return;}
+        insertion=null;branchHeader=-1;panel=Panel.CURSOR;
     }
     public void cancelInsert(){
+        if(layerReturn>=0){
+            int at=layerReturn;layerReturn=-1;insertion=null;callEdit=null;backgroundPicker=null;
+            layers=new BackgroundLayers(text,at);layerMenu=-1;layerChange=null;panel=Panel.LAYERS;return;
+        }
         if(actionHeader>=0){
             actions=new LuaBranchActions(text,actionHeader,actionLine);actionHeader=actionLine=-1;
             insertion=null;callEdit=null;branchHeader=-1;panel=Panel.ACTIONS;return;
@@ -302,6 +350,15 @@ public final class LuaDraft {
     }
     /** Recovery snapshot, including original bytes for stale-draft detection. History is session-only. */
     public byte[] encode(){
+        if(layers!=null||layerReturn>=0)try{
+            BackgroundLayers list=layers;int target=layerReturn;Panel previous=panel;byte[] base;
+            layers=null;layerReturn=-1;if(list!=null)panel=Panel.CURSOR;
+            try{base=encode();}finally{layers=list;layerReturn=target;panel=previous;}
+            ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
+            out.writeInt(13);write(out,base);out.writeBoolean(list==null);
+            out.writeInt(list==null?target:list.index);out.writeInt(layerMenu);
+            out.writeBoolean(layerChange!=null);out.writeBoolean(layerBefore);out.close();return bytes.toByteArray();
+        }catch(IOException e){throw new IllegalStateException(e);}
         if(backgroundPicker!=null)try{
             SpritePlacement pick=backgroundPicker;backgroundPicker=null;byte[] base;
             try{base=encode();}finally{backgroundPicker=pick;}
@@ -338,7 +395,21 @@ public final class LuaDraft {
         }catch(IOException e){throw new IllegalStateException(e);}
     }
     public static LuaDraft restore(byte[] bytes){
-        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>12)throw new IOException("version");
+        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>13)throw new IOException("version");
+            if(version==13){
+                byte[] base=read(in);if(base.length<4||ByteBuffer.wrap(base).getInt()>=13)throw new IOException("nested layers");
+                LuaDraft d=restore(base);boolean editing=in.readBoolean();int choice=in.readInt(),menu=in.readInt();boolean review=in.readBoolean(),before=in.readBoolean();
+                if(menu< -1||menu>4||(!review&&before)||in.available()!=0)throw new IOException("layer state");
+                if(editing){
+                    if(!d.proposal()||d.insertion==null||!d.insertion.backgroundRecipe()||d.cursor!=choice||d.insertion.screen==LuaInsert.Screen.CATALOG||menu!=-1||review)throw new IOException("layer fields");
+                    d.layerReturn=choice;
+                }else{
+                    if(d.panel!=Panel.CURSOR)throw new IOException("layer list");d.beginLayers();
+                    if(choice<0||choice>=Math.max(1,d.layers.entries.size())||(menu>=0&&menu!=4&&d.layers.entries.isEmpty()))throw new IOException("layer choice");
+                    d.layers.index=choice;d.layerMenu=menu;
+                    if(review){if(menu<0||menu>3)throw new IOException("layer review");d.reviewLayer();}d.layerBefore=before;
+                }return d;
+            }
             if(version==12){
                 byte[] base=read(in);if(base.length<4||ByteBuffer.wrap(base).getInt()>=12)throw new IOException("nested picker");
                 LuaDraft d=restore(base);SpritePlacement pick=SpritePlacement.read(in);
@@ -395,7 +466,7 @@ public final class LuaDraft {
                 }
             }
             if((panel==Panel.BRANCHES.ordinal())!=(d.branches!=null))throw new IOException("branch panel");
-            if(panel==Panel.ACTIONS.ordinal())throw new IOException("missing action state");
+            if(panel==Panel.ACTIONS.ordinal()||panel==Panel.LAYERS.ordinal())throw new IOException("missing list state");
             if(in.available()!=0||!d.boundary(d.cursor)||(d.anchor!=-1&&!d.boundary(d.anchor))||d.page<0||d.page>=PAGES.length
                 ||d.key<0||d.key>=PAGES[d.page].length()||panel<0||panel>=Panel.values().length||d.menu<0||d.menu>=COMMANDS.length)throw new IOException("state");
             d.panel=Panel.values()[panel];if(d.proposal()!=(d.insertion!=null))throw new IOException("insert state");

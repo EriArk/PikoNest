@@ -1,5 +1,10 @@
 # PIKOOS Android host experiment
 
+Version 0.0.61 adds a complete bounded background-strip management workflow:
+thumbnail list, edit/return, add, duplicate, delete, reorder adjacent recognized
+blocks, preview, Undo/Redo and recovery. Arbitrary intervening Lua/comments are
+never crossed by reordering. [Evidence](../../docs/design/android-layers-61/README.md).
+
 Version 0.0.60 adds the first horizontal background strip tool: controller sheet
 region selection, independent speed, camera parallax, visibility, reusable parameter
 presets and reopening the generated ordinary Lua. Multiple scoped blocks preserve

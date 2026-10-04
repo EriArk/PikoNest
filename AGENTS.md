@@ -418,6 +418,13 @@ The exact framework/language for the app has not been frozen by this document. D
 
 ## 14. Documentation discipline
 
+Owner workflow clarification (2026-10-04): batch development into complete user
+scenarios with several related operations. Do not end every tiny tool change with
+a full build/install/screenshot cycle. Use focused core checks during implementation,
+then build, install and capture evidence once for the completed batch. Repeat only
+when a failure, new change or unresolved concern requires it. Preserve meaningful
+verification and data safety without repetitive checks.
+
 ### Asset library, first-run setup and terminology
 
 Owner requirements: reusable user-created and extracted cartridge assets belong

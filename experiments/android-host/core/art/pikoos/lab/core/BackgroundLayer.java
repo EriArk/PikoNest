@@ -35,15 +35,22 @@ public final class BackgroundLayer {
         for(String api:new String[]{"camera","sspr","time","flr"})if(symbols.shadows(api)||context.defines(api))throw new IllegalArgumentException("API "+api+" переопределён. Фон не изменён.");
     }
     public static LuaCall find(String source,int point){
+        for(LuaCall call:all(source))if(point>=call.start&&point<call.end)return call;
+        return null;
+    }
+    public static List<LuaCall> all(String source){
+        List<LuaCall> result=new ArrayList<>();
         Matcher m=BLOCK.matcher(source);LuaContext context=new LuaContext(source);
         while(m.find()){
-            if(point<m.start()||point>=m.end()||!context.allowsLine(m.start()))continue;
+            if(!context.allowsLine(m.start()))continue;
             LuaInsert f=new LuaInsert();for(int n=0;n<LuaInsert.ITEMS.length;n++)if(LuaInsert.ITEMS[n].id.equals("background"))f.choose(n);
             f.editing=true;f.screen=LuaInsert.Screen.FIELDS;String[] values=new String[8];int[] from=new int[FIELDS.size()],to=new int[from.length],fields=new int[from.length];
-            for(int n=0;n<from.length;n++){int field=FIELDS.get(n);String v=m.group(n+1);if(values[field]!=null&&!values[field].equals(v))return null;values[field]=v;from[n]=m.start(n+1)-m.start();to[n]=m.end(n+1)-m.start();fields[n]=field;}
-            try{for(int n=0;n<8;n++)f.set(n,values[n]);validate(source,f);}catch(IllegalArgumentException e){return null;}
-            return new LuaCall(m.start(),m.end(),m.group(),"background",from,to,f,fields);
-        }return null;
+            boolean consistent=true;
+            for(int n=0;n<from.length;n++){int field=FIELDS.get(n);String v=m.group(n+1);if(values[field]!=null&&!values[field].equals(v))consistent=false;values[field]=v;from[n]=m.start(n+1)-m.start();to[n]=m.end(n+1)-m.start();fields[n]=field;}
+            if(!consistent)continue;
+            try{for(int n=0;n<8;n++)f.set(n,values[n]);validate(source,f);}catch(IllegalArgumentException e){continue;}
+            result.add(new LuaCall(m.start(),m.end(),m.group(),"background",from,to,f,fields));
+        }return result;
     }
     /** Illustrative preview at a specified clock/camera; standard palette and transparency. */
     public static int pixel(WorkshopCartridge cart,LuaInsert f,int x,int y,double seconds,double cameraX){

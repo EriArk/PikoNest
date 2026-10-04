@@ -51,7 +51,8 @@ public final class LuaInsert {
         new Item("branches","Условия · действия","Выбери ветвь существующего условия: открой её действия или добавь новое из каталога. Просмотр не меняет код.",false),
         new Item("background","Фон · полоса / параллакс","Область листа повторяется по горизонтали. Вставляй в _draw после cls(); более поздний слой рисуется поверх. Камера восстанавливается. 0 — экранный фон, 1 — движение вместе с миром.",false,
             f("Область листа","0",Kind.SHEET_POS),f("Лист Y","0",Kind.SHEET_POS),f("Ширина","16",Kind.SHEET_SIZE),f("Высота","16",Kind.SHEET_SIZE),
-            f("На экране Y","24",Kind.BG_Y),f("Скорость px/с","4",Kind.BG_SPEED),f("Параллакс","0.5",Kind.BG_FACTOR),f("Видимость","true",Kind.BG_VISIBLE))
+            f("На экране Y","24",Kind.BG_Y),f("Скорость px/с","4",Kind.BG_SPEED),f("Параллакс","0.5",Kind.BG_FACTOR),f("Видимость","true",Kind.BG_VISIBLE)),
+        new Item("background_layers","Фон · список слоёв","Открой настройки известного слоя или поменяй порядок соседних полос. Позже нарисованный слой оказывается спереди. Незнакомый Lua остаётся в исходном редакторе.",false)
     };
     public Screen screen=Screen.CATALOG;
     public int selected,field,page,key;
@@ -180,6 +181,7 @@ public final class LuaInsert {
     public void changePage(int delta){page=(page+delta+3)%3;key=Math.min(key,LuaDraft.PAGES[page].length()-1);}
     public String functionName(){return selected<3?new String[]{"_init","_update","_draw"}[selected]:item().id.equals("function")?values[0]:null;}
     public String code(){
+        if(item().id.equals("background_layers"))throw new IllegalArgumentException("Открой список фоновых слоёв");
         if(item().id.equals("branches"))throw new IllegalArgumentException("Выбери ветвь в списке условий");
         if(item().id.equals("animation"))throw new IllegalArgumentException("Открой визуальный выбор кадров");
         if(item().id.equals("camera_reset"))return "camera()\n";
