@@ -48,6 +48,22 @@ public final class WorkshopSession {
     public void restoreUses(byte[] bytes){uses=GameUses.restore(bytes,cart);tool=uses.returnTool;mode=Mode.USES;}
     private void usesAction(Action action)throws Exception{
         GameUses g=uses;
+        if(g.screen==GameUses.Screen.ANIMATION){
+            SpriteAnimation a=g.animation;
+            if(a.picker!=null){
+                if(action==Action.LEFT)a.picker.move(-1,0);if(action==Action.RIGHT)a.picker.move(1,0);
+                if(action==Action.UP)a.picker.move(0,-1);if(action==Action.DOWN)a.picker.move(0,1);
+                if(action==Action.CONTEXT||action==Action.PREVIOUS||action==Action.NEXT)a.picker.toggleStep();
+                if(action==Action.CONFIRM)a.acceptPick();if(action==Action.CANCEL)a.cancelPick();
+            }else{
+                if(action==Action.UP)a.field=Math.max(0,a.field-1);if(action==Action.DOWN)a.field=Math.min(8,a.field+1);
+                if(action==Action.LEFT)a.change(-1);if(action==Action.RIGHT)a.change(1);
+                if(action==Action.PREVIOUS)a.select(a.selected-1);if(action==Action.NEXT)a.select(a.selected+1);
+                if(action==Action.CONTEXT)a.toggle();if(action==Action.UNDO)a.stop();
+                if(action==Action.CONFIRM){if(a.field==8)g.review();else a.choose();}
+                if(action==Action.CANCEL)g.back();
+            }return;
+        }
         if(g.screen==GameUses.Screen.PICK){
             if(action==Action.LEFT)g.picker.move(-1,0);if(action==Action.RIGHT)g.picker.move(1,0);
             if(action==Action.UP)g.picker.move(0,-1);if(action==Action.DOWN)g.picker.move(0,1);
@@ -66,13 +82,14 @@ public final class WorkshopSession {
             if(action==Action.CONTEXT)g.pick();if(action==Action.CONFIRM)g.review();if(action==Action.CANCEL)g.back();return;
         }
         if(g.screen==GameUses.Screen.MENU){
-            if(action==Action.UP)g.menu=Math.max(0,g.menu-1);if(action==Action.DOWN)g.menu=Math.min(5,g.menu+1);
+            if(action==Action.UP)g.menu=Math.max(0,g.menu-1);if(action==Action.DOWN)g.menu=Math.min(7,g.menu+1);
             if(action==Action.CANCEL||action==Action.MENU){g.screen=GameUses.Screen.LIST;return;}
             if(action==Action.CONFIRM){
                 if(g.menu==0)g.addSprite(selection());if(g.menu==1)g.addMap(mapEditor.x,mapEditor.y);
                 if(g.menu==2)g.duplicate();if(g.menu==3)g.delete();
-                if(g.menu==4){GameUses.Entry e=g.current();int at=e==null?0:e.call.start;uses=null;tool=1;beginCode();codeDraft.point(g.source.substring(0,at).split("\r\n|\r|\n",-1).length-1,0);}
+                if(g.menu==4){GameUses.Entry e=g.current();int at=e==null?0:e.start();uses=null;tool=1;beginCode();codeDraft.point(g.source.substring(0,at).split("\r\n|\r|\n",-1).length-1,0);}
                 if(g.menu==5)g.screen=GameUses.Screen.LIST;
+                if(g.menu==6)g.addAnimation(selection());if(g.menu==7)g.animateSelected();
             }return;
         }
         if(action==Action.UP)g.move(-1);if(action==Action.DOWN)g.move(1);

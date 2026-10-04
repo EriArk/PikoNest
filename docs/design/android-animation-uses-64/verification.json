@@ -1,0 +1,49 @@
+{
+  "build": "0.0.64",
+  "core_checks": 81,
+  "old_files": 46,
+  "after_files": 47,
+  "changed_old_files": [],
+  "added_files": [
+    "files/projects/remix-0028/game.p8"
+  ],
+  "cart_sha256": "7edb6c0391840a8e19e2b5fc9d0ac8b114838dcf6e95e75bf895ef63e3bf25b9",
+  "apk_sha256": "0f3c9e60784976b2d669909d483b1bf053aa61fc715857668b1d22c94bc1d0df",
+  "runtime": "official PICO-8 0.2.7 / Runtime Test 8",
+  "runtime_frames_checked": 8,
+  "pixels_per_frame": 16384,
+  "mismatches": 0,
+  "observed_animation_frames": [
+    1,
+    2,
+    1,
+    2,
+    1,
+    1,
+    2,
+    1
+  ],
+  "resource_sections_byte_identical": true,
+  "input": "ADB controller events; copied project and all animation edits through UI, no Lua editor or source injection",
+  "checked": [
+    "convert sprite preserving position",
+    "two frame regions",
+    "duration edit",
+    "form cold recovery",
+    "native and compact UI",
+    "preview play/pause",
+    "duplicate with independent position",
+    "delete cancel/Undo",
+    "conversion Undo/Redo",
+    "Test return",
+    "all prior project/library files preserved"
+  ],
+  "limits": [
+    "recognized flat draw blocks only",
+    "32 frames is current editor limit",
+    "time since cartridge run, no state/event restart binding",
+    "Undo remains in memory",
+    "cold start opens Play before Workshop resume",
+    "physical controller acceptance pending"
+  ]
+}

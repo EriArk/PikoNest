@@ -138,6 +138,7 @@ final class WorkshopView extends View {
         if(w>550) text("маленькая мастерская",width("PIKOOS",28)+28,28,16,14);
         boolean draft=(s.uses!=null&&(s.uses.screen==GameUses.Screen.FORM||s.uses.screen==GameUses.Screen.REVIEW||s.uses.screen==GameUses.Screen.PICK))||s.flagDraft!=null||s.mapEditor.pending()||s.codeDraft!=null||s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
         draft|=s.mapEditor.region!=null;
+        draft|=s.uses!=null&&s.uses.screen==GameUses.Screen.ANIMATION;
         String status=s.mode==Mode.ERROR?"Ошибка":draft?"Правка":"Сохранено";
         fitted(status,Math.max(150,w-158),27,16,draft?10:7,108);
         rect(w-174,19,6,6,draft?10:11);
@@ -589,14 +590,14 @@ final class WorkshopView extends View {
         c.drawBitmap(sceneBitmap,new android.graphics.Rect(r.x,r.y,r.x+r.width,r.y+r.height),new RectF(ox,oy,ox+r.width*zoom,oy+r.height*zoom),p);
     }
     private void animationEditor(){
-        LuaDraft d=s.codeDraft;SpriteAnimation a=d.animation;hits.clear();
+        LuaDraft d=s.codeDraft;boolean managed=s.uses!=null&&s.mode!=Mode.CODE;SpriteAnimation a=managed?s.uses.animation:d.animation;hits.clear();
         if(a.picker!=null){animationClock=0;animationPicker(a);return;}
         if(a.review){animationClock=0;animationReview(a);return;}
         long now=SystemClock.uptimeMillis();
-        if(a.playing&&s.mode==Mode.CODE&&getWindowVisibility()==VISIBLE){if(animationClock!=0)a.advance((int)Math.min(100,now-animationClock));animationClock=now;if(a.playing)postInvalidateDelayed(16);}
+        if(a.playing&&(s.mode==Mode.CODE||s.mode==Mode.USES)&&getWindowVisibility()==VISIBLE){if(animationClock!=0)a.advance((int)Math.min(100,now-animationClock));animationClock=now;if(a.playing)postInvalidateDelayed(16);}
         else animationClock=0;
-        fitted(d.animationEdit==null?"Анимация · кадры":"Анимация · правка",16,75,24,14,w-32);
-        fitted(d.animationEdit!=null?"Блок "+d.animationEdit.firstLine+"–"+d.animationEdit.lastLine:w<500?"Просмотр без кода игры":"Предпросмотр · без кода игры",16,100,16,6,w-32);
+        fitted(managed?"Анимация · кадры":d.animationEdit==null?"Анимация · кадры":"Анимация · правка",16,75,24,14,w-32);
+        fitted(managed?(s.uses.converting?"Заменит выбранный спрайт":s.uses.creating?"Новая анимация в игре":"Правка выбранной анимации"):d.animationEdit!=null?"Блок "+d.animationEdit.firstLine+"–"+d.animationEdit.lastLine:w<500?"Просмотр без кода игры":"Предпросмотр · без кода игры",16,100,16,6,w-32);
         animationImage(a.frame(a.visibleFrame()).region,16,112,96,a.previewWidth(),a.previewHeight());
         fitted((a.playing?"Играет ":"Пауза ")+(a.visibleFrame()+1),128,130,18,10,w-144);
         int firstThumb=Math.max(0,Math.min(a.selected-1,a.count()-3));float thumb=Math.min(48,(w-160)/3);
@@ -608,7 +609,7 @@ final class WorkshopView extends View {
         }
         int rows=Math.max(2,(int)((bodyBottom-290)/34));int first=Math.max(0,Math.min(a.field-rows/2,9-rows));
         for(int n=0;n<rows&&first+n<9;n++){final int row=first+n;
-            button(a.label(row),16,228+n*34,w-32,30,a.field==row,()->{a.field=row;action(Action.CONFIRM);});}
+            button(managed&&row==8?"Проверить и сохранить":a.label(row),16,228+n*34,w-32,30,a.field==row,()->{a.field=row;action(Action.CONFIRM);});}
         fitted(w<500?"↑↓ поля · ←→ · L/R кадр":"↑↓ поле · ←→ менять · L/R кадр",16,bodyBottom-44,16,13,w-32);
         fitted("Y стоп · "+a.duration()+" мс всего",16,bodyBottom-20,16,6,w-32);
         hit(16,bodyBottom-38,w-32,32,()->action(Action.UNDO));
@@ -623,7 +624,7 @@ final class WorkshopView extends View {
     private void regionPicker(SpritePlacement v,String title){
         SpriteRegion r=v.source();
         fitted(title,16,75,24,14,w-32);
-        fitted(v.phase==0?"Первый угол · A дальше":v.phase==1?"Второй угол · A готово":"Внутри _draw после cls()",16,100,18,7,w-32);
+        fitted(v.phase==0?"Первый угол · A дальше":v.phase==1?"Второй угол · A готово":s.uses!=null?"Положение в игре":"Внутри _draw после cls()",16,100,18,7,w-32);
         float size=Math.min(256,Math.min(w-32,bodyBottom-256)),left=(w-size)/2,top=112,cell=size/128;
         placementArea=new RectF(left,top,left+size,top+size);
         for(int yy=0;yy<128;yy++)for(int xx=0;xx<128;xx++)sceneBitmap.setPixel(xx,yy,COLORS[v.phase<2?s.cart().sheetPixel(xx,yy):v.pixel(s.cart(),xx,yy)]);
@@ -684,8 +685,28 @@ final class WorkshopView extends View {
         key(back()+(v.phase==0?" отмена":" назад"),12,bodyBottom,6,()->action(Action.CANCEL));
         fitted(v.phase==3?"Test — потом":"↑↓←→ двигать",w/2,bodyBottom+28,18,13,w/2-12);
     }
+    private void animationUseReview(){
+        GameUses g=s.uses;SpriteAnimation a=g.animation;hits.clear();
+        fitted(g.deleting?"Убрать анимацию?":g.converting?"Оживить спрайт?":g.creating?"Добавить анимацию?":"Сохранить анимацию?",16,78,24,14,w-32);
+        fitted(g.deleting?"Кадры в спрайт-листе останутся":"Проверь кадры и положение",16,106,18,7,w-32);
+        float size=Math.min(224,Math.min((w-48)*.55f,bodyBottom-236)),left=16,top=128;
+        for(int yy=0;yy<128;yy++)for(int xx=0;xx<128;xx++)sceneBitmap.setPixel(xx,yy,COLORS[g.pixel(s.cart(),xx-a.x,yy-a.y)]);
+        c.drawBitmap(sceneBitmap,null,new RectF(left,top,left+size,top+size),p);outline(left-2,top-2,size+4,size+4,13);
+        float rx=left+size+16,rw=w-rx-16;
+        fitted("Кадров: "+a.count(),rx,150,18,10,rw);
+        fitted(a.duration()+" мс",rx,182,18,7,rw);
+        fitted(a.loop?"По кругу":"Один раз",rx,214,18,7,rw);
+        fitted("X "+a.x+" · Y "+a.y,rx,246,18,6,rw);
+        fitted("Эскиз · кадр "+(a.visibleFrame()+1),16,top+size+26,18,6,w-32);
+        fitted(g.deleting?"Убирается только это размещение":g.converting?"Положение спрайта сохранено":"В игре: отсчёт от запуска",16,bodyBottom-86,18,7,w-32);
+        fitted("Y отменит после сохранения",16,bodyBottom-62,16,13,w-32);
+        button(ok()+(g.deleting?" Убрать из игры":" Сохранить"),16,bodyBottom-48,w-32,38,true,()->action(Action.CONFIRM));
+        rect(0,bodyBottom,w,44,0);key(back()+" назад",12,bodyBottom,6,()->action(Action.CANCEL));
+    }
     private void gameUses(){
         GameUses g=s.uses;hits.clear();
+        if(g.screen==GameUses.Screen.ANIMATION){animationEditor();return;}
+        if(g.screen==GameUses.Screen.REVIEW&&g.animation!=null){animationUseReview();return;}
         fitted("В игре · размещения",16,76,26,14,w-32);
         if(g.screen==GameUses.Screen.PICK){
             rect(0,46,w,bodyBottom-46,1);
@@ -694,8 +715,9 @@ final class WorkshopView extends View {
             rect(0,bodyBottom,w,44,0);key(back()+" назад",12,bodyBottom,6,()->action(Action.CANCEL));key("X шаг "+g.picker.step,w/2,bodyBottom,10,()->action(Action.CONTEXT));return;
         }
         if(g.screen==GameUses.Screen.MENU){
-            String[] items={"Добавить спрайт","Добавить карту","Дублировать выбранное","Убрать использование","Открыть Lua (по желанию)","К списку"};
-            for(int i=0;i<items.length;i++){final int n=i;button(items[i],16,106+i*44,w-32,38,g.menu==i,()->{g.menu=n;action(Action.CONFIRM);});}
+            String[] items={"Добавить спрайт","Добавить карту","Дублировать выбранное","Убрать использование","Открыть Lua (по желанию)","К списку","Добавить анимацию","Оживить выбранный спрайт"};
+            int count=Math.max(3,(int)((bodyBottom-144)/44)),first=Math.max(0,Math.min(items.length-count,g.menu-count+1));
+            for(int row=0;row<count&&first+row<items.length;row++){final int n=first+row;button(items[n],16,106+row*44,w-32,38,g.menu==n,()->{g.menu=n;action(Action.CONFIRM);});}
             fitted("Пиксели и тайлы при удалении остаются",16,bodyBottom-12,16,6,w-32);
         }else if(g.screen==GameUses.Screen.LIST){
             fitted(g.entries.size()+" использований · сохранены в игре",16,102,16,6,w-32);
@@ -712,7 +734,7 @@ final class WorkshopView extends View {
                 final int at=first+n;GameUses.Entry e=g.entries.get(at);float y=116+n*58;
                 rect(16,y,w-32,52,g.index==at?2:0);if(g.index==at)outline(16,y,w-32,52,10);
                 fitted((at+1)+" · "+e.title(),28,y+23,20,g.index==at?10:7,w-56);
-                fitted("X "+e.x()+" · Y "+e.y()+" · "+(e.call.name.equals("map")?"область карты":"область листа"),28,y+44,16,6,w-56);
+                fitted("X "+e.x()+" · Y "+e.y()+" · "+(e.kind().equals("map")?"область карты":e.animation!=null?(e.animation.initial.loop?"по кругу":"один раз"):"область листа"),28,y+44,16,6,w-56);
                 hit(16,y,w-32,52,()->{g.index=at;action(Action.CONFIRM);});
             }
             button("R Добавить "+(s.tool==3?"карту":"спрайт"),16,bodyBottom-56,(w-40)/2,38,false,()->action(Action.NEXT));
@@ -1603,6 +1625,9 @@ final class WorkshopView extends View {
             }
             if(placementArea!=null&&placementArea.contains(x,y)&&s.mode==Mode.USES&&s.uses.picker!=null){
                 s.uses.picker.point((int)((x-placementArea.left)*128/placementArea.width()),(int)((y-placementArea.top)*128/placementArea.height()));changed.run();invalidate();return true;
+            }
+            if(placementArea!=null&&placementArea.contains(x,y)&&s.mode==Mode.USES&&s.uses.animation!=null&&s.uses.animation.picker!=null){
+                s.uses.animation.picker.point((int)((x-placementArea.left)*128/placementArea.width()),(int)((y-placementArea.top)*128/placementArea.height()));changed.run();invalidate();return true;
             }
             if(placementArea!=null&&placementArea.contains(x,y)&&s.mode==Mode.CODE&&s.codeDraft.backgroundPicker!=null){
                 s.codeDraft.backgroundPicker.point((int)((x-placementArea.left)*128/placementArea.width()),(int)((y-placementArea.top)*128/placementArea.height()));

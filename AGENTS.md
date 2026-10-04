@@ -153,8 +153,9 @@ genre templates. Reuse existing operations; do not keep adding recipe variants
 to one tool while other core tools or connections remain absent. Design resource
 dependencies now, populate reusable content later. See `docs/CORE_TOOLS.md` for
 the current audit. Bounded G04.2 exists in lab 0.0.62; map-region copy/move/clear
-with explicit shared-gfx review (G03.4) exists in 0.0.63. Next is existing-animation
-management and resource-use integration (N01/G04), followed by camera N02. Shared
+with explicit shared-gfx review (G03.4) exists in 0.0.63. Animation management and
+sprite-use conversion (N01.3/G04) exist in 0.0.64 for recognized flat draw blocks.
+Next is camera entry/management (N02/G04), then the connected M2 workflow. Shared
 sprite painting and map brushes remain unfinished G01/G03 work. N03.3 is deferred from the
 immediate queue. Preserve existing libraries, favorites and presets.
 
@@ -485,9 +486,10 @@ When a major decision is made:
 The foundation-first list below is the original bootstrap order. The launch,
 round-trip and bounded controller experiments now exist. Follow the current
 completion path in `docs/ROADMAP.md` and the basic-editor audit in `docs/CORE_TOOLS.md`:
-G04.2 now connects sprite/map editing to bounded creation and repeat editing of game
-uses in 0.0.62. Next complete basic map-region/shared-memory operations (G01/G03),
-alongside the remaining runtime/storage work.
+G04.2 connects sprite/map editing to game uses in 0.0.62; G03.4 adds map-region/shared
+review in 0.0.63 and N01.3 connects recognized animations to those uses in 0.0.64.
+Next complete the camera entry/management path N02/G04, alongside remaining
+runtime/storage work. Do not mistake time-since-run animations for state/event bindings.
 Do not keep extending launcher polish or template-specific controls as a substitute
 for missing general tools. Close tasks with explicit
 scope/evidence, and keep owner acceptance separate from technical test results.

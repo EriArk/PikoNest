@@ -1,5 +1,11 @@
 # PikoNest Android host experiment
 
+**0.0.64:** recognized animations in the common game-use list. Create from a sheet
+region or animate an existing sprite placement; edit frames, duplicate/remove,
+review, recover and Undo/Redo without opening Lua. Ordinary draw blocks retain
+time-since-run semantics; state/event bindings remain open.
+[Evidence and screenshots](../../docs/design/android-animation-uses-64/README.md).
+
 **0.0.63:** rectangular map copy/move/clear across the default 128x64 map.
 Snapshot-based overlap, preview/cancel, one Undo/Redo, draft recovery and explicit
 before/after confirmation for shared graphics. Ordinary map brushes and shared
