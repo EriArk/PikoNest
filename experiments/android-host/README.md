@@ -1,5 +1,10 @@
 # PIKOOS Android host experiment
 
+Version 0.0.58 adds individual action selection inside a condition branch. A opens
+supported parameter forms and returns to the same action on apply/cancel; X opens
+source. Nested/custom code stays intact. Action lists and pending forms recover
+after restart. [Evidence and limits](../../docs/design/android-actions-58/README.md).
+
 Version 0.0.57 adds cross-project sprite favorites: Y toggles the selected resource,
 L from All opens Favorites. Rename moves to Select → Y; category selection stays
 there. Old asset records remain byte-stable until changed; favorite metadata does

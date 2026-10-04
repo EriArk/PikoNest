@@ -89,7 +89,7 @@ public final class WorkshopSession {
     public void codeCommand(int command){
         if(presets!=null)return;
         if(mode!=Mode.CODE||codeDraft==null)return;
-        if(codeDraft.proposal()||codeDraft.panel==LuaDraft.Panel.NAVIGATION||codeDraft.panel==LuaDraft.Panel.SPRITE||codeDraft.panel==LuaDraft.Panel.ANIMATION||codeDraft.panel==LuaDraft.Panel.BRANCHES)return;
+        if(codeDraft.proposal()||codeDraft.panel==LuaDraft.Panel.NAVIGATION||codeDraft.panel==LuaDraft.Panel.SPRITE||codeDraft.panel==LuaDraft.Panel.ANIMATION||codeDraft.panel==LuaDraft.Panel.BRANCHES||codeDraft.panel==LuaDraft.Panel.ACTIONS)return;
         try{
             LuaDraft d=codeDraft;
             switch(command){
@@ -217,9 +217,16 @@ public final class WorkshopSession {
         if(d.panel==LuaDraft.Panel.BRANCHES){
             if(action==Action.UP)d.branches.move(-1);if(action==Action.DOWN)d.branches.move(1);
             if(action==Action.LEFT)d.branches.move(-5);if(action==Action.RIGHT)d.branches.move(5);
-            if(action==Action.CONFIRM)d.branchAction(false);
+            if(action==Action.CONFIRM)d.beginActions();
             if(action==Action.CONTEXT)d.branchAction(true);
             if(action==Action.CANCEL)d.cancelBranches();
+            return;
+        }
+        if(d.panel==LuaDraft.Panel.ACTIONS){
+            if(action==Action.UP)d.actions.move(-1);if(action==Action.DOWN)d.actions.move(1);
+            if(action==Action.LEFT)d.actions.move(-5);if(action==Action.RIGHT)d.actions.move(5);
+            if(action==Action.CONFIRM)d.openAction(false);if(action==Action.CONTEXT)d.openAction(true);
+            if(action==Action.CANCEL)d.actionsToBranches();
             return;
         }
         if(d.panel==LuaDraft.Panel.NAVIGATION){

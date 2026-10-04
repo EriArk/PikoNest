@@ -8,7 +8,7 @@ import java.util.ArrayDeque;
 
 /** Portable literal-text editor with explicit snippet proposals; never normalizes unrelated Lua. */
 public final class LuaDraft {
-    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS, NAVIGATION, SPRITE, ANIMATION, BRANCHES }
+    public enum Panel { CURSOR, KEYS, MENU, EXIT, INSERT, PARAMETERS, NAVIGATION, SPRITE, ANIMATION, BRANCHES, ACTIONS }
     public static final String[] PAGES={"abcdefghijklmnopqrstuvwxyz0123456789_ ",
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ ","()[]{}=+-*/%^#<>~!;:,.\"'\\|&?$@_ "};
     public static final String[] COMMANDS={"Сохранить и закрыть","Сохранить и тест","Новая строка","Пробел","Табуляция",
@@ -26,12 +26,34 @@ public final class LuaDraft {
     public LuaCall callEdit;
     public LuaNavigation navigation;
     public LuaBranches branches;
+    public LuaBranchActions actions;
+    private int actionHeader=-1,actionLine=-1;
+    public void beginActions(){
+        if(branches==null||branches.current()==null)return;
+        actions=new LuaBranchActions(text,branches.current().header,line());branches=null;panel=Panel.ACTIONS;
+    }
+    public void actionsToBranches(){
+        if(actions==null)return;int header=actions.header;beginBranches();
+        for(int n=0;n<branches.entries.size();n++)if(branches.entries.get(n).header==header)branches.index=n;
+    }
+    public void openAction(boolean code){
+        if(actions==null||actions.current()==null)return;
+        LuaBranchActions refreshed=new LuaBranchActions(text,actions.header,actions.current().line);
+        LuaBranchActions.Entry entry=refreshed.current();
+        if(entry==null||entry.line!=actions.current().line)throw new IllegalArgumentException("Действие изменилось. Открой список заново.");
+        int at=lineStart(entry.line);LuaCall call=null;
+        if(!code&&entry.fields)call=LuaCall.parse(text,at,lineEnd(entry.line));
+        if(at!=cursor||anchor>=0){if(jumps.size()==32)jumps.removeLast();jumps.push(new int[]{cursor,anchor});cursor=at;anchor=-1;}
+        if(call!=null){actionHeader=actions.header;actionLine=entry.line;callEdit=call;insertion=call.form;panel=Panel.PARAMETERS;}
+        else{actionHeader=actionLine=-1;panel=Panel.CURSOR;}
+        actions=null;
+    }
     private int branchHeader=-1;
     public boolean branchInsertion(){return branchHeader>=0;}
     public LuaBranches.Branch insertionBranch(){return branchHeader<0?null:new LuaBranches(text,line()).atHeader(branchHeader);}
     public void beginBranches(){
         if(selectionStart()!=selectionEnd())throw new IllegalArgumentException("Сними выделение перед выбором ветви");
-        insertion=null;callEdit=null;branchHeader=-1;branches=new LuaBranches(text,line());panel=Panel.BRANCHES;
+        insertion=null;callEdit=null;branchHeader=-1;actions=null;actionHeader=actionLine=-1;branches=new LuaBranches(text,line());panel=Panel.BRANCHES;
     }
     public void cancelBranches(){branches=null;panel=Panel.CURSOR;}
     public void branchAction(boolean insert){
@@ -241,6 +263,10 @@ public final class LuaDraft {
         remember(undo);redo.clear();changeText(changed);cursor=caret;anchor=-1;insertion=null;branchHeader=-1;panel=Panel.CURSOR;
     }
     public void cancelInsert(){
+        if(actionHeader>=0){
+            actions=new LuaBranchActions(text,actionHeader,actionLine);actionHeader=actionLine=-1;
+            insertion=null;callEdit=null;branchHeader=-1;panel=Panel.ACTIONS;return;
+        }
         int previousBranch=branchHeader;insertion=null;callEdit=null;branchHeader=-1;panel=Panel.CURSOR;
         if(previousBranch>=0){branches=new LuaBranches(text,previousBranch);for(int n=0;n<branches.entries.size();n++)if(branches.entries.get(n).header==previousBranch)branches.index=n;panel=Panel.BRANCHES;}
     }
@@ -254,10 +280,20 @@ public final class LuaDraft {
     }
     /** Recovery snapshot, including original bytes for stale-draft detection. History is session-only. */
     public byte[] encode(){
+        if(actions!=null||actionHeader>=0)try{
+            ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
+            out.writeInt(10);write(out,encodeBase(actions==null?panel:Panel.CURSOR));
+            out.writeInt(actions==null?actionHeader:actions.header);
+            out.writeInt(actions==null?actionLine:actions.current()==null?actions.header:actions.current().line);
+            out.writeBoolean(actions==null);out.close();return bytes.toByteArray();
+        }catch(IOException e){throw new IllegalStateException(e);}
+        return encodeBase(panel);
+    }
+    private byte[] encodeBase(Panel encodedPanel){
         try{ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream out=new DataOutputStream(bytes);
             boolean branchState=branches!=null||branchInsertion();
             boolean navState=branchState||animation!=null||placement!=null||navigation!=null||!jumps.isEmpty();out.writeInt(branchState?9:animationEdit!=null?8:animation!=null?7:placement!=null?6:navState?5:4);write(out,original.bytes());write(out,text.getBytes(StandardCharsets.UTF_8));
-            out.writeInt(cursor);out.writeInt(anchor);out.writeInt(page);out.writeInt(key);out.writeInt(panel.ordinal());out.writeInt(menu);
+            out.writeInt(cursor);out.writeInt(anchor);out.writeInt(page);out.writeInt(key);out.writeInt(encodedPanel.ordinal());out.writeInt(menu);
             write(out,clipboard.getBytes(StandardCharsets.UTF_8));out.writeBoolean(insertion!=null);if(insertion!=null)insertion.write(out);
             if(navState){
                 out.writeBoolean(navigation!=null);
@@ -272,7 +308,18 @@ public final class LuaDraft {
         }catch(IOException e){throw new IllegalStateException(e);}
     }
     public static LuaDraft restore(byte[] bytes){
-        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>9)throw new IOException("version");
+        try{DataInputStream in=new DataInputStream(new ByteArrayInputStream(bytes));int version=in.readInt();if(version<1||version>10)throw new IOException("version");
+            if(version==10){
+                byte[] base=read(in);if(base.length<4||ByteBuffer.wrap(base).getInt()>=10)throw new IOException("nested action state");
+                LuaDraft d=restore(base);int header=in.readInt(),line=in.readInt();boolean editing=in.readBoolean();
+                LuaBranchActions list=new LuaBranchActions(d.text,header,line);LuaBranchActions.Entry entry=list.current();
+                if(in.available()!=0||line<0||(entry==null?line!=header:entry.line!=line))throw new IOException("action selection");
+                if(editing){
+                    if(d.panel!=Panel.PARAMETERS||entry==null||!entry.fields||d.line()!=line)throw new IOException("action proposal");
+                    d.actionHeader=header;d.actionLine=line;
+                }else{if(d.panel!=Panel.CURSOR)throw new IOException("action list");d.actions=list;d.panel=Panel.ACTIONS;}
+                return d;
+            }
             LuaDraft d=new LuaDraft(new WorkshopCartridge(read(in)),0);d.text=decode(read(in));
             d.cursor=in.readInt();d.anchor=in.readInt();d.page=in.readInt();d.key=in.readInt();int panel=in.readInt();d.menu=in.readInt();
             d.clipboard=decode(read(in));
@@ -307,6 +354,7 @@ public final class LuaDraft {
                 }
             }
             if((panel==Panel.BRANCHES.ordinal())!=(d.branches!=null))throw new IOException("branch panel");
+            if(panel==Panel.ACTIONS.ordinal())throw new IOException("missing action state");
             if(in.available()!=0||!d.boundary(d.cursor)||(d.anchor!=-1&&!d.boundary(d.anchor))||d.page<0||d.page>=PAGES.length
                 ||d.key<0||d.key>=PAGES[d.page].length()||panel<0||panel>=Panel.values().length||d.menu<0||d.menu>=COMMANDS.length)throw new IOException("state");
             d.panel=Panel.values()[panel];if(d.proposal()!=(d.insertion!=null))throw new IOException("insert state");

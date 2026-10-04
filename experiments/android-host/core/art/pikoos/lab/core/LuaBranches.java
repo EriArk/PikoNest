@@ -17,11 +17,12 @@ public final class LuaBranches {
         }
     }
     private static final class Block {
-        final String kind,condition;Branch branch;boolean otherwise;
-        Block(String kind,String condition){this.kind=kind;this.condition=condition;}
+        final String kind,condition;final int start;Branch branch;boolean otherwise;
+        Block(String kind,String condition,int start){this.kind=kind;this.condition=condition;this.start=start;}
     }
     private static final Pattern BLOCK_WORD=Pattern.compile("\\b(if|then|else|elseif|end|function|for|while|do|repeat|until)\\b");
     public final List<Branch> entries;
+    final Map<Integer,Integer> blockEnds=new HashMap<>();
     public final String warning;
     public int index;
     public LuaBranches(String source,int cursorLine){
@@ -38,7 +39,7 @@ public final class LuaBranches {
                 // Their own bodies remain a source-editor operation in this slice.
                 if(inlineBlock(row))continue;
                 if(row.startsWith("if ")||row.startsWith("if(")){
-                    condition(row,"if");Block b=new Block("if",label(rows[n],row,"if"));
+                    condition(row,"if");Block b=new Block("if",label(rows[n],row,"if"),n);
                     b.branch=new Branch("Если · "+b.condition,rows[n],n,scope(stack));stack.push(b);found.add(b.branch);
                 }else if(row.startsWith("elseif ")||row.startsWith("elseif(")){
                     condition(row,"elseif");Block b=top(stack,"if");if(b.otherwise)throw new IllegalArgumentException();
@@ -48,21 +49,21 @@ public final class LuaBranches {
                     close(b.branch,n,mask);b.branch=new Branch("Иначе · "+b.condition,rows[n],n,b.branch.scope);found.add(b.branch);
                 }else if(row.equals("end")){
                     if(stack.isEmpty()||stack.peek().kind.equals("repeat"))throw new IllegalArgumentException();
-                    Block b=stack.pop();if(b.branch!=null)close(b.branch,n,mask);
-                }else if(row.matches("(?:local\\s+)?function\\s+[A-Za-z_][A-Za-z_0-9.:]*\\s*\\([^()]*\\)"))stack.push(new Block("function",row.substring(row.indexOf("function")+8,row.indexOf('(')).trim()));
+                    Block b=stack.pop();blockEnds.put(b.start,n+1);if(b.branch!=null)close(b.branch,n,mask);
+                }else if(row.matches("(?:local\\s+)?function\\s+[A-Za-z_][A-Za-z_0-9.:]*\\s*\\([^()]*\\)"))stack.push(new Block("function",row.substring(row.indexOf("function")+8,row.indexOf('(')).trim(),n));
                 else if((row.startsWith("for ")||row.startsWith("while ")||row.startsWith("while("))&&row.endsWith(" do")){
                     String middle=row.substring(row.startsWith("for ")?3:5,row.length()-3);
-                    if(BLOCK_WORD.matcher(middle).find())throw new IllegalArgumentException();stack.push(new Block("loop",""));
-                }else if(row.equals("do")||row.equals("repeat"))stack.push(new Block(row,""));
+                    if(BLOCK_WORD.matcher(middle).find())throw new IllegalArgumentException();stack.push(new Block("loop","",n));
+                }else if(row.equals("do")||row.equals("repeat"))stack.push(new Block(row,"",n));
                 else if(row.startsWith("until ")||row.startsWith("until(")){
-                    top(stack,"repeat");if(BLOCK_WORD.matcher(row.substring(5)).find())throw new IllegalArgumentException();stack.pop();
+                    top(stack,"repeat");if(BLOCK_WORD.matcher(row.substring(5)).find())throw new IllegalArgumentException();blockEnds.put(stack.pop().start,n+1);
                 }else{
                     if(BLOCK_WORD.matcher(row).find())throw new IllegalArgumentException();
                     if(!stack.isEmpty()&&stack.peek().branch!=null&&Pattern.compile("\\b(return|break|goto)\\b").matcher(row).find())stack.peek().branch.terminal=true;
                 }
             }
             if(!stack.isEmpty())throw new IllegalArgumentException();
-        }catch(IllegalArgumentException e){found.clear();problem="Нужны завершённые блоки с if/then, else и end на отдельных строках. Сокращённый Lua и #include открывай в коде.";}
+        }catch(IllegalArgumentException e){found.clear();blockEnds.clear();problem="Нужны завершённые блоки с if/then, else и end на отдельных строках. Сокращённый Lua и #include открывай в коде.";}
         found.sort(Comparator.comparingInt(b->b.header));entries=Collections.unmodifiableList(found);warning=problem;
         for(int n=0;n<entries.size();n++)if(entries.get(n).header<=cursorLine&&cursorLine<=entries.get(n).end)index=n;
     }

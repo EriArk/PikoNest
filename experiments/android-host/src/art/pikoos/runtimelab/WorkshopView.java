@@ -87,7 +87,7 @@ final class WorkshopView extends View {
             }
             return false;
         }
-        if(d.panel==LuaDraft.Panel.EXIT||d.panel==LuaDraft.Panel.MENU||d.panel==LuaDraft.Panel.NAVIGATION||d.panel==LuaDraft.Panel.BRANCHES)return false;
+        if(d.panel==LuaDraft.Panel.EXIT||d.panel==LuaDraft.Panel.MENU||d.panel==LuaDraft.Panel.NAVIGATION||d.panel==LuaDraft.Panel.BRANCHES||d.panel==LuaDraft.Panel.ACTIONS)return false;
         int key=event.getKeyCode(),command=-1;
         if(event.isCtrlPressed()){
             if(key==KeyEvent.KEYCODE_A)command=8;if(key==KeyEvent.KEYCODE_C)command=9;
@@ -428,6 +428,7 @@ final class WorkshopView extends View {
     }
     private void luaEditor(){
         if(s.presets!=null){presetLibrary();return;}
+        if(s.codeDraft.panel==LuaDraft.Panel.ACTIONS){luaActions();return;}
         LuaDraft d=s.codeDraft;
         if(d.panel==LuaDraft.Panel.BRANCHES){luaBranches();return;}
         if(d.panel==LuaDraft.Panel.ANIMATION){animationEditor();return;}
@@ -678,6 +679,30 @@ final class WorkshopView extends View {
         wrapped(panel.saving?"Сохранится набор. Код не изменится.":"Сначала в форму. Код — после её подтверждения.",16,bodyBottom-40,16,7,w-32,2);
         rect(0,bodyBottom,w,44,0);key(ok()+(panel.saving?" сохранить":" в форму"),12,bodyBottom,10,()->action(Action.CONFIRM));key(back()+" назад",w/2,bodyBottom,6,()->action(Action.CANCEL));
     }
+    private void luaActions(){
+        art.pikoos.lab.core.LuaBranchActions a=s.codeDraft.actions;hits.clear();
+        fitted("Действия ветви",16,75,24,14,w-32);
+        fitted(a.scope+" · "+a.title,16,100,16,6,w-32);
+        art.pikoos.lab.core.LuaBranchActions.Entry selected=a.current();
+        if(selected==null)wrapped("Здесь пока нет действий. Вернись к ветвям и нажми X, чтобы добавить первое.",16,160,20,7,w-32,5);
+        else{
+            float preview=bodyBottom-188;int rows=Math.max(1,(int)((preview-130)/36));
+            int first=Math.max(0,Math.min(a.index-rows/2,a.entries.size()-rows));
+            for(int r=0;r<rows&&first+r<a.entries.size();r++){
+                final int index=first+r;art.pikoos.lab.core.LuaBranchActions.Entry entry=a.entries.get(index);
+                button((entry.line+1)+" · "+entry.title,16,112+r*36,w-32,32,index==a.index,()->{a.index=index;changed.run();invalidate();});
+            }
+            rect(16,preview,w-32,118,0);
+            fitted((a.index+1)+" / "+a.entries.size()+" · "+(selected.fields?"Параметры доступны":"Открывается в Lua"),24,preview+22,16,12,w-48);
+            String[] lines=selected.source.split("\\r\\n|\\r|\\n");for(int n=0;n<3&&n<lines.length;n++)fitted(lines[n].trim(),24,preview+48+n*22,18,7,w-48);
+            fitted("↑↓ выбор · ←→ страница",16,bodyBottom-46,16,6,w-32);
+            fitted(selected.fields?"Форма → обратно к действию":"Вложенный / незнакомый Lua: в код",16,bodyBottom-18,16,13,w-32);
+        }
+        rect(0,bodyBottom,w,44,0);
+        if(selected!=null)key(ok()+(selected.fields?" поля":" код"),12,bodyBottom,10,()->action(Action.CONFIRM));
+        key(back()+" ветви",w/3,bodyBottom,6,()->action(Action.CANCEL));
+        if(selected!=null)key("X код",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
+    }
     private void luaBranches(){
         LuaDraft d=s.codeDraft;art.pikoos.lab.core.LuaBranches n=d.branches;hits.clear();
         fitted("Условия · действия",16,75,24,14,w-32);
@@ -697,10 +722,10 @@ final class WorkshopView extends View {
             if(b.first==b.header)fitted("Действий ещё нет",24,preview+50,18,6,w-48);
             else for(int row=0;row<3&&b.first+row<b.end;row++)fitted(d.lineText(b.first+row).trim(),24,preview+48+row*22,18,7,w-48);
             fitted(b.terminal?"Выход из ветви · правь в коде":w<500?"X: в конец ветви":"X: добавить в конец этой ветви",16,bodyBottom-46,16,6,w-32);
-            fitted(ok()+" код → L поля строки",16,bodyBottom-18,16,13,w-32);
+            fitted(ok()+" список действий",16,bodyBottom-18,16,13,w-32);
         }
         rect(0,bodyBottom,w,44,0);
-        if(b!=null)key(ok()+" код",12,bodyBottom,10,()->action(Action.CONFIRM));
+        if(b!=null)key(ok()+" список",12,bodyBottom,10,()->action(Action.CONFIRM));
         key(back()+" назад",w/3,bodyBottom,6,()->action(Action.CANCEL));
         if(b!=null&&!b.terminal)key(w<500?"X новое":"X добавить",w*2/3,bodyBottom,14,()->action(Action.CONTEXT));
     }
