@@ -1,6 +1,6 @@
 # Android 0.0.14 — картридж с собой
 
-Проверено 2026-10-03 на Retroid Pocket Classic, serial `MC94516AQF040305380`.
+Проверено 2026-10-03 на Retroid Pocket Classic, serial `DEVICE_SERIAL`.
 Это экспорт одного сохранённого `.p8` в выбранный внешний файл.
 
 ## Сценарий

@@ -62,14 +62,14 @@ Note: Recompile with -Xlint:deprecation for details.
 
 FullName                                                   Length
 --------                                                   ------
-D:\Projects\PikoOS\.local\artifacts\pikoos-runtime-lab.apk 324516
+<repo>\.local\artifacts\pikoos-runtime-lab.apk 324516
 
 
 
 
 Algorithm : SHA256
 Hash      : 72EBCC2BD79EC4CA68C18FC4ACA210D0A60F4387AD791754CA440DDD76333CFA
-Path      : D:\Projects\PikoOS\.local\artifacts\pikoos-runtime-lab.apk
+Path      : <repo>\.local\artifacts\pikoos-runtime-lab.apk
 
 
 

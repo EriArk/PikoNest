@@ -4,7 +4,7 @@
   "apk_sha256": "956c8f8f1e65c6736b4cae590972c630acbb55a3e1a3c4c16dd9583b042a93c1",
   "apk_bytes": 344996,
   "device": "Retroid Pocket Classic",
-  "serial": "MC94516AQF040305380",
+  "serial": "DEVICE_SERIAL",
   "official_runtime": "0.2.7",
   "scenario": "Controller events: create, duplicate, edit, reorder, remove, undo/redo, restart; overlapping layers before/after in official runtime",
   "core_tests": 95,

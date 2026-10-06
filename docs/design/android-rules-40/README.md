@@ -57,7 +57,7 @@ block comments, shorthand `if(x) ...`, других составных прис�
 
 ## Проверка на устройстве
 
-Retroid Pocket Classic / Android 14, `MC94516AQF040305380`, landscape 1240×1080,
+Retroid Pocket Classic / Android 14, `DEVICE_SERIAL`, landscape 1240×1080,
 density 320; Runtime Test 7 с пользовательским PICO-8 0.2.7 Raspberry Pi ARM64.
 
 1. Через полку сделана «Копия 10» (`remix-0010`) из `blank-0004` предыдущего ACC-01.

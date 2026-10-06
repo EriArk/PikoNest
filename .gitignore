@@ -1,2 +1,23 @@
 # Local downloads, upstream research checkouts and device diagnostics.
 .local/
+
+# Purchased runtime inputs stay local; older Git history needs separate cleanup.
+/dev-runtime/pico-8/
+/pico-8*.zip
+/pico-8/
+
+# Local builds, signing material, IDE and agent state.
+*.apk
+*.aab
+*.keystore
+*.jks
+.env
+.env.*
+!.env.example
+local.properties
+.idea/
+.vscode/
+.gradle/
+/.codex/
+.DS_Store
+Thumbs.db

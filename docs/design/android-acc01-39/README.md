@@ -9,7 +9,7 @@ Test и возврат. **Это техническое свидетельств
 
 ## Условия и границы ввода
 
-- Retroid Pocket Classic, Android 14, `MC94516AQF040305380`, 1240×1080 landscape,
+- Retroid Pocket Classic, Android 14, `DEVICE_SERIAL`, 1240×1080 landscape,
   density 320. Пользовательский официальный PICO-8 0.2.7 Raspberry Pi / ARM64.
 - Создание и все правки игры — только видимый UI: ADB-инъекция D-pad, A/B/X/Y,
   L/R/L2/R2, Select, Start. Каталог вставок и палитра символов; без `input text`,

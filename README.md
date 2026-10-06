@@ -2,6 +2,17 @@
 
 **A tiny PICO-8 home and game-making workshop for handhelds.**
 
+**Early development · Android first · No public APK release yet.**
+The working lab includes Play, project workflows and several editors. The complete
+game-creation workflow is still being built. Playing requires your own purchased
+copy of official PICO-8; this project does not supply it.
+
+[Current scope and roadmap](docs/README.md) · [Build and contribute](CONTRIBUTING.md) ·
+[Open tasks](docs/ISSUES.md) · [Screenshots](docs/showcase/README.md)
+
+The license for original PikoNest code is awaiting an owner decision;
+[third-party notices](THIRD_PARTY_NOTICES.md) cover the components identified so far.
+
 PikoNest is for that moment when you finish a little game and think:  
 *“I wonder what happens if I change this.”*
 

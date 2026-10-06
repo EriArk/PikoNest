@@ -1,5 +1,12 @@
 # PikoNest Android host experiment
 
+**Current lab: 0.0.66.** Shared English Play/project shelves, action menus and
+explicit copy confirmation. Editors/settings are still being migrated.
+[Current scope](../../docs/README.md) · [Build instructions](../../CONTRIBUTING.md) ·
+[Evidence and limits](../../docs/showcase/0.0.66-en/README.md).
+
+The version notes below are historical evidence, not the current task order.
+
 **0.0.65:** camera management from the common game-use list. Reuse position,
 follow/room forms, apply to a range with an explicit restore, switch following
 draws to screen coordinates, reopen/remove/Undo/recover without a Lua cursor.

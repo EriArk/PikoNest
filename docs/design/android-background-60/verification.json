@@ -4,7 +4,7 @@
   "apk_sha256": "5039e1f9864f7ef86cdb93af91e07b9a5b5e6797f7f0cb2fcc1e4b941a9d6e0c",
   "apk_bytes": 340900,
   "device": "Retroid Pocket Classic",
-  "serial": "MC94516AQF040305380",
+  "serial": "DEVICE_SERIAL",
   "official_runtime": "0.2.7",
   "runtime_checks": "10/10",
   "core_checks": 71,

@@ -281,7 +281,8 @@ Android lab 0.0.9 keeps Moon Garden's speed/jump/hero data behind the optional
 without it, including the blank and Lights samples. `HeroCode` and `HeroBinding`
 remain platformer-specific; do not turn them into a universal object model.
 Android lab 0.0.13 adds single text `.p8` import with byte-preserving copies.
-PNG carts, linked-file import, full Lua editing and general resource allocation remain open.
+That statement describes lab 0.0.13. Later bounded PNG/include paths exist; use
+`docs/STATUS.md` and `docs/BACKLOG.md` for current import/editing gaps.
 
 A normal project should conceptually look like:
 
@@ -454,6 +455,14 @@ The exact framework/language for the app has not been frozen by this document. D
 
 ## 14. Documentation discipline
 
+Owner decision (2026-10-06): GitHub Actions are disabled. Keep builds and tests
+local; do not introduce CI workflows, bot updates, automated merges or automated
+releases without a new owner decision. Static issue/PR templates are allowed.
+Do not commit purchased runtime archives, signing material or local agent state.
+Original-code licensing and removal of legacy runtime archives from Git history
+require explicit owner decisions; untracking current files is not history cleanup.
+
+
 Owner workflow clarification (2026-10-04): batch development into complete user
 scenarios with several related operations. Do not end every tiny tool change with
 a full build/install/screenshot cycle. Use focused core checks during implementation,
@@ -475,8 +484,10 @@ Lab 0.0.13 also imports single text `.p8` files for resource extraction.
 Lab 0.0.14 exports a selected saved cart byte-for-byte to a new external `.p8`,
 with readback verification. This is not folder setup, dependency/library backup,
 or Share Clean Cartridge; raw export preserves any source bindings unchanged.
-Other asset types, `.p8.png`/linked-file import and first-run folder/runtime setup remain
-unfinished. App-private experimental storage is not the final user-folder model.
+These are historical 0.0.14 limits. Later PNG/include/folder/runtime slices exist;
+the current backlog owns their remaining scope. Complete multi-type reuse and
+independent onboarding remain unfinished. App-private storage is not the final
+user-folder model.
 
 Use accurate user-facing names: sprite, animation frame, tile, map, background,
 SFX and music. Do not call every visual resource a generic "drawing". Background
