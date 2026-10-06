@@ -3,7 +3,7 @@
 PikoNest is an Android development lab with a growing portable core, not yet a
 complete creator or a public APK release. Start with the [current scope](docs/README.md),
 [open tasks](docs/ISSUES.md) and [contributor brief](AGENTS.md).
-The original-code license awaits the owner's decision; third-party licenses keep
+Original PikoNest code uses the [MIT License](LICENSE); third-party licenses keep
 their own scope. See [notices](THIRD_PARTY_NOTICES.md).
 
 ## Local build
@@ -31,7 +31,7 @@ Standalone cartridge framing tests need only the JDK:
 ```
 
 Both paths were checked on 6 October 2026 against a clean source snapshot of
-`cb0d054` using the existing Windows toolchain. This was not a fresh-machine setup
+`9c900e4` using the existing Windows toolchain. This was not a fresh-machine setup
 test or runtime-wrapper rebuild. A PowerShell 5.1 combined-stream redirection
 wrapper can promote native compiler warnings to errors; use the direct commands
 above when diagnosing that behavior.
@@ -96,3 +96,11 @@ Do not introduce Actions workflows, bot updates, automated merges or automated
 releases without a new owner decision. Issue/PR templates are static forms.
 APK publication needs explicit owner approval of a particular release after
 product acceptance. Passing tests or pushing source is not that approval.
+
+## Clones from before the history cleanup
+
+On 6 October 2026, purchased runtime archives were removed from the published Git
+history. If your clone predates that cleanup, preserve any uncommitted work and
+clone the repository again before contributing. Do not merge or push the old
+history back. Coordinate unpublished commits with the maintainer for selective
+reapplication. Historical evidence may still name pre-cleanup commit hashes.

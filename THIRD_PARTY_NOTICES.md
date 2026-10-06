@@ -1,7 +1,9 @@
 # Third-party materials and license status
 
-The license for original PikoNest code, original demo content and documentation
-has not yet been selected by the owner. This notice does not assign one.
+Owner decision, 6 October 2026: original PikoNest source code (including original
+demo Lua) and accompanying documentation use the [MIT License](LICENSE).
+This code-license decision does not relicense third-party materials or establish
+a separate reuse license for original artwork and screenshot imagery.
 
 | Material | Attribution and source | License / scope |
 | --- | --- | --- |

@@ -1,7 +1,7 @@
 # PikoNest: current scope and development map
 
 **Lab 0.0.66 · Android first · No public APK release.** The complete creator is
-still in development. The original-code license awaits an owner decision.
+still in development. Original code uses the [MIT License](../LICENSE).
 
 ## What exists today
 

@@ -459,8 +459,10 @@ Owner decision (2026-10-06): GitHub Actions are disabled. Keep builds and tests
 local; do not introduce CI workflows, bot updates, automated merges or automated
 releases without a new owner decision. Static issue/PR templates are allowed.
 Do not commit purchased runtime archives, signing material or local agent state.
-Original-code licensing and removal of legacy runtime archives from Git history
-require explicit owner decisions; untracking current files is not history cleanup.
+Owner approval (2026-10-06): original code uses MIT; preserve separate third-party
+terms. Legacy purchased runtime archives were removed from published Git history
+after a private backup. Do not reintroduce pre-cleanup history or private backups.
+Further history rewrites or license-scope changes need a separate owner decision.
 
 
 Owner workflow clarification (2026-10-04): batch development into complete user

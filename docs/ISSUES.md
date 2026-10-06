@@ -25,9 +25,10 @@ mean actively being implemented. Next: UX03, then UX04, alongside foundation wor
 | [#12 — Complete English localization and prepare language selection](https://github.com/EriArk/PikoNest/issues/12) | Q07/Q08; H01–H03 | English accompanies interface work; additional locales follow Q07. |
 | [#13 — Validate handheld layouts, controller access and external-launch return](https://github.com/EriArk/PikoNest/issues/13) | Q01–Q06; A05; L01–L03; M6 | Cross-cutting acceptance; local checks only, no GitHub automation. |
 | [#14 — Connect reusable game behaviors and visual effects to events](https://github.com/EriArk/PikoNest/issues/14) | M01–M06; M3; H02/H03 | Complete tool workflows before growing genre/template content. |
-| [#15 — Decide project licensing and complete third-party distribution notices](https://github.com/EriArk/PikoNest/issues/15) | A06; Q05 | Owner decision required; no license chosen by the implementation agent. |
+| [#15 — Complete third-party distribution notices](https://github.com/EriArk/PikoNest/issues/15) | A06; Q05 | MIT approved for original code; runtime dependency audit and artwork terms remain open. |
 | [#16 — Migrate PIKOOS technical identifiers with data-preserving updates](https://github.com/EriArk/PikoNest/issues/16) | A01; Q05; PROJECT_NAME | Deferred by owner; do not fold into documentation housekeeping. |
 
 GitHub Actions are disabled by owner decision. Checks run locally. Passing tests
-or closing an issue does not authorize a GitHub APK release. Licensing and any
-Git-history rewrite need separate owner decisions.
+or closing an issue does not authorize a GitHub APK release. MIT and the purchased
+runtime history cleanup were approved on 6 October 2026. Further license-scope
+changes or history rewrites need separate owner decisions.
