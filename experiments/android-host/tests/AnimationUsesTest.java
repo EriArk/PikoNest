@@ -60,7 +60,7 @@ public final class AnimationUsesTest {
         g=new GameUses(created,2);g.edit();g.animation.toggle();g.animation.advance(120);restored=GameUses.restore(g.encode(),created);
         check(!restored.animation.playing&&restored.animation.elapsed()==120,"restore pauses preview at saved time");
         g.back();check(GameUses.restore(g.encode(),created).screen==GameUses.Screen.LIST,"cancel discards form but list journal remains valid");
-        GameUses old=new GameUses(blank,0);old.addSprite(new SpriteRegion(0,0,8,8));byte[] v1=Arrays.copyOf(old.encode(),old.encode().length-14);v1[3]=1;
+        GameUses old=new GameUses(blank,0);old.addSprite(new SpriteRegion(0,0,8,8));byte[] v1=Arrays.copyOf(old.encode(),old.encode().length-18);v1[3]=1;
         check(GameUses.restore(v1,blank).screen==GameUses.Screen.FORM,"version 1 placement journals still restore");
         final GameUses valid=restored;refused(()->GameUses.restore(Arrays.copyOf(valid.encode(),valid.encode().length-1),created));
         restored.animation.review=true;final GameUses invalid=restored;refused(()->GameUses.restore(invalid.encode(),created));

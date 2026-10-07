@@ -44,14 +44,14 @@ public final class GameUsesTest {
         final GameUses recovery=limits;byte[] truncated=Arrays.copyOf(limits.encode(),10);refused(()->GameUses.restore(truncated,noDraw));byte[] extra=Arrays.copyOf(limits.encode(),limits.encode().length+1);refused(()->GameUses.restore(extra,noDraw));
         class Port implements WorkshopSession.Port {boolean fail;byte[] saved,launched;public void save(byte[] b)throws Exception{if(fail)throw new Exception("disk full");saved=b;}public void launch(byte[] b){launched=b;}}
         Port port=new Port();WorkshopSession s=new WorkshopSession(cart("function _draw()\n cls(1)\nend\n"),port);s.switchTool(2);s.openUses(true);
-        check(s.mode==WorkshopSession.Mode.USES&&s.codeDraft==null,"no Lua UI");s.act(Action.CONFIRM);check(port.saved==null,"review not saved");byte[] journal=s.uses.encode();
+        check(s.mode==WorkshopSession.Mode.USES&&s.codeDraft==null,"no Lua UI");s.act(Action.MENU);check(port.saved==null,"review not saved");byte[] journal=s.uses.encode();
         port.fail=true;s.act(Action.CONFIRM);check(s.mode==WorkshopSession.Mode.ERROR&&!s.canUndo(),"write failure keeps history");s.act(Action.CANCEL);check(s.mode==WorkshopSession.Mode.USES&&s.uses.screen==GameUses.Screen.REVIEW,"retry returns to review");
         port.fail=false;s.act(Action.CONFIRM);check(s.uses.entries.size()==1&&s.canUndo(),"commit saves one");check(s.codeDraft==null,"commit never opens code");resources(noDraw,s.cart());
         s.act(Action.TEST);check(Arrays.equals(port.launched,s.cart().bytes())&&s.mode==WorkshopSession.Mode.USES,"test saved bytes and list remains");
         s.act(Action.UNDO);check(s.uses.entries.isEmpty()&&s.canRedo(),"undo from list");s.act(Action.REDO);check(s.uses.entries.size()==1,"redo from list");
         port.fail=true;s.act(Action.UNDO);check(s.mode==WorkshopSession.Mode.ERROR&&s.uses.entries.size()==1&&s.canUndo(),"failed undo preserves state");s.act(Action.CANCEL);check(s.mode==WorkshopSession.Mode.USES,"failed undo returns list");port.fail=false;
         WorkshopSession reboot=new WorkshopSession(s.cart(),port);reboot.restoreUses(s.uses.encode());check(reboot.mode==WorkshopSession.Mode.USES&&reboot.codeDraft==null,"list recovery without Lua");
-        reboot.act(Action.NEXT);reboot.act(Action.CONFIRM);reboot.act(Action.CANCEL);reboot.act(Action.CANCEL);check(reboot.uses.entries.size()==1,"cancel new no duplicate");
+        reboot.act(Action.NEXT);reboot.act(Action.MENU);reboot.act(Action.CANCEL);reboot.act(Action.CANCEL);check(reboot.uses.entries.size()==1,"cancel new no duplicate");
         s.act(Action.MENU);s.uses.menu=3;s.act(Action.CONFIRM);s.act(Action.CONFIRM);check(s.uses.entries.isEmpty(),"controller deletion");s.act(Action.UNDO);check(s.uses.entries.size()==1,"delete undo");
         System.out.println("GameUsesTest: "+checks+" checks passed");
     }

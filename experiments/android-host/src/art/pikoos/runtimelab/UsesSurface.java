@@ -100,7 +100,7 @@ final class UsesSurface {
             final int at=first+n;GameUses.Entry e=g.entries.get(at);float y=116+n*60;
             if(at==g.index){box(12,y,w-24,56,2);box(12,y,4,56,10);}
             fit((at+1)+"  "+entryTitle(e),24,y+24,20,at==g.index?10:7,w-48);
-            String detail=e.isBackground()?"Y "+e.call.form.value(4)+" · "+e.call.form.value(5)+" px/s · "+(e.call.form.value(7).equals("true")?"visible":"hidden"):e.isCamera()?"Applies to following uses":"X "+e.x()+"   Y "+e.y()+"   · "+(e.view==null||e.view.form.item().id.equals("camera_reset")?"screen":"world");
+            String detail=e.isBackground()?"Y "+e.call.form.value(4)+" · "+e.call.form.value(5)+" px/s · "+(e.call.form.value(7).equals("true")?"visible":"hidden"):e.isCamera()?"Applies to following uses":"X "+e.coordinate(0)+"   Y "+e.coordinate(1)+"   · "+(e.view==null||e.view.form.item().id.equals("camera_reset")?"screen":"world");
             fit(detail,24,y+47,16,6,w-48);hit(12,y,w-24,56,()->{g.index=at;act(Action.CONFIRM);});
         }
         footer(g.entries.isEmpty()?"Add sprite":"Edit","Workshop","Select Actions",Action.MENU,false);hint("Start Test",3,Action.TEST);
@@ -210,12 +210,18 @@ final class UsesSurface {
         footer(v.phase==0?"Next corner":"Use selection","Back","X Step "+v.step+" px",Action.CONTEXT,false);
     }
     private void placement(){
-        GameUses g=s.uses;fit((g.kind.equals("map")?"Map":"Sprite")+" · region and position",16,101,18,6,w-32);
-        String[] labels=g.kind.equals("map")?new String[]{"Map X (tiles)","Map Y (tiles)","Game X","Game Y","Width (tiles)","Height (tiles)"}:g.kind.equals("spr")?new String[]{"Tile","Game X","Game Y"}:new String[]{"Sheet X","Sheet Y","Width (px)","Height (px)","Game X","Game Y"};
-        int count=Math.max(1,(int)((bottom-160)/44)),first=Math.max(0,g.field-count+1);
-        for(int n=0;n<count&&first+n<labels.length;n++){final int at=first+n;row(labels[at]+": "+g.values[at],116+n*44,g.field==at,()->{g.field=at;act(Action.CHECK);});}
-        fit("←→ Adjust · L/R ±8",16,bottom-22,18,6,w-32);
-        footer("Preview","Cancel",g.kind.equals("map")?null:"X Choose region",Action.CONTEXT,false);
+        GameUses g=s.uses;boolean editing=g.editingField();
+        fit(editing?"Editing field":"Region and position",16,101,18,6,w-32);
+        for(int y=0;y<128;y++)for(int x=0;x<128;x++){int color=g.pixel(s.cart(),x,y);bitmap.setPixel(x,y,COLORS[color==0?1:color]);}
+        if(g.kind.equals("map"))c.drawBitmap(bitmap,null,new RectF(16,116,104,204),paint);else frame(g.region(),16,116,88);
+        fit(g.kind.equals("map")?"Map in this game":"Sprite in this game",120,140,20,14,w-136);
+        fit("X "+g.coordinate(0)+"   Y "+g.coordinate(1),120,166,18,7,w-136);
+        fit(g.linked()?"Starts at "+g.x()+", "+g.y():"Fixed position in pixels",120,192,16,6,w-136);
+        int count=Math.max(1,(int)((bottom-270)/44)),first=Math.max(0,g.field-count+1);
+        for(int n=0;n<count&&first+n<g.placementRows();n++){final int at=first+n;row((editing&&at==g.field?"< ":"")+g.placementLabel(at)+(editing&&at==g.field?" >":""),216+n*44,g.field==at,()->{if(!editing||at==g.field){g.field=at;act(Action.CONFIRM);}});}
+        scroll(g.field,g.placementRows(),count,216);
+        fit(g.field>=g.values.length&&g.field<g.values.length+2?"Choose Fixed or a Rules & state value":"Linked values move this use during the game",16,bottom-22,16,6,w-32);
+        if(editing)editingFooter();else footer(g.field==g.placementRows()-1?"Preview":"Edit","Cancel",g.kind.equals("map")?"Select Preview":"X Choose region",g.kind.equals("map")?Action.MENU:Action.CONTEXT,true);
     }
     private void review(){
         clock=0;GameUses g=s.uses;fit(g.deleting?"Remove this use?":g.layerMove<0?"Move layer backward?":g.layerMove>0?"Move layer forward?":"Preview changes",16,101,20,10,w-32);
@@ -229,9 +235,10 @@ final class UsesSurface {
         c.drawBitmap(bitmap,null,new RectF(left,top,left+size,top+size),paint);
         box(left-1,top-1,size+2,1,13);box(left-1,top+size,size+2,1,13);
         box(left-1,top,1,size,13);box(left+size,top,1,size,13);
-        String caption=dynamic?"Dynamic positions need Test":"Sketch only · Test for gameplay";
+        dynamic|=g.linked();
+        String caption=g.linked()?"Starting position only; Test for movement":dynamic?"Dynamic positions need Test":"Sketch only · Test for gameplay";
         fit(caption,16,bottom-69,16,6,w-32);
-        fit(g.deleting?"Sprite-sheet and map data stay intact":g.background!=null?"Scene at start · camera restored":g.camera!=null?cameraTitle(g.camera):g.animation!=null?g.animation.count()+" frames · "+(g.animation.loop?"loop":"once")+" · from game start":"Position: "+g.x()+", "+g.y(),16,bottom-44,18,7,w-32);
+        fit(g.deleting?"Sprite-sheet and map data stay intact":g.background!=null?"Scene at start · camera restored":g.camera!=null?cameraTitle(g.camera):g.animation!=null?g.animation.count()+" frames · "+(g.animation.loop?"loop":"once")+" · from game start":"Position: "+g.coordinate(0)+", "+g.coordinate(1),16,bottom-44,18,7,w-32);
         fit("Apply saves one undo step",16,bottom-20,16,6,w-32);
         footer(g.deleting?"Remove":"Apply",g.deleting||g.layerMove!=0?"Cancel":"Edit",null,null,true);
     }

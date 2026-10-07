@@ -1,6 +1,11 @@
 # PikoNest — English website gallery
 
-Latest: [0.0.71 runtime data import](0.0.71-en/README.md) — six original English
+Latest: [0.0.72 rules move sprites](0.0.72-en/README.md) — eight original English
+Retroid captures of coordinate bindings, rules, a UI-authored game in official
+PICO-8, goal/reset and verified export. Includes the exact exported `.p8`.
+Full physical-controller and independent export acceptance remain open.
+
+Earlier: [0.0.71 runtime data import](0.0.71-en/README.md) — six original English
 Retroid captures: conflict review, verified import, retained save, clean Play and
 Workshop Test. [0.0.70 one Android application](0.0.70-en/README.md) records the
 first integration and Home/resume. Earlier editor packs remain useful for tools.

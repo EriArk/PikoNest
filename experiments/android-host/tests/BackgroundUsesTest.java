@@ -57,7 +57,7 @@ public final class BackgroundUsesTest {
         g.background.toggle();g.background.advance(750);GameUses restored=GameUses.restore(g.encode(),layered);check(restored.background.previewMillis==750&&!restored.background.playing,"preview restores paused without game writes");
         final GameUses stale=g;refused(()->GameUses.restore(stale.encode(),cart("-- changed\n")));refused(()->stale.proposal().candidate(cart("-- changed\n")));
         byte[] bad=Arrays.copyOf(g.encode(),g.encode().length+1);refused(()->GameUses.restore(bad,layered));g.layerMove=2;final GameUses invalid=g;refused(()->GameUses.restore(invalid.encode(),layered));
-        GameUses old=new GameUses(layered,0);old.addAnimation(new SpriteRegion(0,0,8,8));old.animation.field=2;old.beginField();old.animation.change(1);byte[] v4=Arrays.copyOf(old.encode(),old.encode().length-6);v4[3]=4;
+        GameUses old=new GameUses(layered,0);old.addAnimation(new SpriteRegion(0,0,8,8));old.animation.field=2;old.beginField();old.animation.change(1);byte[] v4=Arrays.copyOf(old.encode(),old.encode().length-10);v4[3]=4;
         GameUses previous=GameUses.restore(v4,layered);previous.cancelField();check(previous.animation.frame(0).millis==250,"v4 field draft remains recoverable");
         // Two uses refer to the same sheet data, not copies in an external library.
         GameUses shared=new GameUses(cart("-- shared\n"),0);shared.addBackground(new SpriteRegion(0,64,8,8));WorkshopCartridge lower=apply(shared);resources(shared.base,lower);

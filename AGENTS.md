@@ -182,8 +182,13 @@ including resource selection, parameters, duplication, safe ordering and removal
 See docs/showcase/0.0.68-en/README.md for remaining acceptance. Lab 0.0.69 adds
 the first C02.4 Rules & state path: numeric initialization, input/conditions,
 add/set/reset, readouts and ordered rules without a Lua cursor. This is a bounded
-ordinary-callback workflow, not full ACC-01. Next connect values to resource
-placements/coordinates and events; see docs/showcase/0.0.69-en/README.md.
+ordinary-callback workflow, not full ACC-01. Lab 0.0.72 connects recognized
+numeric values to sprite/map destination coordinates through shared placement
+forms, with field revert, draft Test, Undo and journal v7 recovery. A native
+UI-authored Blank game ran movement, goal and reset in official PICO-8 and
+exported exactly; see docs/showcase/0.0.72-en/README.md. Physical-controller and
+independent exported-cart acceptance remain open. Next implement the general
+sprite/map editors (package 3, G01–G03); state/event animation and audio follow.
 Carry UX05 with remaining core tools rather than
 blocking them on a cosmetic rewrite. Shared
 sprite painting and map brushes remain unfinished G01/G03 work. N03.3 is deferred from the

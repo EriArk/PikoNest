@@ -1,5 +1,16 @@
 # Состояние PikoNest
 
+**Lab 0.0.72 — rules → resource coordinates:** sprite/map destination X/Y can
+follow recognized numeric starting values. Shared placement forms preserve field
+revert, draft Test, Apply/Undo and journal v7 recovery. On Retroid, an original
+Blank project was painted and configured entirely in UI, then ran in official
+PICO-8: held Right moves a heart, the goal stops it, reset returns it to start.
+Save/reopen, placement Undo/Redo and exact SAF export passed; all 48 old
+project/library files stayed unchanged. [Evidence and exported game](showcase/0.0.72-en/README.md).
+This remains partial C02.4/G04: physical-controller/owner acceptance, independent
+export execution, state-linked animation/audio and the full ACC-01 remain open.
+Next: package 3, general sprite/map editors, including shared-memory painting.
+
 **Lab 0.0.71 - runtime data import and isolated clean setup:** old PICO-8 data
 is selected read-only through SAF, reviewed for conflicts, copied and verified
 before atomically switching homes. On Retroid: 84 source files unchanged, 48
@@ -10,7 +21,7 @@ leaves a stale dispatched flag. The disposable package was removed after EXITED;
 independent apps/data stayed intact and audio stayed muted.
 [Evidence and exact limits](showcase/0.0.71-en/README.md). This is not complete
 factory-clean onboarding, frontend-settings migration, boot/crash acceptance or
-modern-target support. The next creation package is C02.4/G04 coordinate bindings.
+modern-target support. Coordinate bindings follow in the 0.0.72 entry above.
 
 **Lab 0.0.70 — первый единый APK:** Play, Workshop и адаптер официального runtime
 собраны в `art.pikoos.runtimelab`, одна иконка PikoNest. По решению владельца

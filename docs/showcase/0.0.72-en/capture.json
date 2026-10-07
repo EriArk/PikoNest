@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-07",
+  "device": "Retroid Pocket Classic",
+  "android": 14,
+  "artifact": {
+    "package": "art.pikoos.runtimelab",
+    "version": "0.0.72",
+    "sha256": "6c472c1ba40adc71aeb28e78489c40d3ea6da5d541d358878a0f4b8929bacb45"
+  },
+  "source": "Unedited ADB screencap PNGs from the normal development APK. No presentation build.",
+  "interaction": "Injected controller events for forms; touch for sprite painting, menus and Android document picker. Runtime input used long-pressed Android keyboard Right/V events. Physical-controller acceptance remains open.",
+  "cartridge": {
+    "file": "heart-goal.p8",
+    "sha256": "697d60b40d76a8d6fe978438010b97b3334bd767bb7f5c037773e7b43dfd146d",
+    "bytes": 1553,
+    "authoring": "New project / Blank through native UI; no Lua edits or project-file injection."
+  },
+  "checks": {
+    "focused_coordinate_checks": 85,
+    "original_project_library_files_unchanged": 48,
+    "runtime_exit_observed": true,
+    "export_matches_saved": true,
+    "outside_pikonest_execution_verified": false
+  },
+  "images": [
+    {
+      "file": "01-coordinate-binding.png",
+      "caption": "Choose a starting value for a sprite coordinate.",
+      "sha256": "a552819858d33ab968176cdc2ec6f0a5a24dac50766ddeba4dcf3309c77534e0",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "02-rules-state.png",
+      "caption": "Numeric state, held input and a goal condition.",
+      "sha256": "f552a5e41cfd5b0323fcdd1b6cb823080e64045bc69b32bc373a6e520f5979b4",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "03-game-uses.png",
+      "caption": "One sprite follows game values; the target stays fixed.",
+      "sha256": "5738494bb495c944bc51e3fce70af61c0b46c72d8455337773412c27da59d31e",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "04-restored-preview.png",
+      "caption": "The placement review restored after the APK update and reopening the project.",
+      "sha256": "8d444b3146adc44bea8f1b3337a547b8b3fbabf4e5367673d187fedd63cdfe1c",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "05-game-start.png",
+      "caption": "The UI-authored game running in official PICO-8: x=24, phase=0.",
+      "sha256": "b94ba185a562768fcf718104db4a12aca35a028e08d882e5317b6d723d8a7592",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "06-goal-reached.png",
+      "caption": "Held Right moves the sprite to x=96; the goal changes phase to 1.",
+      "sha256": "bcecb9d13fd9e20588f4b9a4829c3f1632fdcc19aaedaa47d07b2d801d2ec940",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "07-game-reset.png",
+      "caption": "The reset rule calls _init(): x=24, phase=0 again.",
+      "sha256": "b94ba185a562768fcf718104db4a12aca35a028e08d882e5317b6d723d8a7592",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "08-export-saved.png",
+      "caption": "Android export was read back and matched the saved cartridge.",
+      "sha256": "391b0b87892cee4663d93daec429440b9e99870915005e7a109543f2e824b2a1",
+      "width": 1240,
+      "height": 1080
+    }
+  ]
+}

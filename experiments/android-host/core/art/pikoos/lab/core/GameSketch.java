@@ -19,6 +19,7 @@ public final class GameSketch {
                 }continue;
             }
             if(camera==null){dynamic=true;continue;}
+            dynamic|=e.linked();
             int dx=e.x()-camera[0],dy=e.y()-camera[1];
             SpriteRegion r=e.animation!=null?e.animation.initial.frame(e.animation.initial.frameAt((int)(seconds*1000))).region:e.kind().equals("spr")?new SpriteRegion(e.values[0]%16*8,e.values[0]/16*8,8,8):e.kind().equals("sspr")?new SpriteRegion(e.values[0],e.values[1],e.values[2],e.values[3]):null;
             int width=r!=null?r.width:e.values[4]*8,height=r!=null?r.height:e.values[5]*8;

@@ -52,7 +52,7 @@ public final class WorkshopSession {
         if(action==Action.TEST&&(g.screen==GameUses.Screen.PICK||g.animation!=null&&g.animation.picker!=null||g.background!=null&&g.background.picker!=null))
             throw new IllegalArgumentException("Finish choosing the region or position before Test. Confirm the selection or return to the form.");
         // Test an isolated candidate. The saved cart, history and edit context stay intact.
-        if(action==Action.TEST&&(g.screen==GameUses.Screen.CAMERA||g.screen==GameUses.Screen.ANIMATION||g.screen==GameUses.Screen.BACKGROUND||g.screen==GameUses.Screen.REVIEW)){
+        if(action==Action.TEST&&(g.screen==GameUses.Screen.CAMERA||g.screen==GameUses.Screen.ANIMATION||g.screen==GameUses.Screen.BACKGROUND||g.screen==GameUses.Screen.FORM||g.screen==GameUses.Screen.REVIEW)){
             port.launch(g.proposal().candidate(cart).bytes());return;
         }
         if(g.screen==GameUses.Screen.BACKGROUND){
@@ -116,10 +116,15 @@ public final class WorkshopSession {
             return;
         }
         if(g.screen==GameUses.Screen.FORM){
-            if(action==Action.UP)g.field=Math.max(0,g.field-1);if(action==Action.DOWN)g.field=Math.min(g.values.length-1,g.field+1);
-            if(action==Action.LEFT)g.adjust(-1);if(action==Action.RIGHT)g.adjust(1);
-            if(action==Action.PREVIOUS)g.adjust(-8);if(action==Action.NEXT)g.adjust(8);
-            if(action==Action.CONTEXT)g.pick();if(action==Action.CONFIRM)g.review();if(action==Action.CANCEL)g.back();return;
+            if(g.editingField()){
+                if(action==Action.LEFT)g.changePlacement(-1);if(action==Action.RIGHT)g.changePlacement(1);
+                if(action==Action.PREVIOUS)g.changePlacement(-8);if(action==Action.NEXT)g.changePlacement(8);
+                if(action==Action.CONFIRM)g.finishField();if(action==Action.CANCEL)g.cancelField();
+            }else{
+                if(action==Action.UP)g.field=Math.max(0,g.field-1);if(action==Action.DOWN)g.field=Math.min(g.placementRows()-1,g.field+1);
+                if(action==Action.CONFIRM){if(g.field==g.placementRows()-1)g.review();else g.placementField();}
+                if(action==Action.CONTEXT)g.pick();if(action==Action.MENU)g.review();if(action==Action.CANCEL)g.back();
+            }return;
         }
         if(g.screen==GameUses.Screen.MENU){
             if(action==Action.UP)g.menu=Math.max(0,g.menu-1);if(action==Action.DOWN)g.menu=Math.min(13,g.menu+1);

@@ -1,6 +1,13 @@
 # PikoNest Android host experiment
 
-**Current lab: 0.0.71.** One APK contains Workshop and the runtime adapter.
+**0.0.72:** Rules & state connects sprite/map destination X/Y to recognized
+numeric starting values. Placement forms share field revert, preview, draft Test,
+Apply/Undo and journal v7 recovery (v1–6 readable). A native UI-authored Blank game
+ran movement, goal and reset in official PICO-8 and exported byte-for-byte.
+[Evidence, cartridge and limits](../../docs/showcase/0.0.72-en/README.md).
+Next: general sprite/map editors; event animation/audio and full ACC-01 remain open.
+
+**Current lab: 0.0.72.** One APK contains Workshop and the runtime adapter.
 Verified old-data copy/merge retains source and prior homes. Retroid checks cover
 cartdata retention, isolated clean private installation, Play/Workshop Test/return
 and retry after interrupted setup. [Build inputs](../android-integrated/README.md),

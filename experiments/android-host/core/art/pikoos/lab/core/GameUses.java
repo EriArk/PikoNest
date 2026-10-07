@@ -16,6 +16,8 @@ public final class GameUses {
     public boolean creating,deleting;
     public String kind="sspr";
     public int[] values={0,0,8,8,60,60};
+    public String[] links={"",""};
+    public final GameValues gameValues;
     public SpritePlacement picker;
     public SpriteAnimation animation;
     public boolean converting;
@@ -30,7 +32,7 @@ public final class GameUses {
     public void beginField(){
         if(editingField())return;
         try{ByteArrayOutputStream b=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(b);
-            if(background!=null)background.write(o);else if(camera!=null)camera.write(o);else if(animation!=null)animation.write(o);else return;
+            if(background!=null)background.write(o);else if(camera!=null)camera.write(o);else if(animation!=null)animation.write(o);else if(screen==Screen.FORM){writePosition(o);}else return;
             fieldBaseline=b.toByteArray();
         }catch(IOException e){throw new IllegalStateException(e);}
     }
@@ -38,7 +40,7 @@ public final class GameUses {
     public void cancelField(){
         if(!editingField())return;
         try{DataInputStream i=new DataInputStream(new ByteArrayInputStream(fieldBaseline));
-            if(background!=null)background=BackgroundUse.read(i);else if(camera!=null)camera=CameraUse.read(i,this);else animation=SpriteAnimation.read(i);
+            if(background!=null)background=BackgroundUse.read(i);else if(camera!=null)camera=CameraUse.read(i,this);else if(animation!=null)animation=SpriteAnimation.read(i);else readPosition(i);
             fieldBaseline=null;
         }catch(IOException e){throw new IllegalStateException(e);}
     }
@@ -51,6 +53,9 @@ public final class GameUses {
         public final int[] values;
         public final AnimationEdit animation;
         public LuaCall view;
+        public String[] links={"",""};
+        public String coordinate(int axis){return links[axis].isEmpty()?Integer.toString(axis==0?x():y()):links[axis];}
+        public boolean linked(){return !links[0].isEmpty()||!links[1].isEmpty();}
         Entry(LuaCall call,int[] values){this.call=call;this.values=values;animation=null;}
         Entry(AnimationEdit animation){this.animation=animation;call=null;values=new int[0];}
         public String kind(){return animation!=null?"animation":call.name;}
@@ -63,7 +68,7 @@ public final class GameUses {
         public int y(){return isBackground()?Integer.parseInt(call.form.value(4)):isCamera()?0:animation!=null?animation.initial.y:values[call.name.equals("sspr")?5:call.name.equals("map")?3:2];}
     }
     public GameUses(WorkshopCartridge cart,int returnTool){
-        base=cart;source=new LuaDraft(cart,0).text();this.returnTool=returnTool;
+        base=cart;source=new LuaDraft(cart,0).text();this.returnTool=returnTool;gameValues=new GameValues(source);
         newline=source.contains("\r\n")?"\r\n":source.contains("\r")?"\r":"\n";
         try{scan();}catch(IllegalArgumentException e){entries.clear();blocked=e.getMessage();}
     }
@@ -95,11 +100,13 @@ public final class GameUses {
                 if(call.end!=end||!Arrays.asList("cls","spr","sspr","map","camera","print","circfill","rectfill").contains(call.name))throw unsupported();
                 for(int n=0;n<call.form.item().fields.length;n++)
                     if(call.form.kind(n)!=LuaInsert.Kind.STRING&&!call.form.value(n).matches("-?[0-9]+")
-                        &&!(call.name.equals("print")&&n==0&&call.form.value(n).matches("[A-Za-z_][A-Za-z_0-9]*")))throw unsupported();
+                        &&!(call.name.equals("print")&&n==0&&call.form.value(n).matches("[A-Za-z_][A-Za-z_0-9]*"))
+                        &&!(coordinateAxis(call.name,n)>=0&&gameValues.initial.containsKey(call.form.value(n))))throw unsupported();
                 if(call.name.equals("spr")||call.name.equals("sspr")||call.name.equals("map")){
                     int[] v=new int[call.form.item().fields.length];
-                    for(int n=0;n<v.length;n++)try{v[n]=Integer.parseInt(call.form.value(n));}catch(NumberFormatException e){throw unsupported();}
-                    validate(call.name,v);Entry e=new Entry(call,v);e.view=view;entries.add(e);
+                    String[] linked={"",""};
+                    for(int n=0;n<v.length;n++)try{v[n]=Integer.parseInt(call.form.value(n));}catch(NumberFormatException e){int axis=coordinateAxis(call.name,n);if(axis<0)throw unsupported();linked[axis]=call.form.value(n);v[n]=gameValues.value(linked[axis]);}
+                    validate(call.name,v);Entry e=new Entry(call,v);e.links=linked;e.view=view;entries.add(e);
                 }
                 if(call.name.equals("cls"))for(Entry e:entries)if(!e.isCamera())throw unsupported();
                 String raw=source.substring(at,end);indent=raw.substring(0,raw.length()-raw.replaceFirst("^[ \\t]*","").length());
@@ -124,7 +131,7 @@ public final class GameUses {
     private void builtin(String name){LuaSymbols symbols=new LuaSymbols(source);if(symbols.shadows(name)||(newDraw&&symbols.shadows("cls")))throw unsupported();}
     public void addSprite(SpriteRegion region){available();builtin("sspr");kind="sspr";values=new int[]{region.x,region.y,region.width,region.height,60,60};begin(true);}
     public void addMap(int x,int y){available();builtin("map");kind="map";values=new int[]{x,y,0,0,Math.min(16,128-x),Math.min(16,64-y)};begin(true);}
-    private void begin(boolean create){finishField();background=null;layerMove=0;creating=create;deleting=converting=copyAfter=false;animation=null;camera=null;field=0;screen=Screen.FORM;validate(kind,values);}
+    private void begin(boolean create){if(create)links=new String[]{"",""};finishField();background=null;layerMove=0;creating=create;deleting=converting=copyAfter=false;animation=null;camera=null;field=0;screen=Screen.FORM;validate(kind,values);}
     public void addAnimation(SpriteRegion region){available();builtin("sspr");SpriteAnimation.validateSource(source);finishField();background=null;layerMove=0;kind="animation";creating=true;deleting=converting=copyAfter=false;camera=null;animation=new SpriteAnimation(region);screen=Screen.ANIMATION;}
     public void addCamera(boolean reset){available();if(current()==null||current().isCamera())throw new IllegalArgumentException("Select a sprite, animation, map or background first.");WorldCamera.validateSource(source,false);finishField();background=null;layerMove=0;camera=new CameraUse(this,reset);animation=null;creating=true;deleting=converting=copyAfter=false;kind="camera";screen=Screen.CAMERA;}
     public void addBackground(SpriteRegion region){
@@ -144,6 +151,7 @@ public final class GameUses {
     }
     public void animateSelected(){
         available();Entry e=current();if(e==null||e.isCamera()||e.isBackground()||e.kind().equals("map")||e.animation!=null)throw new IllegalArgumentException("Select a placed sprite to animate.");
+        if(e.linked())throw new IllegalArgumentException("This sprite follows game values. State-linked animation is not available yet; its coordinates were preserved.");
         if(e.x()<-127||e.x()>127||e.y()<-127||e.y()>127)throw new IllegalArgumentException("This animation editor supports positions from -127 to 127. The source is preserved.");
         edit();SpriteRegion r=region();addAnimation(r);animation.x=e.x();animation.y=e.y();creating=false;converting=true;
     }
@@ -153,16 +161,43 @@ public final class GameUses {
         if(e.isBackground()){kind="background";creating=deleting=converting=false;animation=null;background=new BackgroundUse(e.call.form);screen=Screen.BACKGROUND;}
         else if(e.isCamera()){kind="camera";creating=deleting=converting=false;animation=null;camera=new CameraUse(this,e.call);screen=Screen.CAMERA;}
         else if(e.animation!=null){kind="animation";creating=deleting=converting=false;animation=e.animation.initial.copy();screen=Screen.ANIMATION;}
-        else{kind=e.kind();values=e.values.clone();begin(false);}
+        else{kind=e.kind();values=e.values.clone();links=e.links.clone();begin(false);}
     }
     public void duplicate(){if(current()!=null&&current().isCamera())throw new IllegalArgumentException("Choose a use, then add a camera from Actions.");edit();if(current()!=null){creating=true;copyAfter=background!=null||current().view!=null;}}
     public void delete(){edit();if(current()!=null){deleting=true;screen=Screen.REVIEW;}}
-    public void review(){finishField();if(background!=null){BackgroundLayer.validate(source,background.form);background.playing=false;}else if(camera!=null){camera.validate();camera.invalidatePreview();}else if(animation==null)validate(kind,values);else{animation.playing=false;animation.review=false;}screen=Screen.REVIEW;}
+    public void review(){finishField();if(background!=null){BackgroundLayer.validate(source,background.form);background.playing=false;}else if(camera!=null){camera.validate();camera.invalidatePreview();}else if(animation==null){validate(kind,values);validateLinks();}else{animation.playing=false;animation.review=false;}screen=Screen.REVIEW;}
     public void back(){finishField();if(screen==Screen.PICK){picker=null;screen=Screen.FORM;}else if(screen==Screen.REVIEW&&!deleting&&layerMove==0)screen=background!=null?Screen.BACKGROUND:camera!=null?Screen.CAMERA:animation!=null?Screen.ANIMATION:Screen.FORM;else{animation=null;camera=null;background=null;layerMove=0;creating=deleting=converting=copyAfter=false;screen=Screen.LIST;}}
     public String[] labels(){return kind.equals("map")?new String[]{"Карта X, кл","Карта Y, кл","В игре X","В игре Y","Ширина, кл","Высота, кл"}:kind.equals("spr")?new String[]{"Тайл","В игре X","В игре Y"}:new String[]{"Лист X","Лист Y","Ширина, px","Высота, px","В игре X","В игре Y"};}
-    public int x(){return animation!=null?animation.x:values[kind.equals("sspr")?4:kind.equals("map")?2:1];}
-    public int y(){return animation!=null?animation.y:values[kind.equals("sspr")?5:kind.equals("map")?3:2];}
-    public void adjust(int delta){int old=values[field];values[field]+=delta;try{validate(kind,values);}catch(IllegalArgumentException e){values[field]=old;}}
+    private static int coordinateAxis(String kind,int field){int x=kind.equals("sspr")?4:kind.equals("map")?2:kind.equals("spr")?1:-10;return field==x?0:field==x+1?1:-1;}
+    public int coordinateField(int axis){return kind.equals("sspr")?4+axis:kind.equals("map")?2+axis:1+axis;}
+    public int x(){return animation!=null?animation.x:links[0].isEmpty()?values[coordinateField(0)]:gameValues.value(links[0]);}
+    public int y(){return animation!=null?animation.y:links[1].isEmpty()?values[coordinateField(1)]:gameValues.value(links[1]);}
+    public boolean linked(){return !links[0].isEmpty()||!links[1].isEmpty();}
+    public String coordinate(int axis){return links[axis].isEmpty()?Integer.toString(values[coordinateField(axis)]):links[axis];}
+    public int placementRows(){return values.length+3;}
+    public String placementLabel(int at){
+        if(at==placementRows()-1)return "Preview changes";
+        if(at>=values.length)return (at==values.length?"X":"Y")+" follows: "+(links[at-values.length].isEmpty()?"Fixed position":links[at-values.length]);
+        String[] labels=kind.equals("map")?new String[]{"Map X (tiles)","Map Y (tiles)","Game X","Game Y","Width (tiles)","Height (tiles)"}:kind.equals("spr")?new String[]{"Tile","Game X","Game Y"}:new String[]{"Sheet X","Sheet Y","Width (px)","Height (px)","Game X","Game Y"};
+        int axis=coordinateAxis(kind,at);return labels[at]+": "+(axis>=0&&!links[axis].isEmpty()?links[axis]+" (starts "+gameValues.value(links[axis])+")":values[at]);
+    }
+    public void placementField(){
+        int axis=coordinateAxis(kind,field);
+        if(field<values.length&&axis>=0&&!links[axis].isEmpty())throw new IllegalArgumentException("This coordinate follows "+links[axis]+". Change its starting value in Rules & state, or choose Fixed position below to unlink it.");
+        if(field>=values.length&&gameValues.initial.isEmpty())throw new IllegalArgumentException("Add a starting value in Rules & state first. B cancels this unsaved placement; X from the game list opens Rules & state. Then reopen the placement.");
+        beginField();
+    }
+    public void changePlacement(int delta){
+        if(field<values.length){adjust(delta);return;}
+        int axis=field-values.length;List<String> names=new ArrayList<>();names.add("");names.addAll(gameValues.initial.keySet());
+        int at=names.indexOf(links[axis]);String next=names.get(Math.max(0,Math.min(names.size()-1,at+Integer.signum(delta))));
+        if(next.isEmpty()&&!links[axis].isEmpty())values[coordinateField(axis)]=gameValues.value(links[axis]);links[axis]=next;
+    }
+    private void validateLinks(){if(links.length!=2)throw unsupported();for(String name:links)if(!name.isEmpty())gameValues.value(name);}
+    private void writePosition(DataOutputStream o)throws IOException{o.writeInt(values.length);for(int v:values)o.writeInt(v);o.writeUTF(links[0]);o.writeUTF(links[1]);}
+    private void readPosition(DataInputStream i)throws IOException{int size=i.readInt();if(size!=values.length)throw new IOException();int[] v=new int[size];for(int n=0;n<size;n++)v[n]=i.readInt();String[] l={i.readUTF(),i.readUTF()};validate(kind,v);for(String name:l)if(!name.isEmpty())gameValues.value(name);values=v;links=l;}
+
+    public void adjust(int delta){int axis=coordinateAxis(kind,field);if(axis>=0&&!links[axis].isEmpty())throw new IllegalArgumentException("Change the linked starting value in Rules & state, or unlink this coordinate first.");int old=values[field];values[field]+=delta;try{validate(kind,values);}catch(IllegalArgumentException e){values[field]=old;}}
     private static void range(int v,int lo,int hi){if(v<lo||v>hi)throw new IllegalArgumentException("The region or position is outside this form's supported range.");}
     private static void validate(String kind,int[] v){
         if(kind.equals("spr")){if(v.length!=3)throw unsupported();range(v[0],0,255);range(v[1],-32768,32767);range(v[2],-32768,32767);return;}
@@ -186,7 +221,7 @@ public final class GameUses {
         SpriteRegion r=region();return px<0||py<0||px>=r.width||py>=r.height?0:cart.pixel(r,px,py);
     }
     public CartEdit proposal(){
-        available();if(background!=null)return backgroundProposal();if(camera!=null)return camera.proposal(deleting);if(animation==null)validate(kind,values);String result;
+        available();if(background!=null)return backgroundProposal();if(camera!=null)return camera.proposal(deleting);if(animation==null){validate(kind,values);validateLinks();}String result;
         if(deleting){Entry e=current();if(e==null)throw unsupported();result=source.substring(0,e.start())+source.substring(e.animation!=null?e.end():afterLine(e.end()));}
         else if(animation!=null){
             SpriteAnimation.validateSource(source);
@@ -198,9 +233,9 @@ public final class GameUses {
                 result=source.substring(0,e.start())+comment+animationBlock(lead)+source.substring(afterLine(e.end()));
             }else result=insert(animationBlock(indent));
         }
-        else if(!creating){Entry e=current();if(e==null)throw unsupported();LuaInsert form=e.call.form;for(int n=0;n<values.length;n++)form.set(n,Integer.toString(values[n]));result=e.call.replacement(source,form);}
+        else if(!creating){Entry e=current();if(e==null)throw unsupported();LuaInsert form=e.call.form;for(int n=0;n<values.length;n++){int axis=coordinateAxis(kind,n);form.set(n,axis<0?Integer.toString(values[n]):coordinate(axis));}result=e.call.replacement(source,form);}
         else{
-            StringBuilder call=new StringBuilder(kind+"(");for(int n=0;n<values.length;n++){if(n>0)call.append(',');call.append(values[n]);}call.append(')');
+            StringBuilder call=new StringBuilder(kind+"(");for(int n=0;n<values.length;n++){if(n>0)call.append(',');int axis=coordinateAxis(kind,n);call.append(axis<0?Integer.toString(values[n]):coordinate(axis));}call.append(')');
             String insert=indent+call+newline;
             if(newDraw)insert=(source.isEmpty()||source.endsWith("\n")||source.endsWith("\r")?"":newline)+"function _draw()"+newline+" cls(1)"+newline+insert+"end"+newline;
             int at=creationAt();result=source.substring(0,at)+insert+source.substring(at);
@@ -229,12 +264,12 @@ public final class GameUses {
     }
     private int creationAt(){return copyAfter&&current()!=null?(current().animation!=null?current().end():afterLine(current().end())):insertAt;}
     public byte[] encode(){try{
-        ByteArrayOutputStream b=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(b);o.writeInt(6);byte[] cart=base.bytes();o.writeInt(cart.length);o.write(cart);
+        ByteArrayOutputStream b=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(b);o.writeInt(7);byte[] cart=base.bytes();o.writeInt(cart.length);o.write(cart);
         o.writeInt(returnTool);o.writeInt(index);o.writeUTF(screen.name());o.writeInt(field);o.writeInt(menu);o.writeBoolean(creating);o.writeBoolean(deleting);o.writeUTF(kind);o.writeInt(values.length);for(int v:values)o.writeInt(v);o.writeBoolean(picker!=null);if(picker!=null)picker.write(o);
-        o.writeBoolean(converting);o.writeBoolean(animation!=null);if(animation!=null)animation.write(o);o.writeBoolean(copyAfter);o.writeBoolean(camera!=null);if(camera!=null)camera.write(o);o.writeInt(fieldBaseline==null?0:fieldBaseline.length);if(fieldBaseline!=null)o.write(fieldBaseline);o.writeBoolean(background!=null);if(background!=null)background.write(o);o.writeInt(layerMove);o.writeBoolean(logic!=null);if(logic!=null)logic.write(o);return b.toByteArray();
+        o.writeBoolean(converting);o.writeBoolean(animation!=null);if(animation!=null)animation.write(o);o.writeBoolean(copyAfter);o.writeBoolean(camera!=null);if(camera!=null)camera.write(o);o.writeInt(fieldBaseline==null?0:fieldBaseline.length);if(fieldBaseline!=null)o.write(fieldBaseline);o.writeBoolean(background!=null);if(background!=null)background.write(o);o.writeInt(layerMove);o.writeBoolean(logic!=null);if(logic!=null)logic.write(o);o.writeUTF(links[0]);o.writeUTF(links[1]);return b.toByteArray();
     }catch(IOException e){throw new IllegalStateException(e);}}
     public static GameUses restore(byte[] bytes,WorkshopCartridge current){try{
-        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version<1||version>6)throw new IOException();int n=i.readInt();if(n<0||n>2*1024*1024||n>i.available())throw new IOException();byte[] cart=new byte[n];i.readFully(cart);
+        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version<1||version>7)throw new IOException();int n=i.readInt();if(n<0||n>2*1024*1024||n>i.available())throw new IOException();byte[] cart=new byte[n];i.readFully(cart);
         if(!Arrays.equals(cart,current.bytes()))throw new IOException("The project changed; its source was not overwritten.");
         int tool=i.readInt();if(tool<0||tool>3)throw new IOException();GameUses g=new GameUses(current,tool);g.index=i.readInt();g.screen=Screen.valueOf(i.readUTF());g.field=i.readInt();g.menu=i.readInt();g.creating=i.readBoolean();g.deleting=i.readBoolean();g.kind=i.readUTF();int size=i.readInt();if(size!=3&&size!=6)throw new IOException();g.values=new int[size];for(int v=0;v<size;v++)g.values[v]=i.readInt();if(!g.kind.equals("animation")&&!g.kind.equals("camera")&&!g.kind.equals("background"))validate(g.kind,g.values);if(i.readBoolean())g.picker=SpritePlacement.read(i);
         if(version>=2){g.converting=i.readBoolean();if(i.readBoolean())g.animation=SpriteAnimation.read(i);}
@@ -244,14 +279,16 @@ public final class GameUses {
         }
         if(version>=5){if(i.readBoolean())g.background=BackgroundUse.read(i);g.layerMove=i.readInt();}
         if(version>=6&&i.readBoolean())g.logic=GameRules.read(i,current);
+        if(version>=7){g.links=new String[]{i.readUTF(),i.readUTF()};g.validateLinks();}
+        else if(g.current()!=null&&!g.creating&&g.screen==Screen.FORM)g.links=g.current().links.clone();
         if((g.screen==Screen.LOGIC)!=(g.logic!=null))throw new IOException();
         if(g.fieldBaseline!=null){
-            if(g.screen!=Screen.CAMERA&&g.screen!=Screen.ANIMATION&&g.screen!=Screen.BACKGROUND||g.animation!=null&&g.animation.picker!=null||g.background!=null&&g.background.picker!=null)throw new IOException();
+            if(g.screen!=Screen.CAMERA&&g.screen!=Screen.ANIMATION&&g.screen!=Screen.BACKGROUND&&g.screen!=Screen.FORM||g.animation!=null&&g.animation.picker!=null||g.background!=null&&g.background.picker!=null)throw new IOException();
             DataInputStream f=new DataInputStream(new ByteArrayInputStream(g.fieldBaseline));
-            if(g.background!=null)BackgroundUse.read(f);else if(g.camera!=null)CameraUse.read(f,g);else SpriteAnimation.read(f);
+            if(g.background!=null)BackgroundUse.read(f);else if(g.camera!=null)CameraUse.read(f,g);else if(g.animation!=null)SpriteAnimation.read(f);else{int[] saved=g.values.clone();String[] links=g.links.clone();g.readPosition(f);g.values=saved;g.links=links;}
             if(f.available()!=0)throw new IOException();
         }
-        if(i.available()!=0||g.index<0||g.index>=Math.max(1,g.entries.size())||g.field<0||g.field>=size||g.menu<0||g.menu>13||(g.screen==Screen.PICK)!=(g.picker!=null))throw new IOException();
+        if(i.available()!=0||g.index<0||g.index>=Math.max(1,g.entries.size())||g.field<0||g.field>=((g.screen==Screen.FORM||g.screen==Screen.PICK||g.screen==Screen.REVIEW&&g.animation==null&&g.camera==null&&g.background==null)?g.placementRows():size)||g.menu<0||g.menu>13||(g.screen==Screen.PICK)!=(g.picker!=null))throw new IOException();
         if(g.screen!=Screen.LIST&&g.screen!=Screen.MENU&&g.screen!=Screen.LOGIC&&!g.blocked.isEmpty())throw new IOException();
         if(g.screen==Screen.FORM||g.screen==Screen.REVIEW||g.screen==Screen.PICK||g.screen==Screen.ANIMATION||g.screen==Screen.CAMERA||g.screen==Screen.BACKGROUND){
             if(!g.creating&&(g.current()==null||!g.converting&&g.camera==null&&!g.kind.equals(g.current().kind())))throw new IOException();

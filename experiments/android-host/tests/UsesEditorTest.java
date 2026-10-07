@@ -40,7 +40,7 @@ public final class UsesEditorTest {
         p.failLaunch=true;s.act(Action.TEST);check(s.mode==WorkshopSession.Mode.ERROR&&s.uses.camera.form.value(0).equals("8"),"launch failure keeps draft");s.act(Action.CONFIRM);check(s.mode==WorkshopSession.Mode.USES,"error returns to editor");
         int writes=p.writes;s.act(Action.CANCEL);check(p.writes==writes&&s.uses.screen==GameUses.Screen.LIST,"cancel camera writes nothing");
         // Old journals remain readable: v3 ends immediately before the v4 field memento.
-        GameUses old=new GameUses(blank,0);byte[] v3=Arrays.copyOf(old.encode(),old.encode().length-10);v3[3]=3;check(GameUses.restore(v3,blank).screen==GameUses.Screen.LIST,"v3 backward compatibility");
+        GameUses old=new GameUses(blank,0);byte[] v3=Arrays.copyOf(old.encode(),old.encode().length-14);v3[3]=3;check(GameUses.restore(v3,blank).screen==GameUses.Screen.LIST,"v3 backward compatibility");
         s.uses.addCamera(false);s.uses.camera.field=0;act(s,Action.CONFIRM,Action.RIGHT);journal=s.uses.encode();s.restoreUses(journal);s.act(Action.CANCEL);check(s.uses.camera.form.item().id.equals("camera"),"mode rollback restores original dimensions and mode");
         System.out.println("UsesEditorTest: "+checks+" checks passed");
     }
