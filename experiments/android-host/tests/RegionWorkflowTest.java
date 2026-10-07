@@ -79,7 +79,7 @@ public final class RegionWorkflowTest {
         s.act(Action.TEST);check(Arrays.equals(p.launched,s.cart().bytes()),"runtime gets expanded standard cart bytes");
         s.act(Action.REGION);for(int i=0;i<20;i++){s.act(Action.RIGHT);s.act(Action.DOWN);}
         s.act(Action.CONFIRM);s.act(Action.CONFIRM);
-        check(s.region.x==120&&s.region.y==56&&!s.region.sharesMap(),"current UI stops before shared map half");
+        check(s.region.x==120&&s.region.y==120&&s.region.sharesMap(),"full sheet selection reaches the shared corner");
         s.act(Action.SPRITE_SHEET);s.act(Action.ASSIGN_HERO);
         check(s.region==null,"legacy cards resume their explicit 16x16 bindings");
         System.out.println("RegionWorkflowTest: "+checks+" checks passed");

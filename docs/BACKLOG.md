@@ -1,5 +1,15 @@
 # PikoNest — задачи полного цикла
 
+**Lab 0.0.73 - shared sprite/map painting (partial G01-G03):** full-sheet
+selection, lower-half sprite brushes/fill/shapes and full-map brushes/rectangle/fill
+prepare a before/after review. Apply saves both resources as one Undo transaction;
+Cancel and draft Test preserve saved bytes, recovery retains the source-hashed
+proposal. Native Blank authoring, process-death recovery, byte-exact Undo/Redo and
+official PICO-8 draft Test/return passed; all 49 old project/library files stayed
+unchanged. [Evidence and exact limits](showcase/0.0.73-en/README.md).
+Shared sprite copy/move/transform/recolor, allocation, continuous strokes and
+physical/owner acceptance remain open. Continue package 3 before presets.
+
 **Обновление 2026-10-07, lab 0.0.72:** C02.4/G04 связывает X/Y спрайта и карты
 с начальными числовыми значениями. Общие формы размещения, отмена поля,
 Test черновика, Apply/Undo и journal v7 сохраняют обычный `.p8`.
@@ -165,9 +175,9 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 
 | ID | Статус / зависит от | Работа | Критерий закрытия |
 | --- | --- | --- | --- |
-| G01 | Частично / A03 | Полный лист/размеры и прямоугольные области, флаги, доступ к shared map/gfx с предупреждением реального конфликта; использования | Нельзя считать пустые пиксели свободными от ссылок Lua; нижняя половина и карта согласованы; большие спрайты следуют модели PICO-8 |
-| G02 | Частично / G01 | Завершить инструменты: штрихи, zoom/pan, выделение/буфер, вырезать/вставить/стереть, перемещение/трансформации прямоугольников, палитра/прозрачность preview | Навигация не рисует; одна операция — одна отмена; поворот не обрезает молча; цветовой индекс не превращается в придуманную alpha-модель |
-| G03 | Частично (G03.1–4) / G01 | Tile/map editor: выбор тайла/флагов, кисть/штамп/линия/заливка, области/copy/move, масштаб, коллизии как известная механика | Собрать свою карту и поле без героя; gfx/map-конфликт проверен; сохранение/Undo/Test/reopen не меняют несвязанные ресурсы |
+| G01 | Partial / 0.0.73; A03 | Full-sheet selection; lower sprite painting reviews map consequences. [Evidence](showcase/0.0.73-en/README.md) | Shared copy/move/transforms and allocation remain open; empty pixels do not prove an area is unused by Lua |
+| G02 | Partial / 0.0.73; G01 | Brush/eraser/fill/line/rectangle/oval shared review, one Apply/Undo, recovery and draft Test | Continuous strokes, richer zoom/pan, cross-project buffer and shared transforms remain open; preserve index-0 semantics |
+| G03 | Partial / 0.0.73; G03.1-4, G01 | Brush/rectangle/fill use the full standard 128 x 64 map with shared-gfx review; existing region operations retained | Complete brush/stamp/line, scaling and connected hero-free field workflow; remapped RAM and owner acceptance remain open |
 | G03.4 | Частично (0.0.63) / G03, G01 | Копия/перенос/очистка прямоугольной области 128×64; snapshot при перекрытии, preview последствий для gfx, подтверждение, одна отмена, восстановление | Технический путь: android-map-regions-63; физическая UX-приёмка открыта. Межпроектный буфер, shared-кисти и remapped RAM не входят в этот срез |
 | G04 | Частично (G04.1) / C02 | Явное использование ресурса в игре: выбрать sprite/map/область, положение/порядок/HUD, вставить обычный draw-код или связать известное использование | Нарисованный спрайт/фон действительно виден после Test из blank; несколько использований допустимы; не создаётся обязательная сцена/герой/ECS. Map-часть подключается по готовности G03 |
 | G04.2 | Частично (0.0.62, 0.0.64–65) / G04.1, C02, A02 | Из спрайтов/карты разместить ресурс в игре; список известных использований, создание, повторная форма, копия/удаление, безопасная точка draw-вставки, возврат и восстановление | Ограниченный blank-путь без открытия Lua: android-uses-62; анимации подключены в N01.3, камера в N02.3. Фоны, сложные контексты и физическая приёмка остаются. Полный контракт в CORE_TOOLS |

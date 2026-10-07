@@ -1,5 +1,15 @@
 # PikoNest Android host experiment
 
+**Lab 0.0.73 - shared sprite/map painting (partial G01-G03):** full-sheet
+selection, lower-half sprite brushes/fill/shapes and full-map brushes/rectangle/fill
+prepare a before/after review. Apply saves both resources as one Undo transaction;
+Cancel and draft Test preserve saved bytes, recovery retains the source-hashed
+proposal. Native Blank authoring, process-death recovery, byte-exact Undo/Redo and
+official PICO-8 draft Test/return passed; all 49 old project/library files stayed
+unchanged. [Evidence and exact limits](../../docs/showcase/0.0.73-en/README.md).
+Shared sprite copy/move/transform/recolor, allocation, continuous strokes and
+physical/owner acceptance remain open. Continue package 3 before presets.
+
 **0.0.72:** Rules & state connects sprite/map destination X/Y to recognized
 numeric starting values. Placement forms share field revert, preview, draft Test,
 Apply/Undo and journal v7 recovery (v1–6 readable). A native UI-authored Blank game
@@ -7,7 +17,7 @@ ran movement, goal and reset in official PICO-8 and exported byte-for-byte.
 [Evidence, cartridge and limits](../../docs/showcase/0.0.72-en/README.md).
 Next: general sprite/map editors; event animation/audio and full ACC-01 remain open.
 
-**Current lab: 0.0.72.** One APK contains Workshop and the runtime adapter.
+**Current lab: 0.0.73.** One APK contains Workshop and the runtime adapter.
 Verified old-data copy/merge retains source and prior homes. Retroid checks cover
 cartdata retention, isolated clean private installation, Play/Workshop Test/return
 and retry after interrupted setup. [Build inputs](../android-integrated/README.md),

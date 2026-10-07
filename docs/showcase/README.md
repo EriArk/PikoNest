@@ -1,5 +1,7 @@
 # PikoNest — English website gallery
 
+[Lab 0.0.73: shared sprite/map review, native recovery and official draft Test](0.0.73-en/README.md). Six unedited English device captures; partial G01-G03.
+
 Latest: [0.0.72 rules move sprites](0.0.72-en/README.md) — eight original English
 Retroid captures of coordinate bindings, rules, a UI-authored game in official
 PICO-8, goal/reset and verified export. Includes the exact exported `.p8`.

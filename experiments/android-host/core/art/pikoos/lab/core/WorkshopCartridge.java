@@ -29,6 +29,7 @@ public final class WorkshopCartridge {
     public WorkshopCartridge withTile(int x,int y,int tile){return edited(map().withTile(x,y,tile));}
     public WorkshopCartridge withMapChange(MapChange change){return edited(change.apply(map()));}
     public WorkshopCartridge withMapCells(int[] values){return edited(map().withCells(values));}
+    public WorkshopCartridge withSheetPixels(int[] values){return edited(graphics.withPixels(values));}
     public WorkshopCartridge insert(SpriteAsset asset,SpriteRegion target){return edited(graphics.insert(asset,target));}
     public WorkshopCartridge replaceColor(SpriteRegion region,int from,int to){return edited(graphics.replaceColor(region,from,to));}
     private WorkshopCartridge edited(P8Document next){return next==document?this:new WorkshopCartridge(next.bytes());}

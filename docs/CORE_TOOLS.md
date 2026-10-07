@@ -1,5 +1,15 @@
 # Базовые инструменты: завершённость и порядок работ
 
+**Lab 0.0.73 - shared sprite/map painting (partial G01-G03):** full-sheet
+selection, lower-half sprite brushes/fill/shapes and full-map brushes/rectangle/fill
+prepare a before/after review. Apply saves both resources as one Undo transaction;
+Cancel and draft Test preserve saved bytes, recovery retains the source-hashed
+proposal. Native Blank authoring, process-death recovery, byte-exact Undo/Redo and
+official PICO-8 draft Test/return passed; all 49 old project/library files stayed
+unchanged. [Evidence and exact limits](showcase/0.0.73-en/README.md).
+Shared sprite copy/move/transform/recolor, allocation, continuous strokes and
+physical/owner acceptance remain open. Continue package 3 before presets.
+
 **Обновление 0.0.72:** C02.4/G04 — X/Y спрайтов и карты следуют известным
 начальным числам из Rules & state. Формы размещения используют общую грамматику
 A edit/done, B отмена поля, preview/Test/Apply/Undo; journal v7 читает v1–6.
@@ -121,7 +131,7 @@ Lua не является обязательным шагом. Повторно 
 | --- | --- | --- | --- |
 | Код | Черновик, ввод, конструкции/API, формы, простые ветви и действия, сохранение/Test | Контекстные переходы из других редакторов, табы/includes, более полная диагностика; сохранение конфликтов и история | C01–C06, A02, P03/P04 |
 | Спрайты | Выбор области, рисование, копирование/преобразования, флаги, сохранение и библиотека пикселей | Явное размещение из редактора и поиск использований; запись shared gfx/map пока ограничена | G01/G02, G04.2 |
-| Карта | Выбор тайла, кисть/прямоугольник/заливка, обзор, отмена и восстановление предложения | Подключение карты к draw-пути, операции с областями; верхняя половина редактируется, shared-половина остаётся для чтения | G03, G04.2 |
+| Map | Full-map brush/rectangle/fill and shared-gfx review (0.0.73); flags and map-region operations | Complete brush/stamp/line, scale and buffer workflows; runtime RAM remapping remains outside this slice | G03, G04.2 |
 | Анимация | Кадры, порядок/копия/удаление, длительности, loop/once, preview; повторная форма известного блока | Поиск созданной анимации без курсора Lua, управление последовательностями, выбор использования и связи с состоянием | N01, G04 |
 | Камера | Формы положения/follow, ограничения и комнаты, reset для HUD | Понятный вход и выбор существующей настройки, связь с координатами/использованиями, безопасный порядок world/HUD | N02, G04, M05 |
 | Фоны | Список известных полос, создание/копия/параметры/порядок/удаление, Undo и восстановление | Подключение к отрисовке ещё зависит от места в коде; дополнительные оси и анимация расширяют возможности, но не устраняют этот разрыв | N03, G04 |

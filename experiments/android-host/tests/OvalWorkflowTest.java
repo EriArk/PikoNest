@@ -63,7 +63,7 @@ public final class OvalWorkflowTest {
                 s.act(Action.UNDO);s.restoreStroke(1,2);s.act(Action.UNDO);check(!s.pendingStroke()&&s.canRedo(),"Y cancels draft without losing redo");
                 s.act(Action.REDO);same(expected,s.cart().bytes(),"redo survives cancelled oval");
                 s.act(Action.DRAW_TOOLS);s.chooseDrawTool(4);s.paintAt(15,2);check(s.drawTool==tool,"picker returns to oval");
-                s.region=new SpriteRegion(0,56,16,16);s.restoreStroke(1,2);check(!s.pendingStroke(),"shared-map guard applies to oval recovery");
+                s.region=new SpriteRegion(0,56,16,16);s.restoreStroke(1,2);check(s.pendingStroke(),"shared oval recovery remains a draft");s.act(Action.CANCEL);
             }
         }
         for(boolean filled:new boolean[]{false,true})same(blank.bytes(),blank.withOval(sheet,0,0,127,63,0,filled).bytes(),"zero no-op preserves absent gfx rows");

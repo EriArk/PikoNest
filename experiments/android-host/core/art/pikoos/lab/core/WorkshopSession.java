@@ -7,7 +7,7 @@ import java.util.Arrays;
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, REDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS, CHECK }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE, DIAGNOSTIC, ASSET_CATEGORY, USES }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE, DIAGNOSTIC, ASSET_CATEGORY, USES, SHARED }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE, OVAL, FILLED_OVAL }
     // Keep existing operation entries 5/6 stable while adding brushes after them.
     public static int moveMenuIndex(){return DrawTool.values().length+2;}
@@ -39,6 +39,19 @@ public final class WorkshopSession {
     private final int[] toolFocus = new int[4];
     public final MapEditor mapEditor=new MapEditor();
     public GameUses uses;
+    public SharedEdit sharedEdit;
+    private boolean resourceEdit(WorkshopCartridge next,String label,Mode origin)throws Exception{
+        boolean shared=false;
+        for(int y=64;y<128&&!shared;y++)for(int x=0;x<128;x++)if(cart.sheetPixel(x,y)!=next.sheetPixel(x,y)){shared=true;break;}
+        if(!shared){save(next,true);return false;}
+        sharedEdit=new SharedEdit(cart,next,label,origin.name());mode=Mode.SHARED;return true;
+    }
+    public void restoreShared(byte[] bytes){
+        if(tool!=2&&tool!=3||uses!=null||codeDraft!=null||mapEditor.modal()||pendingStroke())throw new IllegalArgumentException("Finish the current draft before restoring the shared-memory proposal.");
+        SharedEdit restored=SharedEdit.restore(bytes,cart);
+        if(tool==3&&!restored.origin.equals("NAVIGATE")||tool==2&&!restored.origin.equals("CANVAS"))throw new IllegalArgumentException("The resource context changed. Saved pixels were preserved.");
+        sharedEdit=restored;mode=Mode.SHARED;
+    }
     public void openUses(boolean create){
         if(codeDraft!=null||pendingStroke()||mapEditor.modal()||flagDraft!=null)return;
         try{uses=new GameUses(cart,tool);mode=Mode.USES;
@@ -692,7 +705,7 @@ public final class WorkshopSession {
     /** The legacy lineX/lineY preference keys hold the first point for all two-point tools. */
     public void restoreStroke(int x,int y){
         SpriteRegion r=selection();
-        if(tool==2&&mode==Mode.CANVAS&&!browsingSprites&&twoPointTool()&&!r.sharesMap()
+        if(tool==2&&mode==Mode.CANVAS&&!browsingSprites&&twoPointTool()
             &&x>=0&&y>=0&&x<r.width&&y<r.height){lineX=x;lineY=y;}
     }
     public SpriteRegion selection(){return region==null?new SpriteRegion(spriteSlot*16,0,16,16):region;}
@@ -708,7 +721,7 @@ public final class WorkshopSession {
     }
     public void pointRegion(int x,int y){
         if(mode!=Mode.REGION)return;
-        regionX=clamp(x,15);regionY=clamp(y,7);act(Action.CONFIRM);
+        regionX=clamp(x,15);regionY=clamp(y,15);act(Action.CONFIRM);
     }
     private void chooseRegion(){
         regionReturn=mode;SpriteRegion r=selection();regionX=r.x/8;regionY=r.y/8;choosingEnd=false;mode=Mode.REGION;
@@ -730,7 +743,7 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = mode==Mode.USES||mode==Mode.CODE||mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE||mode==Mode.ASSET_CATEGORY?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        overlayReturn = mode==Mode.SHARED||mode==Mode.USES||mode==Mode.CODE||mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE||mode==Mode.ASSET_CATEGORY?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
         if(pendingStroke())return;
@@ -817,9 +830,9 @@ public final class WorkshopSession {
     }
     private void draw()throws Exception {
         switch(drawTool){
-            case BRUSH:save(cart.withPixel(selection(),cursorX,cursorY,color),true);break;
-            case ERASER:save(cart.withPixel(selection(),cursorX,cursorY,0),true);break;
-            case FILL:save(cart.withFill(selection(),cursorX,cursorY,color),true);break;
+            case BRUSH:resourceEdit(cart.withPixel(selection(),cursorX,cursorY,color),"Sprite brush",Mode.CANVAS);break;
+            case ERASER:resourceEdit(cart.withPixel(selection(),cursorX,cursorY,0),"Sprite eraser",Mode.CANVAS);break;
+            case FILL:resourceEdit(cart.withFill(selection(),cursorX,cursorY,color),"Sprite fill",Mode.CANVAS);break;
             case LINE:lineX=cursorX;lineY=cursorY;notice="Выбери конец линии";break;
             case RECTANGLE:case FILLED_RECTANGLE:lineX=cursorX;lineY=cursorY;notice="Выбери противоположный угол";break;
             case OVAL:case FILLED_OVAL:lineX=cursorX;lineY=cursorY;notice="Выбери второй угол рамки овала";break;
@@ -836,6 +849,15 @@ public final class WorkshopSession {
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if(mode==Mode.SHARED){
+                if(action==Action.CONTEXT)sharedEdit.mapView=!sharedEdit.mapView;
+                if(action==Action.LEFT)sharedEdit.step(-1);if(action==Action.RIGHT)sharedEdit.step(1);
+                if(action==Action.UP||action==Action.PREVIOUS)sharedEdit.step(-8);if(action==Action.DOWN||action==Action.NEXT)sharedEdit.step(8);
+                if(action==Action.TEST){port.launch(sharedEdit.candidate(cart).bytes());return;}
+                if(action==Action.CANCEL||action==Action.UNDO){mode=Mode.valueOf(sharedEdit.origin);sharedEdit=null;notice="Saved resources unchanged";return;}
+                if(action==Action.CONFIRM){save(sharedEdit.candidate(cart),true);mode=Mode.valueOf(sharedEdit.origin);sharedEdit=null;notice="Resources saved together; Y Undo";}
+                return;
+            }
             if(mode==Mode.USES){usesAction(action);return;}
             if(mode==Mode.DIAGNOSTIC){diagnosticAction(action);return;}
             if(mode==Mode.CODE){codeAction(action);return;}
@@ -951,8 +973,8 @@ public final class WorkshopSession {
             if(mode==Mode.REGION){
                 if(action==Action.LEFT)regionX=clamp(regionX-1,15);
                 if(action==Action.RIGHT)regionX=clamp(regionX+1,15);
-                if(action==Action.UP)regionY=clamp(regionY-1,7);
-                if(action==Action.DOWN)regionY=clamp(regionY+1,7);
+                if(action==Action.UP)regionY=clamp(regionY-1,15);
+                if(action==Action.DOWN)regionY=clamp(regionY+1,15);
                 if(action==Action.CANCEL){if(choosingEnd)choosingEnd=false;else mode=regionReturn;}
                 if(action==Action.CONFIRM){
                     if(!choosingEnd){anchorX=regionX;anchorY=regionY;choosingEnd=true;}
@@ -964,8 +986,8 @@ public final class WorkshopSession {
                 moveCursor(action);
                 if(action==Action.CANCEL||action==Action.UNDO){lineX=lineY=-1;notice=drawTool==DrawTool.LINE?"Линия отменена":ovalTool()?"Овал отменён":"Прямоугольник отменён";}
                 if(action==Action.CONFIRM||action==Action.TEST){
-                    save(canvasPreview(),true);lineX=lineY=-1;
-                    if(action==Action.TEST)port.launch(cart.bytes());
+                    WorkshopCartridge next=canvasPreview();boolean staged=resourceEdit(next,"Sprite "+drawTool.name().toLowerCase(java.util.Locale.ROOT).replace('_',' '),Mode.CANVAS);lineX=lineY=-1;
+                    if(action==Action.TEST)port.launch(staged?next.bytes():cart.bytes());
                 }
                 return; // A draft cannot leak into other resources, tabs or runtime snapshots.
             }
@@ -1092,7 +1114,7 @@ public final class WorkshopSession {
                 if(action==Action.UNDO){mapEditor.clear();notice="Предложение отменено";}
                 if(action==Action.CONFIRM){
                     if(mapEditor.phase==1)mapEditor.review();
-                    else{boolean differs=mapEditor.preview(cart).count>0;save(mapEditor.candidate(cart),true);mapEditor.clear();notice=differs?"Карта изменена · Y отмена":"Клетки не изменились";}
+                    else{boolean differs=mapEditor.preview(cart).count>0;resourceEdit(mapEditor.candidate(cart),"Map "+mapEditor.tool.name().toLowerCase(java.util.Locale.ROOT),Mode.NAVIGATE);mapEditor.clear();notice=differs?"Map proposal ready":"Cells unchanged";}
                 }
                 return;
             }
@@ -1128,7 +1150,7 @@ public final class WorkshopSession {
                 if(action==Action.UP)mapEditor.move(0,-1);
                 if(action==Action.DOWN)mapEditor.move(0,1);
                 if(action==Action.CONTEXT)mapEditor.begin();
-                if(action==Action.CONFIRM){if(mapEditor.tool==MapEditor.Tool.BRUSH)save(cart.withTile(mapEditor.x,mapEditor.y,mapEditor.tile),true);else mapEditor.start(cart);}
+                if(action==Action.CONFIRM){if(mapEditor.tool==MapEditor.Tool.BRUSH)resourceEdit(cart.withMapChange(MapChange.brush(cart.map(),mapEditor.x,mapEditor.y,mapEditor.tile)),"Map brush",Mode.NAVIGATE);else mapEditor.start(cart);}
                 if(action==Action.CANCEL){overlayReturn=mode;mode=Mode.MENU;menuItem=3;}
                 return;
             }

@@ -191,7 +191,10 @@ independent exported-cart acceptance remain open. Next implement the general
 sprite/map editors (package 3, G01–G03); state/event animation and audio follow.
 Carry UX05 with remaining core tools rather than
 blocking them on a cosmetic rewrite. Shared
-sprite painting and map brushes remain unfinished G01/G03 work. N03.3 is deferred from the
+sprite painting and map brushes now have explicit before/after review in 0.0.73.
+Source-hashed recovery, isolated Test and one Apply/Undo are demonstrated; see
+`docs/showcase/0.0.73-en/README.md`. Shared sprite copy/move/transforms/recolor,
+allocation and continuous strokes remain unfinished G01-G03 work. N03.3 is deferred from the
 immediate queue. Preserve existing libraries, favorites and presets.
 
 Owner creation requirement (2026-10-04): a simple original game must be creatable

@@ -53,6 +53,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'SpritePlacemen
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'MapWorkflowTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'MapRegionTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'MapToolsTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'SharedEditingTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'FlagsTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'TileProbeTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'AreaProbeTest',(Join-Path $pikoArtifacts 'area-probe-tests.p8'))

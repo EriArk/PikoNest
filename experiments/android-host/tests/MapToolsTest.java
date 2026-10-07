@@ -30,11 +30,11 @@ public final class MapToolsTest {
         check(MapChange.fill(r.map(),4,5,17).count==0,"same-tile fill is no-op");
         WorkshopCartridge diagonal=b.withTile(0,0,1).withTile(1,1,1).withTile(127,0,1).withTile(0,1,2);
         check(MapChange.fill(diagonal.map(),0,0,2).count==1,"no diagonal or row-wrap connectivity");
-        MapChange full=MapChange.fill(b.map(),127,31,255);check(full.count==4096,"large fill bounded to independent upper half");
-        WorkshopCartridge all=b.withMapChange(full);check(all.map().tile(127,31)==255,"far edge serialized");sameSections(b,all);P8Map am=all.map();
-        for(int y=32;y<64;y++)for(int x=0;x<128;x++)check(am.tile(x,y)==bm.tile(x,y),"shared map unchanged");
+        MapChange full=MapChange.fill(b.map(),127,31,255);check(full.count==8191,"large fill crosses shared boundary and preserves a different tile");
+        WorkshopCartridge all=b.withMapChange(full);check(all.map().tile(127,31)==255,"far edge serialized");P8Map am=all.map();
+        for(int y=32;y<64;y++)for(int x=0;x<128;x++)check(am.tile(x,y)==(bm.tile(x,y)==0?255:bm.tile(x,y)),"shared fill follows matching tile values");
         check(all.withMapChange(MapChange.fill(all.map(),0,0,0)).map().tile(127,31)==0,"zero erases all connected tiles");
-        refused(()->MapChange.rectangle(b.map(),0,0,2,32,1));refused(()->MapChange.fill(b.map(),0,32,1));
+        refused(()->MapChange.rectangle(b.map(),0,0,2,64,1));refused(()->MapChange.fill(b.map(),0,64,1));
         refused(()->MapChange.fill(b.map(),-1,0,1));refused(()->b.map().withTiles(new boolean[8192],1));
         Port port=new Port();WorkshopSession s=new WorkshopSession(b,port);s.switchTool(3);s.act(Action.CHECK);s.act(Action.DOWN);s.act(Action.CONFIRM);
         check(s.mapEditor.tool==MapEditor.Tool.RECTANGLE,"controller tool selection");s.act(Action.CONFIRM);s.act(Action.RIGHT);s.act(Action.DOWN);
@@ -58,7 +58,7 @@ public final class MapToolsTest {
         int previousSaves=port.saves;MapEditor recoveredFill=new MapEditor();recoveredFill.restore(s.mapEditor.encode(),s.cart());check(recoveredFill.phase==2,"recover fill");
         s.act(Action.UNDO);check(!s.mapEditor.pending()&&port.saves==previousSaves&&s.undoCount()==1,"Y cancels proposal, not saved history");
         s.mapEditor.x=0;s.mapEditor.y=0;s.act(Action.CONFIRM);s.act(Action.CONFIRM);check(s.undoCount()==1&&port.saves==previousSaves,"no-op preview creates no save or history");
-        s.mapEditor.y=32;s.act(Action.CONFIRM);check(s.mode==WorkshopSession.Mode.ERROR&&!s.mapEditor.pending(),"shared seed refused before draft");
+        s.mapEditor.y=32;s.act(Action.CONFIRM);check(s.mode!=WorkshopSession.Mode.ERROR&&s.mapEditor.phase==2,"shared seed prepares a review without writing");
         System.out.println("MapToolsTest: "+checks+" checks passed");
     }
 }

@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-07",
+  "device": "Retroid Pocket Classic",
+  "android": 14,
+  "artifact": {
+    "package": "art.pikoos.runtimelab",
+    "version": "0.0.73",
+    "sha256": "2146545555466bab4a2c5b34e8574b84fcccae8fc8d8a451d66dccf9cfffbef0"
+  },
+  "source": "Unedited ADB screencap PNGs from the normal one-APK development build. No presentation build.",
+  "interaction": "Injected controller events for region selection, review, Apply/Undo/Redo and Test; touch for pixel corners, menus and runtime Exit. Physical controls and owner acceptance remain open.",
+  "cartridge": {
+    "file": "shared-oval.p8",
+    "sha256": "d28b4d97d59d692aafe076ba1eb4723f247e3bbee0a05d112a7c957841eb4fe7",
+    "bytes": 10211,
+    "authoring": "New project / Blank through native UI; ordinary sspr placement. Read-only device copy of saved cart, not SAF export in this batch."
+  },
+  "checks": {
+    "focused_shared_checks": 122,
+    "original_project_library_files_unchanged": 49,
+    "process_death_recovery": true,
+    "apply_undo_redo_byte_verified": true,
+    "draft_test_preserves_saved_bytes": true,
+    "runtime_exit_observed": true,
+    "outside_pikonest_execution_verified": false
+  },
+  "images": [
+    {
+      "file": "01-full-sheet.png",
+      "caption": "Choose a region in the full 128 x 128 sprite sheet.",
+      "sha256": "36eac873e96b80c4b5646af005ea3344bc66bb76db636f4847bbf7aaec9dcfec",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "02-shared-sprite.png",
+      "caption": "Review a 32 x 16 sprite before publishing its shared map changes.",
+      "sha256": "7193b554fad28cd57d11279f188aed541272d6a164a4d4338c573344411b2fcf",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "03-restored-review.png",
+      "caption": "The same proposal reopens after the Workshop process was killed.",
+      "sha256": "e90204c919b02d4618a5d87cc0a8d21145dc08d0d5487aabf90267d8b941d91c",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "04-map-changes-sprite.png",
+      "caption": "A map brush changes two packed graphics pixels.",
+      "sha256": "49029d3076b056f2461f327d444a8847b86e9a1b0ffc4fcf173eccac3e327121",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "05-map-view.png",
+      "caption": "Switch to the map view and inspect the exact changed cell.",
+      "sha256": "5e67b8013a8eda5f8a135d7e39502cb2aeee8a61932b3e05956d6a203d02af2f",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "06-official-test.png",
+      "caption": "Official PICO-8 runs the isolated draft, including the white pixel introduced by the map edit.",
+      "sha256": "1c655e69eac03725a02306f7bf3924bc3c36524342a551f2e5e8e1da9f4ddf67",
+      "width": 1240,
+      "height": 1080
+    }
+  ]
+}

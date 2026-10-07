@@ -63,7 +63,7 @@ public final class RectangleWorkflowTest {
                 check(!s.canUndo(),"one history entry per shape");
                 s.restoreStroke(1,2);s.act(Action.UNDO);check(!s.pendingStroke()&&!s.canUndo(),"Y first cancels draft");
                 s.restoreStroke(-1,0);s.restoreStroke(r.width,0);check(!s.pendingStroke(),"invalid anchor ignored");
-                s.region=new SpriteRegion(0,56,16,16);s.restoreStroke(1,2);check(!s.pendingStroke(),"restore never enters shared map half");s.region=r;
+                s.region=new SpriteRegion(0,56,16,16);s.restoreStroke(1,2);check(s.pendingStroke(),"shared shape restores without publishing");s.act(Action.CANCEL);s.region=r;
                 s.paintAt(8,8);s.paintAt(4,3);check(!s.pendingStroke(),"two touch corners commit");
                 same(base.withRectangle(r,8,8,4,3,10,brush==DrawTool.FILLED_RECTANGLE).bytes(),s.cart().bytes(),"touch and controller use identical operation");
                 tool(s,DrawTool.PICKER);s.paintAt(4,3);check(s.drawTool==brush&&s.color==10,"picker returns to rectangle brush");

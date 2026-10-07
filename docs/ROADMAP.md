@@ -1,5 +1,15 @@
 # PikoNest — путь к полному Android-продукту
 
+**Lab 0.0.73 - shared sprite/map painting (partial G01-G03):** full-sheet
+selection, lower-half sprite brushes/fill/shapes and full-map brushes/rectangle/fill
+prepare a before/after review. Apply saves both resources as one Undo transaction;
+Cancel and draft Test preserve saved bytes, recovery retains the source-hashed
+proposal. Native Blank authoring, process-death recovery, byte-exact Undo/Redo and
+official PICO-8 draft Test/return passed; all 49 old project/library files stayed
+unchanged. [Evidence and exact limits](showcase/0.0.73-en/README.md).
+Shared sprite copy/move/transform/recolor, allocation, continuous strokes and
+physical/owner acceptance remain open. Continue package 3 before presets.
+
 Пересобран 2026-10-03 по запросу владельца после аудита кода `f98e27a`, документации
 и GitHub. Старый план сохранён в [ROADMAP_HISTORY.md](ROADMAP_HISTORY.md).
 Номера lab-сборок не являются этапами готовности продукта.

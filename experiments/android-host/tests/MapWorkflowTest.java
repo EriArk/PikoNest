@@ -58,7 +58,7 @@ public final class MapWorkflowTest {
         port.fail=true;s.act(Action.RIGHT);s.act(Action.CONFIRM);
         check(s.mode==WorkshopSession.Mode.ERROR&&s.cart().map().tile(2,1)==0&&s.undoCount()==1,"failed write preserves document and history");
         port.fail=false;s.act(Action.CONFIRM);s.mapEditor.y=32;s.act(Action.CONFIRM);
-        check(s.mode==WorkshopSession.Mode.ERROR&&s.undoCount()==1,"shared write refused through UI");s.act(Action.CONFIRM);
+        check(s.mode==WorkshopSession.Mode.SHARED&&s.undoCount()==1,"shared write waits for explicit review");s.act(Action.CANCEL);
         s.mapEditor.move(1000,1000);check(s.mapEditor.x==127&&s.mapEditor.y==63&&s.mapEditor.left()==112&&s.mapEditor.top()==48,"scroll bounds");
         s.mapEditor.tile=0;s.mapEditor.y=1;s.mapEditor.x=1;s.act(Action.CONFIRM);check(s.cart().map().tile(1,1)==0,"tile zero erases");
         s.switchTool(4);check(s.tool==0,"four-tool wrap");s.switchTool(-1);check(s.tool==3,"reverse four-tool wrap");

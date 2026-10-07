@@ -1,5 +1,15 @@
 # Состояние PikoNest
 
+**Lab 0.0.73 - shared sprite/map painting (partial G01-G03):** full-sheet
+selection, lower-half sprite brushes/fill/shapes and full-map brushes/rectangle/fill
+prepare a before/after review. Apply saves both resources as one Undo transaction;
+Cancel and draft Test preserve saved bytes, recovery retains the source-hashed
+proposal. Native Blank authoring, process-death recovery, byte-exact Undo/Redo and
+official PICO-8 draft Test/return passed; all 49 old project/library files stayed
+unchanged. [Evidence and exact limits](showcase/0.0.73-en/README.md).
+Shared sprite copy/move/transform/recolor, allocation, continuous strokes and
+physical/owner acceptance remain open. Continue package 3 before presets.
+
 **Lab 0.0.72 — rules → resource coordinates:** sprite/map destination X/Y can
 follow recognized numeric starting values. Shared placement forms preserve field
 revert, draft Test, Apply/Undo and journal v7 recovery. On Retroid, an original

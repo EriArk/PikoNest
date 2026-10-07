@@ -478,10 +478,12 @@ public final class MainActivity extends Activity {
         libraryPrefs.edit().putString("favoriteTools",toolCatalogue.encode()).putInt("toolCategory",toolCatalogue.category).apply();
         if(session.codeDraft!=null)codeRecoveryFailed.remove(activeId);
         if(session.uses!=null)usesRecoveryFailed.remove(activeId);
+        if(session.sharedEdit!=null)sharedRecoveryFailed.remove(activeId);
         libraryPrefs.edit().putString("active",activeId).putBoolean("swapAB",session.swapAB).apply();
         prefs.edit().putInt("tool",session.tool).putInt("focus",session.focus)
             .putInt("mapX",session.mapEditor.x).putInt("mapY",session.mapEditor.y).putInt("mapTile",session.mapEditor.tile)
             .putString("mapTool",session.mapEditor.tool.name()).putString("mapDraft",session.mapEditor.encode())
+            .putString("sharedEdit",session.sharedEdit==null?(sharedRecoveryFailed.contains(activeId)?prefs.getString("sharedEdit",""):""):Base64.encodeToString(session.sharedEdit.encode(),Base64.NO_WRAP))
             .putString("flagDraft",session.flagDraft==null?"":session.flagDraft.encode())
             .putString("gameUses",session.uses==null?(usesRecoveryFailed.contains(activeId)?prefs.getString("gameUses",""):""):Base64.encodeToString(session.uses.encode(),Base64.NO_WRAP))
             .putString("luaDraft",session.codeDraft==null?(codeRecoveryFailed.contains(activeId)?prefs.getString("luaDraft",""):""):Base64.encodeToString(session.codeDraft.encode(),Base64.NO_WRAP))
@@ -541,7 +543,7 @@ public final class MainActivity extends Activity {
         if(prefs.getBoolean("region",false)&&!session.browsingSprites){
             try{
                 SpriteRegion r=new SpriteRegion(prefs.getInt("regionX",0),prefs.getInt("regionY",0),prefs.getInt("regionWidth",16),prefs.getInt("regionHeight",16));
-                if(!r.sharesMap()&&r.x%8==0&&r.y%8==0&&r.width%8==0&&r.height%8==0)session.region=r;
+                if(r.x%8==0&&r.y%8==0&&r.width%8==0&&r.height%8==0)session.region=r;
             }catch(IllegalArgumentException ignored){/* Invalid optional view state cannot damage a cartridge. */}
         }
         session.cursorX=bounded("x",7,session.selection().width-1);session.cursorY=bounded("y",7,session.selection().height-1);
@@ -583,7 +585,12 @@ public final class MainActivity extends Activity {
                 }
             }catch(Exception e){session.fail(e);}
         }
+        sharedRecoveryFailed.remove(activeId);
+        String shared=prefs.getString("sharedEdit","");
+        if(!shared.isEmpty())try{session.restoreShared(Base64.decode(shared,Base64.NO_WRAP));}
+        catch(Exception e){sharedRecoveryFailed.add(activeId);session.fail(e);}
     }
+    private final java.util.Set<String> sharedRecoveryFailed=new java.util.HashSet<>();
     private final java.util.Set<String> usesRecoveryFailed=new java.util.HashSet<>();
     private void restoreUses(){
         usesRecoveryFailed.remove(activeId);String encoded=prefs.getString("gameUses","");
