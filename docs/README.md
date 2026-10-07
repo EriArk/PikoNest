@@ -1,6 +1,6 @@
 # PikoNest: current scope and development map
 
-**Lab 0.0.66 · Android first · No public APK release.** The complete creator is
+**Lab 0.0.70 · Android first · No public APK release.** The complete creator is
 still in development. Original code uses the [MIT License](../LICENSE).
 
 ## What exists today
@@ -9,10 +9,10 @@ still in development. Original code uses the [MIT License](../LICENSE).
 | --- | --- | --- |
 | Play/projects | Local library, favorites/recent games, shared English shelves, safe copy | Settings migration, long text and broader device acceptance |
 | Sprites/maps | Pixel/region operations, map brushes, region review and sprite reuse | Shared-memory painting, allocation and complete cross-tool workflows |
-| Animation/camera | Recognized uses can be created and reopened without selecting Lua lines | Shared English forms, event bindings and consistent Test/return |
-| Backgrounds | Recognized sprite-strip layers, ordering and parameters | Common Workshop entry without a Lua cursor |
-| Rules/code | Structural insertion, parameter forms, branches/actions | A complete original game from blank without manual Lua wiring |
-| Storage/runtime | Save/import/export slices and testing through official PICO-8 | Independent first-run setup, user-folder ownership and session recovery |
+| Animation/camera | Shared English forms, create/reopen/reorder and draft Test for recognized uses | Event bindings and wider lifecycle acceptance |
+| Backgrounds | Sprite-strip layers through the common Workshop path, ordering, parameters and recovery | Broader layer representations and complete scene workflows |
+| Rules/code | Numeric state, input/conditions, add/set/reset and readouts without a Lua cursor | Coordinate/resource/event bindings and a complete original game from blank |
+| Storage/runtime | One APK; purchased-runtime preparation, Play/Test/return and Home/resume on Retroid | Clean install, complete saves migration, modern Android target and crash/boot recovery |
 | Audio/reuse | Audio scope planned; bounded sprite/parameter reuse exists | SFX/music editors, event bindings and dependency-aware reuse |
 
 Unsupported editor operations preserve unfamiliar source. Templates do not lock
@@ -21,11 +21,15 @@ Technical PIKOOS IDs remain until the [coordinated migration](PROJECT_NAME.md).
 
 ## Next implementation work
 
-1. Shared English animation/camera forms, draft/preview/Test/exact return (UX03),
-   alongside remaining UX02 checks.
-2. Existing background layers through the same Workshop path (UX04 / N03 / G04).
-3. Basic editors and connected game-creation workflows before more genre presets.
-   Runtime/storage work proceeds alongside them.
+1. Complete the one-APK foundation: verify old runtime-data migration, clean
+   installation and interrupted-session recovery. The first integrated build uses
+   owner-approved target SDK 28; modern-target execution remains mandatory.
+2. Connect rules/state to resource coordinates and events for a simple original
+   game without Lua wiring.
+3. Complete basic editors and connected workflows before expanding genre presets.
+
+[Current one-APK evidence](showcase/0.0.70-en/README.md) ·
+[The ordered 14-package plan](ROADMAP.md).
 
 The full roadmap is **foundations → an original playable game → world/movement →
 audio/rules/effects → reuse/remix/multicart → independent setup → Android acceptance**.

@@ -1,6 +1,12 @@
 # PikoNest Android host experiment
 
-**Current lab: 0.0.69.** Rules & state connects numeric starting values, input,
+**Current lab: 0.0.70.** The default build now packages Workshop and the runtime
+adapter in one APK. [Build inputs](../android-integrated/README.md),
+[device evidence and remaining gates](../../docs/showcase/0.0.70-en/README.md).
+Play/Test/return and Home/resume passed on Retroid with the old helper disabled.
+Clean setup, old save migration and modern Android target remain open.
+
+**0.0.69:** Rules & state connects numeric starting values, input,
 conditions, add/set/reset and live readouts without a Lua cursor. Forms, order,
 Undo and draft recovery reuse the shared Workshop path. Physical Test/return remains pending;
 other editors/settings are still being migrated.

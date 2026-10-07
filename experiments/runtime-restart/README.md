@@ -2,8 +2,13 @@
 
 2026-10-03. Bounded bootstrap fix for the upstream Android wrapper
 ([Macs75/pico8-android](https://github.com/Macs75/pico8-android), release 1.6.6).
-This remains a separate Android research adapter, not a production runtime
-architecture or a new framework choice for PikoNest.
+The adapter sources are now also packaged inside the default host APK (0.0.70);
+see [integrated build](../android-integrated/README.md). The separate build remains
+for lab migration/research, not a product prerequisite.
+
+Revision 9 adds explicit evidence-based recovery of an unknown token when the
+adapter UID is idle. It preserves the original journal and never kills processes.
+[Recovery decision and remaining crash/boot gates](../../docs/SINGLE_APK.md).
 
 Revision 8 (`1.6.6-pikoos.8`, host 0.0.41) changes only our menu typography to
 Monocraft/OFL and shortens two explanations to fit. Session/input/exit behavior

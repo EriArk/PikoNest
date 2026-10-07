@@ -79,6 +79,18 @@ public final class MainActivity extends Activity {
     private LaunchView runtimeGate;
     private void runtimeAction(Action action){
         if(action==Action.CANCEL){moveTaskToBack(true);return;}
+        if(action==Action.CONTEXT&&runtimeGate.recovery){
+            runtimeGate.busy=true;runtimeGate.message="Checking the previous session...";runtimeGate.invalidate();
+            new Thread(()->{
+                boolean recovered=false;try{recovered=backend.recoverSession();}catch(Exception ignored){}
+                final boolean ended=recovered;
+                runOnUiThread(()->{if(isFinishing()||isDestroyed()||runtimeGate==null)return;
+                    runtimeGate.busy=false;
+                    if(ended)onRuntimeResume();
+                    else{runtimeGate.message="Recovery could not confirm an idle runtime. Your draft and session record are kept. Return to the game, or update the old runtime adapter if this is a lab migration.";runtimeGate.invalidate();}
+                });
+            },"pikonest-session-recovery").start();return;
+        }
         if(action==Action.CONFIRM||action==Action.TEST){
             if(backend.sessionEnded()){onRuntimeResume();return;}
             try{backend.resume();}catch(Exception e){runtimeGate.message="Не удалось вернуться к игре. Попробуй ещё раз.";runtimeGate.invalidate();}
@@ -603,9 +615,9 @@ public final class MainActivity extends Activity {
         if(backend.hasSession()&&!backend.sessionEnded()){
             runtimeGate=new LaunchView(this,this::runtimeAction,libraryPrefs.getBoolean("swapAB",false));
             runtimeGate.busy=false;runtimeGate.active=true;
-            runtimeGate.message="Игра ещё открыта. Вернись в неё, чтобы продолжить или завершить.";
-            if(backend.sessionPhase()==art.pikoos.lab.core.RuntimeSession.Phase.PREPARING)runtimeGate.message="Запуск передан PICO-8. Вернись туда, чтобы проверить, открылась ли игра.";
-            if(backend.sessionPhase()==art.pikoos.lab.core.RuntimeSession.Phase.UNKNOWN)runtimeGate.message="Завершение игры пока не подтверждено. Вернись в PICO-8 и проверь сеанс.";
+            runtimeGate.message="A game is still open. Return to continue or finish it.";
+            if(backend.sessionPhase()==art.pikoos.lab.core.RuntimeSession.Phase.PREPARING)runtimeGate.message="PICO-8 is starting. Return to check the game.";
+            if(backend.sessionPhase()==art.pikoos.lab.core.RuntimeSession.Phase.UNKNOWN){runtimeGate.recovery=true;runtimeGate.message="The previous session could not be identified. X checks whether its runtime is idle and preserves the record as interrupted. It never closes a running game.";}
             setContentView(runtimeGate);runtimeGate.requestFocus();return;
         }
         if(runtimeGate!=null){runtimeGate=null;setContentView(showingFolders?folderView:showingPlay?playView:showingLibrary?shelf:surface);}

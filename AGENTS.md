@@ -34,6 +34,11 @@ backend boundary. The purchased official PICO-8 runtime remains user-imported,
 never bundled. Preserve projects, saves, library and runtime setup during the
 transition; remove obsolete development apps only after verified migration.
 
+Owner-approved interim decision (2026-10-07): first integrate using the current
+runtime's target SDK 28 compatibility mode. A modern-target runtime remains an
+explicit required follow-up; see `docs/SINGLE_APK.md`. At the end of each work
+turn, state the next task and recommend a model and reasoning level for it.
+
 Owner clarification (2026-10-03): the current deliverable is an installable Android
 APK application. Linux handhelds are occupied by TrainerOS work; Linux porting and
 device validation are deferred and must not block Android. Keep portable boundaries.

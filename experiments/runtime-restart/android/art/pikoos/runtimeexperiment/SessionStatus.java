@@ -18,6 +18,10 @@ final class SessionStatus {
         if(f[0].equals("Z")||f[0].equals("X"))throw new Gone();return f[19];
     }
     static Phase phase(Context c,String token){
+        if(RuntimeSession.validToken(token)){
+            File recovered=new File(c.getFilesDir(),"recovered-sessions/"+token);
+            try{if(new String(Files.readAllBytes(recovered.toPath()),"US-ASCII").equals("INTERRUPTED"))return Phase.INTERRUPTED;}catch(IOException absent){}
+        }
         RuntimeSession r=read(c);if(r.phase!=Phase.PREPARING&&r.phase!=Phase.RUNNING)return r.observe(token,false);
         boolean same=false;
         try{same=start(r.pid).equals(r.start);}catch(NoSuchFileException|Gone exited){}catch(Exception unknown){return Phase.UNKNOWN;}
@@ -33,5 +37,31 @@ final class SessionStatus {
     }
     static synchronized void cancel(Context c,String token){
         RuntimeSession r=read(c);if(r.token.equals(token)&&r.phase==Phase.PREPARING)file(c).delete();
+    }
+    /** Explicit recovery only: preserve all journals, never kill a process or claim game success. */
+    static synchronized boolean recover(Context c,String token,int caller)throws IOException{
+        if(!RuntimeSession.validToken(token)||RuntimeControls.gameOpen())return false;
+        RuntimeSession current=read(c);Phase latest=phase(c,current.token);
+        if(latest==Phase.RUNNING||latest==Phase.PREPARING)return false;
+        java.lang.Process scanner=new ProcessBuilder("/system/bin/ps","-A","-n","-o","UID,PID,NAME").redirectErrorStream(true).start();
+        ByteArrayOutputStream bytes=new ByteArrayOutputStream();
+        try(InputStream in=scanner.getInputStream()){
+            byte[] b=new byte[4096];for(int n;(n=in.read(b))!=-1;){if(bytes.size()+n>1024*1024)return false;bytes.write(b,0,n);}
+        }
+        try{if(!scanner.waitFor(2,java.util.concurrent.TimeUnit.SECONDS)||scanner.exitValue()!=0)return false;}catch(InterruptedException e){Thread.currentThread().interrupt();return false;}
+        // Android Java 8 has no Process.pid(); the platform exposes the spawned PID privately.
+        // Obtain it from the census: one unique ps owned by this UID, otherwise refuse.
+        int pid=0;for(String line:bytes.toString("US-ASCII").split("\n")){
+            String[] f=line.trim().split("\\s+",3);
+            if(f.length==3&&f[0].equals(Integer.toString(android.os.Process.myUid()))&&f[2].equals("ps")){
+                if(pid!=0)return false;try{pid=Integer.parseInt(f[1]);}catch(NumberFormatException bad){return false;}
+            }
+        }
+        if(!art.pikoos.lab.core.RuntimeRecovery.idle(bytes.toString("US-ASCII"),android.os.Process.myUid(),android.os.Process.myPid(),caller,pid))return false;
+        File dir=new File(c.getFilesDir(),"recovered-sessions");if(!dir.isDirectory()&&!dir.mkdir())throw new IOException("Cannot preserve recovery evidence");
+        File[] previous=dir.listFiles();if(previous==null||previous.length>=64)return false;
+        AtomicFile record=new AtomicFile(new File(dir,token));FileOutputStream out=null;
+        try{out=record.startWrite();out.write("INTERRUPTED".getBytes("US-ASCII"));record.finishWrite(out);}catch(IOException e){record.failWrite(out);throw e;}
+        return true;
     }
 }

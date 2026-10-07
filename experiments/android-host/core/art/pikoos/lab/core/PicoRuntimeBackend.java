@@ -27,6 +27,8 @@ public interface PicoRuntimeBackend {
     default boolean hasSession(){return false;}
     default RuntimeSession.Phase sessionPhase(){return RuntimeSession.Phase.UNKNOWN;}
     default boolean sessionEnded(){return RuntimeSession.ended(sessionPhase());}
+    /** Explicit, evidence-based recovery. Never force-stops a session or claims game success. */
+    default boolean recoverSession()throws Exception{return false;}
     default void resume()throws Exception{throw new UnsupportedOperationException("Возврат в runtime недоступен");}
     /** Launch acceptance is not proof of successful official-runtime execution. */
     void launch(byte[] standardCart) throws Exception;

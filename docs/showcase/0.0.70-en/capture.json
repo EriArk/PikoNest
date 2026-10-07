@@ -1,0 +1,75 @@
+{
+  "version": "0.0.70",
+  "captured_local_date": "2026-10-07",
+  "base_commit": "fc62b89",
+  "apk_sha256": "7da08bc3755161a142309c05ad27593254b33c4b74936a8a04c3513139c6fbba",
+  "environment": "Retroid Pocket Classic, Android 14, ARM64",
+  "capture": "Original ADB screencap PNGs; no image edits",
+  "screens": [
+    {
+      "name": "01-runtime-setup.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "e35e8d54e1e013f77d25c3b32a305f8e7e75b6408d78ee6271c0e39426b53ead"
+    },
+    {
+      "name": "02-play-game.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "9c94f7589b38e9c03861feefc74ce21e62a83bbfa8b7e70422ce64dbaaeec90e"
+    },
+    {
+      "name": "03-game-menu.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "dfc0d004d90263f52123b764e22d33e9bf80220a78a3e2653bdae0f0b2922187"
+    },
+    {
+      "name": "04-resume.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "2d68aa07e0ad6af138b02da348c02f6fd9ec13bc91654d3904eeb90bfbe5d273"
+    },
+    {
+      "name": "05-workshop-test.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "06a250fe3082582ca9c9b005daa0557a1c5bf6fb040f185d7629730d97373f35"
+    },
+    {
+      "name": "06-workshop-return.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "3f2bd3c661793ac54ce9956ecd83f302dba0cc54331e1c3078b265373de50134"
+    }
+  ],
+  "target_sdk": 28,
+  "launcher_activities": 1,
+  "legacy_helper": "disabled-user; data preserved",
+  "purchased_runtime": "Official user-supplied PICO-8 0.2.7 Raspberry Pi ZIP; not in APK or Git",
+  "project_library_check": {
+    "compared": 48,
+    "changed": [],
+    "added": []
+  },
+  "checks": [
+    "Full portable suite passed before Android packaging corrections",
+    "RuntimeArchiveTest 37, RuntimeRecoveryTest 17, RuntimeSessionTest 16 passed after final build",
+    "APK signature and 263 Godot asset hashes verified; APK/bootstrap scanned for purchased files",
+    "Runtime preparation inside main app",
+    "Play launch and normal menu exit",
+    "Home and resume preserve exact token, PID and start identity",
+    "Workshop Copy 29 Test and return to same selected camera",
+    "Old helper disabled; independent io.wip.pico8 processes untouched"
+  ],
+  "input": "ADB-injected keys and touch; physical controller acceptance pending",
+  "console_audio": "Muted; no listening acceptance",
+  "github_apk_release": false,
+  "remaining": [
+    "Clean install without prior archives/settings or other wrapper packages",
+    "Full old saves/Splore/settings migration",
+    "Crash/boot/interruption matrix",
+    "Modern Android execution/target and device matrix",
+    "Complete transitive redistribution audit"
+  ]
+}

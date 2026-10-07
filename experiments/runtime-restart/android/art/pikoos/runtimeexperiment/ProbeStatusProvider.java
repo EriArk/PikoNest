@@ -36,11 +36,13 @@ public final class ProbeStatusProvider extends ContentProvider {
     }
     public String getType(Uri u){return "vnd.android.cursor.item/vnd.pikoos.probe";}
     @Override public android.os.Bundle call(String method,String token,android.os.Bundle extras){
-        getContext().enforceCallingPermission("art.pikoos.runtimeexperiment.PROBE","Session handshake requires the host signature");
+        if(android.os.Binder.getCallingUid()!=android.os.Process.myUid())getContext().enforceCallingPermission("art.pikoos.runtimeexperiment.PROBE","Session handshake requires the host signature");
         try{
             if("beginSession".equals(method))SessionStatus.begin(getContext(),token);
             else if("cancelSession".equals(method))SessionStatus.cancel(getContext(),token);
-            else throw new IllegalArgumentException("Unknown operation");
+            else if("recoverSession".equals(method)){
+                android.os.Bundle result=new android.os.Bundle();result.putBoolean("ok",SessionStatus.recover(getContext(),token,android.os.Binder.getCallingPid()));return result;
+            }else throw new IllegalArgumentException("Unknown operation");
             android.os.Bundle result=new android.os.Bundle();result.putBoolean("ok",true);return result;
         }catch(java.io.IOException e){throw new IllegalStateException("Cannot persist session",e);}
     }

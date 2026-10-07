@@ -11,6 +11,9 @@ their own scope. See [notices](THIRD_PARTY_NOTICES.md).
 The documented path uses Windows PowerShell, a JDK with `javac` available,
 Android SDK Platform 34 and Build Tools 36.0.0. The lab documents JDK 21;
 Android Studio's JBR is also used locally. There is no Gradle wrapper.
+The default integrated build also needs Python 3 and the hash-pinned open-source
+wrapper inputs listed in [android-integrated](experiments/android-integrated/README.md).
+It does not need the purchased PICO-8 archive to build.
 From the repository root:
 
 ```powershell
@@ -38,11 +41,11 @@ above when diagnosing that behavior.
 
 ## Optional device work
 
-The host builds without PICO-8. Running cartridges requires a separately prepared
-backend and the user's purchased runtime. Pinned wrapper inputs and steps are in
-[runtime-restart](experiments/runtime-restart/README.md#reproducible-local-build).
-Clean-device onboarding is unfinished. Host and experimental adapter must use the
-same local signing key for signature-protected integration.
+The APK builds without proprietary PICO-8. Import the purchased Raspberry Pi ZIP
+through runtime setup; 0.0.70 prepares and launches it within the main application.
+No separate helper is required by the integrated path. Clean-device onboarding
+and full migration remain unfinished; preserve old apps/data while validating.
+The separate adapter build is only a legacy migration/research option.
 
 ```powershell
 adb devices
@@ -51,7 +54,7 @@ adb -s YOUR_DEVICE_SERIAL shell am start -n art.pikoos.runtimelab/.MainActivity
 ```
 
 Preserve projects and saves before device work. A signature mismatch is not a
-reason to uninstall or clear data. PIKOOS package IDs and installed labels remain
+reason to uninstall or clear data. The integrated label is PikoNest; existing package IDs remain
 intentional until the [coordinated migration](docs/PROJECT_NAME.md).
 
 ## Repository map

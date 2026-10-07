@@ -66,12 +66,12 @@ public final class RuntimeSetupActivity extends Activity {
         }catch(Exception error){getSharedPreferences("runtime-setup",0).edit().putBoolean("dispatched",false).commit();state.testing=false;state.problem=error.getMessage();}
     }
     private void observeProbe(){
-        if(!getSharedPreferences("runtime-setup",0).getBoolean("dispatched",false))return;
+        if(!getSharedPreferences("runtime-setup",0).getBoolean("dispatched",false)){state.testing=false;return;}
         state.testing=true;String phase=new ExternalPicoBackend(this).probePhase();
         if(phase.equals("EXITED")||phase.equals("FAILED")){
             getSharedPreferences("runtime-setup",0).edit().putBoolean("dispatched",false).commit();state.testing=false;state.returned=true;
-            state.notice="Рабочая установка сохранена";
-            if(phase.equals("FAILED"))state.problem=probeFailure="Пробный запуск прервался. Можно проверить архив и попробовать снова.";
+            state.notice="Runtime prepared inside PikoNest";
+            if(phase.equals("FAILED"))state.problem=probeFailure="Test interrupted. Verify the archive and try again.";
         }view.invalidate();
     }
     @Override protected void onActivityResult(int request,int result,Intent data){

@@ -13,7 +13,7 @@ import java.io.*;
 import java.util.UUID;
 import org.json.JSONObject;
 
-/** One application-owned worker, independent of Activity recreation. Never touches runtime files. */
+/** One application-owned worker, independent of Activity recreation. Prepares candidates; activation holds the cancel/commit lock. */
 final class RuntimeArchiveJob {
     interface Listener {void changed(RuntimeArchiveJob job);}
     static RuntimeArchiveJob current;
@@ -50,7 +50,7 @@ final class RuntimeArchiveJob {
     private void notifyUi(){ui.post(()->{if(listener!=null)listener.changed(this);});}
     private void phase(String text){phase=text;notifyUi();}
     private void run(){
-        File temporary=null;Saved previous=null;boolean readableJournal=true;
+        File temporary=null,preparedRuntime=null;Saved previous=null;boolean readableJournal=true;
         try{
             try{previous=saved(context);}catch(Exception ignored){readableJournal=false;/* Preserve candidate files if their journal cannot be read. */}
             File root=directory(context);if(!root.isDirectory()&&!root.mkdir())throw new IOException("Не удалось создать место для архива");
@@ -81,6 +81,10 @@ final class RuntimeArchiveJob {
             RuntimeArchive.Result inspected=RuntimeArchive.inspect(file,()->cancelled);
             if(recheck&&!inspected.sha256.equals(previous.hash))throw new IOException("Сохранённый архив изменился. Выбери исходный ZIP снова.");
             if(probe){
+                if(RuntimeInstallation.integrated(context)){
+                    phase("Preparing PICO-8 inside PikoNest...");
+                    preparedRuntime=RuntimeInstallation.prepare(context,previous,()->cancelled);
+                }
                 phase("Готовим пробный запуск…");byte[] cart;
                 try(InputStream input=context.getAssets().open("runtime-probe.p8");ByteArrayOutputStream buffer=new ByteArrayOutputStream()){
                     byte[] bytes=new byte[4096];for(int n;(n=input.read(bytes))!=-1;)buffer.write(bytes,0,n);cart=buffer.toByteArray();
@@ -100,6 +104,7 @@ final class RuntimeArchiveJob {
                     catch(Exception failure){journal.failWrite(output);throw failure;}
                     temporary=null;
                 }
+                if(probe&&RuntimeInstallation.integrated(context))RuntimeInstallation.activate(context,preparedRuntime);
                 result=candidate;done=true;
             }
             if(!recheck&&previous!=null&&!previous.file.equals(candidate.file))new File(root,previous.file).delete();

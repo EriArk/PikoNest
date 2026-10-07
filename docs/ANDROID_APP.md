@@ -23,15 +23,18 @@ installed runtime/helper APK is not an acceptable product prerequisite. Internal
 activities, services or processes may remain separate behind the runtime port.
 The official purchased PICO-8 runtime is still imported by the user, not bundled.
 
-Live Retroid inspection on 2026-10-07 found `art.pikoos.runtimelab` 0.0.69 and
+Before integration, Retroid inspection on 2026-10-07 found `art.pikoos.runtimelab` 0.0.69 and
 `art.pikoos.runtimeexperiment` 1.6.6-pikoos.8 as separate launcher applications.
-The host's ExternalPicoBackend currently targets the latter. This is an actual
-development dependency, not merely a duplicate shortcut. `io.wip.pico8` is also
+The 0.0.69 host targeted the latter: a real development dependency. `io.wip.pico8` is also
 installed independently; do not assume it is disposable or part of the migration.
 
-The next foundation package integrates the adapter, verifies clean installation
-and Test/Play/return without either external wrapper package, and preserves
-existing data during migration. Unknown/interrupted session recovery is part of
+Lab 0.0.70 integrates the adapter in the main APK, with one launcher activity.
+On Retroid, preparation, Play/Test/return and Home/resume passed with the old helper
+disabled; 48 project/library files matched their backups. The independently
+installed wrapper stayed untouched. Clean installation and full saves/settings
+migration remain open. The owner approved interim target SDK 28; modern-target
+execution is mandatory R10. See [the decision](SINGLE_APK.md) and
+[evidence](showcase/0.0.70-en/README.md). Unknown/interrupted session recovery is part of
 that package, not a reason to bypass the current session guard. Audit bundled
 third-party components and distribution notices before shipping them. Existing
 technical identifiers stay unchanged until the coordinated naming migration.

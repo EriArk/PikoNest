@@ -2,7 +2,9 @@ param(
     [string]$SdkRoot = (Join-Path $env:LOCALAPPDATA 'Android\Sdk'),
     [string]$JdkRoot = (Split-Path (Split-Path (Get-Command javac -ErrorAction Stop).Source)),
     [string]$BuildToolsVersion = '36.0.0',
-    [string]$Platform = 'android-34'
+    [string]$Platform = 'android-34',
+    [switch]$HostOnly,
+    [switch]$SkipCoreTests
 )
 $ErrorActionPreference = 'Stop'
 $pikoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
@@ -24,9 +26,11 @@ New-Item -ItemType Directory -Force -Path $pikoBuild,$pikoArtifacts,
 $pikoCore = @(Get-ChildItem (Join-Path $PSScriptRoot 'core') -Recurse -Filter '*.java' | ForEach-Object FullName)
 $pikoCore += @(Get-ChildItem (Join-Path $pikoRoot 'experiments\p8-roundtrip\core') -Recurse -Filter '*.java' | ForEach-Object FullName)
 $pikoSources = @(Get-ChildItem (Join-Path $PSScriptRoot 'src') -Recurse -Filter '*.java' | ForEach-Object FullName)
+if(-not $HostOnly) { $pikoSources += @(Get-ChildItem (Join-Path $pikoRoot 'experiments\runtime-restart\android') -Recurse -Filter '*.java' | ForEach-Object FullName) }
 $pikoTests = @(Get-ChildItem (Join-Path $PSScriptRoot 'tests') -Filter '*.java' | ForEach-Object FullName)
 
 # Compile/test the domain with the JDK alone, proving no Android dependency.
+if(-not $SkipCoreTests) {
 Invoke-PikoTool $pikoJavac (@('--release','8','-encoding','UTF-8','-d',(Join-Path $pikoBuild 'tests')) + $pikoCore + $pikoTests)
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaInsertTest',(Join-Path $PSScriptRoot 'assets\blank.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaSymbolsTest')
@@ -63,6 +67,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaNavigationT
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeDiagnosticTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeMenuTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeSessionTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeRecoveryTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaEditorTest',(Join-Path $PSScriptRoot 'assets\blank.p8'),(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'FolderSetupTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LauncherPathTest')
@@ -93,6 +98,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'HistoryWorkflo
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'MoveWorkflowTest',(Join-Path $PSScriptRoot 'assets\blank.p8'),(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'OvalWorkflowTest',(Join-Path $PSScriptRoot 'tests\fixtures\oval-0.2.7.sha256'),(Join-Path $PSScriptRoot 'assets\blank.p8'),(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 
+}
 Invoke-PikoTool $pikoJavac (@('--release','8','-encoding','UTF-8','-classpath',$pikoAndroid,'-d',(Join-Path $pikoBuild 'classes')) + $pikoCore + $pikoSources)
 Invoke-PikoTool $pikoJar @('--create','--file',(Join-Path $pikoBuild 'classes.jar'),'-C',(Join-Path $pikoBuild 'classes'),'.')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoTools 'lib\d8.jar'),'com.android.tools.r8.D8','--min-api','26','--lib',$pikoAndroid,'--output',(Join-Path $pikoBuild 'dex'),(Join-Path $pikoBuild 'classes.jar'))
@@ -114,6 +120,10 @@ if (-not (Test-Path -LiteralPath $pikoKey)) {
     Invoke-PikoTool (Join-Path $JdkRoot 'bin\keytool.exe') @('-genkeypair','-keystore',$pikoKey,'-storepass','android','-keypass','android','-alias','pikoos-lab','-keyalg','RSA','-keysize','2048','-validity','3650','-dname','CN=PIKOOS Runtime Lab')
 }
 $pikoApk = Join-Path $pikoArtifacts 'pikoos-runtime-lab.apk'
+if(-not $HostOnly) {
+    & (Join-Path $pikoRoot 'experiments\android-integrated\package.ps1') -Dex (Join-Path $pikoBuild 'dex\classes.dex') -Output $pikoApk -JdkRoot $JdkRoot -SdkRoot $SdkRoot
+    return
+}
 Invoke-PikoTool $pikoJava @('-jar',(Join-Path $pikoTools 'lib\apksigner.jar'),'sign','--ks',$pikoKey,'--ks-key-alias','pikoos-lab','--ks-pass','pass:android','--key-pass','pass:android','--out',$pikoApk,$pikoAligned)
 Invoke-PikoTool $pikoJava @('-jar',(Join-Path $pikoTools 'lib\apksigner.jar'),'verify',$pikoApk)
 Get-Item -LiteralPath $pikoApk | Select-Object FullName,Length

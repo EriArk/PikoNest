@@ -14,6 +14,8 @@ import java.util.*;
 public final class RuntimeControls implements Application.ActivityLifecycleCallbacks {
     private static RuntimeControls installed;
     private final Map<Activity,Controls> active=new HashMap<>();
+    private static volatile int gameActivities;
+    static boolean gameOpen(){return gameActivities!=0;}
     public static void install(Application app){installed=new RuntimeControls();app.registerActivityLifecycleCallbacks(installed);}
     /** Called by the pinned Godot process monitor after its EXITED journal write, before quitting. */
     public static void sessionExited(){
@@ -22,7 +24,7 @@ public final class RuntimeControls implements Application.ActivityLifecycleCallb
         if(Looper.myLooper()==Looper.getMainLooper())finish.run();
         else{new Handler(Looper.getMainLooper()).post(finish);try{done.await(1,java.util.concurrent.TimeUnit.SECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();}}
     }
-    public void onActivityCreated(Activity a,Bundle b){}
+    public void onActivityCreated(Activity a,Bundle b){if(a.getClass().getName().equals("com.godot.game.GodotApp"))gameActivities++;}
     public void onActivityStarted(Activity a){}
     public void onActivityResumed(Activity a){
         if(!a.getClass().getName().equals("com.godot.game.GodotApp"))return;
@@ -35,7 +37,7 @@ public final class RuntimeControls implements Application.ActivityLifecycleCallb
     public void onActivityPaused(Activity a){Controls c=active.get(a);if(c!=null){if(a.isFinishing())c.returnToCaller();c.resumed=false;}}
     public void onActivityStopped(Activity a){Controls c=active.get(a);if(c!=null)c.background();}
     public void onActivitySaveInstanceState(Activity a,Bundle b){}
-    public void onActivityDestroyed(Activity a){Controls c=active.remove(a);if(c!=null)c.background();}
+    public void onActivityDestroyed(Activity a){if(a.getClass().getName().equals("com.godot.game.GodotApp"))gameActivities--;Controls c=active.remove(a);if(c!=null)c.background();}
 
     private static final class Controls {
         final Activity activity;final Handler handler=new Handler(Looper.getMainLooper());
@@ -138,34 +140,34 @@ public final class RuntimeControls implements Application.ActivityLifecycleCallb
     private static final class MenuView extends View {
         final Controls controls;final Paint paint=new Paint();final Typeface font;
         final RectF[] buttons={new RectF(),new RectF()};float scale;int pressed=-1;
-        MenuView(Controls c){super(c.activity);controls=c;font=Typeface.createFromAsset(c.activity.getAssets(),"pikoos/Monocraft.ttf");paint.setFontFeatureSettings("'liga' 0, 'calt' 0, 'dlig' 0");setFocusable(true);setContentDescription("Меню игры: продолжить или завершить игру");}
+        MenuView(Controls c){super(c.activity);controls=c;font=Typeface.createFromAsset(c.activity.getAssets(),"pikoos/Monocraft.ttf");paint.setFontFeatureSettings("'liga' 0, 'calt' 0, 'dlig' 0");setFocusable(true);setContentDescription("Game menu: continue or exit");}
         void box(Canvas c,float x,float y,float w,float h,int color){paint.setColor(color);c.drawRect(x,y,x+w,y+h,paint);}
         void text(Canvas c,String s,float x,float y,float size,int color){paint.setTypeface(font);paint.setTextSize(size);paint.setColor(color);c.drawText(s,x,y,paint);}
         @Override protected void onDraw(Canvas canvas){
             scale=Math.min(getWidth()/400f,getHeight()/480f);Canvas c=canvas; c.save();c.scale(scale,scale);
             float w=getWidth()/scale,h=getHeight()/scale,left=(w-368)/2,top=(h-324)/2;
             box(c,left,top,368,324,0xff1d2b53);box(c,left,top,368,4,0xffff77a8);
-            text(c,"PIKOOS / МЕНЮ ИГРЫ",left+16,top+39,24,0xffff77a8);
+            text(c,"PikoNest / GAME MENU",left+16,top+39,24,0xffff77a8);
             if(controls.model.state==State.EXIT_REQUESTED){
-                text(c,"Завершаем игру...",left+16,top+102,26,0xffffec27);
-                text(c,"Ждём выхода PICO-8.",left+16,top+140,20,0xffc2c3c7);
-                text(c,"Затем вернёмся к предыдущему",left+16,top+189,18,0xfffff1e8);
-                text(c,"экрану.",left+16,top+213,18,0xfffff1e8);c.restore();return;
+                text(c,"Leaving game...",left+16,top+102,26,0xffffec27);
+                text(c,"Waiting for PICO-8 to exit.",left+16,top+140,20,0xffc2c3c7);
+                text(c,"Then return to the previous",left+16,top+189,18,0xfffff1e8);
+                text(c,"screen.",left+16,top+213,18,0xfffff1e8);c.restore();return;
             }
             if(controls.model.failed){
-                text(c,"Игра пока не завершилась.",left+16,top+78,20,0xffffec27);
-                text(c,"Продолжить или повторить.",left+16,top+103,18,0xffc2c3c7);
+                text(c,"The game has not exited yet.",left+16,top+78,20,0xffffec27);
+                text(c,"Continue or try again.",left+16,top+103,18,0xffc2c3c7);
             }else{
-                text(c,"Вернуться из игры?",left+16,top+79,26,0xfffff1e8);
-                text(c,"Сохранение прогресса зависит",left+16,top+108,18,0xffc2c3c7);
-                text(c,"от самой игры.",left+16,top+130,18,0xffc2c3c7);
+                text(c,"Return from the game?",left+16,top+79,26,0xfffff1e8);
+                text(c,"Progress is saved by the",left+16,top+108,18,0xffc2c3c7);
+                text(c,"game itself.",left+16,top+130,18,0xffc2c3c7);
             }
             for(int i=0;i<2;i++){
                 RectF b=buttons[i];b.set(left+16,top+155+i*59,left+352,top+205+i*59);
                 boolean selected=controls.model.selection==i;box(c,b.left,b.top,b.width(),b.height(),selected?0xffffec27:0xff000000);
-                text(c,(selected?"> ":"  ")+(i==0?"Продолжить":"Завершить игру"),b.left+12,b.top+33,24,selected?0xff1d2b53:0xfffff1e8);
+                text(c,(selected?"> ":"  ")+(i==0?"Continue":"Exit game"),b.left+12,b.top+33,24,selected?0xff1d2b53:0xfffff1e8);
             }
-            text(c,(controls.swap()?"B":"A")+": выбрать     "+(controls.swap()?"A":"B")+": назад",left+16,top+303,18,0xffc2c3c7);c.restore();
+            text(c,(controls.swap()?"B":"A")+": Choose     "+(controls.swap()?"A":"B")+": Back",left+16,top+303,18,0xffc2c3c7);c.restore();
         }
         @Override public boolean onTouchEvent(MotionEvent e){
             if(controls.model.state!=State.OPEN)return true;

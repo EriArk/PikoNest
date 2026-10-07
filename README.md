@@ -1,5 +1,9 @@
 # PikoNest
 
+The current development build combines Play, Workshop and runtime setup in
+**one Android APK**. Import your purchased Raspberry Pi PICO-8 ZIP inside PikoNest.
+[Device checks and remaining setup/migration work](docs/showcase/0.0.70-en/README.md).
+
 **A tiny PICO-8 home and game-making workshop for handhelds.**
 
 **Early development · Android first · No public APK release yet.**
