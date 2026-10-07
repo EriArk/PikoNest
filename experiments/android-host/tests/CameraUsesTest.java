@@ -61,18 +61,18 @@ public final class CameraUsesTest {
         dynamic.back();dynamic.addCamera(true);dynamic.review();check(dynamic.proposal().candidate(dynamic.base)!=null,"explicit screen reset does not re-evaluate old dynamic camera");
         GameUses known=new GameUses(cart("function _draw()\n camera(10,20)\n cls(1)\n spr(1,0,0)\nend\n"),0);check(known.entries.size()==2&&CameraUse.offset(known.entries.get(1).view)[1]==20,"legacy camera before cls supported");
         GameUses journal=new GameUses(base,0);journal.addCamera(false);journal.camera.field=2;check(GameUses.restore(journal.encode(),base).camera.field==2,"form field recovery");journal.back();check(GameUses.restore(journal.encode(),base).screen==GameUses.Screen.LIST,"cancel journal");
-        GameUses old=new GameUses(base,0);old.addSprite(new SpriteRegion(0,0,8,8));byte[] v2=Arrays.copyOf(old.encode(),old.encode().length-2);v2[3]=2;check(GameUses.restore(v2,base).screen==GameUses.Screen.FORM,"v2 journals remain readable");
+        GameUses old=new GameUses(base,0);old.addSprite(new SpriteRegion(0,0,8,8));byte[] v2=Arrays.copyOf(old.encode(),old.encode().length-6);v2[3]=2;check(GameUses.restore(v2,base).screen==GameUses.Screen.FORM,"v2 journals remain readable");
         GameUses cp=new GameUses(comment.base,0);cp.index=1;cp.duplicate();check(GameUses.restore(cp.encode(),comment.base).copyAfter,"copy retains camera placement through recovery");
         String animation=new SpriteAnimation(new SpriteRegion(0,0,8,8)).code();GameUses animated=new GameUses(cart("function _draw()\n cls(1)\n camera(16,8)\n"+animation+" camera()\nend\n"),0);animated.index=1;animated.duplicate();animated.review();GameUses doubled=new GameUses(animated.proposal().candidate(animated.base),0);
         check(doubled.entries.get(2).animation!=null&&CameraUse.offset(doubled.entries.get(2).view)[0]==16,"animation duplicate also retains camera");
 
         Port port=new Port();WorkshopSession s=new WorkshopSession(base,port);s.openUses(false);menu(s,8);
-        check(s.uses.screen==GameUses.Screen.CAMERA,"controller camera entry");s.act(Action.DOWN);s.act(Action.NEXT);s.act(Action.NEXT);s.act(Action.DOWN);s.act(Action.NEXT);
-        s.act(Action.TEST);s.act(Action.MENU);check(port.saves==0&&port.launches==0,"draft traps shortcuts");s.act(Action.DOWN);s.act(Action.RIGHT);s.act(Action.DOWN);s.act(Action.CONFIRM);
+        check(s.uses.screen==GameUses.Screen.CAMERA,"controller camera entry");s.act(Action.DOWN);s.act(Action.CONFIRM);s.act(Action.NEXT);s.act(Action.NEXT);s.act(Action.CONFIRM);s.act(Action.DOWN);s.act(Action.CONFIRM);s.act(Action.NEXT);s.act(Action.CONFIRM);
+        s.act(Action.TEST);check(port.saves==0&&port.launches==1,"draft Test without save");s.act(Action.DOWN);s.act(Action.CONFIRM);s.act(Action.RIGHT);s.act(Action.CONFIRM);s.act(Action.DOWN);s.act(Action.CONFIRM);
         check(s.uses.screen==GameUses.Screen.REVIEW&&s.codeDraft==null,"human review without Lua");port.fail=true;s.act(Action.CONFIRM);
         check(s.mode==WorkshopSession.Mode.ERROR&&s.uses.camera!=null&&s.undoCount()==0&&Arrays.equals(s.cart().bytes(),base.bytes()),"save failure retains proposal/history/source");port.fail=false;s.act(Action.CONFIRM);s.act(Action.CONFIRM);
         check(s.uses.index==0&&s.uses.current().isCamera()&&s.undoCount()==1,"saved camera selected, one history item");byte[] result=s.cart().bytes();s.act(Action.UNDO);check(Arrays.equals(s.cart().bytes(),base.bytes()),"one undo removes both camera calls");s.act(Action.REDO);check(Arrays.equals(result,s.cart().bytes()),"redo exact source");
-        menu(s,3);s.act(Action.CANCEL);check(port.saves==3,"delete cancel writes nothing");menu(s,3);s.act(Action.CONFIRM);check(!s.uses.current().isCamera(),"delete single camera setting");s.act(Action.UNDO);s.act(Action.TEST);check(port.launches==1,"saved camera scene Test");
+        menu(s,3);s.act(Action.CANCEL);check(port.saves==3,"delete cancel writes nothing");menu(s,3);s.act(Action.CONFIRM);check(!s.uses.current().isCamera(),"delete single camera setting");s.act(Action.UNDO);s.act(Action.TEST);check(port.launches==2,"saved camera scene Test");
         System.out.println("CameraUsesTest: "+checks+" checks passed");
     }
 }

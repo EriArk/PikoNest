@@ -48,14 +48,24 @@ public final class WorkshopSession {
     public void restoreUses(byte[] bytes){uses=GameUses.restore(bytes,cart);tool=uses.returnTool;mode=Mode.USES;}
     private void usesAction(Action action)throws Exception{
         GameUses g=uses;
+        if(action==Action.TEST&&(g.screen==GameUses.Screen.PICK||g.animation!=null&&g.animation.picker!=null))
+            throw new IllegalArgumentException("Finish choosing the region or position before Test. Confirm the selection or return to the form.");
+        // Test an isolated candidate. The saved cart, history and edit context stay intact.
+        if(action==Action.TEST&&(g.screen==GameUses.Screen.CAMERA||g.screen==GameUses.Screen.ANIMATION||g.screen==GameUses.Screen.REVIEW)){
+            port.launch(g.proposal().candidate(cart).bytes());return;
+        }
         if(g.screen==GameUses.Screen.CAMERA){
             CameraUse camera=g.camera;
-            if(action==Action.UP)camera.field=Math.max(0,camera.field-1);if(action==Action.DOWN)camera.field=Math.min(camera.rows()-1,camera.field+1);
-            if(action==Action.LEFT)camera.change(-1);if(action==Action.RIGHT)camera.change(1);
-            if(action==Action.PREVIOUS)camera.change(-8);if(action==Action.NEXT)camera.change(8);
-            if(action==Action.CONTEXT)camera.symbol();
-            if(action==Action.CONFIRM){if(camera.field==camera.rows()-1)g.review();else camera.change(1);}
-            if(action==Action.CANCEL)g.back();return;
+            if(g.editingField()){
+                if(action==Action.LEFT)camera.change(-1);if(action==Action.RIGHT)camera.change(1);
+                if(action==Action.PREVIOUS)camera.change(-8);if(action==Action.NEXT)camera.change(8);
+                if(action==Action.CONTEXT)camera.symbol();
+                if(action==Action.CONFIRM)g.finishField();if(action==Action.CANCEL)g.cancelField();
+            }else{
+                if(action==Action.UP)camera.field=Math.max(0,camera.field-1);if(action==Action.DOWN)camera.field=Math.min(camera.rows()-1,camera.field+1);
+                if(action==Action.CONFIRM){if(camera.field==camera.rows()-1)g.review();else g.beginField();}
+                if(action==Action.MENU)g.review();if(action==Action.CANCEL)g.back();
+            }return;
         }
         if(g.screen==GameUses.Screen.ANIMATION){
             SpriteAnimation a=g.animation;
@@ -64,13 +74,15 @@ public final class WorkshopSession {
                 if(action==Action.UP)a.picker.move(0,-1);if(action==Action.DOWN)a.picker.move(0,1);
                 if(action==Action.CONTEXT||action==Action.PREVIOUS||action==Action.NEXT)a.picker.toggleStep();
                 if(action==Action.CONFIRM)a.acceptPick();if(action==Action.CANCEL)a.cancelPick();
+            }else if(g.editingField()){
+                if(action==Action.LEFT)a.change(-1);if(action==Action.RIGHT)a.change(1);
+                if(action==Action.CONFIRM)g.finishField();if(action==Action.CANCEL)g.cancelField();
             }else{
                 if(action==Action.UP)a.field=Math.max(0,a.field-1);if(action==Action.DOWN)a.field=Math.min(8,a.field+1);
-                if(action==Action.LEFT)a.change(-1);if(action==Action.RIGHT)a.change(1);
                 if(action==Action.PREVIOUS)a.select(a.selected-1);if(action==Action.NEXT)a.select(a.selected+1);
                 if(action==Action.CONTEXT)a.toggle();if(action==Action.UNDO)a.stop();
-                if(action==Action.CONFIRM){if(a.field==8)g.review();else a.choose();}
-                if(action==Action.CANCEL)g.back();
+                if(action==Action.CONFIRM){if(a.field==8)g.review();else if(a.field==0||a.field==2||a.field==4||a.field==6)g.beginField();else a.choose();}
+                if(action==Action.MENU)g.review();if(action==Action.CANCEL)g.back();
             }return;
         }
         if(g.screen==GameUses.Screen.PICK){

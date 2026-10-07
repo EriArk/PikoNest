@@ -25,7 +25,7 @@ public final class WorldCamera {
         if(mode.equals("camera_rooms")){
             LuaSymbols symbols=new LuaSymbols(source);LuaContext context=new LuaContext(source);
             for(String name:new String[]{"mid","flr"})if(symbols.shadows(name)||context.defines(name))
-                throw new IllegalArgumentException("Имя API "+name+" переопределено. Камера не изменена.");
+                throw new IllegalArgumentException("API "+name+" is redefined. The camera was not changed.");
         }
     }
     static boolean modeSwitch(String original,LuaInsert proposal){
@@ -39,10 +39,10 @@ public final class WorldCamera {
     public static void validateSource(String source,boolean follow){
         LuaContext context=new LuaContext(source);String mask=context.masked();
         if(Pattern.compile("(?m)^\\s*#include\\b|(?<![A-Za-z0-9_])(?:_ENV|_G)(?![A-Za-z0-9_])").matcher(mask).find())
-            throw new IllegalArgumentException("Для includes/изменённого окружения камера пока проверяется вручную. Код сохранён.");
+            throw new IllegalArgumentException("This camera editor cannot change included files or a modified Lua environment yet. The source is preserved.");
         LuaSymbols symbols=new LuaSymbols(source);
         for(String name:follow?new String[]{"camera","mid","max"}:new String[]{"camera"})
-            if(symbols.shadows(name)||context.defines(name))throw new IllegalArgumentException("Имя API "+name+" переопределено. Камера не изменена.");
+            if(symbols.shadows(name)||context.defines(name))throw new IllegalArgumentException("API "+name+" is redefined. The camera was not changed.");
     }
     public static void validateForm(LuaInsert form){
         if(form.item().id.equals("camera_reset"))return;
@@ -52,7 +52,7 @@ public final class WorldCamera {
             String call="camera(("+form.value(n)+"),0)";
             LuaCall parsed=LuaCall.parse(call,0,call.length());
             if(!parsed.form.item().id.equals("camera")||!parsed.form.value(0).equals("("+form.value(n)+")"))
-                throw new IllegalArgumentException("Выражение камеры вышло за границы поля");
+                throw new IllegalArgumentException("The camera expression is outside the supported field range.");
         }
     }
     /** Recognize only our exact pair of expressions; edited/custom calls remain raw X/Y forms. */

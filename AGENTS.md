@@ -162,7 +162,9 @@ direction work approved; individual screens still need visual acceptance). Owner
 clarification: repair the interface first and make the new interface English.
 Lab 0.0.66 starts UX02 with shared English Play/project shelves, actions and safe
 copy confirmation; remaining editors/settings/localization are not yet migrated.
-Continue UX03 animation/camera forms and draft/Test/return, then
+Lab 0.0.67 adds the UX03 shared English animation/camera forms, reversible field
+edits and isolated draft Test snapshots. Physical Test/return, runtime recovery and
+owner acceptance remain open; see docs/showcase/0.0.67-en/README.md. Continue with
 UX04 existing background layers in the same workshop path (N03/G04), followed
 by connected M1/M2 workflows. Carry UX05 with remaining core tools rather than
 blocking them on a cosmetic rewrite. Shared

@@ -66,14 +66,15 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         activity.startActivityForResult(intent,DIAGNOSTIC_REQUEST);
     }
     void checkAvailableForLaunch() throws Exception {
+        if(!detect().launcherPresent)throw new Exception("PICO-8 is not set up. Open runtime setup from Play to import your purchased runtime.");
         String token=sessionPrefs().getString("token","");
-        if(!token.isEmpty()&&!sessionEnded())throw new Exception("Игра ещё открыта. Сначала вернись в неё и заверши сеанс.");
-        if(activity.getSharedPreferences("runtime-setup",0).getBoolean("dispatched",false))throw new Exception("Сначала заверши пробный запуск PICO-8 и вернись в подключение.");
+        if(!token.isEmpty()&&!sessionEnded())throw new Exception("A game is still open. Return to it and finish the session first.");
+        if(activity.getSharedPreferences("runtime-setup",0).getBoolean("dispatched",false))throw new Exception("Finish the PICO-8 trial launch and return to runtime setup first.");
         boolean external=activity instanceof LaunchActivity;
         if(external&&activity.getSharedPreferences("library-ui",0).getBoolean("awaitingReturn",false))
-            throw new Exception("Игра уже запущена из PIKOOS. Вернись в неё и заверши игру перед новым запуском.");
+            throw new Exception("A game is already running from PikoNest. Return to it and finish before launching another.");
         if(!external&&activity.getSharedPreferences("external-launch",0).getBoolean("dispatched",false))
-            throw new Exception("Игра запущена из другого лаунчера. Сначала заверши её и вернись в лаунчер.");
+            throw new Exception("A game was started by another launcher. Finish it and return to that launcher first.");
     }
     void checkProbeAvailable()throws Exception{
         checkAvailableForLaunch();
@@ -108,7 +109,7 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
     private void dispatch(byte[] cart,String filename,android.net.Uri uri,String mime,boolean fileSet)throws Exception{
         checkAvailableForLaunch();
         PackageInfo selected = runtime();
-        if(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<7)throw new Exception("Для надёжного возврата обнови PIKOOS Runtime Test до версии 7");
+        if(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<7)throw new Exception("Update PIKOOS Runtime Test to version 7 for reliable return.");
         if(fileSet&&(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<3))
             throw new Exception("Обнови PIKOOS Runtime Test до версии 3 для запуска частей игры");
         AtomicFile snapshot = new AtomicFile(new File(activity.getFilesDir(),filename));

@@ -1,5 +1,10 @@
 # PikoNest — English website gallery
 
+New: [0.0.67 shared animation/camera editors](0.0.67-en/README.md) — seven English
+captures from the regular APK, including field editing, preview and a compact layout.
+[Download the new editor pack](PikoNest-editors-en-0.0.67.zip?raw=true).
+The older download below remains an explicitly versioned collection.
+
 A tool-focused selection assembled on 5 October 2026: **10 original PNGs**.
 Lead with the **sprite editor, asset library and map editor**; use Play and
 Workshop to explain how people enter and leave creation.

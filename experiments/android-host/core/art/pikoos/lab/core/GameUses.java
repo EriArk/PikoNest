@@ -21,6 +21,24 @@ public final class GameUses {
     public boolean converting;
     public CameraUse camera;
     public boolean copyAfter;
+    private byte[] fieldBaseline;
+    public boolean editingField(){return fieldBaseline!=null;}
+    /** A field edit is a reversible part of the draft, never a cart write. */
+    public void beginField(){
+        if(editingField())return;
+        try{ByteArrayOutputStream b=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(b);
+            if(camera!=null)camera.write(o);else if(animation!=null)animation.write(o);else return;
+            fieldBaseline=b.toByteArray();
+        }catch(IOException e){throw new IllegalStateException(e);}
+    }
+    public void finishField(){fieldBaseline=null;}
+    public void cancelField(){
+        if(!editingField())return;
+        try{DataInputStream i=new DataInputStream(new ByteArrayInputStream(fieldBaseline));
+            if(camera!=null)camera=CameraUse.read(i,this);else animation=SpriteAnimation.read(i);
+            fieldBaseline=null;
+        }catch(IOException e){throw new IllegalStateException(e);}
+    }
     private int insertAt;
     private boolean newDraw;
     private String newline,indent=" ";
@@ -45,7 +63,7 @@ public final class GameUses {
         newline=source.contains("\r\n")?"\r\n":source.contains("\r")?"\r":"\n";
         try{scan();}catch(IllegalArgumentException e){entries.clear();blocked=e.getMessage();}
     }
-    private static IllegalArgumentException unsupported(){return new IllegalArgumentException("Здесь сложная отрисовка. Авторазмещение недоступно; исходник сохранён.");}
+    private static IllegalArgumentException unsupported(){return new IllegalArgumentException("This draw code is not supported by the placement editor yet. The source is preserved.");}
     private void scan(){
         LuaContext context=new LuaContext(source);String mask=context.masked();
         Matcher names=Pattern.compile("(?<![A-Za-z0-9_])_draw(?![A-Za-z0-9_])").matcher(mask);int count=0;while(names.find())count++;
@@ -101,10 +119,10 @@ public final class GameUses {
     public void addMap(int x,int y){available();builtin("map");kind="map";values=new int[]{x,y,0,0,Math.min(16,128-x),Math.min(16,64-y)};begin(true);}
     private void begin(boolean create){creating=create;deleting=converting=copyAfter=false;animation=null;camera=null;field=0;screen=Screen.FORM;validate(kind,values);}
     public void addAnimation(SpriteRegion region){available();builtin("sspr");SpriteAnimation.validateSource(source);kind="animation";creating=true;deleting=converting=copyAfter=false;camera=null;animation=new SpriteAnimation(region);screen=Screen.ANIMATION;}
-    public void addCamera(boolean reset){available();if(current()==null||current().isCamera())throw new IllegalArgumentException("Сначала выбери спрайт, анимацию или карту.");WorldCamera.validateSource(source,false);camera=new CameraUse(this,reset);animation=null;creating=true;deleting=converting=copyAfter=false;kind="camera";screen=Screen.CAMERA;}
+    public void addCamera(boolean reset){available();if(current()==null||current().isCamera())throw new IllegalArgumentException("Select a sprite, animation or map first.");WorldCamera.validateSource(source,false);camera=new CameraUse(this,reset);animation=null;creating=true;deleting=converting=copyAfter=false;kind="camera";screen=Screen.CAMERA;}
     public void animateSelected(){
-        available();Entry e=current();if(e==null||e.isCamera()||e.kind().equals("map")||e.animation!=null)throw new IllegalArgumentException("Выбери размещённый спрайт для анимации.");
-        if(e.x()<-127||e.x()>127||e.y()<-127||e.y()>127)throw new IllegalArgumentException("Положение вне диапазона редактора анимации −127…127.");
+        available();Entry e=current();if(e==null||e.isCamera()||e.kind().equals("map")||e.animation!=null)throw new IllegalArgumentException("Select a placed sprite to animate.");
+        if(e.x()<-127||e.x()>127||e.y()<-127||e.y()>127)throw new IllegalArgumentException("This animation editor supports positions from -127 to 127. The source is preserved.");
         edit();SpriteRegion r=region();addAnimation(r);animation.x=e.x();animation.y=e.y();creating=false;converting=true;
     }
     public void edit(){available();if(current()==null)return;
@@ -114,15 +132,15 @@ public final class GameUses {
         else if(e.animation!=null){kind="animation";creating=deleting=converting=false;animation=e.animation.initial.copy();screen=Screen.ANIMATION;}
         else{kind=e.kind();values=e.values.clone();begin(false);}
     }
-    public void duplicate(){if(current()!=null&&current().isCamera())throw new IllegalArgumentException("Добавь камеру перед нужным размещением через меню.");edit();if(current()!=null){creating=true;copyAfter=current().view!=null;}}
+    public void duplicate(){if(current()!=null&&current().isCamera())throw new IllegalArgumentException("Choose a use, then add a camera from Actions.");edit();if(current()!=null){creating=true;copyAfter=current().view!=null;}}
     public void delete(){edit();if(current()!=null){deleting=true;screen=Screen.REVIEW;}}
-    public void review(){if(camera!=null){camera.validate();camera.invalidatePreview();}else if(animation==null)validate(kind,values);else{animation.playing=false;animation.review=false;}screen=Screen.REVIEW;}
-    public void back(){if(screen==Screen.PICK){picker=null;screen=Screen.FORM;}else if(screen==Screen.REVIEW&&!deleting)screen=camera!=null?Screen.CAMERA:animation!=null?Screen.ANIMATION:Screen.FORM;else{animation=null;camera=null;creating=deleting=converting=copyAfter=false;screen=Screen.LIST;}}
+    public void review(){finishField();if(camera!=null){camera.validate();camera.invalidatePreview();}else if(animation==null)validate(kind,values);else{animation.playing=false;animation.review=false;}screen=Screen.REVIEW;}
+    public void back(){finishField();if(screen==Screen.PICK){picker=null;screen=Screen.FORM;}else if(screen==Screen.REVIEW&&!deleting)screen=camera!=null?Screen.CAMERA:animation!=null?Screen.ANIMATION:Screen.FORM;else{animation=null;camera=null;creating=deleting=converting=copyAfter=false;screen=Screen.LIST;}}
     public String[] labels(){return kind.equals("map")?new String[]{"Карта X, кл","Карта Y, кл","В игре X","В игре Y","Ширина, кл","Высота, кл"}:kind.equals("spr")?new String[]{"Тайл","В игре X","В игре Y"}:new String[]{"Лист X","Лист Y","Ширина, px","Высота, px","В игре X","В игре Y"};}
     public int x(){return animation!=null?animation.x:values[kind.equals("sspr")?4:kind.equals("map")?2:1];}
     public int y(){return animation!=null?animation.y:values[kind.equals("sspr")?5:kind.equals("map")?3:2];}
     public void adjust(int delta){int old=values[field];values[field]+=delta;try{validate(kind,values);}catch(IllegalArgumentException e){values[field]=old;}}
-    private static void range(int v,int lo,int hi){if(v<lo||v>hi)throw new IllegalArgumentException("Область или положение вне диапазона формы");}
+    private static void range(int v,int lo,int hi){if(v<lo||v>hi)throw new IllegalArgumentException("The region or position is outside this form's supported range.");}
     private static void validate(String kind,int[] v){
         if(kind.equals("spr")){if(v.length!=3)throw unsupported();range(v[0],0,255);range(v[1],-32768,32767);range(v[2],-32768,32767);return;}
         if(v.length!=6)throw unsupported();
@@ -132,7 +150,7 @@ public final class GameUses {
     }
     public SpriteRegion region(){return kind.equals("spr")?new SpriteRegion(values[0]%16*8,values[0]/16*8,8,8):new SpriteRegion(values[0],values[1],values[2],values[3]);}
     public void pick(){if(kind.equals("map"))return;picker=new SpritePlacement(region());screen=Screen.PICK;}
-    public void picked(){SpriteRegion r=picker.source();if(kind.equals("spr")&&(r.width!=8||r.height!=8))throw new IllegalArgumentException("Для этого тайла выбери область 8×8");
+    public void picked(){SpriteRegion r=picker.source();if(kind.equals("spr")&&(r.width!=8||r.height!=8))throw new IllegalArgumentException("Choose an 8 × 8 region for this tile.");
         if(kind.equals("spr"))values[0]=r.y/8*16+r.x/8;else{values[0]=r.x;values[1]=r.y;values[2]=r.width;values[3]=r.height;}picker=null;screen=Screen.FORM;}
     public String summary(){return (deleting?"Убрать использование":creating?"Добавить использование":"Изменить использование")+" · "+(kind.equals("map")?"карта":"спрайт");}
     public String target(){return newDraw?"Новая отрисовка · после очистки экрана":"Отрисовка · после существующих элементов";}
@@ -173,16 +191,24 @@ public final class GameUses {
     }
     private int creationAt(){return copyAfter&&current()!=null?(current().animation!=null?current().end():afterLine(current().end())):insertAt;}
     public byte[] encode(){try{
-        ByteArrayOutputStream b=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(b);o.writeInt(3);byte[] cart=base.bytes();o.writeInt(cart.length);o.write(cart);
+        ByteArrayOutputStream b=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(b);o.writeInt(4);byte[] cart=base.bytes();o.writeInt(cart.length);o.write(cart);
         o.writeInt(returnTool);o.writeInt(index);o.writeUTF(screen.name());o.writeInt(field);o.writeInt(menu);o.writeBoolean(creating);o.writeBoolean(deleting);o.writeUTF(kind);o.writeInt(values.length);for(int v:values)o.writeInt(v);o.writeBoolean(picker!=null);if(picker!=null)picker.write(o);
-        o.writeBoolean(converting);o.writeBoolean(animation!=null);if(animation!=null)animation.write(o);o.writeBoolean(copyAfter);o.writeBoolean(camera!=null);if(camera!=null)camera.write(o);return b.toByteArray();
+        o.writeBoolean(converting);o.writeBoolean(animation!=null);if(animation!=null)animation.write(o);o.writeBoolean(copyAfter);o.writeBoolean(camera!=null);if(camera!=null)camera.write(o);o.writeInt(fieldBaseline==null?0:fieldBaseline.length);if(fieldBaseline!=null)o.write(fieldBaseline);return b.toByteArray();
     }catch(IOException e){throw new IllegalStateException(e);}}
     public static GameUses restore(byte[] bytes,WorkshopCartridge current){try{
-        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version<1||version>3)throw new IOException();int n=i.readInt();if(n<0||n>2*1024*1024||n>i.available())throw new IOException();byte[] cart=new byte[n];i.readFully(cart);
-        if(!Arrays.equals(cart,current.bytes()))throw new IOException("Проект изменился; исходник не перезаписан");
+        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version<1||version>4)throw new IOException();int n=i.readInt();if(n<0||n>2*1024*1024||n>i.available())throw new IOException();byte[] cart=new byte[n];i.readFully(cart);
+        if(!Arrays.equals(cart,current.bytes()))throw new IOException("The project changed; its source was not overwritten.");
         int tool=i.readInt();if(tool<0||tool>3)throw new IOException();GameUses g=new GameUses(current,tool);g.index=i.readInt();g.screen=Screen.valueOf(i.readUTF());g.field=i.readInt();g.menu=i.readInt();g.creating=i.readBoolean();g.deleting=i.readBoolean();g.kind=i.readUTF();int size=i.readInt();if(size!=3&&size!=6)throw new IOException();g.values=new int[size];for(int v=0;v<size;v++)g.values[v]=i.readInt();if(!g.kind.equals("animation")&&!g.kind.equals("camera"))validate(g.kind,g.values);if(i.readBoolean())g.picker=SpritePlacement.read(i);
         if(version>=2){g.converting=i.readBoolean();if(i.readBoolean())g.animation=SpriteAnimation.read(i);}
-        if(version==3){g.copyAfter=i.readBoolean();if(i.readBoolean())g.camera=CameraUse.read(i,g);}
+        if(version>=3){g.copyAfter=i.readBoolean();if(i.readBoolean())g.camera=CameraUse.read(i,g);}
+        if(version>=4){int length=i.readInt();if(length<0||length>8192||length>i.available())throw new IOException();
+            if(length>0){g.fieldBaseline=new byte[length];i.readFully(g.fieldBaseline);
+                if(g.screen!=Screen.CAMERA&&g.screen!=Screen.ANIMATION||g.animation!=null&&g.animation.picker!=null)throw new IOException();
+                DataInputStream f=new DataInputStream(new ByteArrayInputStream(g.fieldBaseline));
+                if(g.camera!=null)CameraUse.read(f,g);else SpriteAnimation.read(f);
+                if(f.available()!=0)throw new IOException();
+            }
+        }
         if(i.available()!=0||g.index<0||g.index>=Math.max(1,g.entries.size())||g.field<0||g.field>=size||g.menu<0||g.menu>9||(g.screen==Screen.PICK)!=(g.picker!=null))throw new IOException();
         if(g.screen!=Screen.LIST&&g.screen!=Screen.MENU&&!g.blocked.isEmpty())throw new IOException();
         if(g.screen==Screen.FORM||g.screen==Screen.REVIEW||g.screen==Screen.PICK||g.screen==Screen.ANIMATION||g.screen==Screen.CAMERA){
@@ -194,5 +220,5 @@ public final class GameUses {
         if(animated&&(g.animation.review||g.screen==Screen.REVIEW&&g.animation.picker!=null))throw new IOException();
         if((g.screen==Screen.CAMERA||g.screen==Screen.REVIEW&&g.kind.equals("camera"))!=(g.camera!=null)||g.copyAfter&&(!g.creating||g.current()==null||g.current().isCamera()))throw new IOException();
         if(g.picker!=null&&(g.kind.equals("map")||g.picker.phase>1))throw new IOException();return g;
-    }catch(Exception e){throw new IllegalArgumentException("Размещения не восстановлены. Картридж сохранён; открой список заново.",e);}}
+    }catch(Exception e){throw new IllegalArgumentException("Could not restore game uses. The saved cartridge is intact; reopen the list.",e);}}
 }

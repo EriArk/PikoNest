@@ -43,10 +43,10 @@ public final class SpriteAnimation {
         else{elapsed=(int)Math.min(next,duration());if(elapsed==duration())playing=false;}
     }
     public void duplicate(){
-        if(count()==MAX_FRAMES)throw new IllegalArgumentException("В этой версии до 32 кадров. Исходный код сохранён.");
+        if(count()==MAX_FRAMES)throw new IllegalArgumentException("This editor version supports up to 32 frames. The source is preserved.");
         frames.add(selected+1,frame(selected));select(selected+1);
     }
-    public void remove(){if(count()==1)throw new IllegalArgumentException("Оставь хотя бы один кадр");frames.remove(selected);select(selected);}
+    public void remove(){if(count()==1)throw new IllegalArgumentException("Keep at least one frame.");frames.remove(selected);select(selected);}
     public void reorder(int delta){int to=Math.max(0,Math.min(count()-1,selected+delta));Collections.swap(frames,selected,to);select(to);}
     public void durationStep(int delta){Frame f=frame(selected);frames.set(selected,new Frame(f.region,Math.max(50,Math.min(5000,f.millis+delta*50))));seekSelected();}
     public void beginPick(boolean position){
@@ -85,10 +85,10 @@ public final class SpriteAnimation {
     public static void validateSource(String source){
         LuaContext context=new LuaContext(source);String mask=context.masked();
         if(Pattern.compile("(?m)^\\s*#include\\b|\\b(?:_G|_ENV)\\b").matcher(mask).find())
-            throw new IllegalArgumentException("Для includes/изменённого окружения вставка пока недоступна. Исходник сохранён.");
+            throw new IllegalArgumentException("This editor cannot insert into included files or a modified Lua environment yet. The source is preserved.");
         LuaSymbols symbols=new LuaSymbols(source);
         for(String api:new String[]{"time","sspr"})if(symbols.shadows(api)||context.defines(api))
-            throw new IllegalArgumentException("API "+api+" переопределён. Анимация не вставлена.");
+            throw new IllegalArgumentException("API "+api+" is redefined. No animation was inserted.");
     }
     // Hex literals express exact 16.16 boundaries; no time*fps multiplication overflow.
     private static String seconds(int millis){int fixed=(int)((long)millis*65536/1000);return String.format(Locale.ROOT,"0x%x.%04x",fixed>>16,fixed&65535);}

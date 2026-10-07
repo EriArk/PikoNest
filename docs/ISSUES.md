@@ -1,8 +1,9 @@
 # Public issue map
 
-Updated 6 October 2026. These are real follow-up scenarios from the existing
+Updated 7 October 2026. These are real follow-up scenarios from the existing
 [backlog](BACKLOG.md), not a second roadmap. Open means unfinished; it does not
-mean actively being implemented. Next: UX03, then UX04, alongside foundation work.
+mean actively being implemented. UX03 has a bounded implementation in 0.0.67; physical Test/return and acceptance
+remain open. Next implementation: UX04, alongside foundation work.
 
 ## Existing product issues
 
@@ -13,7 +14,7 @@ mean actively being implemented. Next: UX03, then UX04, alongside foundation wor
 
 | Issue | Backlog mapping | Sequence / scope |
 | --- | --- | --- |
-| [#3 — UX03: unify English animation and camera editing workflows](https://github.com/EriArk/PikoNest/issues/3) | UX03; UX02; N01/N02; A02/A05 | Next implementation batch; follow-up to #2. |
+| [#3 — UX03: unify English animation and camera editing workflows](https://github.com/EriArk/PikoNest/issues/3) | UX03; UX02; N01/N02; A02/A05 | Partial in 0.0.67; physical Test/return, runtime recovery and acceptance remain open. |
 | [#4 — UX04: connect background layers to the common Workshop path](https://github.com/EriArk/PikoNest/issues/4) | UX04; N03/G04 | After UX03; N03.3 recipe expansion remains deferred. |
 | [#5 — Complete sprite and map editing across shared graphics memory](https://github.com/EriArk/PikoNest/issues/5) | G01–G04; A03 | Core tools before additional preset libraries. |
 | [#6 — M1: create a complete original game from a blank cartridge without Lua editing](https://github.com/EriArk/PikoNest/issues/6) | M1; C01–C03/C06; G04; M01; H01/H02 | Connected workflow milestone, not a claim of current completion. |

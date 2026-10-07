@@ -56,7 +56,7 @@ The finished Workshop is meant to cover the whole little-game loop: **sprites, m
 <table>
   <tr>
     <td width="50%"><img src="docs/showcase/0.0.65-en/04-map-editor.png" alt="A tile map with grass, flowers and a winding path"></td>
-    <td width="50%"><img src="docs/showcase/0.0.65-en/05-animation-editor.png" alt="Two heart frames in the animation editor"></td>
+    <td width="50%"><img src="docs/showcase/0.0.67-en/01-animation.png" alt="Two heart frames in the animation editor"></td>
   </tr>
   <tr>
     <td align="center"><sub>Build a world, one tile at a time.</sub></td>
@@ -64,8 +64,8 @@ The finished Workshop is meant to cover the whole little-game loop: **sprites, m
   </tr>
 </table>
 
-Editor images show the 0.0.65 English capture build; Play shows the regular 0.0.66
-build. [Browse the complete English website gallery and download the image pack](docs/showcase/README.md).
+Animation and camera images show the regular 0.0.67 build; Play shows 0.0.66.
+The other editors show the earlier 0.0.65 English capture build. [Browse the complete English website gallery and download the image pack](docs/showcase/README.md).
 
 Start from a blank cartridge if you know what you want. Start from a small template if you do not. The tools are the same either way — PikoNest is not built around one genre, one hero, or one kind of game.
 
@@ -77,7 +77,7 @@ PikoNest can present common game logic as small, controller-friendly tools: cond
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/showcase/0.0.65-en/06-camera-preview.png" alt="PikoNest camera resource preview"></td>
+    <td width="50%"><img src="docs/showcase/0.0.67-en/04-camera-preview.png" alt="PikoNest camera resource preview"></td>
     <td width="50%"><img src="docs/showcase/0.0.65-en/07-background-layers.png" alt="PikoNest background layers"></td>
   </tr>
   <tr>

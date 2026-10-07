@@ -1,0 +1,77 @@
+{
+  "version": "0.0.67",
+  "captured_local_date": "2026-10-07",
+  "base_commit": "9e1ebc739d7ccbfbcfd1dbd32b6521d1fc0bf130",
+  "build": "regular development APK; no capture-only translations",
+  "apk_sha256": "11bba73bd7c6779e5d932fb283d51c300adef22d34956411e7ab49785bedad5d",
+  "environment": "isolated Android 15 x86_64 emulator; dedicated PikoNest_UX67 AVD; 320 dpi",
+  "capture": "adb exec-out screencap -p; original PNGs, no image edits",
+  "screens": [
+    {
+      "name": "01-animation.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "c4dacefa5f078070f63e542e56f98c3d2fe50b00a45308fcfa53bb38afbfd9ea"
+    },
+    {
+      "name": "02-field-edit.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "b54abda6e070fe2c0c37d03436d07a4651eb3f29ea8bf17c6b83ac553264ffc7"
+    },
+    {
+      "name": "03-camera.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "79882f383362d02b2fbfffb12d76d31ec844f9258aa08d15a7ddcb3d4576ef4a"
+    },
+    {
+      "name": "04-camera-preview.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "bbc2cedc308e6e388b4958b9b556efd17c4c6466bb7853238cc5b79c3d211ef7"
+    },
+    {
+      "name": "05-frame-region.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "21530cb5b7fb24397714706a2c0bde73aa76ca5813c645afc733758bc2c4df28"
+    },
+    {
+      "name": "06-compact-camera.png",
+      "width": 720,
+      "height": 960,
+      "sha256": "73244192baa3471ef5cb7338c5023ef68cd2f58dcca36e27a6def8d8c5b11d14"
+    },
+    {
+      "name": "07-runtime-required.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "4fc94557e319a6b3a44e33d7d0c71c07d905d4ab635e573137bd101b89a921e7"
+    }
+  ],
+  "fixture": "docs/design/android-camera-uses-65/final.p8, loaded into the isolated Moon Garden project; initial journal prepared with portable core",
+  "native_checks": [
+    "animation field edit and cancel after process recreation",
+    "missing-runtime Test preserves exact journal and saved bytes",
+    "animation Apply/Undo/Redo exact bytes",
+    "camera field edit/cancel, process recovery and Apply/Undo/Redo exact bytes",
+    "unfinished selection Test explains prerequisite and preserves journal",
+    "1240x1080, 720x960 and 1920x1080 inspected"
+  ],
+  "full_local_build_and_domain_suite": "passed; subsequent focused tests and native repack after UI findings",
+  "focused_checks": {
+    "UsesEditorTest": 32,
+    "GameUsesTest": 90,
+    "AnimationUsesTest": 81,
+    "CameraUsesTest": 76,
+    "WorldCameraTest": 69
+  },
+  "runtime_successful_launch": "not checked in this batch; emulator has no official runtime; candidate launch bytes verified through core Port",
+  "physical_device": "Retroid Pocket Classic; final APK 0.0.67 installed with data-preserving update",
+  "physical_acceptance": "pending; existing unknown runtime session was not bypassed or stopped",
+  "project_and_library_files_unchanged": 48,
+  "console_music_stream": "muted",
+  "github_apk_release": false,
+  "next": "UX04 existing background-layer integration; successful physical Test/return and unknown-session recovery remain open"
+}

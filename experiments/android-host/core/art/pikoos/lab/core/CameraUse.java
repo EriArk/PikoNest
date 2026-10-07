@@ -35,13 +35,13 @@ public final class CameraUse {
         }
         if(field<=form.item().fields.length){
             int at=field-1;String v=form.value(at);
-            if(!v.matches("-?[0-9]+"))throw new IllegalArgumentException("Это выражение. X выбирает число или имя проекта; исходное значение сохранено.");
+            if(!v.matches("-?[0-9]+"))throw new IllegalArgumentException("This is an expression. Press X to choose a number or project value. The original value is preserved.");
             long next=Long.parseLong(v)+delta;
             if(next < -32768||next>32767)return;
             try{form.set(at,""+next);}catch(IllegalArgumentException e){return;}
         }else if(ranged()&&field==rows()-2){
             int next=Math.max(owner.index,Math.min(owner.entries.size()-1,rangeEnd+(delta<0?-1:1)));
-            for(int n=owner.index;n<=next;n++)if(owner.entries.get(n).isCamera())throw new IllegalArgumentException("Диапазон не пересекает другую камеру. Измени её отдельно.");
+            for(int n=owner.index;n<=next;n++)if(owner.entries.get(n).isCamera())throw new IllegalArgumentException("The range cannot cross another camera. Edit that camera separately.");
             rangeEnd=next;
         }
     }
@@ -55,9 +55,9 @@ public final class CameraUse {
     public void validate(){
         WorldCamera.validateSource(owner.source,form.item().id);WorldCamera.validateForm(form);
         if(ranged()){
-            if(owner.current().view!=null&&offset(owner.current().view)==null)throw new IllegalArgumentException("Прежняя камера зависит от игры. Измени её настройку отдельно: повторное вычисление при возврате может изменить поведение.");
-            if(rangeEnd<owner.index||rangeEnd>=owner.entries.size())throw new IllegalArgumentException("Выбери конец диапазона.");
-            for(int n=owner.index;n<=rangeEnd;n++)if(owner.entries.get(n).isCamera())throw new IllegalArgumentException("Диапазон пересекает другую камеру.");
+            if(owner.current().view!=null&&offset(owner.current().view)==null)throw new IllegalArgumentException("The previous camera uses runtime expressions. Edit it separately; recalculating its position could change the game.");
+            if(rangeEnd<owner.index||rangeEnd>=owner.entries.size())throw new IllegalArgumentException("Choose the last use in the range.");
+            for(int n=owner.index;n<=rangeEnd;n++)if(owner.entries.get(n).isCamera())throw new IllegalArgumentException("The range crosses another camera.");
         }
     }
     private static int after(String s,int at){if(at<s.length()&&s.charAt(at)=='\r')at++;if(at<s.length()&&s.charAt(at)=='\n')at++;return at;}
