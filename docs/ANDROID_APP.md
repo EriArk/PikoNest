@@ -15,6 +15,29 @@ explicit confirmation of complete satisfaction and permission to release. Local
 test builds, device updates and source commits are development work, not release
 approval.
 
+## Single-APK delivery requirement
+
+Owner-confirmed 2026-10-07: one installable APK and one PikoNest launcher icon
+must provide Play, Workshop, setup and runtime launch/return. A separately
+installed runtime/helper APK is not an acceptable product prerequisite. Internal
+activities, services or processes may remain separate behind the runtime port.
+The official purchased PICO-8 runtime is still imported by the user, not bundled.
+
+Live Retroid inspection on 2026-10-07 found `art.pikoos.runtimelab` 0.0.69 and
+`art.pikoos.runtimeexperiment` 1.6.6-pikoos.8 as separate launcher applications.
+The host's ExternalPicoBackend currently targets the latter. This is an actual
+development dependency, not merely a duplicate shortcut. `io.wip.pico8` is also
+installed independently; do not assume it is disposable or part of the migration.
+
+The next foundation package integrates the adapter, verifies clean installation
+and Test/Play/return without either external wrapper package, and preserves
+existing data during migration. Unknown/interrupted session recovery is part of
+that package, not a reason to bypass the current session guard. Audit bundled
+third-party components and distribution notices before shipping them. Existing
+technical identifiers stay unchanged until the coordinated naming migration.
+Retire obsolete development apps only after verified data transfer and successful
+launch/return; hiding their icons does not satisfy the requirement.
+
 Host 0.0.30 / Runtime Test 4 can prepare and launch an isolated runtime candidate
 from the user's verified Raspberry Pi ZIP. Existing games still use the working
 installation. Clean-install bootstrap and permanent activation remain pending.

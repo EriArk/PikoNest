@@ -27,6 +27,13 @@ The intended emotional experience is closer to a creative toy than to a desktop 
 
 The first production target is Android gaming handhelds with physical controls.
 
+Owner clarification (2026-10-07): the Android product must install from **one APK**,
+with one PikoNest launcher icon and no separately installed runtime/helper app.
+Integrate the runtime adapter inside the application while preserving the portable
+backend boundary. The purchased official PICO-8 runtime remains user-imported,
+never bundled. Preserve projects, saves, library and runtime setup during the
+transition; remove obsolete development apps only after verified migration.
+
 Owner clarification (2026-10-03): the current deliverable is an installable Android
 APK application. Linux handhelds are occupied by TrainerOS work; Linux porting and
 device validation are deferred and must not block Android. Keep portable boundaries.
