@@ -18,6 +18,8 @@ final class UsesSurface {
     private Canvas c; private float w,h,bottom,scale,downX,downY;
     private long clock;
     private int errorScroll;
+    private GameSketch layerReview;
+    private GameUses layerReviewOwner;
     private RectF pickerArea;
     private SpritePlacement picker;
     private static final int[] COLORS=PicoPalette.COLORS;
@@ -71,37 +73,56 @@ final class UsesSurface {
         c=canvas;this.scale=scale;w=width;h=height;bottom=h-88;hits.clear();pickerArea=null;picker=null;
         box(0,0,w,h,1);GameUses g=s.uses;
         fit(project,16,25,18,6,w-136);fit(g.screen==GameUses.Screen.LIST||g.screen==GameUses.Screen.MENU?"Saved":"Draft",w-112,25,18,10,96);
-        String title=g.camera!=null?"Camera":g.animation!=null?"Animation":g.screen==GameUses.Screen.MENU?"Game actions":"In the game";
+        String title=g.background!=null?"Background":g.camera!=null?"Camera":g.animation!=null?"Animation":g.screen==GameUses.Screen.MENU?"Game actions":"In the game";
         text(title,16,60,26,7);box(16,72,32,3,14);
+        if(g.screen!=GameUses.Screen.REVIEW){layerReview=null;layerReviewOwner=null;}
         if(s.mode==WorkshopSession.Mode.ERROR){error();return;}
         if(g.screen==GameUses.Screen.PICK){resource(g.picker,"Sprite region");return;}
         if(g.animation!=null&&g.animation.picker!=null){resource(g.animation.picker,g.animation.picker.phase==2?"Position in game":"Frame "+(g.animation.selected+1)+" region");return;}
+        if(g.background!=null&&g.background.picker!=null){resource(g.background.picker,"Background strip");return;}
         if(g.screen==GameUses.Screen.REVIEW){review();return;}
+        if(g.background!=null){background();return;}
         if(g.camera!=null){camera();return;}
         if(g.animation!=null){animation();return;}
         if(g.screen==GameUses.Screen.FORM){placement();return;}
         if(g.screen==GameUses.Screen.MENU){
-            String[] items={"Add sprite","Add map","Duplicate selection","Remove use","Open Lua (optional)","Back to list","Add animation","Animate selected sprite","Camera for selected uses","Screen space from here"};
+            String[] items={"Add sprite","Add map","Duplicate selection","Remove use","Open Lua (optional)","Back to list","Add animation","Animate selected sprite","Camera for selected uses","Screen space from here","Add background before selection","Move layer backward","Move layer forward"};
             fit("Choose an action",16,101,18,6,w-32);int count=Math.max(1,(int)((bottom-120)/44)),first=Math.max(0,g.menu-count+1);
             for(int n=0;n<count&&first+n<items.length;n++){final int at=first+n;row(items[at],116+n*44,g.menu==at,()->{g.menu=at;act(Action.CONFIRM);});}
             footer("Choose","Back","↑↓ Browse",Action.DOWN,false);return;
         }
         fit(g.entries.size()+" uses · draw order",16,101,18,6,w-32);
         if(!g.blocked.isEmpty()){wrap("This list cannot safely edit this draw code yet. Your source is preserved. Open Lua from Actions.",16,148,w-32,20,7,5);}
-        else if(g.entries.isEmpty()){wrap("Add a sprite, map or animation. Choose its place, then try it in Test.",16,156,w-32,20,7,5);}
+        else if(g.entries.isEmpty()){wrap("Add a sprite, map, animation or background from Actions, then try it in Test.",16,156,w-32,20,7,5);}
         int count=Math.max(1,(int)((bottom-122)/60)),first=Math.max(0,g.index-count+1);
         for(int n=0;n<count&&first+n<g.entries.size();n++){
             final int at=first+n;GameUses.Entry e=g.entries.get(at);float y=116+n*60;
             if(at==g.index){box(12,y,w-24,56,2);box(12,y,4,56,10);}
             fit((at+1)+"  "+entryTitle(e),24,y+24,20,at==g.index?10:7,w-48);
-            String detail=e.isCamera()?"Applies to following uses":"X "+e.x()+"   Y "+e.y()+"   · "+(e.view==null||e.view.form.item().id.equals("camera_reset")?"screen":"world");
+            String detail=e.isBackground()?"Y "+e.call.form.value(4)+" · "+e.call.form.value(5)+" px/s · "+(e.call.form.value(7).equals("true")?"visible":"hidden"):e.isCamera()?"Applies to following uses":"X "+e.x()+"   Y "+e.y()+"   · "+(e.view==null||e.view.form.item().id.equals("camera_reset")?"screen":"world");
             fit(detail,24,y+47,16,6,w-48);hit(12,y,w-24,56,()->{g.index=at;act(Action.CONFIRM);});
         }
         footer(g.entries.isEmpty()?"Add sprite":"Edit","Workshop","Select Actions",Action.MENU,false);hint("Start Test",3,Action.TEST);
     }
     private static String cameraTitle(CameraUse camera){return cameraTitle(camera.form);}
     private static String cameraTitle(LuaInsert form){String id=form.item().id;return id.equals("camera_reset")?"Screen space":id.equals("camera_follow")?"Follow a point":id.equals("camera_rooms")?"Room by room":"Fixed offset";}
-    private static String entryTitle(GameUses.Entry e){return e.isCamera()?"Camera · "+cameraTitle(e.call.form):e.animation!=null?"Animation · "+e.animation.initial.count()+" frames":e.kind().equals("map")?"Map":"Sprite";}
+    private static String entryTitle(GameUses.Entry e){return e.isBackground()?"Background · "+e.call.form.value(2)+" × "+e.call.form.value(3):e.isCamera()?"Camera · "+cameraTitle(e.call.form):e.animation!=null?"Animation · "+e.animation.initial.count()+" frames":e.kind().equals("map")?"Map":"Sprite";}
+    private void background(){
+        GameUses g=s.uses;BackgroundUse b=g.background;boolean editing=g.editingField();long now=SystemClock.uptimeMillis();
+        if(b.playing&&view.getWindowVisibility()==android.view.View.VISIBLE){if(clock!=0)b.advance((int)Math.min(100,now-clock));clock=now;view.postInvalidateDelayed(33);}else clock=0;
+        fit(g.creating?(g.copyAfter?"Copy after selected layer":g.current()==null?"First use in the game":"Before use "+(g.index+1)+" · behind later uses"):"Repeats horizontally · keeps the camera",16,101,18,6,w-32);
+        for(int y=0;y<128;y++)for(int x=0;x<128;x++){int color=b.pixel(s.cart(),x,y);bitmap.setPixel(x,y,COLORS[color==0?1:color]);}
+        c.drawBitmap(bitmap,null,new RectF(16,116,112,212),paint);box(16,212,96,1,13);
+        fit(b.playing?"Playing sketch":"Paused sketch",128,139,18,14,w-144);
+        fit("Camera X: "+b.previewCameraX,128,166,18,6,w-144);
+        fit("0 = screen · 1 = world",128,193,18,6,w-144);
+        SpriteRegion r=b.region();String[] rows={"Region: "+r.width+" × "+r.height+" at "+r.x+", "+r.y,"Screen Y: "+b.form.value(4),"Speed: "+b.form.value(5)+" px/s","Parallax: "+b.form.value(6),"Visible: "+(b.form.value(7).equals("true")?"Yes":"No"),"Sketch camera X: "+b.previewCameraX,"Preview changes"};
+        int count=Math.max(1,(int)((bottom-258)/44)),first=Math.max(0,b.field-count+1);
+        for(int n=0;n<count&&first+n<rows.length;n++){final int at=first+n;row((editing&&at==b.field?"< ":"")+rows[at]+(editing&&at==b.field?" >":""),224+n*44,b.field==at,()->{if(!editing||b.field==at){b.field=at;act(Action.CONFIRM);}});}
+        scroll(b.field,rows.length,count,224);
+        fit(b.field==5?"Sketch camera is not saved to the game":r.sharesMap()?"This strip shares memory with the map":"Region refers to pixels in this cartridge",16,bottom-14,16,6,w-32);
+        if(editing)editingFooter();else footer(b.field==6?"Preview":b.field==0?"Choose":"Edit","Cancel",b.playing?"X Pause":"X Play sketch",Action.CONTEXT,true);
+    }
     private void camera(){
         GameUses g=s.uses;CameraUse a=g.camera;boolean editing=g.editingField();
         fit(editing?"Editing field · ←→ adjust":"Choose a field to edit",16,101,18,6,w-32);
@@ -162,19 +183,22 @@ final class UsesSurface {
         footer("Preview","Cancel",g.kind.equals("map")?null:"X Choose region",Action.CONTEXT,false);
     }
     private void review(){
-        clock=0;GameUses g=s.uses;fit(g.deleting?"Remove this use?":"Preview changes",16,101,20,10,w-32);
+        clock=0;GameUses g=s.uses;fit(g.deleting?"Remove this use?":g.layerMove<0?"Move layer backward?":g.layerMove>0?"Move layer forward?":"Preview changes",16,101,20,10,w-32);
         float size=Math.min(256,Math.min(w-32,bottom-208)),left=(w-size)/2,top=116;
         boolean dynamic=false;
-        if(g.camera!=null){int[] pixels=g.camera.preview(g.deleting);dynamic=g.camera.dynamicPreview;for(int y=0;y<128;y++)for(int x=0;x<128;x++)bitmap.setPixel(x,y,COLORS[pixels[y*128+x]]);}
+        if(g.background!=null){
+            if(layerReview==null||layerReviewOwner!=g){layerReview=new GameSketch(g.proposal().candidate(s.cart()),0);layerReviewOwner=g;}
+            dynamic=layerReview.dynamic;for(int y=0;y<128;y++)for(int x=0;x<128;x++)bitmap.setPixel(x,y,COLORS[layerReview.pixels[y*128+x]]);
+        }else if(g.camera!=null){int[] pixels=g.camera.preview(g.deleting);dynamic=g.camera.dynamicPreview;for(int y=0;y<128;y++)for(int x=0;x<128;x++)bitmap.setPixel(x,y,COLORS[pixels[y*128+x]]);}
         else for(int y=0;y<128;y++)for(int x=0;x<128;x++)bitmap.setPixel(x,y,COLORS[g.deleting?1:g.pixel(s.cart(),x-g.x(),y-g.y())]);
         c.drawBitmap(bitmap,null,new RectF(left,top,left+size,top+size),paint);
         box(left-1,top-1,size+2,1,13);box(left-1,top+size,size+2,1,13);
         box(left-1,top,1,size,13);box(left+size,top,1,size,13);
         String caption=dynamic?"Dynamic positions need Test":"Sketch only · Test for gameplay";
         fit(caption,16,bottom-69,16,6,w-32);
-        fit(g.deleting?"Sprite-sheet and map data stay intact":g.camera!=null?cameraTitle(g.camera):g.animation!=null?g.animation.count()+" frames · "+(g.animation.loop?"loop":"once")+" · from game start":"Position: "+g.x()+", "+g.y(),16,bottom-44,18,7,w-32);
+        fit(g.deleting?"Sprite-sheet and map data stay intact":g.background!=null?"Scene at start · camera restored":g.camera!=null?cameraTitle(g.camera):g.animation!=null?g.animation.count()+" frames · "+(g.animation.loop?"loop":"once")+" · from game start":"Position: "+g.x()+", "+g.y(),16,bottom-44,18,7,w-32);
         fit("Apply saves one undo step",16,bottom-20,16,6,w-32);
-        footer(g.deleting?"Remove":"Apply",g.deleting?"Cancel":"Edit",null,null,true);
+        footer(g.deleting?"Remove":"Apply",g.deleting||g.layerMove!=0?"Cancel":"Edit",null,null,true);
     }
     private void error(){
         fit("Could not complete this action",16,101,18,10,w-32);

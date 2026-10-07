@@ -6,7 +6,7 @@ import java.util.regex.*;
 
 /** Bounded ordinary draw calls. No scene graph, source annotations or runtime dependency. */
 public final class GameUses {
-    public enum Screen { LIST, MENU, FORM, REVIEW, PICK, ANIMATION, CAMERA }
+    public enum Screen { LIST, MENU, FORM, REVIEW, PICK, ANIMATION, CAMERA, BACKGROUND }
     public final WorkshopCartridge base;
     public final String source;
     public final List<Entry> entries=new ArrayList<>();
@@ -20,6 +20,8 @@ public final class GameUses {
     public SpriteAnimation animation;
     public boolean converting;
     public CameraUse camera;
+    public BackgroundUse background;
+    public int layerMove;
     public boolean copyAfter;
     private byte[] fieldBaseline;
     public boolean editingField(){return fieldBaseline!=null;}
@@ -27,7 +29,7 @@ public final class GameUses {
     public void beginField(){
         if(editingField())return;
         try{ByteArrayOutputStream b=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(b);
-            if(camera!=null)camera.write(o);else if(animation!=null)animation.write(o);else return;
+            if(background!=null)background.write(o);else if(camera!=null)camera.write(o);else if(animation!=null)animation.write(o);else return;
             fieldBaseline=b.toByteArray();
         }catch(IOException e){throw new IllegalStateException(e);}
     }
@@ -35,7 +37,7 @@ public final class GameUses {
     public void cancelField(){
         if(!editingField())return;
         try{DataInputStream i=new DataInputStream(new ByteArrayInputStream(fieldBaseline));
-            if(camera!=null)camera=CameraUse.read(i,this);else animation=SpriteAnimation.read(i);
+            if(background!=null)background=BackgroundUse.read(i);else if(camera!=null)camera=CameraUse.read(i,this);else animation=SpriteAnimation.read(i);
             fieldBaseline=null;
         }catch(IOException e){throw new IllegalStateException(e);}
     }
@@ -53,10 +55,11 @@ public final class GameUses {
         public String kind(){return animation!=null?"animation":call.name;}
         public int start(){return animation!=null?animation.start:call.start;}
         public int end(){return animation!=null?animation.end:call.end;}
+        public boolean isBackground(){return call!=null&&call.name.equals("background");}
         public boolean isCamera(){return call!=null&&call.form.cameraRecipe();}
-        public String title(){return isCamera()?CameraUse.title(call.form):animation!=null?"Анимация · "+animation.initial.count()+" кадров":call.name.equals("map")?"Карта":"Спрайт";}
-        public int x(){return isCamera()?0:animation!=null?animation.initial.x:values[call.name.equals("sspr")?4:call.name.equals("map")?2:1];}
-        public int y(){return isCamera()?0:animation!=null?animation.initial.y:values[call.name.equals("sspr")?5:call.name.equals("map")?3:2];}
+        public String title(){return isBackground()?"Background layer":isCamera()?CameraUse.title(call.form):animation!=null?"Анимация · "+animation.initial.count()+" кадров":call.name.equals("map")?"Карта":"Спрайт";}
+        public int x(){return isCamera()||isBackground()?0:animation!=null?animation.initial.x:values[call.name.equals("sspr")?4:call.name.equals("map")?2:1];}
+        public int y(){return isBackground()?Integer.parseInt(call.form.value(4)):isCamera()?0:animation!=null?animation.initial.y:values[call.name.equals("sspr")?5:call.name.equals("map")?3:2];}
     }
     public GameUses(WorkshopCartridge cart,int returnTool){
         base=cart;source=new LuaDraft(cart,0).text();this.returnTool=returnTool;
@@ -76,6 +79,8 @@ public final class GameUses {
             if(line.equals("end")){insertAt=at;closed=true;break;}
             if(!line.isEmpty()){
                 if(line.equals("do")){
+                    LuaCall layer=BackgroundLayer.find(source,at);
+                    if(layer!=null&&layer.start==at){Entry e=new Entry(layer,new int[0]);e.view=view;entries.add(e);at=afterLine(layer.end);continue;}
                     AnimationEdit animation=AnimationEdit.find(source,at);
                     if(animation==null||animation.start!=at)throw unsupported();
                     Entry e=new Entry(animation);e.view=view;entries.add(e);indent=animation.indent;at=animation.end;continue;
@@ -117,25 +122,41 @@ public final class GameUses {
     private void builtin(String name){LuaSymbols symbols=new LuaSymbols(source);if(symbols.shadows(name)||(newDraw&&symbols.shadows("cls")))throw unsupported();}
     public void addSprite(SpriteRegion region){available();builtin("sspr");kind="sspr";values=new int[]{region.x,region.y,region.width,region.height,60,60};begin(true);}
     public void addMap(int x,int y){available();builtin("map");kind="map";values=new int[]{x,y,0,0,Math.min(16,128-x),Math.min(16,64-y)};begin(true);}
-    private void begin(boolean create){creating=create;deleting=converting=copyAfter=false;animation=null;camera=null;field=0;screen=Screen.FORM;validate(kind,values);}
-    public void addAnimation(SpriteRegion region){available();builtin("sspr");SpriteAnimation.validateSource(source);kind="animation";creating=true;deleting=converting=copyAfter=false;camera=null;animation=new SpriteAnimation(region);screen=Screen.ANIMATION;}
-    public void addCamera(boolean reset){available();if(current()==null||current().isCamera())throw new IllegalArgumentException("Select a sprite, animation or map first.");WorldCamera.validateSource(source,false);camera=new CameraUse(this,reset);animation=null;creating=true;deleting=converting=copyAfter=false;kind="camera";screen=Screen.CAMERA;}
+    private void begin(boolean create){finishField();background=null;layerMove=0;creating=create;deleting=converting=copyAfter=false;animation=null;camera=null;field=0;screen=Screen.FORM;validate(kind,values);}
+    public void addAnimation(SpriteRegion region){available();builtin("sspr");SpriteAnimation.validateSource(source);finishField();background=null;layerMove=0;kind="animation";creating=true;deleting=converting=copyAfter=false;camera=null;animation=new SpriteAnimation(region);screen=Screen.ANIMATION;}
+    public void addCamera(boolean reset){available();if(current()==null||current().isCamera())throw new IllegalArgumentException("Select a sprite, animation, map or background first.");WorldCamera.validateSource(source,false);finishField();background=null;layerMove=0;camera=new CameraUse(this,reset);animation=null;creating=true;deleting=converting=copyAfter=false;kind="camera";screen=Screen.CAMERA;}
+    public void addBackground(SpriteRegion region){
+        available();builtin("sspr");BackgroundUse next=new BackgroundUse(region);BackgroundLayer.validate(source,next.form);
+        finishField();animation=null;camera=null;background=next;kind="background";creating=true;
+        deleting=converting=copyAfter=false;layerMove=0;screen=Screen.BACKGROUND;
+    }
+    public void reorderLayer(int direction){
+        available();if(current()==null||!current().isBackground())throw new IllegalArgumentException("Select a background layer first.");
+        BackgroundLayers list=new BackgroundLayers(source,current().start());list.change(direction);
+        edit();layerMove=direction;screen=Screen.REVIEW;
+    }
+    public int resultIndex(){
+        if(layerMove!=0)return index+layerMove;
+        if(background!=null)return index+(creating&&copyAfter?1:0);
+        return camera!=null?index:creating?(copyAfter?index+1:entries.size()):index;
+    }
     public void animateSelected(){
-        available();Entry e=current();if(e==null||e.isCamera()||e.kind().equals("map")||e.animation!=null)throw new IllegalArgumentException("Select a placed sprite to animate.");
+        available();Entry e=current();if(e==null||e.isCamera()||e.isBackground()||e.kind().equals("map")||e.animation!=null)throw new IllegalArgumentException("Select a placed sprite to animate.");
         if(e.x()<-127||e.x()>127||e.y()<-127||e.y()>127)throw new IllegalArgumentException("This animation editor supports positions from -127 to 127. The source is preserved.");
         edit();SpriteRegion r=region();addAnimation(r);animation.x=e.x();animation.y=e.y();creating=false;converting=true;
     }
     public void edit(){available();if(current()==null)return;
         Entry e=current();
-        camera=null;copyAfter=false;
-        if(e.isCamera()){kind="camera";creating=deleting=converting=false;animation=null;camera=new CameraUse(this,e.call);screen=Screen.CAMERA;}
+        finishField();background=null;layerMove=0;camera=null;copyAfter=false;
+        if(e.isBackground()){kind="background";creating=deleting=converting=false;animation=null;background=new BackgroundUse(e.call.form);screen=Screen.BACKGROUND;}
+        else if(e.isCamera()){kind="camera";creating=deleting=converting=false;animation=null;camera=new CameraUse(this,e.call);screen=Screen.CAMERA;}
         else if(e.animation!=null){kind="animation";creating=deleting=converting=false;animation=e.animation.initial.copy();screen=Screen.ANIMATION;}
         else{kind=e.kind();values=e.values.clone();begin(false);}
     }
-    public void duplicate(){if(current()!=null&&current().isCamera())throw new IllegalArgumentException("Choose a use, then add a camera from Actions.");edit();if(current()!=null){creating=true;copyAfter=current().view!=null;}}
+    public void duplicate(){if(current()!=null&&current().isCamera())throw new IllegalArgumentException("Choose a use, then add a camera from Actions.");edit();if(current()!=null){creating=true;copyAfter=background!=null||current().view!=null;}}
     public void delete(){edit();if(current()!=null){deleting=true;screen=Screen.REVIEW;}}
-    public void review(){finishField();if(camera!=null){camera.validate();camera.invalidatePreview();}else if(animation==null)validate(kind,values);else{animation.playing=false;animation.review=false;}screen=Screen.REVIEW;}
-    public void back(){finishField();if(screen==Screen.PICK){picker=null;screen=Screen.FORM;}else if(screen==Screen.REVIEW&&!deleting)screen=camera!=null?Screen.CAMERA:animation!=null?Screen.ANIMATION:Screen.FORM;else{animation=null;camera=null;creating=deleting=converting=copyAfter=false;screen=Screen.LIST;}}
+    public void review(){finishField();if(background!=null){BackgroundLayer.validate(source,background.form);background.playing=false;}else if(camera!=null){camera.validate();camera.invalidatePreview();}else if(animation==null)validate(kind,values);else{animation.playing=false;animation.review=false;}screen=Screen.REVIEW;}
+    public void back(){finishField();if(screen==Screen.PICK){picker=null;screen=Screen.FORM;}else if(screen==Screen.REVIEW&&!deleting&&layerMove==0)screen=background!=null?Screen.BACKGROUND:camera!=null?Screen.CAMERA:animation!=null?Screen.ANIMATION:Screen.FORM;else{animation=null;camera=null;background=null;layerMove=0;creating=deleting=converting=copyAfter=false;screen=Screen.LIST;}}
     public String[] labels(){return kind.equals("map")?new String[]{"Карта X, кл","Карта Y, кл","В игре X","В игре Y","Ширина, кл","Высота, кл"}:kind.equals("spr")?new String[]{"Тайл","В игре X","В игре Y"}:new String[]{"Лист X","Лист Y","Ширина, px","Высота, px","В игре X","В игре Y"};}
     public int x(){return animation!=null?animation.x:values[kind.equals("sspr")?4:kind.equals("map")?2:1];}
     public int y(){return animation!=null?animation.y:values[kind.equals("sspr")?5:kind.equals("map")?3:2];}
@@ -163,7 +184,7 @@ public final class GameUses {
         SpriteRegion r=region();return px<0||py<0||px>=r.width||py>=r.height?0:cart.pixel(r,px,py);
     }
     public CartEdit proposal(){
-        available();if(camera!=null)return camera.proposal(deleting);if(animation==null)validate(kind,values);String result;
+        available();if(background!=null)return backgroundProposal();if(camera!=null)return camera.proposal(deleting);if(animation==null)validate(kind,values);String result;
         if(deleting){Entry e=current();if(e==null)throw unsupported();result=source.substring(0,e.start())+source.substring(e.animation!=null?e.end():afterLine(e.end()));}
         else if(animation!=null){
             SpriteAnimation.validateSource(source);
@@ -184,6 +205,21 @@ public final class GameUses {
         }
         LuaDraft draft=new LuaDraft(base,0);draft.selectAll();draft.replace(result);return draft.edit();
     }
+    private CartEdit backgroundProposal(){
+        BackgroundLayer.validate(source,background.form);String result;
+        if(layerMove!=0||deleting)result=new BackgroundLayers(source,current().start()).change(deleting?3:layerMove).result;
+        else if(!creating)result=current().call.replacement(source,background.form);
+        else if(copyAfter){
+            Entry e=current();int at=afterLine(e.end());
+            result=source.substring(0,at)+e.call.preview(background.form)+newline+source.substring(at);
+        }else{
+            StringBuilder block=new StringBuilder();
+            for(String row:background.form.code().split("\n"))block.append(indent).append(row).append(newline);
+            if(newDraw)result=insert(block.toString());
+            else{int at=current()==null?insertAt:current().start();result=source.substring(0,at)+block+source.substring(at);}
+        }
+        LuaDraft draft=new LuaDraft(base,0);draft.selectAll();draft.replace(result);return draft.edit();
+    }
     private String animationBlock(String prefix){StringBuilder b=new StringBuilder();for(String row:animation.code().split("\n"))b.append(prefix).append(row).append(newline);return b.toString();}
     private String insert(String block){
         if(newDraw)block=(source.isEmpty()||source.endsWith("\n")||source.endsWith("\r")?"":newline)+"function _draw()"+newline+" cls(1)"+newline+block+"end"+newline;
@@ -191,34 +227,42 @@ public final class GameUses {
     }
     private int creationAt(){return copyAfter&&current()!=null?(current().animation!=null?current().end():afterLine(current().end())):insertAt;}
     public byte[] encode(){try{
-        ByteArrayOutputStream b=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(b);o.writeInt(4);byte[] cart=base.bytes();o.writeInt(cart.length);o.write(cart);
+        ByteArrayOutputStream b=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(b);o.writeInt(5);byte[] cart=base.bytes();o.writeInt(cart.length);o.write(cart);
         o.writeInt(returnTool);o.writeInt(index);o.writeUTF(screen.name());o.writeInt(field);o.writeInt(menu);o.writeBoolean(creating);o.writeBoolean(deleting);o.writeUTF(kind);o.writeInt(values.length);for(int v:values)o.writeInt(v);o.writeBoolean(picker!=null);if(picker!=null)picker.write(o);
-        o.writeBoolean(converting);o.writeBoolean(animation!=null);if(animation!=null)animation.write(o);o.writeBoolean(copyAfter);o.writeBoolean(camera!=null);if(camera!=null)camera.write(o);o.writeInt(fieldBaseline==null?0:fieldBaseline.length);if(fieldBaseline!=null)o.write(fieldBaseline);return b.toByteArray();
+        o.writeBoolean(converting);o.writeBoolean(animation!=null);if(animation!=null)animation.write(o);o.writeBoolean(copyAfter);o.writeBoolean(camera!=null);if(camera!=null)camera.write(o);o.writeInt(fieldBaseline==null?0:fieldBaseline.length);if(fieldBaseline!=null)o.write(fieldBaseline);o.writeBoolean(background!=null);if(background!=null)background.write(o);o.writeInt(layerMove);return b.toByteArray();
     }catch(IOException e){throw new IllegalStateException(e);}}
     public static GameUses restore(byte[] bytes,WorkshopCartridge current){try{
-        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version<1||version>4)throw new IOException();int n=i.readInt();if(n<0||n>2*1024*1024||n>i.available())throw new IOException();byte[] cart=new byte[n];i.readFully(cart);
+        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version<1||version>5)throw new IOException();int n=i.readInt();if(n<0||n>2*1024*1024||n>i.available())throw new IOException();byte[] cart=new byte[n];i.readFully(cart);
         if(!Arrays.equals(cart,current.bytes()))throw new IOException("The project changed; its source was not overwritten.");
-        int tool=i.readInt();if(tool<0||tool>3)throw new IOException();GameUses g=new GameUses(current,tool);g.index=i.readInt();g.screen=Screen.valueOf(i.readUTF());g.field=i.readInt();g.menu=i.readInt();g.creating=i.readBoolean();g.deleting=i.readBoolean();g.kind=i.readUTF();int size=i.readInt();if(size!=3&&size!=6)throw new IOException();g.values=new int[size];for(int v=0;v<size;v++)g.values[v]=i.readInt();if(!g.kind.equals("animation")&&!g.kind.equals("camera"))validate(g.kind,g.values);if(i.readBoolean())g.picker=SpritePlacement.read(i);
+        int tool=i.readInt();if(tool<0||tool>3)throw new IOException();GameUses g=new GameUses(current,tool);g.index=i.readInt();g.screen=Screen.valueOf(i.readUTF());g.field=i.readInt();g.menu=i.readInt();g.creating=i.readBoolean();g.deleting=i.readBoolean();g.kind=i.readUTF();int size=i.readInt();if(size!=3&&size!=6)throw new IOException();g.values=new int[size];for(int v=0;v<size;v++)g.values[v]=i.readInt();if(!g.kind.equals("animation")&&!g.kind.equals("camera")&&!g.kind.equals("background"))validate(g.kind,g.values);if(i.readBoolean())g.picker=SpritePlacement.read(i);
         if(version>=2){g.converting=i.readBoolean();if(i.readBoolean())g.animation=SpriteAnimation.read(i);}
         if(version>=3){g.copyAfter=i.readBoolean();if(i.readBoolean())g.camera=CameraUse.read(i,g);}
         if(version>=4){int length=i.readInt();if(length<0||length>8192||length>i.available())throw new IOException();
-            if(length>0){g.fieldBaseline=new byte[length];i.readFully(g.fieldBaseline);
-                if(g.screen!=Screen.CAMERA&&g.screen!=Screen.ANIMATION||g.animation!=null&&g.animation.picker!=null)throw new IOException();
-                DataInputStream f=new DataInputStream(new ByteArrayInputStream(g.fieldBaseline));
-                if(g.camera!=null)CameraUse.read(f,g);else SpriteAnimation.read(f);
-                if(f.available()!=0)throw new IOException();
-            }
+            if(length>0){g.fieldBaseline=new byte[length];i.readFully(g.fieldBaseline);}
         }
-        if(i.available()!=0||g.index<0||g.index>=Math.max(1,g.entries.size())||g.field<0||g.field>=size||g.menu<0||g.menu>9||(g.screen==Screen.PICK)!=(g.picker!=null))throw new IOException();
+        if(version>=5){if(i.readBoolean())g.background=BackgroundUse.read(i);g.layerMove=i.readInt();}
+        if(g.fieldBaseline!=null){
+            if(g.screen!=Screen.CAMERA&&g.screen!=Screen.ANIMATION&&g.screen!=Screen.BACKGROUND||g.animation!=null&&g.animation.picker!=null||g.background!=null&&g.background.picker!=null)throw new IOException();
+            DataInputStream f=new DataInputStream(new ByteArrayInputStream(g.fieldBaseline));
+            if(g.background!=null)BackgroundUse.read(f);else if(g.camera!=null)CameraUse.read(f,g);else SpriteAnimation.read(f);
+            if(f.available()!=0)throw new IOException();
+        }
+        if(i.available()!=0||g.index<0||g.index>=Math.max(1,g.entries.size())||g.field<0||g.field>=size||g.menu<0||g.menu>12||(g.screen==Screen.PICK)!=(g.picker!=null))throw new IOException();
         if(g.screen!=Screen.LIST&&g.screen!=Screen.MENU&&!g.blocked.isEmpty())throw new IOException();
-        if(g.screen==Screen.FORM||g.screen==Screen.REVIEW||g.screen==Screen.PICK||g.screen==Screen.ANIMATION||g.screen==Screen.CAMERA){
+        if(g.screen==Screen.FORM||g.screen==Screen.REVIEW||g.screen==Screen.PICK||g.screen==Screen.ANIMATION||g.screen==Screen.CAMERA||g.screen==Screen.BACKGROUND){
             if(!g.creating&&(g.current()==null||!g.converting&&g.camera==null&&!g.kind.equals(g.current().kind())))throw new IOException();
             if(g.deleting&&(g.creating||g.screen!=Screen.REVIEW))throw new IOException();
         }
         boolean animated=g.screen==Screen.ANIMATION||g.screen==Screen.REVIEW&&g.kind.equals("animation");
-        if(animated!=(g.animation!=null)||animated&&!g.kind.equals("animation")||g.converting&&(!animated||g.creating||g.deleting||g.current()==null||g.current().animation!=null||g.current().kind().equals("map")))throw new IOException();
+        if(animated!=(g.animation!=null)||animated&&!g.kind.equals("animation")||g.converting&&(!animated||g.creating||g.deleting||g.current()==null||g.current().animation!=null||g.current().kind().equals("map")||g.current().isBackground()))throw new IOException();
         if(animated&&(g.animation.review||g.screen==Screen.REVIEW&&g.animation.picker!=null))throw new IOException();
         if((g.screen==Screen.CAMERA||g.screen==Screen.REVIEW&&g.kind.equals("camera"))!=(g.camera!=null)||g.copyAfter&&(!g.creating||g.current()==null||g.current().isCamera()))throw new IOException();
+        if((g.screen==Screen.BACKGROUND||g.screen==Screen.REVIEW&&g.kind.equals("background"))!=(g.background!=null))throw new IOException();
+        if(g.background!=null){
+            if(!g.kind.equals("background")||g.camera!=null||g.animation!=null||g.screen==Screen.REVIEW&&g.background.picker!=null||g.copyAfter&&(g.current()==null||!g.current().isBackground()))throw new IOException();
+            BackgroundLayer.validate(g.source,g.background.form);
+        }
+        if(g.layerMove!=0){if(Math.abs(g.layerMove)!=1||g.background==null||g.screen!=Screen.REVIEW||g.creating||g.deleting)throw new IOException();new BackgroundLayers(g.source,g.current().start()).change(g.layerMove);}
         if(g.picker!=null&&(g.kind.equals("map")||g.picker.phase>1))throw new IOException();return g;
     }catch(Exception e){throw new IllegalArgumentException("Could not restore game uses. The saved cartridge is intact; reopen the list.",e);}}
 }

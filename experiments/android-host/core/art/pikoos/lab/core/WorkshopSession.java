@@ -48,11 +48,29 @@ public final class WorkshopSession {
     public void restoreUses(byte[] bytes){uses=GameUses.restore(bytes,cart);tool=uses.returnTool;mode=Mode.USES;}
     private void usesAction(Action action)throws Exception{
         GameUses g=uses;
-        if(action==Action.TEST&&(g.screen==GameUses.Screen.PICK||g.animation!=null&&g.animation.picker!=null))
+        if(action==Action.TEST&&(g.screen==GameUses.Screen.PICK||g.animation!=null&&g.animation.picker!=null||g.background!=null&&g.background.picker!=null))
             throw new IllegalArgumentException("Finish choosing the region or position before Test. Confirm the selection or return to the form.");
         // Test an isolated candidate. The saved cart, history and edit context stay intact.
-        if(action==Action.TEST&&(g.screen==GameUses.Screen.CAMERA||g.screen==GameUses.Screen.ANIMATION||g.screen==GameUses.Screen.REVIEW)){
+        if(action==Action.TEST&&(g.screen==GameUses.Screen.CAMERA||g.screen==GameUses.Screen.ANIMATION||g.screen==GameUses.Screen.BACKGROUND||g.screen==GameUses.Screen.REVIEW)){
             port.launch(g.proposal().candidate(cart).bytes());return;
+        }
+        if(g.screen==GameUses.Screen.BACKGROUND){
+            BackgroundUse b=g.background;
+            if(b.picker!=null){
+                if(action==Action.LEFT)b.picker.move(-1,0);if(action==Action.RIGHT)b.picker.move(1,0);
+                if(action==Action.UP)b.picker.move(0,-1);if(action==Action.DOWN)b.picker.move(0,1);
+                if(action==Action.CONTEXT)b.picker.toggleStep();
+                if(action==Action.CONFIRM)b.acceptPick();if(action==Action.CANCEL)b.cancelPick();
+            }else if(g.editingField()){
+                if(action==Action.LEFT)b.change(-1);if(action==Action.RIGHT)b.change(1);
+                if(action==Action.PREVIOUS)b.change(-8);if(action==Action.NEXT)b.change(8);
+                if(action==Action.CONFIRM)g.finishField();if(action==Action.CANCEL)g.cancelField();
+            }else{
+                if(action==Action.UP)b.field=Math.max(0,b.field-1);if(action==Action.DOWN)b.field=Math.min(6,b.field+1);
+                if(action==Action.CONFIRM){if(b.field==0)b.chooseRegion();else if(b.field==6)g.review();else{b.playing=false;g.beginField();}}
+                if(action==Action.CONTEXT)b.toggle();if(action==Action.UNDO){b.playing=false;b.previewMillis=0;}
+                if(action==Action.MENU)g.review();if(action==Action.CANCEL)g.back();
+            }return;
         }
         if(g.screen==GameUses.Screen.CAMERA){
             CameraUse camera=g.camera;
@@ -93,7 +111,7 @@ public final class WorkshopSession {
         }
         if(g.screen==GameUses.Screen.REVIEW){
             if(action==Action.CANCEL)g.back();
-            if(action==Action.CONFIRM){int selected=g.camera!=null?g.index:g.creating?(g.copyAfter?g.index+1:g.entries.size()):g.index;save(g.proposal().candidate(cart),true);uses=new GameUses(cart,g.returnTool);uses.move(selected);}
+            if(action==Action.CONFIRM){int selected=g.resultIndex();save(g.proposal().candidate(cart),true);uses=new GameUses(cart,g.returnTool);uses.move(selected);}
             return;
         }
         if(g.screen==GameUses.Screen.FORM){
@@ -103,7 +121,7 @@ public final class WorkshopSession {
             if(action==Action.CONTEXT)g.pick();if(action==Action.CONFIRM)g.review();if(action==Action.CANCEL)g.back();return;
         }
         if(g.screen==GameUses.Screen.MENU){
-            if(action==Action.UP)g.menu=Math.max(0,g.menu-1);if(action==Action.DOWN)g.menu=Math.min(9,g.menu+1);
+            if(action==Action.UP)g.menu=Math.max(0,g.menu-1);if(action==Action.DOWN)g.menu=Math.min(12,g.menu+1);
             if(action==Action.CANCEL||action==Action.MENU){g.screen=GameUses.Screen.LIST;return;}
             if(action==Action.CONFIRM){
                 if(g.menu==0)g.addSprite(selection());if(g.menu==1)g.addMap(mapEditor.x,mapEditor.y);
@@ -112,6 +130,7 @@ public final class WorkshopSession {
                 if(g.menu==5)g.screen=GameUses.Screen.LIST;
                 if(g.menu==6)g.addAnimation(selection());if(g.menu==7)g.animateSelected();
                 if(g.menu==8)g.addCamera(false);if(g.menu==9)g.addCamera(true);
+                if(g.menu==10)g.addBackground(selection());if(g.menu==11)g.reorderLayer(-1);if(g.menu==12)g.reorderLayer(1);
             }return;
         }
         if(action==Action.UP)g.move(-1);if(action==Action.DOWN)g.move(1);

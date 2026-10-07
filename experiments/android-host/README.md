@@ -1,10 +1,11 @@
 # PikoNest Android host experiment
 
-**Current lab: 0.0.67.** Shared English animation/camera forms, reversible field
-edits and isolated draft Test snapshots. Physical Test/return remains pending;
+**Current lab: 0.0.68.** Background strips join the shared game-use path: create,
+region/parameters, duplicate, order, visibility, removal, reversible fields and
+isolated draft Test snapshots. Physical Test/return remains pending;
 other editors/settings are still being migrated.
 [Current scope](../../docs/README.md) · [Build instructions](../../CONTRIBUTING.md) ·
-[Evidence and limits](../../docs/showcase/0.0.67-en/README.md).
+[Evidence and limits](../../docs/showcase/0.0.68-en/README.md).
 
 The version notes below are historical evidence, not the current task order.
 

@@ -1,0 +1,85 @@
+{
+  "version": "0.0.68",
+  "captured_local_date": "2026-10-07",
+  "base_commit": "66e66d8d91d7ccd10404fa2f87a7e7b311718d98",
+  "apk_sha256": "cc399c1a7a8e1294c484e6b45055c23ad3f854fc2a93b9210f3b56e5d02f1014",
+  "build": "regular local development APK; no release",
+  "environment": "dedicated PikoNest_UX67 Android 15 x86_64 AVD, 320 dpi",
+  "capture": "adb exec-out screencap -p; original PNGs without image edits",
+  "screens": [
+    {
+      "name": "01-background.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "6ca3ba639bd5cc1e7a2b00df0b04e7fc70f3bbc0f60c410dcbd55bd41d1f30e5"
+    },
+    {
+      "name": "02-strip-region.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "8a3919e3bf1783ec8adb98c6620f0df445b452b9a5e747471a4f2a78cd4b920e"
+    },
+    {
+      "name": "03-layer-order.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "b4145737788b75e33011c3b9af2345077ec85a31264aeb71c5c24be6005bf4bf"
+    },
+    {
+      "name": "04-game-uses.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "8ad94557e2a51c2d4930900dcc77bf692cd8a491bcde0ee02fe7dc7f7b6b148d"
+    },
+    {
+      "name": "05-parallax-field.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "5d1ed16585325b0d406395ef910abf13e01c34e3aae147697fd45516387c5921"
+    },
+    {
+      "name": "06-scene-preview.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "e3446b49b77f4323aa303b1b50165966169dea36b43d70a93147f9f1898f1e60"
+    },
+    {
+      "name": "07-compact-background.png",
+      "width": 720,
+      "height": 960,
+      "sha256": "5406b24602c2ab827c383a17f83475b782fd3886b5782feb908ad9fb87643776"
+    }
+  ],
+  "fixture": "blank Lua and existing 0.0.61 gfx prepared before UI journey; initial empty game-use journal restored; all final placements created through Android controller events",
+  "cartridges": {
+    "blank.p8": "a14cc88ce90c0affc8c26928d9b84e2dcffb27d01f05b1f3710c2074d8882cfa",
+    "final.p8": "577e0e747091b2335b69e97134d07677f78f6cfc707e5a1abeb9424fcaedd30f"
+  },
+  "full_local_build_and_domain_suite": "passed",
+  "focused_checks": {
+    "BackgroundUsesTest": 106,
+    "GameUsesTest": 90,
+    "AnimationUsesTest": 81,
+    "CameraUsesTest": 76,
+    "UsesEditorTest": 32,
+    "BackgroundLayerTest": 71,
+    "BackgroundLayersTest": 95
+  },
+  "native_checks": [
+    "blank-code creation and D-pad sheet-region selection",
+    "field revert after process recreation",
+    "missing-runtime Test preserves exact journal and saved bytes",
+    "Apply/Undo/Redo exact bytes",
+    "duplicate and safe reorder, visibility and removal with Undo",
+    "sprite placement and saved project reopen",
+    "1240x1080, 720x960 and 1920x1080 inspected after configuration recreation"
+  ],
+  "runtime_successful_launch": "not checked in this batch; emulator has no official runtime; generated formula unchanged from runtime-verified 0.0.60",
+  "native_export": "pending; ordinary .p8 export/readback verified in core",
+  "physical_device": "Retroid Pocket Classic: local 0.0.68 update installed",
+  "project_and_library_files_unchanged": 48,
+  "console_music_stream": "0 of 15",
+  "physical_acceptance": "pending; pre-existing unknown runtime session neither bypassed nor stopped",
+  "github_apk_release": false,
+  "next": "C02.4 connected M1/M2 workflow; runtime recovery remains separate"
+}

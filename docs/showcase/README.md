@@ -1,6 +1,10 @@
 # PikoNest — English website gallery
 
-New: [0.0.67 shared animation/camera editors](0.0.67-en/README.md) — seven English
+Latest: [0.0.68 background workflow](0.0.68-en/README.md) — seven original English
+captures from the regular APK, covering resource selection, layers and parallax.
+[Download the background pack](PikoNest-backgrounds-en-0.0.68.zip?raw=true).
+
+Also: [0.0.67 shared animation/camera editors](0.0.67-en/README.md) — seven English
 captures from the regular APK, including field editing, preview and a compact layout.
 [Download the new editor pack](PikoNest-editors-en-0.0.67.zip?raw=true).
 The older download below remains an explicitly versioned collection.

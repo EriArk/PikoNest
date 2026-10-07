@@ -94,20 +94,8 @@ public final class CameraUse {
     /** Resource-only sketch. Text/shapes and dynamic expressions must be checked in Test. */
     public int[] preview(boolean deleting){
         if(preview!=null)return preview;
-        WorkshopCartridge cart=proposal(deleting).candidate(owner.base);GameUses uses=new GameUses(cart,owner.returnTool);
-        int[] pixels=new int[16384];Arrays.fill(pixels,1);P8Map map=cart.map();
-        for(GameUses.Entry e:uses.entries){
-            if(e.isCamera())continue;int[] camera=offset(e.view);if(camera==null){dynamicPreview=true;continue;}
-            int dx=e.x()-camera[0],dy=e.y()-camera[1];SpriteRegion r=e.animation!=null?e.animation.initial.frame(0).region:e.kind().equals("spr")?new SpriteRegion(e.values[0]%16*8,e.values[0]/16*8,8,8):e.kind().equals("sspr")?new SpriteRegion(e.values[0],e.values[1],e.values[2],e.values[3]):null;
-            int width=r!=null?r.width:e.values[4]*8,height=r!=null?r.height:e.values[5]*8;
-            for(int yy=Math.max(0,dy);yy<Math.min(128,dy+height);yy++)for(int xx=Math.max(0,dx);xx<Math.min(128,dx+width);xx++){
-                int x=xx-dx,y=yy-dy,color;
-                if(r!=null)color=cart.sheetPixel(r.x+x,r.y+y);
-                else{int tile=map.tile(e.values[0]+x/8,e.values[1]+y/8);color=tile==0?0:cart.sheetPixel(tile%16*8+x%8,tile/16*8+y%8);}
-                if(color!=0)pixels[yy*128+xx]=color;
-            }
-        }
-        preview=pixels;return preview;
+        GameSketch sketch=new GameSketch(proposal(deleting).candidate(owner.base),0);
+        dynamicPreview=sketch.dynamic;preview=sketch.pixels;return preview;
     }
     public void invalidatePreview(){preview=null;dynamicPreview=false;}
     /** Null means runtime expressions: never pretend to evaluate arbitrary Lua in an editor preview. */

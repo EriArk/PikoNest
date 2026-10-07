@@ -64,7 +64,7 @@ The finished Workshop is meant to cover the whole little-game loop: **sprites, m
   </tr>
 </table>
 
-Animation and camera images show the regular 0.0.67 build; Play shows 0.0.66.
+Background images show the regular 0.0.68 build; animation and camera show 0.0.67; Play shows 0.0.66.
 The other editors show the earlier 0.0.65 English capture build. [Browse the complete English website gallery and download the image pack](docs/showcase/README.md).
 
 Start from a blank cartridge if you know what you want. Start from a small template if you do not. The tools are the same either way — PikoNest is not built around one genre, one hero, or one kind of game.
@@ -78,7 +78,7 @@ PikoNest can present common game logic as small, controller-friendly tools: cond
 <table>
   <tr>
     <td width="50%"><img src="docs/showcase/0.0.67-en/04-camera-preview.png" alt="PikoNest camera resource preview"></td>
-    <td width="50%"><img src="docs/showcase/0.0.65-en/07-background-layers.png" alt="PikoNest background layers"></td>
+    <td width="50%"><img src="docs/showcase/0.0.68-en/06-scene-preview.png" alt="PikoNest background and sprite resource preview"></td>
   </tr>
   <tr>
     <td align="center"><sub>Preview how the camera frames placed resources.</sub></td>

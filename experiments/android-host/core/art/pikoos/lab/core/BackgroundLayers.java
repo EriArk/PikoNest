@@ -17,15 +17,15 @@ public final class BackgroundLayers {
     public String title(int n){LuaInsert f=entries.get(n).form;return (n+1)+" · "+f.value(2)+"×"+f.value(3)+" · Y "+f.value(4);}
     public String detail(int n){LuaInsert f=entries.get(n).form;return f.value(5)+" px/с · "+f.value(6)+" · "+(f.value(7).equals("true")?"виден":"скрыт");}
     public String blocked(int direction){
-        if(current()==null)return "Слоёв пока нет";
+        if(current()==null)return "There are no background layers yet.";
         if(direction==2||direction==3)return "";
         int other=index+direction;
-        if(other<0||other>=entries.size())return direction<0?"Это первый слой списка":"Это последний слой списка";
+        if(other<0||other>=entries.size())return direction<0?"This is the first background layer.":"This is the last background layer.";
         LuaCall a=entries.get(Math.min(index,other)),b=entries.get(Math.max(index,other));
-        return source.substring(a.end,b.start).trim().isEmpty()?"":"Между слоями другой код или комментарий. Открой Lua через X; перенос здесь не меняет исходник.";
+        return source.substring(a.end,b.start).trim().isEmpty()?"":"Another draw, camera or comment separates these layers. Reordering here preserves that boundary. Lua remains available from Actions.";
     }
     public Change change(int direction){
-        if(direction!=-1&&direction!=1&&direction!=2&&direction!=3)throw new IllegalArgumentException("Операция слоя");
+        if(direction!=-1&&direction!=1&&direction!=2&&direction!=3)throw new IllegalArgumentException("Unsupported layer operation.");
         String reason=blocked(direction);if(!reason.isEmpty())throw new IllegalArgumentException(reason);
         LuaCall selected=current();
         if(direction==2){

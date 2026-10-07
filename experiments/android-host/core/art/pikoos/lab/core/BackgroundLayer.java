@@ -31,8 +31,8 @@ public final class BackgroundLayer {
     public static String code(LuaInsert f){region(f);String s=TEMPLATE;for(int n=0;n<8;n++)s=s.replace("@"+n+"@",f.value(n));return s+"\n";}
     public static void validate(String source,LuaInsert f){
         region(f);LuaContext context=new LuaContext(source);LuaSymbols symbols=new LuaSymbols(source);
-        if(Pattern.compile("(?m)^\\s*#include\\b|\\b(?:_G|_ENV)\\b").matcher(context.masked()).find())throw new IllegalArgumentException("Фон для includes/изменённого окружения пока настраивается в Lua. Код сохранён.");
-        for(String api:new String[]{"camera","sspr","time","flr"})if(symbols.shadows(api)||context.defines(api))throw new IllegalArgumentException("API "+api+" переопределён. Фон не изменён.");
+        if(Pattern.compile("(?m)^\\s*#include\\b|\\b(?:_G|_ENV)\\b").matcher(context.masked()).find())throw new IllegalArgumentException("This background editor cannot change included files or a modified Lua environment yet. The source is preserved.");
+        for(String api:new String[]{"camera","sspr","time","flr"})if(symbols.shadows(api)||context.defines(api))throw new IllegalArgumentException("API "+api+" is redefined. The background was not changed.");
     }
     public static LuaCall find(String source,int point){
         for(LuaCall call:all(source))if(point>=call.start&&point<call.end)return call;

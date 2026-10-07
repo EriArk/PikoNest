@@ -164,9 +164,11 @@ Lab 0.0.66 starts UX02 with shared English Play/project shelves, actions and saf
 copy confirmation; remaining editors/settings/localization are not yet migrated.
 Lab 0.0.67 adds the UX03 shared English animation/camera forms, reversible field
 edits and isolated draft Test snapshots. Physical Test/return, runtime recovery and
-owner acceptance remain open; see docs/showcase/0.0.67-en/README.md. Continue with
-UX04 existing background layers in the same workshop path (N03/G04), followed
-by connected M1/M2 workflows. Carry UX05 with remaining core tools rather than
+owner acceptance remain open; see docs/showcase/0.0.67-en/README.md. Lab 0.0.68
+connects existing background strips through the same workshop path (UX04, N03/G04),
+including resource selection, parameters, duplication, safe ordering and removal.
+See docs/showcase/0.0.68-en/README.md for remaining acceptance. Continue with
+connected M1/M2 workflows. Carry UX05 with remaining core tools rather than
 blocking them on a cosmetic rewrite. Shared
 sprite painting and map brushes remain unfinished G01/G03 work. N03.3 is deferred from the
 immediate queue. Preserve existing libraries, favorites and presets.
@@ -513,9 +515,9 @@ round-trip and bounded controller experiments now exist. Follow the current
 completion path in `docs/ROADMAP.md` and the basic-editor audit in `docs/CORE_TOOLS.md`:
 G04.2 connects sprite/map editing to game uses in 0.0.62; G03.4 adds map-region/shared
 review in 0.0.63 and N01.3 connects recognized animations to those uses in 0.0.64.
-N02.3 connects camera management in 0.0.65. The issue #2 audit now proposes bounded
-UX02/UX03 shared navigation and editor-state pilots before connecting existing
-background layers without a Lua cursor (N03/G04, UX04), alongside remaining
+N02.3 connects camera management in 0.0.65. UX02/UX03 add shared navigation and
+editor-state pilots in 0.0.66–67; 0.0.68 connects existing background strips without
+a Lua cursor (N03/G04, UX04). Next connect M1/M2 creation workflows, alongside remaining
 runtime/storage work. See `docs/UX_AUDIT.md`; new visual/interaction decisions
 still need owner review. Do not mistake time-since-run animations for state/event bindings.
 Do not keep extending launcher polish or template-specific controls as a substitute
