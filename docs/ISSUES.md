@@ -1,9 +1,12 @@
 # Public issue map
 
-Updated 7 October 2026. These are real follow-up scenarios from the existing
+Updated 8 October 2026. These are real follow-up scenarios from the existing
 [backlog](BACKLOG.md), not a second roadmap. Open means unfinished; it does not
 mean actively being implemented. UX03 has a bounded implementation in 0.0.67; physical Test/return and acceptance
-remain open. Next implementation: UX04, alongside foundation work.
+remain open. Current priority is the creation-experience design UX06 and connected
+UX07–UX09, under #2/#6; see [the creation journey](CREATION_EXPERIENCE.md).
+UX04 has a bounded implementation in 0.0.68; technical baseline is 0.0.75.
+Specific proposed screens still need owner review. The prototype is not an APK.
 
 ## Existing product issues
 

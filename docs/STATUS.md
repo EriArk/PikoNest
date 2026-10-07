@@ -1,5 +1,13 @@
 # Состояние PikoNest
 
+**2026-10-08 — пересмотр опыта создания, UX06 (дизайн):** согласовано направление
+простого конструктора: game view, действия выбранного элемента, безопасная
+автоматическая подготовка и изменяемые жанровые старты. Подготовлены
+[сценарии и ограничения](CREATION_EXPERIENCE.md),
+[обсуждаемый макет](design/creation-flow-2026-10-08/README.md), обновлены очередь и
+ACC-09. Конкретные экраны ещё не приняты. APK и native-код в этом срезе не менялись;
+макет не доказывает совместимость/аллокатор/экспорт. Lab 0.0.75 остаётся базисом.
+
 **Lab 0.0.75 - connected sprite strokes and buffer (partial G01/G02):** touch
 brush/eraser drags and controller strokes collect one recoverable pixel draft;
 Cancel/Test preserve saved bytes and Apply creates one Undo transaction. Shared

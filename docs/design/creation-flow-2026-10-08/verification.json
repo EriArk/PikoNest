@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-08",
+  "kind": "browser-design-prototype",
+  "browser": "154.0.4258.62",
+  "applicationBaseline": "0.0.75",
+  "checks": [
+    "Move changes selected placement; Cancel restores original canvas",
+    "Paint draft survives simulated Test/return; Cancel leaves committed canvas unchanged",
+    "Paint Done and Undo restore exact canvas",
+    "Explorer simulation reaches goal, restarts, and returns to same selected element",
+    "Shared-appearance choice supports independent edit and Undo",
+    "Puzzle simulation toggles once per key press, wins, restarts and leaves authored board unchanged",
+    "Blank has no hero; own pixels can become a movable element through demo UI",
+    "Blank project keeps all proposed tool entries",
+    "Six screens checked at four viewport sizes for overflow and clipped controls",
+    "Opening a form after compact-view scrolling brings initial focus into view"
+  ],
+  "layouts": [
+    {
+      "width": 360,
+      "height": 480,
+      "screens": 6,
+      "horizontalOverflow": false,
+      "clippedControls": false
+    },
+    {
+      "width": 360,
+      "height": 800,
+      "screens": 6,
+      "horizontalOverflow": false,
+      "clippedControls": false
+    },
+    {
+      "width": 720,
+      "height": 720,
+      "screens": 6,
+      "horizontalOverflow": false,
+      "clippedControls": false
+    },
+    {
+      "width": 1240,
+      "height": 800,
+      "screens": 6,
+      "horizontalOverflow": false,
+      "clippedControls": false
+    }
+  ],
+  "pageErrors": [],
+  "notValidated": [
+    "Android implementation",
+    "PICO-8 execution/export",
+    "allocator or real shared-memory conflicts",
+    "physical controller",
+    "owner acceptance",
+    "durable storage and recovery",
+    "full blank puzzle authoring"
+  ]
+}

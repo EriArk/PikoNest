@@ -1,5 +1,13 @@
 # Базовые инструменты: завершённость и порядок работ
 
+**Уточнение владельца 2026-10-08:** завершённость измеряется простотой целого
+создания игры, а не только набором операций. [CREATION_EXPERIENCE](CREATION_EXPERIENCE.md)
+задаёт путь от Game view, действий выбранного элемента и автоматической подготовки
+ресурсов/Lua; [ROADMAP](ROADMAP.md) ставит UX06–UX09 перед дальнейшими изолированными
+расширениями. Дизайн подготовлен, реализация остаётся lab 0.0.75. Все G/N/S/B
+сохраняются; необходимые инструменты доводим внутри общих пользовательских путей.
+Два небольших шаблона проверяют этот же путь и не заменяют общие инструменты.
+
 **Lab 0.0.75 - connected sprite strokes and buffer (partial G01/G02):** touch
 brush/eraser drags and controller strokes collect one recoverable pixel draft;
 Cancel/Test preserve saved bytes and Apply creates one Undo transaction. Shared

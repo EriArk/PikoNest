@@ -144,6 +144,17 @@ A beginner should be able to create something playable quickly.
 
 Prefer progressive disclosure. Advanced controls should appear when useful rather than occupying the first screen.
 
+Owner decision (2026-10-08): measure simplicity across the complete creation
+journey. The proposed project home is the game view with contextual actions for
+the selected element; automate safe resource placement and ordinary Lua wiring
+in supported authored projects. Keep templates as editable starting content and
+all tools available in blank and genre-neutral projects. Direction is approved;
+specific screens remain proposals pending owner review. See
+`docs/CREATION_EXPERIENCE.md`, UX06–UX09 and the current queue at the top of
+`docs/ROADMAP.md`. This supersedes historical "next" notes below, including the
+immediate zoom/map expansion. Existing editor, preservation and runtime work
+remains required; do not turn a design prototype into an implemented-feature claim.
+
 ### Tools are independent of templates and genres
 
 All general tools must be available in every project, including blank and
