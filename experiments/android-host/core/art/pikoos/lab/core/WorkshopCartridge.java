@@ -112,9 +112,6 @@ public final class WorkshopCartridge {
     }
     /** Explicit replacement of pixels; no allocation or game-role inference. */
     public WorkshopCartridge copyRegion(SpriteRegion source, SpriteRegion destination) {
-        if(source.x<destination.x+destination.width&&destination.x<source.x+source.width
-            &&source.y<destination.y+destination.height&&destination.y<source.y+source.height)
-            throw new IllegalArgumentException("Выбери место вне исходной области");
         return edited(graphics.copy(source,destination));
     }
     public WorkshopCartridge copySprite(int source, int destination) {

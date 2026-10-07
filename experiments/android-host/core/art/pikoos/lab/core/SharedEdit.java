@@ -14,7 +14,7 @@ public final class SharedEdit {
     public int selected;
     public boolean mapView;
     public SharedEdit(WorkshopCartridge base,WorkshopCartridge candidate,String label,String origin){
-        if(!origin.equals("CANVAS")&&!origin.equals("NAVIGATE"))throw new IllegalArgumentException("Invalid resource return context");
+        if(!Arrays.asList("CANVAS","NAVIGATE","COPY_CONFIRM","MOVE","TRANSFORM","RECOLOR").contains(origin))throw new IllegalArgumentException("Invalid resource return context");
         original=base;after=candidate;this.label=label;this.origin=origin;
         Arrays.fill(pixelValues,-1);Arrays.fill(mapValues,-1);
         int pc=0,mc=0,minX=127,minY=127,maxX=0,maxY=0;

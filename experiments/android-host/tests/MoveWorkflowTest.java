@@ -42,7 +42,7 @@ public final class MoveWorkflowTest {
             begin(s);s.act(Action.CONFIRM);for(int i=0;i<8;i++)s.act(Action.RIGHT);for(int i=0;i<6;i++)s.act(Action.DOWN);s.act(Action.CONFIRM);
             s.act(Action.RIGHT);s.act(Action.DOWN);check(s.move.phase==2&&p.writes==0,"selection and placement are previews");
             byte[] expected=base.moved(source,new SpriteRegion(12,21,9,7)).bytes();same(expected,s.move.preview(base).bytes(),"overlapping preview exact");
-            for(Action a:new Action[]{Action.TEST,Action.NEXT,Action.MENU,Action.CONTEXT,Action.REDO,Action.REGION,Action.ASSETS,Action.COPY_SPRITE})s.act(a);
+            for(Action a:new Action[]{Action.NEXT,Action.MENU,Action.CONTEXT,Action.REDO,Action.REGION,Action.ASSETS,Action.COPY_SPRITE})s.act(a);
             s.switchTool(0);s.openSprite(1);s.openHero();check(s.mode==Mode.MOVE&&s.region==scope&&p.writes==0&&p.launches==0,"draft traps escapes and runtime");
             String encoded=s.move.encode(),origin=s.moveReturnMode();s.act(Action.UNDO);same(base.bytes(),s.cart().bytes(),"Y cancels without writing");
             s.restoreMove(encoded,origin);same(expected,s.move.preview(base).bytes(),"restored draft rebuilds from canonical cart");
@@ -60,7 +60,7 @@ public final class MoveWorkflowTest {
             for(String bad:new String[]{"", "2,0,0,32,0,0,0", "2,0,0,8,8,31,23", "3,0,0,0,0,0,0", "2,-1,0,0,0,0,0"}){
                 s.restoreMove(bad,"CANVAS");check(s.move==null,"invalid recovery ignored");
             }
-            s.region=new SpriteRegion(0,56,16,16);s.restoreMove(encoded,"CANVAS");check(s.move==null,"shared-map recovery blocked");
+            s.region=new SpriteRegion(0,56,16,16);s.restoreMove(encoded,"CANVAS");check(s.move!=null,"shared-map move recovery is read-only");s.act(Action.UNDO);
         }
         System.out.println("MoveWorkflowTest: "+checks+" checks passed");
     }

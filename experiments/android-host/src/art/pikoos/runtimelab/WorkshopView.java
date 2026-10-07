@@ -62,7 +62,7 @@ final class WorkshopView extends View {
     private int viewX,viewY,viewWidth,viewHeight;
     private static final String[] DRAW_NAMES={"Brush","Eraser","Fill","Line","Pick color","Rectangle","Filled rectangle","Oval","Filled oval"};
     private static final String[] DRAW_HELP={"Paint one pixel in the selected color.","Erase a pixel to color 0.","Fill connected pixels of the same color.","Choose the start and end of a line.","Pick a color from the selected sprite.","Outline: choose two opposite corners.","Fill a rectangle between two corners.","Choose two corners of the oval bounds.","Fill an oval inside the chosen bounds."};
-    private static final String[] TRANSFORM_NAMES={"Зеркало: слева направо","Зеркало: сверху вниз","Поворот на 90° вправо","Разворот на 180°"};
+    private static final String[] TRANSFORM_NAMES={"Flip horizontal","Flip vertical","Quarter turn right","Half turn"};
     private static final class Hit {
         final RectF rect; final Runnable action;
         Hit(float x,float y,float w,float h,Runnable action) { rect=new RectF(x,y,x+w,y+h); this.action=action; }
@@ -197,21 +197,20 @@ final class WorkshopView extends View {
             else if(m.pending())key("Y отмена",w-106,bodyBottom,14,()->action(Action.UNDO));return;
         }
         if(s.mode==Mode.MOVE){
-            key(ok()+(s.move.phase==2?" Done":" угол"),12,bodyBottom,10,()->action(Action.CONFIRM));
-            key(back()+" Back",w/3+12,bodyBottom,6,()->action(Action.CANCEL));
-            key("Y отмена",w*2/3+12,bodyBottom,14,()->action(Action.UNDO));return;
+            key(ok()+(s.move.phase==2?" Review":" Corner"),12,bodyBottom,10,()->action(Action.CONFIRM));
+            key(back()+" Back",w/3+8,bodyBottom,6,()->action(Action.CANCEL));
+            key(s.move.phase==2?"Start Test":"Y Cancel",w*2/3+8,bodyBottom,14,()->action(s.move.phase==2?Action.TEST:Action.UNDO));return;
         }
         if(s.mode==Mode.RECOLOR){
-            key(ok()+" применить",12,bodyBottom,10,()->action(Action.CONFIRM));
-            key(back()+" Cancel",w<500?166:220,bodyBottom,6,()->action(Action.CANCEL));
-            key("X из / в",w-110,bodyBottom,14,()->action(Action.CONTEXT));
-            return;
+            compactKey(ok()+" Review",0,10,()->action(Action.CONFIRM));
+            compactKey(back()+" Cancel",1,6,()->action(Action.CANCEL));
+            compactKey("X From/To",2,14,()->action(Action.CONTEXT));
+            compactKey("Start Test",3,7,()->action(Action.TEST));return;
         }
         if(s.mode==Mode.TRANSFORM){
-            key(ok()+" применить",12,bodyBottom,s.transformAllowed()?10:13,()->action(Action.CONFIRM));
-            key(back()+" Cancel",w<500?180:228,bodyBottom,6,()->action(Action.CANCEL));
-            if(w>=540)text("← → вариант",w-152,bodyBottom+28,18,6);
-            return;
+            key(ok()+" Review",12,bodyBottom,s.transformAllowed()?10:13,()->action(Action.CONFIRM));
+            key(back()+" Cancel",w/3+8,bodyBottom,6,()->action(Action.CANCEL));
+            key("Start Test",w*2/3+8,bodyBottom,14,()->action(Action.TEST));return;
         }
         if(s.mode==Mode.ASSETS||s.mode==Mode.ASSET_SAVE){
             if(s.mode==Mode.ASSETS&&s.currentAsset()==null&&s.assetFilter!=0){
@@ -226,9 +225,10 @@ final class WorkshopView extends View {
             return;
         }
         if(s.copying()&&s.mode!=Mode.ERROR){
-            key(ok()+(s.mode==Mode.COPY_CONFIRM?(s.copyAsset!=null?" вставить":" копировать"):" просмотр"),12,bodyBottom,10,()->action(Action.CONFIRM));
-            key(back()+" Back",w<500?190:220,bodyBottom,6,()->action(Action.CANCEL));
-            if(w>=540&&s.mode==Mode.COPY_PLACE)text("↑ ↓ ← → место",360,bodyBottom+28,18,6);
+            key(ok()+" Review",12,bodyBottom,10,()->action(Action.CONFIRM));
+            key(back()+" Back",w/3+8,bodyBottom,6,()->action(Action.CANCEL));
+            if(s.mode==Mode.COPY_CONFIRM)key("Start Test",w*2/3+8,bodyBottom,14,()->action(Action.TEST));
+            else fitted("Arrows: place",w*2/3+8,bodyBottom+28,16,6,w/3-16);
             return;
         }
         String confirm=s.swapAB?"B":"A",cancel=s.swapAB?"A":"B";
@@ -245,6 +245,10 @@ final class WorkshopView extends View {
             else key("L/R Tools",260,bodyBottom,6,()->action(Action.NEXT));
         }
         if(s.mode!=Mode.REGION)key("Start Test",w-126,bodyBottom,14,()->action(Action.TEST));
+    }
+    private void compactKey(String label,int column,int color,Runnable run){
+        float x=column*w/4+8,bw=w/4-16;
+        fitted(label,x,bodyBottom+27,14,color,bw);hit(x,bodyBottom,bw,44,run);
     }
     private void key(String label,float x,float y,int color,Runnable run) {
         if(w<500)label=label.replace(" выбрать"," выбор").replace(" сохранить"," сохр.").replace("START готово","START OK");
@@ -325,12 +329,12 @@ final class WorkshopView extends View {
         fitted(e.pixels+" graphics pixels / "+e.cells+" map cells",16,y+29,18,9,w-32);
         fitted("Shared cell "+(e.selected+1)+"/"+e.sharedCells+": "+e.x()+", "+e.y(),16,y+58,18,7,w-32);
         fitted("Tile value: "+e.original.map().tile(e.x(),e.y())+" -> "+e.after.map().tile(e.x(),e.y()),16,y+84,18,10,w-32);
-        fitted("Both views change together. One Undo restores both.",16,y+113,16,6,w-32);
+        fitted("One Undo restores both resources.",16,y+113,16,6,w-32);
         button(ok()+" Apply",16,bodyBottom-48,(w-44)/2,38,true,()->action(Action.CONFIRM));
         button(back()+" Cancel",28+(w-44)/2,bodyBottom-48,(w-44)/2,38,false,()->action(Action.CANCEL));
         rect(0,bodyBottom,w,44,0);
         key(e.mapView?"X Sprites":"X Map",12,bodyBottom,14,()->action(Action.CONTEXT));
-        fitted("Arrows: changed cells",w/3,bodyBottom+28,16,6,w/3-12);
+        fitted("Arrows: cells",w/3,bodyBottom+28,16,6,w/3-12);
         key("Start Test",w-130,bodyBottom,7,()->action(Action.TEST));
     }
     private void sharedMap(WorkshopCartridge cart,Bitmap bitmap,int mx,int my,float x,float y,float width,float height){
@@ -1335,8 +1339,8 @@ final class WorkshopView extends View {
     }
     private void moveChooser(){
         SpriteMove m=s.move;SpriteRegion r=m.scope,source=m.source(),target=m.phase==2?m.destination():source;
-        text("ПЕРЕНЕСТИ ФРАГМЕНТ",16,169,18,14);
-        fitted(m.phase==0?"1 / Выбери первый угол":m.phase==1?"2 / Выбери второй угол":"3 / Выбери новое место",16,198,22,7,w-32);
+        text("MOVE PIXELS",16,169,18,14);
+        fitted(m.phase==0?"1 / Choose the first corner":m.phase==1?"2 / Choose the opposite corner":"3 / Choose a destination",16,198,22,7,w-32);
         float size=Math.min(w-32,bodyBottom-292),left=(w-size)/2,top=214;
         picture(r,null,m.preview(s.cart()),left,top,size);
         float cell=size/Math.max(r.width,r.height);if(cell>=1)cell=(int)cell;
@@ -1349,51 +1353,51 @@ final class WorkshopView extends View {
             final int px=x,py=y;hit(fx+x*fc,fy+y*fc,fc,fc,()->{m.point(px,py);changed.run();invalidate();});
         }
         float by=top+size;
-        fitted(m.phase==2?source.width+" × "+source.height+" · сдвиг "+(target.x-source.x)+", "+(target.y-source.y):"Крестовина: пиксель · касание: позиция",16,by+23,18,10,w-32);
-        fitted(m.phase==2?"Источник → цвет 0. Под рамкой — замена, включая 0.":"Выдели часть внутри открытого спрайта или области.",16,by+46,16,6,w-32);
-        if(m.phase==2)fitted("Розовая: откуда · жёлтая: куда",16,by+67,16,13,w-32);
+        fitted(m.phase==2?source.width+" × "+source.height+" / offset: "+(target.x-source.x)+", "+(target.y-source.y):"Arrows: pixel / touch: position",16,by+23,18,10,w-32);
+        fitted(m.phase==2?"Source clears to 0; destination replaces all pixels.":"Select a part of the open sprite or region.",16,by+46,16,6,w-32);
+        if(m.phase==2)fitted("Pink: source / yellow: destination",16,by+67,16,13,w-32);
     }
     private void copyChooser(){
         SpriteRegion source=s.copySource,target=s.copyDestination();
         boolean confirm=s.mode==Mode.COPY_CONFIRM;
-        text((s.copyAsset!=null?"ИЗ БИБЛИОТЕКИ / ":"КОПИЯ / ")+source.width+" × "+source.height,16,169,18,14);
-        fitted(confirm?"2 / Проверь замену пикселей":"1 / Выбери место на листе",16,198,24,7,w-32);
+        text((s.copyAsset!=null?"LIBRARY SPRITE / ":"COPY / ")+source.width+" × "+source.height,16,169,18,14);
+        fitted(confirm?"2 / Review replacement":"1 / Choose a destination",16,198,24,7,w-32);
         if(confirm){
             float size=Math.min(160,bodyBottom-330),gap=32,total=size*2+gap,left=(w-total)/2;
-            text("БЫЛО",left,232,18,6);text("БУДЕТ",left+size+gap,232,18,10);
+            text("BEFORE",left,232,18,6);text("AFTER",left+size+gap,232,18,10);
             copyPicture(target,left,246,size);
             if(s.copyAsset!=null)assetPicture(s.copyAsset,left+size+gap,246,size);else copyPicture(source,left+size+gap,246,size);
             float by=246+size;
-            fitted(s.cart().empty(target)?"Нулевые пиксели тоже могут использоваться игрой.":"Пиксели в этом месте будут заменены.",16,by+29,18,10,w-32);
-            fitted("Код и ссылки на спрайты остаются прежними.",16,by+54,18,6,w-32);
+            fitted(s.cart().empty(target)?"Empty pixels may still be used by Lua.":"Destination pixels will be replaced.",16,by+29,18,10,w-32);
+            fitted(s.copyOverlaps()?"Overlap may replace source pixels too.":"Lua and sprite flags stay unchanged.",16,by+54,18,6,w-32);
         }else{
-            float cell=Math.max(1,(int)Math.min((w-32)/128,(bodyBottom-306)/64));
+            float cell=Math.max(1,(int)Math.min((w-32)/128,(bodyBottom-306)/128));
             float x=(w-cell*128)/2,y=218;
-            for(int py=0;py<64;py++)for(int px=0;px<128;px++){
+            for(int py=0;py<128;py++)for(int px=0;px<128;px++){
                 int color=s.cart().sheetPixel(px,py);
                 rect(x+px*cell,y+py*cell,cell,cell,color==0?((px/8+py/8)%2==0?0:1):color);
             }
-            outline(x-2,y-2,128*cell+4,64*cell+4,13);
+            outline(x-2,y-2,128*cell+4,128*cell+4,13);
             if(s.copyAsset==null)outline(x+source.x*cell,y+source.y*cell,source.width*cell,source.height*cell,14);
             outline(x+target.x*cell,y+target.y*cell,target.width*cell,target.height*cell,s.copyOverlaps()?8:10);
-            for(int ty=0;ty<8;ty++)for(int tx=0;tx<16;tx++){
+            for(int ty=0;ty<16;ty++)for(int tx=0;tx<16;tx++){
                 final int px=tx,py=ty;hit(x+tx*8*cell,y+ty*8*cell,8*cell,8*cell,()->{s.pointCopy(px,py);changed.run();invalidate();});
             }
-            float by=y+64*cell;
-            fitted(s.copyOverlaps()?"Рамки пересекаются — выбери другое место.":s.copyAsset!=null?s.copyAsset.title+" · жёлтая рамка: место вставки":"Розовая: источник · жёлтая: место копии",16,by+29,18,s.copyOverlaps()?8:7,w-32);
-            fitted("Место: "+target.x+", "+target.y+" · шаг 8 пикселей",16,by+55,18,6,w-32);
-            fitted("Выбор места ничего не меняет в картридже.",16,by+80,16,13,w-32);
+            float by=y+128*cell;
+            fitted(s.copyOverlaps()?"Overlap replaces destination pixels from a snapshot.":s.copyAsset!=null?s.copyAsset.title+" / yellow: destination":"Pink: source / yellow: destination",16,by+29,18,s.copyOverlaps()?8:7,w-32);
+            fitted("Destination: "+target.x+", "+target.y+" / step: 8 pixels",16,by+55,18,6,w-32);
+            fitted("Lower rows share map memory; edits need review.",16,by+80,16,13,w-32);
         }
     }
     private void recolorChooser(){
         SpriteRegion r=s.selection();
-        fitted("ЗАМЕНА ЦВЕТА · "+r.width+" × "+r.height,16,169,18,14,w-32);
+        fitted("REPLACE COLOR / "+r.width+" × "+r.height,16,169,18,14,w-32);
         float size=Math.min(Math.min(120,(w-64)/2),bodyBottom-374),gap=32,left=(w-size*2-gap)/2;
-        text("БЫЛО",left,197,18,6);text("БУДЕТ",left+size+gap,197,18,10);
+        text("BEFORE",left,197,18,6);text("AFTER",left+size+gap,197,18,10);
         picture(r,null,s.cart(),left,208,size);picture(r,null,s.recolorPreview(),left+size+gap,208,size);
         float by=208+size,bw=(w-44)/2;
-        button("Из #"+s.recolorFrom(),16,by+12,bw,40,s.recolorField()==0,()->{s.selectRecolorField(0);changed.run();invalidate();});
-        button("В #"+s.recolorTo(),28+bw,by+12,bw,40,s.recolorField()==1,()->{s.selectRecolorField(1);changed.run();invalidate();});
+        button("From #"+s.recolorFrom(),16,by+12,bw,40,s.recolorField()==0,()->{s.selectRecolorField(0);changed.run();invalidate();});
+        button("To #"+s.recolorTo(),28+bw,by+12,bw,40,s.recolorField()==1,()->{s.selectRecolorField(1);changed.run();invalidate();});
         rect(16+bw-34,by+20,24,24,s.recolorFrom());outline(16+bw-34,by+20,24,24,13);
         rect(w-50,by+20,24,24,s.recolorTo());outline(w-50,by+20,24,24,13);
         int selected=s.recolorField()==0?s.recolorFrom():s.recolorTo();float cw=(w-32)/8;
@@ -1404,26 +1408,26 @@ final class WorkshopView extends View {
             text(""+i,x+cw/2-width(""+i,16)/2,y+24,16,i==0||i==1||i==2||i==4||i==5||i==8?7:0);
             hit(x,y,cw,36,()->{s.chooseRecolor(value);changed.run();invalidate();});
         }
-        String hint="Изменится пикселей: "+s.recolorCount()+" · ← → ↑ ↓ цвет";
-        if(s.recolorFrom()==0||s.recolorTo()==0)hint="Пикселей: "+s.recolorCount()+" · 0 обычно прозрачный в игре";
+        String hint="Changed pixels: "+s.recolorCount()+" / arrows: color";
+        if(s.recolorFrom()==0||s.recolorTo()==0)hint="Pixels: "+s.recolorCount()+" / 0 is transparent by default";
         fitted(hint,16,by+158,16,6,w-32);
     }
     private void transformChooser(){
         SpriteRegion r=s.selection();
-        fitted("ОТРАЗИТЬ / ПОВЕРНУТЬ",16,169,18,14,w-188);
+        fitted("FLIP / ROTATE",16,169,18,14,w-188);
         fitted(r.width+" × "+r.height+" · "+(s.transformOperation().ordinal()+1)+" / 4",w-156,169,18,6,140);
         button("<",16,188,44,44,false,()->action(Action.LEFT));
         rect(68,188,w-136,44,0);
         fitted(TRANSFORM_NAMES[s.transformOperation().ordinal()],80,216,22,10,w-160);
         button(">",w-60,188,44,44,false,()->action(Action.RIGHT));
         float size=Math.min(Math.min(160,(w-64)/2),bodyBottom-350),gap=32,left=(w-size*2-gap)/2;
-        text("БЫЛО",left,266,18,6);fitted(s.transformAllowed()?"БУДЕТ":"НУЖЕН КВАДРАТ",left+size+gap,266,18,s.transformAllowed()?10:13,w-left-size-gap-16);
+        text("BEFORE",left,266,18,6);fitted(s.transformAllowed()?"AFTER":"SQUARE REQUIRED",left+size+gap,266,18,s.transformAllowed()?10:13,w-left-size-gap-16);
         picture(r,null,s.cart(),left,278,size);
         if(s.transformAllowed())picture(r,null,s.transformPreview(),left+size+gap,278,size);
         else{rect(left+size+gap,278,size,size,0);outline(left+size+gap,278,size,size,13);text("?",left+size+gap+size/2-8,278+size/2+12,32,13);}
         float by=278+size;
-        fitted(s.transformAllowed()?"Изменится везде, где используется этот спрайт.":"Для 90° пока выбери квадратную область.",16,by+26,18,7,w-32);
-        fitted(s.transformAllowed()?"После применения Y отменит эту правку.":"Отражения и 180° доступны для прямоугольника.",16,by+51,18,6,w-32);
+        fitted(s.transformAllowed()?"Every use of these pixels will change.":"Quarter turns currently need a square.",16,by+26,18,7,w-32);
+        fitted(s.transformAllowed()?"Shared pixels need map review before saving.":"Flip and half-turn support rectangles.",16,by+51,18,6,w-32);
     }
     private void copyPicture(SpriteRegion r,float x,float y,float size){
         picture(r,null,x,y,size);
@@ -1486,7 +1490,7 @@ final class WorkshopView extends View {
             button(ok()+" Назначить",dx+16,dy+336,(dw-44)/2,48,true,()->action(Action.CONFIRM));
             button(back()+" Отмена",dx+28+(dw-44)/2,dy+336,(dw-44)/2,48,false,()->action(Action.CANCEL));
         }else if(s.mode==Mode.DRAW_TOOLS){
-            fitted("Инструменты спрайта",dx+20,dy+36,26,14,dw-104);
+            fitted("Sprite tools",dx+20,dy+36,26,14,dw-104);
             text((s.drawToolCursor+1)+" / "+WorkshopSession.drawMenuCount(),dx+dw-70,dy+34,18,6);
             int first=Math.max(0,s.drawToolCursor-5);
             for(int row=0;row<6;row++){final int item=first+row;

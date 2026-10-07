@@ -1,6 +1,6 @@
 # PikoNest: current scope and development map
 
-**Lab 0.0.73 · Android first · No public APK release.** The complete creator is
+**Lab 0.0.74 · Android first · No public APK release.** The complete creator is
 still in development. Original code uses the [MIT License](../LICENSE).
 
 ## What exists today
@@ -8,7 +8,7 @@ still in development. Original code uses the [MIT License](../LICENSE).
 | Area | Demonstrated scope | Still open |
 | --- | --- | --- |
 | Play/projects | Local library, favorites/recent games, shared English shelves, safe copy | Settings migration, long text and broader device acceptance |
-| Sprites/maps | Pixel/region operations, full-map brushes and shared graphics/map review (0.0.73), sprite reuse | Shared sprite copy/move/transforms, allocation, continuous strokes and complete cross-tool workflows |
+| Sprites/maps | Pixel/region operations, full-map brushes and shared graphics/map painting and operation review (0.0.74), sprite reuse | Allocation, continuous strokes, richer zoom/pan, cross-project buffers and complete cross-tool workflows |
 | Animation/camera | Shared English forms, create/reopen/reorder and draft Test for recognized uses | Event bindings and wider lifecycle acceptance |
 | Backgrounds | Sprite-strip layers through the common Workshop path, ordering, parameters and recovery | Broader layer representations and complete scene workflows |
 | Rules/code | Numeric state, input/conditions, add/set/reset, readouts and sprite/map X/Y bindings; a UI-authored Blank game tested in official PICO-8 and exported | Animation/audio events, broader bindings and complete ACC-01 with physical controls and independent export execution |
@@ -21,7 +21,7 @@ Technical PIKOOS IDs remain until the [coordinated migration](PROJECT_NAME.md).
 
 ## Next implementation work
 
-1. Complete the basic sprite/map editors, including shared sprite copy/move/transforms, continuous strokes and
+1. Complete the basic sprite/map editors, including continuous strokes, zoom/pan, cross-project buffers and
    resource allocation; connect them to the existing placement workflow.
 2. Continue state/event animation, camera/background and other connected workflows
    before expanding genre presets.
@@ -29,7 +29,7 @@ Technical PIKOOS IDs remain until the [coordinated migration](PROJECT_NAME.md).
    rollback, full onboarding and crash/boot matrix. Owner-approved target SDK 28
    remains temporary; modern-target execution is mandatory before release.
 
-[Shared-memory editing evidence](showcase/0.0.73-en/README.md) |
+[Shared sprite-operation evidence](showcase/0.0.74-en/README.md) |
 [Current creation evidence and exported game](showcase/0.0.72-en/README.md) ·
 [One-APK setup evidence](showcase/0.0.71-en/README.md) ·
 [The ordered 14-package plan](ROADMAP.md).

@@ -193,8 +193,11 @@ Carry UX05 with remaining core tools rather than
 blocking them on a cosmetic rewrite. Shared
 sprite painting and map brushes now have explicit before/after review in 0.0.73.
 Source-hashed recovery, isolated Test and one Apply/Undo are demonstrated; see
-`docs/showcase/0.0.73-en/README.md`. Shared sprite copy/move/transforms/recolor,
-allocation and continuous strokes remain unfinished G01-G03 work. N03.3 is deferred from the
+`docs/showcase/0.0.73-en/README.md`. Lab 0.0.74 connects full-sheet copy/library insertion, move/transforms/recolor
+to that review, with operation-matched recovery, draft Test and one Apply/Undo.
+See `docs/showcase/0.0.74-en/README.md`. Allocation, continuous strokes, richer
+zoom/pan, cross-project buffers and remaining map operations are still unfinished
+G01-G03 work. N03.3 is deferred from the
 immediate queue. Preserve existing libraries, favorites and presets.
 
 Owner creation requirement (2026-10-04): a simple original game must be creatable

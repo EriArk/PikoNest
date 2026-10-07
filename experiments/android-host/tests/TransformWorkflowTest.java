@@ -41,7 +41,7 @@ public final class TransformWorkflowTest {
                 WorkshopCartridge original=base.withPixel(r,0,0,8).withPixel(r,1,0,12).withPixel(r,r.width-1,r.height-1,10);
                 for(SpriteTransform op:SpriteTransform.values()){
                     Port p=new Port();WorkshopSession s=editor(original,r,p);begin(s);s.chooseTransform(op.ordinal());
-                    for(Action action:new Action[]{Action.TEST,Action.UNDO,Action.NEXT,Action.MENU,Action.REGION,Action.ASSETS,Action.CONTEXT,Action.SPRITE_SHEET})s.act(action);
+                    for(Action action:new Action[]{Action.UNDO,Action.NEXT,Action.MENU,Action.REGION,Action.ASSETS,Action.CONTEXT,Action.SPRITE_SHEET})s.act(action);
                     s.switchTool(0);s.openSprite(1);
                     check(s.mode==Mode.TRANSFORM&&s.tool==2&&s.selection()==r&&p.writes==0&&p.launches==0,"draft traps controller and touch escapes");
                     same(original.bytes(),s.cart().bytes(),"preview does not write");
@@ -70,7 +70,7 @@ public final class TransformWorkflowTest {
             s.restoreTransform("ROTATE_CLOCKWISE","CANVAS");check(s.mode==Mode.TRANSFORM&&p.writes==0,"cold restoration requires confirmation");
             verifyPixels(original,s.transformPreview(),square,SpriteTransform.ROTATE_CLOCKWISE);s.act(Action.CANCEL);
             s.restoreTransform("bad","CANVAS");s.restoreTransform("FLIP_HORIZONTAL","ASSETS");check(!s.transforming(),"corrupt metadata ignored");
-            s.region=new SpriteRegion(0,56,16,16);s.restoreTransform("FLIP_HORIZONTAL","CANVAS");check(!s.transforming(),"lab prevents map-shared edits");
+            s.region=new SpriteRegion(0,56,16,16);s.restoreTransform("FLIP_HORIZONTAL","CANVAS");check(s.transforming(),"shared transform restores a read-only proposal");s.act(Action.CANCEL);
             s.region=square;s.drawTool=WorkshopSession.DrawTool.LINE;s.lineX=0;s.lineY=0;s.act(Action.DRAW_TOOLS);
             check(s.mode==Mode.CANVAS&&s.pendingLine(),"line draft cannot be replaced by transforms");
         }

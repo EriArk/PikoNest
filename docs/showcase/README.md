@@ -1,5 +1,7 @@
 # PikoNest — English website gallery
 
+[Lab 0.0.74: full-sheet copy, transform/color/move and official draft Test](0.0.74-en/README.md). Seven unedited English device captures; partial G01-G03.
+
 [Lab 0.0.73: shared sprite/map review, native recovery and official draft Test](0.0.73-en/README.md). Six unedited English device captures; partial G01-G03.
 
 Latest: [0.0.72 rules move sprites](0.0.72-en/README.md) — eight original English

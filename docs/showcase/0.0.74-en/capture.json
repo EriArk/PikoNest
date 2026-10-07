@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-07",
+  "device": "Retroid Pocket Classic",
+  "android": 14,
+  "artifact": {
+    "package": "art.pikoos.runtimelab",
+    "version": "0.0.74",
+    "sha256": "8370fd601af46ff6274d968ae92274b4fb9b43b64a0ee64cb46ab9c868ef3c9c"
+  },
+  "source": "Seven unedited ADB screencap PNGs from the normal one-APK development build. No presentation build.",
+  "interaction": "Injected controller events for full-sheet selection, copying, forms, review, Apply/Undo/Redo and Test. Touch for drawing and several entry/position actions and runtime Exit. Physical-controller acceptance remains open.",
+  "cartridge": {
+    "file": "shared-sprite.p8",
+    "sha256": "4a272faacd40a9d8b69265e81f2dd86caea43d0f95a0aa8bd77f2d984ad48cc1",
+    "bytes": 12276,
+    "authoring": "Native New project / Blank, painting, copy, flip, recolor, move and sspr placement; no Lua edits or project-file injection. Read-only saved-cart copy, not SAF export in this batch."
+  },
+  "checks": {
+    "core_build_test_suites": 71,
+    "focused_shared_operation_checks": 98707,
+    "previous_shared_painting_checks": 122,
+    "original_project_library_files_unchanged": 51,
+    "process_death_copy_review_recovery": true,
+    "copy_transform_recolor_move_apply_undo_redo_byte_verified": true,
+    "form_draft_test_preserves_saved_bytes": true,
+    "runtime_exit_observed": true,
+    "outside_pikonest_execution_verified": false
+  },
+  "images": [
+    {
+      "file": "01-copy-destination.png",
+      "caption": "Choose a destination anywhere in the sprite sheet.",
+      "sha256": "8642b32f425ce49433386ed95a3458bdf36c5798ed8c6f89524a7cbcea311dfd",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "02-copy-preview.png",
+      "caption": "Review replacement before changing destination pixels.",
+      "sha256": "043d8e1764569ed6091d31da10e1404f76b0aa7a8ae1c6ce142add9e666b3e5c",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "03-restored-copy.png",
+      "caption": "The shared copy proposal restored after Workshop process death.",
+      "sha256": "4cd84b48f144a40ff074c98b869914e0b567adea61982fb63aec61ed95f31e0b",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "04-transform.png",
+      "caption": "Flip the same sprite and inspect both orientations.",
+      "sha256": "da8b441d52825b278289b1a84fd125d3be819d969681ab0667952f0f3e33be6d",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "05-recolor.png",
+      "caption": "Replace a palette index without repainting every pixel.",
+      "sha256": "55317364dc19b35a7b92bbe3ee4edd4e154345196677efa82fc46f5ba68e53ee",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "06-move.png",
+      "caption": "Move a selected fragment with overlap from a pixel snapshot.",
+      "sha256": "d2586be94d2950608cb2c3122a52b4cef7f45132ee6754de9d93258a3173ec30",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "07-official-test.png",
+      "caption": "Official PICO-8 displays the unsaved move from the operation form.",
+      "sha256": "42226bb71ab09017e018c467f14e6aeb3ee15e8ab2620a9f32995dddd39bbc82",
+      "width": 1240,
+      "height": 1080
+    }
+  ]
+}

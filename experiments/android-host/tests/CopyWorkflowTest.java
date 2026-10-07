@@ -26,7 +26,7 @@ public final class CopyWorkflowTest {
             s.openSprite(0);s.region=src;s.mode=Mode.CANVAS;
             s.act(Action.COPY_SPRITE);check(s.mode==Mode.COPY_PLACE,"copy in every project, any rectangle");
             s.pointCopy(8,4);s.act(Action.CONFIRM);check(s.mode==Mode.COPY_CONFIRM,"occupied destination reaches explicit preview");
-            for(Action a:new Action[]{Action.TEST,Action.UNDO,Action.NEXT,Action.MENU,Action.REGION}){
+            for(Action a:new Action[]{Action.UNDO,Action.NEXT,Action.MENU,Action.REGION}){
                 s.act(a);check(s.mode==Mode.COPY_CONFIRM&&p.writes==0&&p.launches==0,"draft traps unrelated actions");
             }
             s.switchTool(0);check(s.tool==2,"touch tabs cannot escape draft");
@@ -34,8 +34,8 @@ public final class CopyWorkflowTest {
             check(s.mode==Mode.CANVAS&&s.selection()==src&&!s.copying(),"cancel restores source editor");
             same(original.bytes(),s.cart().bytes(),"cancel is byte exact");
             s.act(Action.COPY_SPRITE);s.pointCopy(1,1);s.act(Action.CONFIRM);
-            check(s.copyOverlaps()&&s.mode==Mode.COPY_PLACE,"overlap cannot destroy source");
-            s.pointCopy(999,999);check(s.copyDestination().x==104&&s.copyDestination().y==40,"destination bounds account for rectangle");
+            check(s.copyOverlaps()&&s.mode==Mode.COPY_CONFIRM,"overlap requires explicit replacement preview");
+            s.act(Action.CANCEL);s.pointCopy(999,999);check(s.copyDestination().x==104&&s.copyDestination().y==104,"destination bounds account for rectangle");
             s.pointCopy(8,4);s.act(Action.CONFIRM);p.fail=true;s.act(Action.CONFIRM);
             check(s.mode==Mode.ERROR&&s.copying()&&!s.canUndo()&&p.writes==0,"failed save retains draft and empty history");
             same(original.bytes(),s.cart().bytes(),"failed copy byte exact");
@@ -55,7 +55,7 @@ public final class CopyWorkflowTest {
             s.restoreCopy(64,32,"CANVAS");check(s.mode==Mode.COPY_PLACE,"restored draft requires preview again");
             s.act(Action.CANCEL);check(s.mode==Mode.CANVAS,"restored cancel returns correctly");
             s.restoreCopy(65,32,"CANVAS");check(!s.copying(),"invalid saved draft ignored");
-            s.restoreCopy(64,48,"CANVAS");check(!s.copying(),"map-overlapping saved draft ignored");
+            s.restoreCopy(64,48,"CANVAS");check(s.copying(),"shared destination restores only a proposal");s.act(Action.CANCEL);
             s.openSprite(0);s.region=dst;
             s.act(Action.COPY_SPRITE);s.pointCopy(0,0);s.act(Action.CONFIRM);s.act(Action.CONFIRM);
             check(s.cart().pixel(0,3,3)==12,"explicit replacement is allowed even for known hero pixels");

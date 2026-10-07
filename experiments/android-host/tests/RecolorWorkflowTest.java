@@ -45,7 +45,7 @@ public final class RecolorWorkflowTest {
                 for(int[] pair:new int[][]{{8,12},{0,7},{7,0},{3,3},{15,2}}){
                     Port p=new Port();WorkshopSession s=editor(original,r,p);begin(s);
                     s.selectRecolorField(0);s.chooseRecolor(pair[0]);s.act(Action.CONTEXT);s.chooseRecolor(pair[1]);
-                    for(Action a:new Action[]{Action.TEST,Action.UNDO,Action.NEXT,Action.MENU,Action.REGION,Action.ASSETS,Action.SPRITE_SHEET})s.act(a);
+                    for(Action a:new Action[]{Action.UNDO,Action.NEXT,Action.MENU,Action.REGION,Action.ASSETS,Action.SPRITE_SHEET})s.act(a);
                     s.switchTool(0);s.openSprite(1);s.openHero();
                     check(s.mode==Mode.RECOLOR&&s.selection()==r&&p.writes==0&&p.launches==0,"modal draft traps controller and direct touch actions");
                     same(original.bytes(),s.cart().bytes(),"preview never changes canonical cart");
@@ -73,7 +73,7 @@ public final class RecolorWorkflowTest {
             s.act(Action.CONTEXT);s.chooseRecolor(0);s.act(Action.LEFT);check(s.recolorFrom()==7,"horizontal wrap remains on palette row");
             s.act(Action.DOWN);check(s.recolorFrom()==15,"vertical row switch");s.act(Action.RIGHT);check(s.recolorFrom()==8,"second row wrap");
             s.act(Action.CANCEL);s.restoreRecolor(-1,12,1,"CANVAS");s.restoreRecolor(8,16,1,"CANVAS");s.restoreRecolor(8,12,2,"CANVAS");s.restoreRecolor(8,12,1,"ASSETS");
-            check(!s.recoloring(),"invalid metadata ignored");s.region=new SpriteRegion(0,56,16,16);s.restoreRecolor(8,12,1,"CANVAS");check(!s.recoloring(),"shared map half blocked in lab UI");
+            check(!s.recoloring(),"invalid metadata ignored");s.region=new SpriteRegion(0,56,16,16);s.restoreRecolor(8,12,1,"CANVAS");check(s.recoloring(),"shared color restores a read-only proposal");s.act(Action.CANCEL);
             s.region=r;s.drawTool=DrawTool.LINE;s.lineX=s.lineY=0;s.act(Action.DRAW_TOOLS);check(s.mode==Mode.CANVAS&&s.pendingLine(),"line draft cannot be discarded");
         }
         WorkshopCartridge blank=new WorkshopCartridge(Files.readAllBytes(Paths.get(args[0])));SpriteRegion r=new SpriteRegion(0,0,16,16);

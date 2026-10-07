@@ -49,11 +49,35 @@ public final class WorkshopSession {
     public void restoreShared(byte[] bytes){
         if(tool!=2&&tool!=3||uses!=null||codeDraft!=null||mapEditor.modal()||pendingStroke())throw new IllegalArgumentException("Finish the current draft before restoring the shared-memory proposal.");
         SharedEdit restored=SharedEdit.restore(bytes,cart);
-        if(tool==3&&!restored.origin.equals("NAVIGATE")||tool==2&&!restored.origin.equals("CANVAS"))throw new IllegalArgumentException("The resource context changed. Saved pixels were preserved.");
+        Mode origin=Mode.valueOf(restored.origin);WorkshopCartridge expected=null;
+        if(tool==3){if(origin!=Mode.NAVIGATE)throw new IllegalArgumentException("The resource context changed. Saved resources were preserved.");}
+        else switch(origin){
+            case CANVAS:if(copying()||move!=null||transforming()||recoloring())throw new IllegalArgumentException("Finish the resource operation first.");break;
+            case COPY_CONFIRM:if(copySource==null||(mode!=Mode.COPY_PLACE&&mode!=Mode.COPY_CONFIRM))throw new IllegalArgumentException("The copy context could not be restored.");expected=copyCandidate();break;
+            case MOVE:if(move==null||move.phase!=2||mode!=Mode.MOVE)throw new IllegalArgumentException("The move context could not be restored.");expected=move.preview(cart);break;
+            case TRANSFORM:if(!transformAllowed()||mode!=Mode.TRANSFORM)throw new IllegalArgumentException("The transform context could not be restored.");expected=transformPreview;break;
+            case RECOLOR:if(!recoloring()||mode!=Mode.RECOLOR)throw new IllegalArgumentException("The color context could not be restored.");expected=recolorPreview;break;
+            default:throw new IllegalArgumentException("The resource context changed. Saved pixels were preserved.");
+        }
+        if(expected!=null&&!Arrays.equals(expected.bytes(),restored.after.bytes()))throw new IllegalArgumentException("The operation no longer matches its proposal. Saved resources were preserved.");
         sharedEdit=restored;mode=Mode.SHARED;
     }
+    private WorkshopCartridge copyCandidate(){return copyAsset==null?cart.copyRegion(copySource,copyDestination()):cart.insert(copyAsset,copyDestination());}
+    private void finishResourceOperation(Mode context){
+        switch(context){
+            case COPY_CONFIRM:
+                SpriteRegion target=copyDestination();copySource=null;copyAsset=null;
+                if(target.y==0&&target.width==16&&target.height==16&&target.x%16==0)openSprite(target.x/16);
+                else{region=target;tool=2;focus=0;browsingSprites=false;cursorX=cursorY=0;zoom=false;}
+                mode=Mode.CANVAS;break;
+            case MOVE:move=null;mode=moveReturn;break;
+            case TRANSFORM:transform=null;transformPreview=null;mode=transformReturn;break;
+            case RECOLOR:recolorPreview=null;mode=recolorReturn;break;
+            default:mode=context;
+        }
+    }
     public void openUses(boolean create){
-        if(codeDraft!=null||pendingStroke()||mapEditor.modal()||flagDraft!=null)return;
+        if(sharedEdit!=null||copying()||move!=null||transforming()||recoloring()||codeDraft!=null||pendingStroke()||mapEditor.modal()||flagDraft!=null)return;
         try{uses=new GameUses(cart,tool);mode=Mode.USES;
             if(create){if(tool==3)uses.addMap(mapEditor.x,mapEditor.y);else uses.addSprite(selection());}
         }catch(Exception e){fail(e);}
@@ -495,7 +519,7 @@ public final class WorkshopSession {
     private Mode moveReturn=Mode.CANVAS;
     public String moveReturnMode(){return moveReturn.name();}
     public void restoreMove(String encoded,String origin){
-        if(tool!=2||browsingSprites||pendingStroke()||selection().sharesMap()||(mode!=Mode.CANVAS&&mode!=Mode.NAVIGATE))return;
+        if(tool!=2||browsingSprites||pendingStroke()||(mode!=Mode.CANVAS&&mode!=Mode.NAVIGATE))return;
         try{
             Mode parsed=Mode.valueOf(origin);if(parsed!=Mode.CANVAS&&parsed!=Mode.NAVIGATE)return;
             SpriteMove restored=SpriteMove.restore(selection(),encoded);move=restored;moveReturn=parsed;mode=Mode.MOVE;
@@ -534,7 +558,7 @@ public final class WorkshopSession {
     }
     /** Restore UI intent against current canonical pixels; never write on restore. */
     public void restoreRecolor(int from,int to,int field,String origin){
-        if(tool!=2||browsingSprites||pendingStroke()||selection().sharesMap()
+        if(tool!=2||browsingSprites||pendingStroke()
             ||(mode!=Mode.CANVAS&&mode!=Mode.NAVIGATE)||from<0||from>15||to<0||to>15||field<0||field>1)return;
         Mode parsed;try{parsed=Mode.valueOf(origin);}catch(IllegalArgumentException e){return;}
         if(parsed!=Mode.CANVAS&&parsed!=Mode.NAVIGATE)return;
@@ -556,7 +580,7 @@ public final class WorkshopSession {
     }
     /** A restored operation is only a preview of current canonical pixels. Never auto-apply. */
     public void restoreTransform(String operation,String origin){
-        if(tool!=2||browsingSprites||pendingStroke()||selection().sharesMap()
+        if(tool!=2||browsingSprites||pendingStroke()
             ||(mode!=Mode.CANVAS&&mode!=Mode.NAVIGATE))return;
         try{
             Mode parsed=Mode.valueOf(origin);SpriteTransform chosen=SpriteTransform.valueOf(operation);
@@ -644,13 +668,13 @@ public final class WorkshopSession {
         mode=origin;showAssets();assetIndex=clamp(index,assets.size()-1);
     }
     public void restoreInsertion(SpriteAsset asset,int x,int y){
-        if(mode!=Mode.ASSETS||asset.height>64||asset.width%8!=0||asset.height%8!=0
-            ||x<0||y<0||x%8!=0||y%8!=0||x+asset.width>128||y+asset.height>64)return;
+        if(mode!=Mode.ASSETS||asset.width%8!=0||asset.height%8!=0
+            ||x<0||y<0||x%8!=0||y%8!=0||x+asset.width>128||y+asset.height>128)return;
         copyAsset=asset;copySource=new SpriteRegion(0,0,asset.width,asset.height);
         copyX=x;copyY=y;copyReturn=Mode.ASSETS;mode=Mode.COPY_PLACE;
     }
     private void beginInsertion(SpriteAsset asset){
-        if(asset.height>64||asset.width%8!=0||asset.height%8!=0){notice="Размещение этого размера пока не поддерживается";return;}
+        if(asset.width%8!=0||asset.height%8!=0){notice="Placement currently requires whole 8x8 tiles.";return;}
         copyAsset=asset;copySource=new SpriteRegion(0,0,asset.width,asset.height);copyReturn=Mode.ASSETS;
         suggestCopyPlace();
     }
@@ -662,29 +686,28 @@ public final class WorkshopSession {
         return a.x<b.x+b.width&&b.x<a.x+a.width&&a.y<b.y+b.height&&b.y<a.y+a.height;
     }
     private void beginCopy(){
-        if(selection().sharesMap()){notice="Редактор общей области с картой ещё не готов";return;}
         if(cart.empty(selection())){notice="Пустая область: пока нечего копировать";return;}
         copySource=selection();copyReturn=mode;copyX=copySource.x;copyY=copySource.y;
         suggestCopyPlace();
     }
     private void suggestCopyPlace(){
         // Suggest a visually empty destination, never assume it is unused by Lua.
-        search:for(int y=0;y<=64-copySource.height;y+=8)for(int x=0;x<=128-copySource.width;x+=8){
+        search:for(int y=0;y<=128-copySource.height;y+=8)for(int x=0;x<=128-copySource.width;x+=8){
             copyX=x;copyY=y;if(!copyOverlaps()&&cart.empty(copyDestination()))break search;
         }
         mode=Mode.COPY_PLACE;
     }
     public void pointCopy(int x,int y){
         if(mode!=Mode.COPY_PLACE)return;
-        copyX=clamp(x, (128-copySource.width)/8)*8;copyY=clamp(y,(64-copySource.height)/8)*8;
+        copyX=clamp(x, (128-copySource.width)/8)*8;copyY=clamp(y,(128-copySource.height)/8)*8;
     }
     /** Restore only a validated draft; always re-show the replacement before saving. */
     public void restoreCopy(int x,int y,String returnMode){
-        if(tool!=2||pendingStroke()||cart.empty(selection())||selection().sharesMap())return;
+        if(sharedEdit!=null||tool!=2||pendingStroke()||cart.empty(selection()))return;
         Mode origin;
         try{origin=Mode.valueOf(returnMode);}catch(IllegalArgumentException e){return;}
         if(origin!=Mode.SHEET&&origin!=Mode.CANVAS&&origin!=Mode.NAVIGATE)return;
-        if(x<0||y<0||x%8!=0||y%8!=0||x+selection().width>128||y+selection().height>64)return;
+        if(x<0||y<0||x%8!=0||y%8!=0||x+selection().width>128||y+selection().height>128)return;
         copySource=selection();copyX=x;copyY=y;copyReturn=origin;mode=Mode.COPY_PLACE;
     }
     public String copyReturnMode(){return copyReturn.name();}
@@ -758,7 +781,7 @@ public final class WorkshopSession {
         focus = clamp(target, maxFocus()); act(Action.CONFIRM);
     }
     public void openSprite(int slot) {
-        if(pendingStroke()||transforming()||recoloring()||move!=null)return;
+        if(sharedEdit!=null||copying()||pendingStroke()||transforming()||recoloring()||move!=null)return;
         if (slot < 0 || slot >= WorkshopCartridge.SPRITE_COUNT) throw new IllegalArgumentException("Sprite slot out of range");
         spriteSlot = slot; sheetFocus = slot; browsingSprites = false;
         region=null;cursorX=clamp(cursorX,15);cursorY=clamp(cursorY,15);zoom=false;
@@ -772,7 +795,7 @@ public final class WorkshopSession {
     }
     public void openHero(){
         if(!cart.hasHero())return;
-        if(pendingStroke()||transforming()||recoloring()||move!=null)return;
+        if(sharedEdit!=null||copying()||pendingStroke()||transforming()||recoloring()||move!=null)return;
         HeroBinding h=cart.hero();
         if(h.image.sharesMap()){notice="Редактор общей области с картой ещё не готов";return;}
         if(h.card()>=0){openSprite(h.card());return;}
@@ -855,7 +878,7 @@ public final class WorkshopSession {
                 if(action==Action.UP||action==Action.PREVIOUS)sharedEdit.step(-8);if(action==Action.DOWN||action==Action.NEXT)sharedEdit.step(8);
                 if(action==Action.TEST){port.launch(sharedEdit.candidate(cart).bytes());return;}
                 if(action==Action.CANCEL||action==Action.UNDO){mode=Mode.valueOf(sharedEdit.origin);sharedEdit=null;notice="Saved resources unchanged";return;}
-                if(action==Action.CONFIRM){save(sharedEdit.candidate(cart),true);mode=Mode.valueOf(sharedEdit.origin);sharedEdit=null;notice="Resources saved together; Y Undo";}
+                if(action==Action.CONFIRM){Mode context=Mode.valueOf(sharedEdit.origin);save(sharedEdit.candidate(cart),true);sharedEdit=null;finishResourceOperation(context);notice="Resources saved together; Y Undo";}
                 return;
             }
             if(mode==Mode.USES){usesAction(action);return;}
@@ -867,8 +890,9 @@ public final class WorkshopSession {
                 if(action==Action.UNDO||(action==Action.CANCEL&&!move.back())){move=null;mode=moveReturn;notice="Перенос отменён";return;}
                 if(action==Action.CONFIRM){
                     if(move.phase<2)move.next();
-                    else{save(move.preview(cart),true);move=null;mode=moveReturn;notice="Перенос завершён · Y отмена";}
+                    else if(!resourceEdit(move.preview(cart),"Move sprite pixels",Mode.MOVE)){finishResourceOperation(Mode.MOVE);notice="Pixels moved; Y Undo";}
                 }
+                if(action==Action.TEST&&move.phase==2)port.launch(move.preview(cart).bytes());
                 return;
             }
             if(mode==Mode.RECOLOR){
@@ -878,9 +902,9 @@ public final class WorkshopSession {
                 if(action==Action.UP||action==Action.DOWN)chooseRecolor((selected+8)%16);
                 if(action==Action.CONTEXT)selectRecolorField(1-recolorField);
                 if(action==Action.CONFIRM){
-                    boolean differs=recolorCount>0;save(recolorPreview,true);mode=recolorReturn;recolorPreview=null;
-                    notice=differs?"Цвет заменён · Y отмена":"Пиксели не изменились";
+                    if(!resourceEdit(recolorPreview,"Replace sprite color",Mode.RECOLOR)){finishResourceOperation(Mode.RECOLOR);notice="Color applied; Y Undo";}
                 }
+                if(action==Action.TEST)port.launch(recolorPreview.bytes());
                 if(action==Action.CANCEL){mode=recolorReturn;recolorPreview=null;notice="Без изменений";}
                 return;
             }
@@ -888,10 +912,9 @@ public final class WorkshopSession {
                 if(action==Action.LEFT||action==Action.UP)chooseTransform((transform.ordinal()+3)%4);
                 if(action==Action.RIGHT||action==Action.DOWN)chooseTransform((transform.ordinal()+1)%4);
                 if(action==Action.CONFIRM&&transformAllowed()){
-                    boolean differs=!Arrays.equals(cart.bytes(),transformPreview.bytes());
-                    save(transformPreview,true);mode=transformReturn;transform=null;transformPreview=null;
-                    notice=differs?"Применено · Y отмена":"Пиксели не изменились";
+                    if(!resourceEdit(transformPreview,"Transform sprite pixels",Mode.TRANSFORM)){finishResourceOperation(Mode.TRANSFORM);notice="Transform applied; Y Undo";}
                 }
+                if(action==Action.TEST&&transformAllowed())port.launch(transformPreview.bytes());
                 if(action==Action.CANCEL){mode=transformReturn;transform=null;transformPreview=null;notice="Без изменений";}
                 return;
             }
@@ -950,16 +973,11 @@ public final class WorkshopSession {
                     if(action==Action.RIGHT)pointCopy(copyX/8+1,copyY/8);
                     if(action==Action.UP)pointCopy(copyX/8,copyY/8-1);
                     if(action==Action.DOWN)pointCopy(copyX/8,copyY/8+1);
-                    if(action==Action.CONFIRM&&!copyOverlaps())mode=Mode.COPY_CONFIRM;
+                    if(action==Action.CONFIRM)mode=Mode.COPY_CONFIRM;
                 }else if(action==Action.CONFIRM){
-                    SpriteRegion target=copyDestination();
-                    boolean insertion=copyAsset!=null;
-                    save(insertion?cart.insert(copyAsset,target):cart.copyRegion(copySource,target),true);
-                    copySource=null;copyAsset=null;
-                    if(target.y==0&&target.width==16&&target.height==16&&target.x%16==0)openSprite(target.x/16);
-                    else{region=target;tool=2;focus=0;browsingSprites=false;cursorX=cursorY=0;zoom=false;}
-                    mode=Mode.CANVAS;notice=insertion?"Спрайт вставлен. Можно редактировать":"Копия готова. Исходные пиксели сохранены";
+                    if(!resourceEdit(copyCandidate(),copyAsset==null?"Copy sprite pixels":"Insert library sprite",Mode.COPY_CONFIRM)){finishResourceOperation(Mode.COPY_CONFIRM);notice="Pixels copied; Y Undo";}
                 }
+                if(action==Action.TEST&&mode==Mode.COPY_CONFIRM)port.launch(copyCandidate().bytes());
                 return; // No launch, tab switching, undo or implicit commit during placement.
             }
             if(mode==Mode.HERO){
@@ -996,7 +1014,6 @@ public final class WorkshopSession {
                 if(action==Action.DOWN)drawToolCursor=clamp(drawToolCursor+1,drawMenuCount()-1);
                 if(action==Action.CONFIRM){
                     if(drawToolCursor==moveMenuIndex()){
-                        if(selection().sharesMap()){notice="Редактор общей области с картой ещё не готов";return;}
                         moveReturn=overlayReturn;move=new SpriteMove(selection(),cursorX,cursorY);mode=Mode.MOVE;return;
                     }
                     if(drawToolCursor==6){
