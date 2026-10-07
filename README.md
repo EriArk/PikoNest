@@ -75,6 +75,10 @@ Writing Lua on a handheld should not mean pecking out punctuation with a D-pad.
 
 PikoNest can present common game logic as small, controller-friendly tools: conditions, values, drawing, input, movement, collisions, transitions and other reusable pieces. Pick what you need, change the useful parts, preview it and put it into the game.
 
+The new **Rules & state** path connects starting numbers, button input, conditions,
+add/set/reset actions and live readouts without opening Lua.
+[See the blank-project workflow and its current limits](docs/showcase/0.0.69-en/README.md).
+
 <table>
   <tr>
     <td width="50%"><img src="docs/showcase/0.0.67-en/04-camera-preview.png" alt="PikoNest camera resource preview"></td>

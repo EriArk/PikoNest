@@ -6,7 +6,7 @@ import java.util.regex.*;
 
 /** Bounded ordinary draw calls. No scene graph, source annotations or runtime dependency. */
 public final class GameUses {
-    public enum Screen { LIST, MENU, FORM, REVIEW, PICK, ANIMATION, CAMERA, BACKGROUND }
+    public enum Screen { LIST, MENU, FORM, REVIEW, PICK, ANIMATION, CAMERA, BACKGROUND, LOGIC }
     public final WorkshopCartridge base;
     public final String source;
     public final List<Entry> entries=new ArrayList<>();
@@ -21,6 +21,7 @@ public final class GameUses {
     public boolean converting;
     public CameraUse camera;
     public BackgroundUse background;
+    public GameRules logic;
     public int layerMove;
     public boolean copyAfter;
     private byte[] fieldBaseline;
@@ -93,7 +94,8 @@ public final class GameUses {
                 // A call spanning generated recipes or containing dynamic expressions is not a flat draw row.
                 if(call.end!=end||!Arrays.asList("cls","spr","sspr","map","camera","print","circfill","rectfill").contains(call.name))throw unsupported();
                 for(int n=0;n<call.form.item().fields.length;n++)
-                    if(call.form.kind(n)!=LuaInsert.Kind.STRING&&!call.form.value(n).matches("-?[0-9]+"))throw unsupported();
+                    if(call.form.kind(n)!=LuaInsert.Kind.STRING&&!call.form.value(n).matches("-?[0-9]+")
+                        &&!(call.name.equals("print")&&n==0&&call.form.value(n).matches("[A-Za-z_][A-Za-z_0-9]*")))throw unsupported();
                 if(call.name.equals("spr")||call.name.equals("sspr")||call.name.equals("map")){
                     int[] v=new int[call.form.item().fields.length];
                     for(int n=0;n<v.length;n++)try{v[n]=Integer.parseInt(call.form.value(n));}catch(NumberFormatException e){throw unsupported();}
@@ -227,12 +229,12 @@ public final class GameUses {
     }
     private int creationAt(){return copyAfter&&current()!=null?(current().animation!=null?current().end():afterLine(current().end())):insertAt;}
     public byte[] encode(){try{
-        ByteArrayOutputStream b=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(b);o.writeInt(5);byte[] cart=base.bytes();o.writeInt(cart.length);o.write(cart);
+        ByteArrayOutputStream b=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(b);o.writeInt(6);byte[] cart=base.bytes();o.writeInt(cart.length);o.write(cart);
         o.writeInt(returnTool);o.writeInt(index);o.writeUTF(screen.name());o.writeInt(field);o.writeInt(menu);o.writeBoolean(creating);o.writeBoolean(deleting);o.writeUTF(kind);o.writeInt(values.length);for(int v:values)o.writeInt(v);o.writeBoolean(picker!=null);if(picker!=null)picker.write(o);
-        o.writeBoolean(converting);o.writeBoolean(animation!=null);if(animation!=null)animation.write(o);o.writeBoolean(copyAfter);o.writeBoolean(camera!=null);if(camera!=null)camera.write(o);o.writeInt(fieldBaseline==null?0:fieldBaseline.length);if(fieldBaseline!=null)o.write(fieldBaseline);o.writeBoolean(background!=null);if(background!=null)background.write(o);o.writeInt(layerMove);return b.toByteArray();
+        o.writeBoolean(converting);o.writeBoolean(animation!=null);if(animation!=null)animation.write(o);o.writeBoolean(copyAfter);o.writeBoolean(camera!=null);if(camera!=null)camera.write(o);o.writeInt(fieldBaseline==null?0:fieldBaseline.length);if(fieldBaseline!=null)o.write(fieldBaseline);o.writeBoolean(background!=null);if(background!=null)background.write(o);o.writeInt(layerMove);o.writeBoolean(logic!=null);if(logic!=null)logic.write(o);return b.toByteArray();
     }catch(IOException e){throw new IllegalStateException(e);}}
     public static GameUses restore(byte[] bytes,WorkshopCartridge current){try{
-        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version<1||version>5)throw new IOException();int n=i.readInt();if(n<0||n>2*1024*1024||n>i.available())throw new IOException();byte[] cart=new byte[n];i.readFully(cart);
+        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version<1||version>6)throw new IOException();int n=i.readInt();if(n<0||n>2*1024*1024||n>i.available())throw new IOException();byte[] cart=new byte[n];i.readFully(cart);
         if(!Arrays.equals(cart,current.bytes()))throw new IOException("The project changed; its source was not overwritten.");
         int tool=i.readInt();if(tool<0||tool>3)throw new IOException();GameUses g=new GameUses(current,tool);g.index=i.readInt();g.screen=Screen.valueOf(i.readUTF());g.field=i.readInt();g.menu=i.readInt();g.creating=i.readBoolean();g.deleting=i.readBoolean();g.kind=i.readUTF();int size=i.readInt();if(size!=3&&size!=6)throw new IOException();g.values=new int[size];for(int v=0;v<size;v++)g.values[v]=i.readInt();if(!g.kind.equals("animation")&&!g.kind.equals("camera")&&!g.kind.equals("background"))validate(g.kind,g.values);if(i.readBoolean())g.picker=SpritePlacement.read(i);
         if(version>=2){g.converting=i.readBoolean();if(i.readBoolean())g.animation=SpriteAnimation.read(i);}
@@ -241,14 +243,16 @@ public final class GameUses {
             if(length>0){g.fieldBaseline=new byte[length];i.readFully(g.fieldBaseline);}
         }
         if(version>=5){if(i.readBoolean())g.background=BackgroundUse.read(i);g.layerMove=i.readInt();}
+        if(version>=6&&i.readBoolean())g.logic=GameRules.read(i,current);
+        if((g.screen==Screen.LOGIC)!=(g.logic!=null))throw new IOException();
         if(g.fieldBaseline!=null){
             if(g.screen!=Screen.CAMERA&&g.screen!=Screen.ANIMATION&&g.screen!=Screen.BACKGROUND||g.animation!=null&&g.animation.picker!=null||g.background!=null&&g.background.picker!=null)throw new IOException();
             DataInputStream f=new DataInputStream(new ByteArrayInputStream(g.fieldBaseline));
             if(g.background!=null)BackgroundUse.read(f);else if(g.camera!=null)CameraUse.read(f,g);else SpriteAnimation.read(f);
             if(f.available()!=0)throw new IOException();
         }
-        if(i.available()!=0||g.index<0||g.index>=Math.max(1,g.entries.size())||g.field<0||g.field>=size||g.menu<0||g.menu>12||(g.screen==Screen.PICK)!=(g.picker!=null))throw new IOException();
-        if(g.screen!=Screen.LIST&&g.screen!=Screen.MENU&&!g.blocked.isEmpty())throw new IOException();
+        if(i.available()!=0||g.index<0||g.index>=Math.max(1,g.entries.size())||g.field<0||g.field>=size||g.menu<0||g.menu>13||(g.screen==Screen.PICK)!=(g.picker!=null))throw new IOException();
+        if(g.screen!=Screen.LIST&&g.screen!=Screen.MENU&&g.screen!=Screen.LOGIC&&!g.blocked.isEmpty())throw new IOException();
         if(g.screen==Screen.FORM||g.screen==Screen.REVIEW||g.screen==Screen.PICK||g.screen==Screen.ANIMATION||g.screen==Screen.CAMERA||g.screen==Screen.BACKGROUND){
             if(!g.creating&&(g.current()==null||!g.converting&&g.camera==null&&!g.kind.equals(g.current().kind())))throw new IOException();
             if(g.deleting&&(g.creating||g.screen!=Screen.REVIEW))throw new IOException();

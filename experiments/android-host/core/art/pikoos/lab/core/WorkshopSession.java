@@ -48,6 +48,7 @@ public final class WorkshopSession {
     public void restoreUses(byte[] bytes){uses=GameUses.restore(bytes,cart);tool=uses.returnTool;mode=Mode.USES;}
     private void usesAction(Action action)throws Exception{
         GameUses g=uses;
+        if(g.logic!=null){rulesAction(action);return;}
         if(action==Action.TEST&&(g.screen==GameUses.Screen.PICK||g.animation!=null&&g.animation.picker!=null||g.background!=null&&g.background.picker!=null))
             throw new IllegalArgumentException("Finish choosing the region or position before Test. Confirm the selection or return to the form.");
         // Test an isolated candidate. The saved cart, history and edit context stay intact.
@@ -121,7 +122,7 @@ public final class WorkshopSession {
             if(action==Action.CONTEXT)g.pick();if(action==Action.CONFIRM)g.review();if(action==Action.CANCEL)g.back();return;
         }
         if(g.screen==GameUses.Screen.MENU){
-            if(action==Action.UP)g.menu=Math.max(0,g.menu-1);if(action==Action.DOWN)g.menu=Math.min(12,g.menu+1);
+            if(action==Action.UP)g.menu=Math.max(0,g.menu-1);if(action==Action.DOWN)g.menu=Math.min(13,g.menu+1);
             if(action==Action.CANCEL||action==Action.MENU){g.screen=GameUses.Screen.LIST;return;}
             if(action==Action.CONFIRM){
                 if(g.menu==0)g.addSprite(selection());if(g.menu==1)g.addMap(mapEditor.x,mapEditor.y);
@@ -130,6 +131,7 @@ public final class WorkshopSession {
                 if(g.menu==5)g.screen=GameUses.Screen.LIST;
                 if(g.menu==6)g.addAnimation(selection());if(g.menu==7)g.animateSelected();
                 if(g.menu==8)g.addCamera(false);if(g.menu==9)g.addCamera(true);
+                if(g.menu==13){g.logic=new GameRules(cart);g.screen=GameUses.Screen.LOGIC;}
                 if(g.menu==10)g.addBackground(selection());if(g.menu==11)g.reorderLayer(-1);if(g.menu==12)g.reorderLayer(1);
             }return;
         }
@@ -137,12 +139,45 @@ public final class WorkshopSession {
         if(action==Action.CONFIRM){if(g.current()==null){if(tool==3)g.addMap(mapEditor.x,mapEditor.y);else g.addSprite(selection());}else g.edit();}
         if(action==Action.NEXT){if(tool==3)g.addMap(mapEditor.x,mapEditor.y);else g.addSprite(selection());}
         if(action==Action.MENU){g.screen=GameUses.Screen.MENU;g.menu=0;}
+        if(action==Action.CONTEXT){g.logic=new GameRules(cart);g.screen=GameUses.Screen.LOGIC;}
         if(action==Action.TEST)port.launch(cart.bytes());
         if(action==Action.CANCEL){uses=null;mode=tool==2&&browsingSprites?Mode.SHEET:Mode.NAVIGATE;}
         if(action==Action.UNDO||action==Action.REDO){
             mode=Mode.NAVIGATE;act(action);
             if(mode==Mode.ERROR){overlayReturn=Mode.USES;return;}
             uses=new GameUses(cart,g.returnTool);uses.move(g.index);mode=Mode.USES;
+        }
+    }
+    private void rulesAction(Action a)throws Exception {
+        GameRules r=uses.logic;
+        if(a==Action.TEST){port.launch(r.draft==null?cart.bytes():r.proposal().candidate(cart).bytes());return;}
+        if(r.page==GameRules.Page.REVIEW){
+            if(a==Action.CANCEL)r.back();
+            if(a==Action.CONFIRM){int selected=r.resultIndex();save(r.proposal().candidate(cart),true);int tool=uses.returnTool;uses=new GameUses(cart,tool);uses.logic=new GameRules(cart);uses.logic.index=Math.max(0,Math.min(selected,uses.logic.entries.size()-1));uses.screen=GameUses.Screen.LOGIC;}
+            return;
+        }
+        if(r.page==GameRules.Page.FORM){
+            if(r.editing()){
+                if(a==Action.LEFT)r.change(-1);if(a==Action.RIGHT)r.change(1);if(a==Action.PREVIOUS)r.change(-8);if(a==Action.NEXT)r.change(8);
+                if(a==Action.CONFIRM)r.finishField();if(a==Action.CANCEL)r.revertField();
+            }else{
+                if(a==Action.UP)r.field=Math.max(0,r.field-1);if(a==Action.DOWN)r.field=Math.min(r.rows()-1,r.field+1);
+                if(a==Action.CONFIRM){if(r.field==r.rows()-1)r.review();else r.beginField();}
+                if(a==Action.MENU)r.review();if(a==Action.CANCEL)r.back();
+            }return;
+        }
+        if(r.page==GameRules.Page.MENU){
+            if(a==Action.UP)r.menu=Math.max(0,r.menu-1);if(a==Action.DOWN)r.menu=Math.min(7,r.menu+1);
+            if(a==Action.CANCEL||a==Action.MENU){r.page=GameRules.Page.LIST;return;}
+            if(a==Action.CONFIRM){if(r.menu<3)r.add(new String[]{"state","rule","readout"}[r.menu]);if(r.menu==3)r.duplicate();if(r.menu==4)r.remove();if(r.menu==5)r.back();if(r.menu==6)r.reorder(-1);if(r.menu==7)r.reorder(1);}return;
+        }
+        if(a==Action.UP)r.index=Math.max(0,r.index-1);if(a==Action.DOWN)r.index=Math.min(Math.max(0,r.entries.size()-1),r.index+1);
+        if(a==Action.CONFIRM){if(r.current()==null)r.add("state");else r.edit();}
+        if(a==Action.MENU){r.menu=0;r.page=GameRules.Page.MENU;}
+        if(a==Action.CANCEL){uses.logic=null;uses.screen=GameUses.Screen.LIST;}
+        if(a==Action.UNDO||a==Action.REDO){
+            int tool=uses.returnTool;mode=Mode.NAVIGATE;act(a);if(mode==Mode.ERROR){overlayReturn=Mode.USES;return;}
+            uses=new GameUses(cart,tool);uses.logic=new GameRules(cart);uses.logic.index=Math.min(r.index,Math.max(0,uses.logic.entries.size()-1));uses.screen=GameUses.Screen.LOGIC;mode=Mode.USES;
         }
     }
     public FlagDraft flagDraft;

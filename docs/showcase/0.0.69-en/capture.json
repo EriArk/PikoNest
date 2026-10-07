@@ -1,0 +1,100 @@
+{
+  "version": "0.0.69",
+  "captured_local_date": "2026-10-07",
+  "base_commit": "81364e5733da6ac0550a247971259574cab08680",
+  "apk_sha256": "5c9bb185ff9f21a761a3a549e0f68c312699363c7e8692be3b6322838d65bc33",
+  "environment": "dedicated PikoNest_UX67 Android 15 x86_64 AVD; 320 dpi",
+  "capture": "original adb screencap PNGs; regular development APK; no image edits",
+  "screens": [
+    {
+      "name": "01-starting-value.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "152bd414c136900cebb4cc814982445bb16609a2626a08c8e94e59acfd40b4b8"
+    },
+    {
+      "name": "02-input-rule.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "464b955b747d8ed7cc673fd6e5046441fb34e53bd228fc5d9e55d0768302af2a"
+    },
+    {
+      "name": "03-rule-review.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "f9f23019bd4e3f5b139929e21adafc72a4aa528e58804113c3bcdd73037ce83a"
+    },
+    {
+      "name": "04-reset-review.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "32d18f92ffaeb67eb4fab06c3490288bdda1dc6b2819c2d113a387f58cffeb41"
+    },
+    {
+      "name": "05-readout.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "c4cd520c8609a0c51aaee8f72ff4bb3c5ba074008b0599eacd7cab41390b32a5"
+    },
+    {
+      "name": "06-rules-list.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "a9a801135773b1dc5e0dc18821c5c8d6d9e14aa917c9dd163b798312ed27a0e7"
+    },
+    {
+      "name": "07-compact-rule.png",
+      "width": 720,
+      "height": 960,
+      "sha256": "0f541f0d561568ab5d6af104ac1e9536087cb1a640f85d8687ff526a3f421ebb"
+    },
+    {
+      "name": "08-export.png",
+      "width": 1240,
+      "height": 1080,
+      "sha256": "e3c75fd70edb72368f85ff7189bb554a61b20b279c0e91347771c3016b6672e6"
+    }
+  ],
+  "authoring": "New project -> Blank through app UI; all state, rules and readouts authored through injected controller events; no Lua editor or project-file edits",
+  "touch_used": [
+    "Workshop shelf entrance and New action",
+    "return to Workshop after process recreation",
+    "Android document picker Done/Save"
+  ],
+  "project": "blank-0001",
+  "export_sha256": "596e86cc1c0c0a5c68dec608d09f5e40ea2fd9f62edee9e6d6ef4150db094c34",
+  "native_export": "348 bytes in Downloads; readback exactly matches saved project",
+  "native_checks": [
+    "blank creation; score/phase initial values",
+    "O with phase==0 adds score; score>=5 sets phase; X resets initial values",
+    "two live print readouts",
+    "draft Test missing-runtime error and return preserves saved bytes and exact journal",
+    "unfinished field edit recovered after process recreation; B reverts",
+    "Apply/Undo/Redo byte equality",
+    "rule duplicate, removal/cancel and ordered execution changes with Undo",
+    "1240x1080 and 720x960 inspected",
+    "Android export and independent byte comparison"
+  ],
+  "full_local_domain_suite_and_build": "passed",
+  "focused_checks": {
+    "GameRulesTest": 111,
+    "BackgroundUsesTest": 106,
+    "GameUsesTest": 90,
+    "AnimationUsesTest": 81,
+    "CameraUsesTest": 76,
+    "UsesEditorTest": 32
+  },
+  "official_runtime_execution": "pending; no isolated official runtime in emulator; existing Retroid unknown session untouched",
+  "physical_device": "Retroid Pocket Classic; local 0.0.69 update installed",
+  "project_and_library_files_unchanged": 48,
+  "console_music_stream": "0 of 15",
+  "physical_controller_and_owner_acceptance": "pending",
+  "github_apk_release": false,
+  "limits": [
+    "numeric state and one action per rule",
+    "suggested/numbered new variable names; linked rename unavailable",
+    "supported flat callbacks only; no _update60 or includes",
+    "resource coordinate and animation/audio event bindings remain open"
+  ],
+  "next": "Connect state/rules to resource coordinates and events; runtime recovery remains a separate task"
+}

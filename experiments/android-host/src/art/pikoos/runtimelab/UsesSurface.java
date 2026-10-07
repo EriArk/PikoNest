@@ -72,11 +72,12 @@ final class UsesSurface {
     void draw(Canvas canvas,float scale,float width,float height){
         c=canvas;this.scale=scale;w=width;h=height;bottom=h-88;hits.clear();pickerArea=null;picker=null;
         box(0,0,w,h,1);GameUses g=s.uses;
-        fit(project,16,25,18,6,w-136);fit(g.screen==GameUses.Screen.LIST||g.screen==GameUses.Screen.MENU?"Saved":"Draft",w-112,25,18,10,96);
-        String title=g.background!=null?"Background":g.camera!=null?"Camera":g.animation!=null?"Animation":g.screen==GameUses.Screen.MENU?"Game actions":"In the game";
+        fit(project,16,25,18,6,w-136);fit(g.screen==GameUses.Screen.LIST||g.screen==GameUses.Screen.MENU||g.logic!=null&&g.logic.draft==null?"Saved":"Draft",w-112,25,18,10,96);
+        String title=g.logic!=null?"Rules & state":g.background!=null?"Background":g.camera!=null?"Camera":g.animation!=null?"Animation":g.screen==GameUses.Screen.MENU?"Game actions":"In the game";
         text(title,16,60,26,7);box(16,72,32,3,14);
         if(g.screen!=GameUses.Screen.REVIEW){layerReview=null;layerReviewOwner=null;}
         if(s.mode==WorkshopSession.Mode.ERROR){error();return;}
+        if(g.logic!=null){rules();return;}
         if(g.screen==GameUses.Screen.PICK){resource(g.picker,"Sprite region");return;}
         if(g.animation!=null&&g.animation.picker!=null){resource(g.animation.picker,g.animation.picker.phase==2?"Position in game":"Frame "+(g.animation.selected+1)+" region");return;}
         if(g.background!=null&&g.background.picker!=null){resource(g.background.picker,"Background strip");return;}
@@ -86,12 +87,12 @@ final class UsesSurface {
         if(g.animation!=null){animation();return;}
         if(g.screen==GameUses.Screen.FORM){placement();return;}
         if(g.screen==GameUses.Screen.MENU){
-            String[] items={"Add sprite","Add map","Duplicate selection","Remove use","Open Lua (optional)","Back to list","Add animation","Animate selected sprite","Camera for selected uses","Screen space from here","Add background before selection","Move layer backward","Move layer forward"};
+            String[] items={"Add sprite","Add map","Duplicate selection","Remove use","Open Lua (optional)","Back to list","Add animation","Animate selected sprite","Camera for selected uses","Screen space from here","Add background before selection","Move layer backward","Move layer forward","Rules & state"};
             fit("Choose an action",16,101,18,6,w-32);int count=Math.max(1,(int)((bottom-120)/44)),first=Math.max(0,g.menu-count+1);
             for(int n=0;n<count&&first+n<items.length;n++){final int at=first+n;row(items[at],116+n*44,g.menu==at,()->{g.menu=at;act(Action.CONFIRM);});}
-            footer("Choose","Back","↑↓ Browse",Action.DOWN,false);return;
+            scroll(g.menu,items.length,count,116);footer("Choose","Back","↑↓ Browse",Action.DOWN,false);return;
         }
-        fit(g.entries.size()+" uses · draw order",16,101,18,6,w-32);
+        fit(g.entries.size()+" uses · X Rules & state",16,101,18,6,w-32);hit(12,78,w-24,34,()->act(Action.CONTEXT));
         if(!g.blocked.isEmpty()){wrap("This list cannot safely edit this draw code yet. Your source is preserved. Open Lua from Actions.",16,148,w-32,20,7,5);}
         else if(g.entries.isEmpty()){wrap("Add a sprite, map, animation or background from Actions, then try it in Test.",16,156,w-32,20,7,5);}
         int count=Math.max(1,(int)((bottom-122)/60)),first=Math.max(0,g.index-count+1);
@@ -103,6 +104,40 @@ final class UsesSurface {
             fit(detail,24,y+47,16,6,w-48);hit(12,y,w-24,56,()->{g.index=at;act(Action.CONFIRM);});
         }
         footer(g.entries.isEmpty()?"Add sprite":"Edit","Workshop","Select Actions",Action.MENU,false);hint("Start Test",3,Action.TEST);
+    }
+    private void rules(){
+        GameRules r=s.uses.logic;
+        if(r.page==GameRules.Page.MENU){
+            String[] items={"Add starting value","Add rule","Show a value","Duplicate selection","Remove selection","Back to list","Run rule earlier","Run rule later"};
+            fit("Build your game's behavior",16,101,18,6,w-32);int count=Math.max(1,(int)((bottom-120)/44)),first=Math.max(0,r.menu-count+1);
+            for(int n=0;n<count&&first+n<items.length;n++){final int at=first+n;row(items[at],116+n*44,r.menu==at,()->{r.menu=at;act(Action.CONFIRM);});}
+            scroll(r.menu,items.length,count,116);footer("Choose","Back",null,null,false);return;
+        }
+        if(r.page==GameRules.Page.REVIEW){
+            String verb=r.deleting?"Remove":r.move!=0?"Reorder":r.creating?"Add":"Change";
+            text(verb+" "+(r.draft.type.equals("state")?"starting value":r.draft.type.equals("rule")?"rule":"readout")+"?",16,101,20,10);
+            wrap(r.title(r.draft),24,148,w-48,22,7,2);
+            wrap(r.detail(r.draft),24,212,w-48,20,14,3);
+            wrap(r.draft.type.equals("state")?"At game start and reset":r.draft.type.equals("rule")?"Runs in update order · ordinary Lua":"Drawn after existing resources",24,308,w-48,18,6,2);
+            fit("Apply saves one undo step",16,bottom-20,16,6,w-32);
+            footer(r.deleting?"Remove":"Apply",r.deleting||r.move!=0?"Cancel":"Edit",null,null,true);return;
+        }
+        if(r.page==GameRules.Page.FORM){
+            fit(r.editing()?"Editing field · ←→ adjust":r.draft.type.equals("state")?"A number your game remembers":r.draft.type.equals("rule")?"Choose when and what happens":"Show a live value in the game",16,101,18,6,w-32);
+            int count=Math.max(1,(int)((bottom-205)/44)),first=Math.max(0,r.field-count+1);
+            for(int n=0;n<count&&first+n<r.rows();n++){final int at=first+n;row((r.editing()&&at==r.field?"< ":"")+r.label(at)+(r.editing()&&at==r.field?" >":""),116+n*44,r.field==at,()->{if(!r.editing()||at==r.field){r.field=at;act(Action.CONFIRM);}});}
+            scroll(r.field,r.rows(),count,116);wrap(r.help(),16,bottom-76,w-32,16,6,3);
+            if(r.editing())editingFooter();else footer(r.field==r.rows()-1?"Preview":"Edit","Cancel","Select Preview",Action.MENU,true);return;
+        }
+        fit("Starting values → rules → readouts",16,101,18,6,w-32);
+        if(!r.blocked.isEmpty())wrap(r.blocked,16,148,w-32,18,7,7);
+        else if(r.entries.isEmpty())wrap("Start with a value. Add a button rule to change it, then show it in the game. No hero or template is required.",16,152,w-32,20,7,7);
+        int count=Math.max(1,(int)((bottom-122)/60)),first=Math.max(0,r.index-count+1);
+        for(int n=0;n<count&&first+n<r.entries.size();n++){final int at=first+n;GameRules.Entry e=r.entries.get(at);float y=116+n*60;
+            if(at==r.index){box(12,y,w-24,56,2);box(12,y,4,56,10);}
+            fit(r.title(e),24,y+24,20,at==r.index?10:7,w-48);fit(r.detail(e),24,y+47,16,6,w-48);hit(12,y,w-24,56,()->{r.index=at;act(Action.CONFIRM);});
+        }
+        footer(r.entries.isEmpty()?"Add value":"Edit","Game uses","Select Actions",Action.MENU,true);
     }
     private static String cameraTitle(CameraUse camera){return cameraTitle(camera.form);}
     private static String cameraTitle(LuaInsert form){String id=form.item().id;return id.equals("camera_reset")?"Screen space":id.equals("camera_follow")?"Follow a point":id.equals("camera_rooms")?"Room by room":"Fixed offset";}

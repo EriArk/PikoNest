@@ -50,6 +50,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'AnimationUsesT
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'CameraUsesTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'UsesEditorTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'BackgroundUsesTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'GameRulesTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RoomCameraTest',(Join-Path $pikoArtifacts 'room-camera-tests.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'DoorTransitionTest',(Join-Path $pikoArtifacts 'door-tests.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'CatalogueTest')

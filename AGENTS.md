@@ -167,8 +167,12 @@ edits and isolated draft Test snapshots. Physical Test/return, runtime recovery 
 owner acceptance remain open; see docs/showcase/0.0.67-en/README.md. Lab 0.0.68
 connects existing background strips through the same workshop path (UX04, N03/G04),
 including resource selection, parameters, duplication, safe ordering and removal.
-See docs/showcase/0.0.68-en/README.md for remaining acceptance. Continue with
-connected M1/M2 workflows. Carry UX05 with remaining core tools rather than
+See docs/showcase/0.0.68-en/README.md for remaining acceptance. Lab 0.0.69 adds
+the first C02.4 Rules & state path: numeric initialization, input/conditions,
+add/set/reset, readouts and ordered rules without a Lua cursor. This is a bounded
+ordinary-callback workflow, not full ACC-01. Next connect values to resource
+placements/coordinates and events; see docs/showcase/0.0.69-en/README.md.
+Carry UX05 with remaining core tools rather than
 blocking them on a cosmetic rewrite. Shared
 sprite painting and map brushes remain unfinished G01/G03 work. N03.3 is deferred from the
 immediate queue. Preserve existing libraries, favorites and presets.

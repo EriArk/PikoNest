@@ -1,6 +1,10 @@
 # PikoNest — English website gallery
 
-Latest: [0.0.68 background workflow](0.0.68-en/README.md) — seven original English
+Latest: [0.0.69 Rules & state](0.0.69-en/README.md) — eight English captures of
+starting values, input/conditions, reset, readouts and export from a blank project.
+[Download the rules pack](PikoNest-rules-en-0.0.69.zip?raw=true).
+
+Also: [0.0.68 background workflow](0.0.68-en/README.md) — seven original English
 captures from the regular APK, covering resource selection, layers and parallax.
 [Download the background pack](PikoNest-backgrounds-en-0.0.68.zip?raw=true).
 
