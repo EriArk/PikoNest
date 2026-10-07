@@ -141,7 +141,7 @@ final class WorkshopView extends View {
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
         text("PikoNest",16,30,28,7);
         if(w>550) text("Workshop",width("PikoNest",28)+28,28,16,14);
-        boolean draft=(s.uses!=null&&(s.uses.screen==GameUses.Screen.FORM||s.uses.screen==GameUses.Screen.REVIEW||s.uses.screen==GameUses.Screen.PICK))||s.flagDraft!=null||s.mapEditor.pending()||s.codeDraft!=null||s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
+        boolean draft=s.stroke!=null||(s.uses!=null&&(s.uses.screen==GameUses.Screen.FORM||s.uses.screen==GameUses.Screen.REVIEW||s.uses.screen==GameUses.Screen.PICK))||s.flagDraft!=null||s.mapEditor.pending()||s.codeDraft!=null||s.mode==Mode.VALUE||s.mode==Mode.HERO||s.pendingStroke()||s.copying()||s.transforming()||s.recoloring()||s.move!=null||s.assetDraft!=null||s.nameEditor!=null;
         draft|=s.mapEditor.region!=null;
         draft|=s.uses!=null&&s.uses.screen==GameUses.Screen.ANIMATION;
         draft|=s.uses!=null&&s.uses.screen==GameUses.Screen.CAMERA;
@@ -195,6 +195,11 @@ final class WorkshopView extends View {
             key(back()+(m.modal()?" Back":" меню"),w<500?138:190,bodyBottom,6,()->action(Action.CANCEL));
             if(!m.modal())key("Start Test",w-126,bodyBottom,14,()->action(Action.TEST));
             else if(m.pending())key("Y отмена",w-106,bodyBottom,14,()->action(Action.UNDO));return;
+        }
+        if(s.mode==Mode.STROKE){
+            key(ok()+" Finish",12,bodyBottom,10,()->action(Action.CONFIRM));
+            key(back()+" Cancel",w/3+8,bodyBottom,6,()->action(Action.CANCEL));
+            key("Start Test",w*2/3+8,bodyBottom,14,()->action(Action.TEST));return;
         }
         if(s.mode==Mode.MOVE){
             key(ok()+(s.move.phase==2?" Review":" Corner"),12,bodyBottom,10,()->action(Action.CONFIRM));
@@ -1173,6 +1178,20 @@ final class WorkshopView extends View {
             text(token,x,y,20,color);x+=width(token,20);
         }
     }
+    private String operationName(int item){
+        if(item==WorkshopSession.strokeMenuIndex())return "Continuous stroke";
+        if(item==WorkshopSession.bufferCopyIndex())return "Copy to buffer";
+        if(item==WorkshopSession.bufferPasteIndex())return "Paste buffer";
+        if(item==WorkshopSession.moveMenuIndex())return "Move pixels";
+        return item==6?"Replace color":item==5?"Flip / rotate":DRAW_NAMES[WorkshopSession.drawMenuTool(item).ordinal()];
+    }
+    private String operationHelp(int item){
+        if(item==WorkshopSession.strokeMenuIndex())return "Arrows draw; "+ok()+" finishes; "+back()+" cancels.";
+        if(item==WorkshopSession.bufferCopyIndex())return "Keep independent pixels for another project.";
+        if(item==WorkshopSession.bufferPasteIndex())return "Choose a destination; review before replacing pixels.";
+        if(item==WorkshopSession.moveMenuIndex())return "Select pixels, then their destination.";
+        return item==6?"Replace a color throughout the selection.":item==5?"Compare variants before applying.":DRAW_HELP[WorkshopSession.drawMenuTool(item).ordinal()];
+    }
     private void sprites() {
         float size=Math.min(256,Math.min((w-56)*.46f,bodyBottom-232));size=Math.max(128,((int)size/16)*16);
         float x=16,y=180,right=size+32,rw=w-right-16;
@@ -1181,27 +1200,32 @@ final class WorkshopView extends View {
         viewWidth=s.zoom?Math.min(16,region.width):region.width;viewHeight=s.zoom?Math.min(16,region.height):region.height;
         viewX=s.zoom?Math.max(0,Math.min(region.width-viewWidth,s.cursorX-viewWidth/2)):0;
         viewY=s.zoom?Math.max(0,Math.min(region.height-viewHeight,s.cursorY-viewHeight/2)):0;
+        if(strokeTouchArea!=null){viewX=strokeViewX;viewY=strokeViewY;viewWidth=strokeViewWidth;viewHeight=strokeViewHeight;}
         float cell=Math.max(1,(int)(size/Math.max(viewWidth,viewHeight)));
         float sw=cell*viewWidth,sh=cell*viewHeight;
         x+=(size-sw)/2;y+=(size-sh)/2;
-        outline(x-4,y-4,sw+8,sh+8,s.focus==0||s.mode==Mode.CANVAS?10:0);
+        outline(x-4,y-4,sw+8,sh+8,s.focus==0||s.mode==Mode.CANVAS||s.mode==Mode.STROKE?10:0);
         WorkshopCartridge picture=s.canvasPreview();
+        int[] pixels=new int[viewWidth*viewHeight];
         for(int py=0;py<viewHeight;py++)for(int px=0;px<viewWidth;px++){
             int color=picture.pixel(region,viewX+px,viewY+py);
-            rect(x+px*cell,y+py*cell,cell,cell,color==0?((px+viewX+py+viewY)%2==0?0:1):color);
+            pixels[py*viewWidth+px]=COLORS[color==0?((px+viewX+py+viewY)%2==0?0:1):color];
         }
+        sceneBitmap.setPixels(pixels,0,viewWidth,0,0,viewWidth,viewHeight);
+        p.setColor(COLORS[7]);p.setFilterBitmap(false);
+        c.drawBitmap(sceneBitmap,new android.graphics.Rect(0,0,viewWidth,viewHeight),new RectF(x,y,x+sw,y+sh),p);
         spriteArea=new RectF(x,y,x+sw,y+sh);
         if(s.pendingStroke()){
             if(s.lineX>=viewX&&s.lineX<viewX+viewWidth&&s.lineY>=viewY&&s.lineY<viewY+viewHeight)
                 outline(x+(s.lineX-viewX)*cell,y+(s.lineY-viewY)*cell,cell,cell,10);
         }
-        if(s.mode==Mode.CANVAS) {
+        if(s.mode==Mode.CANVAS||s.mode==Mode.STROKE) {
             float cx=x+(s.cursorX-viewX)*cell,cy=y+(s.cursorY-viewY)*cell;
             outline(cx-1,cy-1,cell+2,cell+2,0);outline(cx,cy,cell,cell,7);
         }
         String draftLabel=s.drawTool==DrawTool.LINE?"Line":(Math.abs(s.cursorX-s.lineX)+1)+" × "+(Math.abs(s.cursorY-s.lineY)+1);
-        fitted(s.pendingStroke()?draftLabel+": "+ok()+" Done / "+back()+" Cancel":s.mode==Mode.CANVAS?DRAW_NAMES[s.drawTool.ordinal()]+" · "+s.cursorX+", "+s.cursorY:ok()+": edit sprite",16,180+size+24,16,s.pendingStroke()?10:6,size);
-        if(180+size+48<bodyBottom)fitted(s.pendingStroke()?"Start: "+s.lineX+", "+s.lineY:s.zoom?"Zoom follows the cursor":"X Color / Y Undo",16,180+size+48,16,6,size);
+        fitted(s.stroke!=null?"Stroke: "+ok()+" Finish / "+back()+" Cancel":s.pendingStroke()?draftLabel+": "+ok()+" Done / "+back()+" Cancel":s.mode==Mode.CANVAS?DRAW_NAMES[s.drawTool.ordinal()]+" · "+s.cursorX+", "+s.cursorY:ok()+": edit sprite",16,180+size+24,16,s.pendingStroke()?10:6,size);
+        if(180+size+48<bodyBottom)fitted(s.stroke!=null?"Arrows draw / Start tests draft":s.pendingStroke()?"Start: "+s.lineX+", "+s.lineY:s.zoom?"Zoom follows the cursor":"X Color / Y Undo",16,180+size+48,16,6,size);
         text("TOOLS",right,169,18,14);
         button(DRAW_NAMES[s.drawTool.ordinal()]+"  >",right,180,rw,44,s.mode==Mode.NAVIGATE&&s.focus==1,()->action(Action.DRAW_TOOLS));
         boolean paletteActive=s.mode==Mode.PALETTE;
@@ -1218,8 +1242,8 @@ final class WorkshopView extends View {
         button("Sheet",right,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==3,()->action(Action.SPRITE_SHEET));
         button("Region",right+(rw+8)/2,by,(rw-8)/2,44,s.mode==Mode.NAVIGATE&&s.focus==4,()->action(Action.REGION));
         int count=s.cart().hasHero()&&w>=500?3:2;float bw=(rw-8*(count-1))/count;
-        button(s.zoom?"Целиком":"Крупно",right,by+52,bw,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
-        button("Копия",right+bw+8,by+52,bw,40,s.mode==Mode.NAVIGATE&&s.focus==6,()->action(Action.COPY_SPRITE));
+        button(s.zoom?"Whole":"Zoom",right,by+52,bw,40,s.mode==Mode.NAVIGATE&&s.focus==5,()->action(Action.ZOOM));
+        button("Copy",right+bw+8,by+52,bw,40,s.mode==Mode.NAVIGATE&&s.focus==6,()->action(Action.COPY_SPRITE));
         if(s.cart().hasHero())button("Герою",w>=500?right+2*(bw+8):16,by+52,w>=500?bw:size,40,s.mode==Mode.NAVIGATE&&s.focus==7,()->action(Action.ASSIGN_HERO));
     }
     private void spriteSheet() {
@@ -1360,7 +1384,7 @@ final class WorkshopView extends View {
     private void copyChooser(){
         SpriteRegion source=s.copySource,target=s.copyDestination();
         boolean confirm=s.mode==Mode.COPY_CONFIRM;
-        text((s.copyAsset!=null?"LIBRARY SPRITE / ":"COPY / ")+source.width+" × "+source.height,16,169,18,14);
+        text((s.bufferInsertion()?"BUFFER / ":s.copyAsset!=null?"LIBRARY SPRITE / ":"COPY / ")+source.width+" × "+source.height,16,169,18,14);
         fitted(confirm?"2 / Review replacement":"1 / Choose a destination",16,198,24,7,w-32);
         if(confirm){
             float size=Math.min(160,bodyBottom-330),gap=32,total=size*2+gap,left=(w-total)/2;
@@ -1494,10 +1518,10 @@ final class WorkshopView extends View {
             text((s.drawToolCursor+1)+" / "+WorkshopSession.drawMenuCount(),dx+dw-70,dy+34,18,6);
             int first=Math.max(0,s.drawToolCursor-5);
             for(int row=0;row<6;row++){final int item=first+row;
-                button(item==WorkshopSession.moveMenuIndex()?"Move pixels":item==6?"Replace color":item==5?"Flip / rotate":DRAW_NAMES[WorkshopSession.drawMenuTool(item).ordinal()],dx+16,dy+54+row*50,dw-32,44,s.drawToolCursor==item,()->{s.chooseDrawTool(item);changed.run();invalidate();});
+                button(operationName(item),dx+16,dy+54+row*50,dw-32,44,s.drawToolCursor==item,()->{s.chooseDrawTool(item);changed.run();invalidate();});
             }
-            fitted(s.drawToolCursor==WorkshopSession.moveMenuIndex()?"Select pixels, then their destination.":s.drawToolCursor==6?"Replace a color throughout the selection.":s.drawToolCursor==5?"Compare variants before applying.":DRAW_HELP[WorkshopSession.drawMenuTool(s.drawToolCursor).ordinal()],dx+20,dy+389,18,7,dw-40);
-            text(ok()+" выбрать · "+back()+" Back",dx+20,dy+426,18,6);
+            fitted(operationHelp(s.drawToolCursor),dx+20,dy+389,18,7,dw-40);
+            text(ok()+" Choose · "+back()+" Back",dx+20,dy+426,18,6);
             hit(dx+12,dy+398,(dw-32)/2,44,()->action(Action.CONFIRM));
             hit(dx+20+(dw-32)/2,dy+398,(dw-32)/2,44,()->action(Action.CANCEL));
         }else if(s.mode==Mode.MENU) {
@@ -1516,12 +1540,12 @@ final class WorkshopView extends View {
             text("История — в текущем сеансе",dx+20,dy+422,16,13);
         } else if(s.mode==Mode.HELP) {
             if(s.tool==3){
-                text("Карта из тайлов",dx+20,dy+40,26,14);
-                fitted("Каждая клетка — спрайт 8×8.",dx+20,dy+80,18,7,dw-40);
-                fitted("Тайл 0 стирает клетку.",dx+20,dy+108,18,7,dw-40);
-                fitted("Строки 32–63 общие со спрайтами:",dx+20,dy+136,18,6,dw-40);
-                fitted("пока их можно только смотреть.",dx+20,dy+162,18,6,dw-40);
-                fitted("В игре: map() в _draw после cls().",dx+20,dy+188,18,7,dw-40);
+                text("Map tiles",dx+20,dy+40,26,14);
+                fitted("Each cell stores an 8x8 sprite index.",dx+20,dy+80,18,7,dw-40);
+                fitted("Tile 0 clears a cell.",dx+20,dy+108,18,7,dw-40);
+                fitted("Rows 32-63 share sprite memory.",dx+20,dy+136,18,6,dw-40);
+                fitted("Review both resources before saving.",dx+20,dy+162,18,6,dw-40);
+                fitted("Use In the game to place your map.",dx+20,dy+188,18,7,dw-40);
                 button(ok()+" К коду",dx+16,dy+210,(dw-44)/2,48,true,()->action(Action.CONFIRM));
                 button(back()+" Назад",dx+28+(dw-44)/2,dy+210,(dw-44)/2,48,false,()->action(Action.CANCEL));return;
             }
@@ -1563,10 +1587,37 @@ final class WorkshopView extends View {
             button(ok()+" Вернуться",dx+16,dy+210,dw-32,48,true,()->action(Action.CONFIRM));
         }
     }
+    private RectF strokeTouchArea;
+    private int strokePointer,strokeViewX,strokeViewY,strokeViewWidth,strokeViewHeight;
+    private void touchStrokePoint(float x,float y){
+        int px=Math.max(0,Math.min(strokeViewWidth-1,(int)((x/scale-strokeTouchArea.left)*strokeViewWidth/strokeTouchArea.width())));
+        int py=Math.max(0,Math.min(strokeViewHeight-1,(int)((y/scale-strokeTouchArea.top)*strokeViewHeight/strokeTouchArea.height())));
+        s.strokePoint(strokeViewX+px,strokeViewY+py);
+    }
     @Override public boolean onTouchEvent(MotionEvent event) {
         if(s.uses!=null&&(s.mode==Mode.USES||s.mode==Mode.ERROR))return usesSurface.touch(event);
         float x=event.getX()/scale,y=event.getY()/scale;
-        if(event.getActionMasked()==MotionEvent.ACTION_DOWN){downX=x;downY=y;return true;}
+        if(strokeTouchArea!=null){
+            int index=event.findPointerIndex(strokePointer);
+            if(s.mode!=Mode.STROKE){strokeTouchArea=null;return true;}
+            if(event.getActionMasked()==MotionEvent.ACTION_CANCEL||index<0){strokeTouchArea=null;s.act(Action.CANCEL);changed.run();invalidate();return true;}
+            if(event.getActionMasked()==MotionEvent.ACTION_MOVE){
+                for(int h=0;h<event.getHistorySize();h++)touchStrokePoint(event.getHistoricalX(index,h),event.getHistoricalY(index,h));
+                touchStrokePoint(event.getX(index),event.getY(index));changed.run();invalidate();return true;
+            }
+            if(event.getActionMasked()==MotionEvent.ACTION_UP||(event.getActionMasked()==MotionEvent.ACTION_POINTER_UP&&event.getPointerId(event.getActionIndex())==strokePointer)){
+                touchStrokePoint(event.getX(index),event.getY(index));strokeTouchArea=null;s.act(Action.CONFIRM);changed.run();invalidate();performClick();return true;
+            }
+            return true;
+        }
+        if(event.getActionMasked()==MotionEvent.ACTION_DOWN){
+            downX=x;downY=y;
+            if(spriteArea!=null&&spriteArea.contains(x,y)&&s.canBeginStroke()){
+                strokeTouchArea=new RectF(spriteArea);strokeViewX=viewX;strokeViewY=viewY;strokeViewWidth=viewWidth;strokeViewHeight=viewHeight;strokePointer=event.getPointerId(0);
+                s.beginStrokeAt(viewX+(int)((x-spriteArea.left)*viewWidth/spriteArea.width()),viewY+(int)((y-spriteArea.top)*viewHeight/spriteArea.height()));changed.run();invalidate();
+            }
+            return true;
+        }
         if(event.getActionMasked()==MotionEvent.ACTION_UP) {
             if(s.mode==Mode.DRAW_TOOLS&&Math.abs(y-downY)>24){
                 int steps=Math.max(1,Math.round(Math.abs(downY-y)/50));

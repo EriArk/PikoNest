@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-07",
+  "device": "Retroid Pocket Classic",
+  "android": 14,
+  "artifact": {
+    "package": "art.pikoos.runtimelab",
+    "version": "0.0.75",
+    "target_sdk": 28,
+    "sha256": "c61f2d34a0045c66c1023df2cc97b55eda95f61e81ffd53bf4652851d43a8e45"
+  },
+  "source": "Seven unedited native ADB screencap PNGs from the normal single-APK development build.",
+  "interaction": "Injected controller events for stroke drawing, copying, placement, review, Apply/Undo/Redo and Test. Touch events for drawing and several entrances, palette and runtime Exit. Physical-controller acceptance remains open.",
+  "cartridge": {
+    "file": "stroke-buffer-heart.p8",
+    "sha256": "1c13e26c17004f12288d97c8268d203a9641faecf4aad08b123a724a7a478b70",
+    "authoring": "Native Blank project 12 painted by touch; persistent buffer pasted in Blank project 13; native In the game placement; controller stroke. No Lua edits or cartridge-file injection. Read-only copy of saved cart, not SAF export in this batch."
+  },
+  "checks": {
+    "focused_stroke_buffer_checks": 170,
+    "core_test_suites_in_full_build": 71,
+    "official_frame": {
+      "pixels_compared": 16384,
+      "mismatches": 0
+    },
+    "touch_stroke_one_undo_verified": true,
+    "buffer_and_stroke_process_death_recovery": true,
+    "cancel_apply_undo_redo_byte_verified": true,
+    "draft_test_preserves_saved_cart": true,
+    "runtime_exited": true,
+    "preservation": {
+      "previous_project_library_files": 52,
+      "changed": [],
+      "runtime_home_unchanged": "61aad8e46dfc",
+      "media_muted": true,
+      "session_exited": "8910748a-f5ab-4403-90bd-aa52223f9b3e"
+    },
+    "outside_pikonest_execution_verified": false
+  },
+  "images": [
+    {
+      "file": "01-source-sprite.png",
+      "caption": "A sprite painted in a new Blank project.",
+      "sha256": "a7de4c7dcd0a80e0eaf1328d2474c826b7e9597ccfc4e6530bf39cdb7f3d8787",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "02-sprite-buffer.png",
+      "caption": "Copy independent pixels for another project.",
+      "sha256": "b4b5cfcb7f96d04a2d5035c2a4667895b30143ad26a1c1cca66d83567303638a",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "03-restored-paste.png",
+      "caption": "The shared-memory paste review recovered after process death.",
+      "sha256": "edcab1bf5a7fa880dd12377eced02a63a36a56639ff43a1652ecaf0328c00092",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "04-restored-stroke.png",
+      "caption": "A complete controller stroke recovered before saving.",
+      "sha256": "1944c5738cf16ad159f83d64e521efee8b234d932d6c867123b3fce21b357523",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "05-stroke-review.png",
+      "caption": "Review both sprite and map changes before applying one stroke.",
+      "sha256": "001cae159b62a1dd5dc6c67383e0e8fcae6014d3a019589b2addbe48265ed7b2",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "06-official-test.png",
+      "caption": "The unsaved stroke shown by the purchased official PICO-8 runtime.",
+      "sha256": "281a39279311acce062552a3284fc068ea62a735d60056dcc16b49e105bc0e30",
+      "width": 1240,
+      "height": 1080
+    },
+    {
+      "file": "07-saved-sprite.png",
+      "caption": "The complete stroke saved, undone and redone as one edit.",
+      "sha256": "15d44a394eed7104ca3f7ed2c7e625015028dec7a3457ad43d5b7454511d746a",
+      "width": 1240,
+      "height": 1080
+    }
+  ]
+}

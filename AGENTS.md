@@ -200,6 +200,12 @@ zoom/pan, cross-project buffers and remaining map operations are still unfinishe
 G01-G03 work. N03.3 is deferred from the
 immediate queue. Preserve existing libraries, favorites and presets.
 
+Lab 0.0.75 adds recoverable continuous sprite strokes (touch/controller) and a
+persistent one-item sprite buffer across projects, reusing ordinary pixel data
+and shared-memory review. Next finish richer zoom/pan and the remaining map editor
+operations before presets. Full resource allocation, non-sprite buffers and owner
+acceptance remain open. See the current G01-G03 backlog and evidence.
+
 Owner creation requirement (2026-10-04): a simple original game must be creatable
 from a blank cart, editable, testable and exportable without opening or editing Lua.
 Resource placement, input, state, conditions/actions, basic animation/audio and

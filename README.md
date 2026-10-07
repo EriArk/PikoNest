@@ -12,7 +12,7 @@ The working lab includes Play, project workflows and several editors. The comple
 game-creation workflow is still being built. Playing requires your own purchased
 copy of official PICO-8; this project does not supply it.
 
-[Copy, transform and move sprites through the tools](docs/showcase/0.0.74-en/README.md) |
+[Paint strokes and reuse sprites across projects](docs/showcase/0.0.75-en/README.md) |
 [A game made from Blank through the tools](docs/showcase/0.0.72-en/README.md) ·
 [Current scope and roadmap](docs/README.md) · [Build and contribute](CONTRIBUTING.md) ·
 [Open tasks](docs/ISSUES.md) · [Screenshots](docs/showcase/README.md)

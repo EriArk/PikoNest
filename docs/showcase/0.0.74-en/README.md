@@ -51,7 +51,7 @@ intact. Audio volume remained zero. The PikoNest runtime session ended with EXIT
 
 ## Validation and remaining work
 
-The complete local build list of 71 core test suites passed, followed by APK
+The complete local build list of 70 core test suites passed, followed by APK
 packaging and one installation. SharedOperationsTest passed 98,707 checks; the
 previous shared-painting suite still passes its 122 checks. Tests cover resource
 boundaries, snapshot overlap, unknown-source preservation, LF/CRLF, operation

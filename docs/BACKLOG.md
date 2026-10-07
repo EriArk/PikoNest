@@ -1,5 +1,16 @@
 # PikoNest — задачи полного цикла
 
+**Lab 0.0.75 - connected sprite strokes and buffer (partial G01/G02):** touch
+brush/eraser drags and controller strokes collect one recoverable pixel draft;
+Cancel/Test preserve saved bytes and Apply creates one Undo transaction. Shared
+sprite/map consequences are reviewed once for the complete stroke. A persistent
+sprite buffer copies independent pixels between projects through existing paste
+review. Native Blank authoring, buffer/stroke process-death recovery, byte-exact
+Undo/Redo and official PICO-8 draft Test/return passed; all 16,384 frame pixels
+matched. All 52 previous project/library files stayed unchanged. [Evidence and
+limits](showcase/0.0.75-en/README.md). Richer zoom/pan, allocation and remaining map
+operations keep package 3 open; physical and owner acceptance remain separate.
+
 **Lab 0.0.74 - shared sprite operations (partial G01-G03):** full-sheet copy
 and library insertion, overlapping snapshot copy/move, flips/rotation and color
 replacement now use the shared map/gfx review. Back retains operation intent;
@@ -185,8 +196,8 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 
 | ID | Статус / зависит от | Работа | Критерий закрытия |
 | --- | --- | --- | --- |
-| G01 | Partial / 0.0.74; A03 | Full-sheet selection/copy/insertion and shared painting/operations review. [Evidence](showcase/0.0.74-en/README.md) | Allocation and full resource workflows remain open; blank pixels do not prove an area is unused by Lua |
-| G02 | Partial / 0.0.74; G01 | Shared brush/shapes, copy/move/flips/rotation/color replacement, form Test, one Apply/Undo and matched recovery | Continuous strokes, richer zoom/pan and cross-project buffer remain open; quarter-turn rectangles and placement stepping are editor restrictions |
+| G01 | Partial / 0.0.75; A03 | Full-sheet selection/copy/insertion, persistent sprite buffer and shared painting/operations review. [Evidence](showcase/0.0.75-en/README.md) | Allocation and full resource workflows remain open; blank pixels do not prove an area is unused by Lua |
+| G02 | Partial / 0.0.75; G01 | Connected brush/eraser strokes, sprite buffer, shared brush/shapes and pixel operations, isolated Test, one Apply/Undo and matched recovery | Richer zoom/pan, non-sprite buffers and resource allocation remain open; quarter-turn rectangles and placement stepping are editor restrictions |
 | G03 | Partial / 0.0.73; G03.1-4, G01 | Brush/rectangle/fill use the full standard 128 x 64 map with shared-gfx review; existing region operations retained | Complete brush/stamp/line, scaling and connected hero-free field workflow; remapped RAM and owner acceptance remain open |
 | G03.4 | Частично (0.0.63) / G03, G01 | Копия/перенос/очистка прямоугольной области 128×64; snapshot при перекрытии, preview последствий для gfx, подтверждение, одна отмена, восстановление | Технический путь: android-map-regions-63; физическая UX-приёмка открыта. Межпроектный буфер, shared-кисти и remapped RAM не входят в этот срез |
 | G04 | Частично (G04.1) / C02 | Явное использование ресурса в игре: выбрать sprite/map/область, положение/порядок/HUD, вставить обычный draw-код или связать известное использование | Нарисованный спрайт/фон действительно виден после Test из blank; несколько использований допустимы; не создаётся обязательная сцена/герой/ECS. Map-часть подключается по готовности G03 |

@@ -16,7 +16,7 @@
     "authoring": "Native New project / Blank, painting, copy, flip, recolor, move and sspr placement; no Lua edits or project-file injection. Read-only saved-cart copy, not SAF export in this batch."
   },
   "checks": {
-    "core_build_test_suites": 71,
+    "core_build_test_suites": 70,
     "focused_shared_operation_checks": 98707,
     "previous_shared_painting_checks": 122,
     "original_project_library_files_unchanged": 51,

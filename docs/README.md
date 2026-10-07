@@ -1,6 +1,17 @@
 # PikoNest: current scope and development map
 
-**Lab 0.0.74 · Android first · No public APK release.** The complete creator is
+**Lab 0.0.75 - connected sprite strokes and buffer (partial G01/G02):** touch
+brush/eraser drags and controller strokes collect one recoverable pixel draft;
+Cancel/Test preserve saved bytes and Apply creates one Undo transaction. Shared
+sprite/map consequences are reviewed once for the complete stroke. A persistent
+sprite buffer copies independent pixels between projects through existing paste
+review. Native Blank authoring, buffer/stroke process-death recovery, byte-exact
+Undo/Redo and official PICO-8 draft Test/return passed; all 16,384 frame pixels
+matched. All 52 previous project/library files stayed unchanged. [Evidence and
+limits](showcase/0.0.75-en/README.md). Richer zoom/pan, allocation and remaining map
+operations keep package 3 open; physical and owner acceptance remain separate.
+
+**Lab 0.0.75 · Android first · No public APK release.** The complete creator is
 still in development. Original code uses the [MIT License](../LICENSE).
 
 ## What exists today
@@ -8,7 +19,7 @@ still in development. Original code uses the [MIT License](../LICENSE).
 | Area | Demonstrated scope | Still open |
 | --- | --- | --- |
 | Play/projects | Local library, favorites/recent games, shared English shelves, safe copy | Settings migration, long text and broader device acceptance |
-| Sprites/maps | Pixel/region operations, full-map brushes and shared graphics/map painting and operation review (0.0.74), sprite reuse | Allocation, continuous strokes, richer zoom/pan, cross-project buffers and complete cross-tool workflows |
+| Sprites/maps | Pixel/region operations, connected sprite strokes, shared graphics/map review and a persistent sprite buffer (0.0.75) | Allocation, richer zoom/pan, remaining map operations, non-sprite buffers and complete cross-tool workflows |
 | Animation/camera | Shared English forms, create/reopen/reorder and draft Test for recognized uses | Event bindings and wider lifecycle acceptance |
 | Backgrounds | Sprite-strip layers through the common Workshop path, ordering, parameters and recovery | Broader layer representations and complete scene workflows |
 | Rules/code | Numeric state, input/conditions, add/set/reset, readouts and sprite/map X/Y bindings; a UI-authored Blank game tested in official PICO-8 and exported | Animation/audio events, broader bindings and complete ACC-01 with physical controls and independent export execution |

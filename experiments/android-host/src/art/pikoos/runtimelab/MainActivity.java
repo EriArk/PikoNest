@@ -49,6 +49,7 @@ public final class MainActivity extends Activity {
     private final art.pikoos.lab.core.ToolCatalogue toolCatalogue=new art.pikoos.lab.core.ToolCatalogue();
     private ProjectStore store;
     private SpriteAssetStore assetStore;
+    private SpriteBufferStore spriteBuffer;
     private ParameterPresetStore presetStore;
     private LibrarySession library;
     private LibraryView shelf;
@@ -114,6 +115,7 @@ public final class MainActivity extends Activity {
         try {
             store=new ProjectStore(getFilesDir());
             assetStore=new SpriteAssetStore(getFilesDir());
+            spriteBuffer=new SpriteBufferStore(getFilesDir());
             presetStore=new ParameterPresetStore(getFilesDir());
             importDraft=new AtomicFile(new File(getFilesDir(),"pending-import.bin"));
             exportDraft=new AtomicFile(new File(getFilesDir(),"pending-export.bin"));
@@ -201,6 +203,8 @@ public final class MainActivity extends Activity {
                 public void library()throws Exception{showLibrary();}
                 public java.util.List<SpriteAsset> assets()throws Exception{return assetStore.list();}
                 public void storeAsset(SpriteAsset asset)throws Exception{assetStore.create(asset);}
+                public void writeSpriteBuffer(SpriteAsset asset)throws Exception{spriteBuffer.write(asset);}
+                public SpriteAsset readSpriteBuffer()throws Exception{return spriteBuffer.read();}
                 public void renameAsset(SpriteAsset expected,String title)throws Exception{assetStore.rename(expected,title);}
                 public void categorizeAsset(SpriteAsset expected,SpriteAsset.Category category)throws Exception{assetStore.categorize(expected,category);}
                 public void favoriteAsset(SpriteAsset expected,boolean favorite)throws Exception{assetStore.favorite(expected,favorite);}
@@ -479,10 +483,12 @@ public final class MainActivity extends Activity {
         if(session.codeDraft!=null)codeRecoveryFailed.remove(activeId);
         if(session.uses!=null)usesRecoveryFailed.remove(activeId);
         if(session.sharedEdit!=null)sharedRecoveryFailed.remove(activeId);
+        if(session.stroke!=null)strokeRecoveryFailed.remove(activeId);
         libraryPrefs.edit().putString("active",activeId).putBoolean("swapAB",session.swapAB).apply();
         prefs.edit().putInt("tool",session.tool).putInt("focus",session.focus)
             .putInt("mapX",session.mapEditor.x).putInt("mapY",session.mapEditor.y).putInt("mapTile",session.mapEditor.tile)
             .putString("mapTool",session.mapEditor.tool.name()).putString("mapDraft",session.mapEditor.encode())
+            .putString("freehand",session.stroke==null?(strokeRecoveryFailed.contains(activeId)?prefs.getString("freehand",""):""):Base64.encodeToString(session.stroke.encode(),Base64.NO_WRAP))
             .putString("sharedEdit",session.sharedEdit==null?(sharedRecoveryFailed.contains(activeId)?prefs.getString("sharedEdit",""):""):Base64.encodeToString(session.sharedEdit.encode(),Base64.NO_WRAP))
             .putString("flagDraft",session.flagDraft==null?"":session.flagDraft.encode())
             .putString("gameUses",session.uses==null?(usesRecoveryFailed.contains(activeId)?prefs.getString("gameUses",""):""):Base64.encodeToString(session.uses.encode(),Base64.NO_WRAP))
@@ -508,7 +514,7 @@ public final class MainActivity extends Activity {
             .putString("moveDraft",session.move==null?"":session.move.encode()).putString("moveReturn",session.moveReturnMode())
             .putInt("recolorFrom",session.recolorFrom()).putInt("recolorTo",session.recolorTo())
             .putInt("recolorField",session.recolorField()).putString("recolorReturn",session.recolorReturnMode())
-            .putBoolean("assets",session.mode==Mode.ASSETS||session.mode==Mode.ASSET_CATEGORY||session.assetDraft!=null||session.copyAsset!=null||session.nameEditor!=null)
+            .putBoolean("assets",session.mode==Mode.ASSETS||session.mode==Mode.ASSET_CATEGORY||session.assetDraft!=null||session.copyAsset!=null&&!session.bufferInsertion()||session.nameEditor!=null)
             .putInt("assetFilter",session.assetFilter).putInt("assetCategoryChoice",session.mode==Mode.ASSET_CATEGORY?session.assetCategoryChoice:-1)
             .putInt("assetIndex",session.assetIndex).putString("assetsReturn",session.assetsReturnMode())
             .putString("assetId",session.currentAsset()==null?"":session.currentAsset().id)
@@ -585,11 +591,19 @@ public final class MainActivity extends Activity {
                 }
             }catch(Exception e){session.fail(e);}
         }
+        if(!prefs.getBoolean("assets",false)&&!prefs.getString("copyAsset","").isEmpty())try{
+            session.restoreBufferInsertion(SpriteAsset.decode(Base64.decode(prefs.getString("copyAsset",""),Base64.NO_WRAP)),prefs.getInt("copyX",-1),prefs.getInt("copyY",-1));
+        }catch(Exception e){session.fail(e);}
+        strokeRecoveryFailed.remove(activeId);
+        String freehand=prefs.getString("freehand","");
+        if(!freehand.isEmpty())try{session.restoreFreehand(Base64.decode(freehand,Base64.NO_WRAP));}
+        catch(Exception e){strokeRecoveryFailed.add(activeId);session.fail(e);}
         sharedRecoveryFailed.remove(activeId);
         String shared=prefs.getString("sharedEdit","");
         if(!shared.isEmpty())try{session.restoreShared(Base64.decode(shared,Base64.NO_WRAP));}
         catch(Exception e){sharedRecoveryFailed.add(activeId);session.fail(e);}
     }
+    private final java.util.Set<String> strokeRecoveryFailed=new java.util.HashSet<>();
     private final java.util.Set<String> sharedRecoveryFailed=new java.util.HashSet<>();
     private final java.util.Set<String> usesRecoveryFailed=new java.util.HashSet<>();
     private void restoreUses(){

@@ -7,15 +7,18 @@ import java.util.Arrays;
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, REDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS, CHECK }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE, DIAGNOSTIC, ASSET_CATEGORY, USES, SHARED }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE, DIAGNOSTIC, ASSET_CATEGORY, USES, SHARED, STROKE }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE, OVAL, FILLED_OVAL }
     // Keep existing operation entries 5/6 stable while adding brushes after them.
     public static int moveMenuIndex(){return DrawTool.values().length+2;}
-    public static int drawMenuCount(){return moveMenuIndex()+1;}
+    public static int strokeMenuIndex(){return moveMenuIndex()+1;}
+    public static int bufferCopyIndex(){return moveMenuIndex()+2;}
+    public static int bufferPasteIndex(){return moveMenuIndex()+3;}
+    public static int drawMenuCount(){return moveMenuIndex()+4;}
     public static int drawMenuIndex(DrawTool tool){return tool.ordinal()<5?tool.ordinal():tool.ordinal()+2;}
     public static DrawTool drawMenuTool(int index){
         if(index<0||index>=drawMenuCount())throw new IllegalArgumentException("Tool outside menu");
-        return index==5||index==6||index==moveMenuIndex()?null:DrawTool.values()[index<5?index:index-2];
+        return index==5||index==6||index>=moveMenuIndex()?null:DrawTool.values()[index<5?index:index-2];
     }
     public interface Port {
         void save(byte[] bytes) throws Exception;
@@ -23,6 +26,8 @@ public final class WorkshopSession {
         void launch(byte[] bytes) throws Exception;
         default void diagnose(byte[] bytes)throws Exception{throw new Exception("Проверка недоступна в этом runtime");}
         default void library() throws Exception {}
+        default void writeSpriteBuffer(SpriteAsset asset)throws Exception{throw new Exception("Sprite buffer is unavailable");}
+        default SpriteAsset readSpriteBuffer()throws Exception{return null;}
         default java.util.List<SpriteAsset> assets()throws Exception{return java.util.Collections.emptyList();}
         default void storeAsset(SpriteAsset asset)throws Exception{throw new Exception("Хранилище ресурсов не подключено");}
         default void renameAsset(SpriteAsset expected,String title)throws Exception{throw new Exception("Переименование не подключено");}
@@ -40,6 +45,29 @@ public final class WorkshopSession {
     public final MapEditor mapEditor=new MapEditor();
     public GameUses uses;
     public SharedEdit sharedEdit;
+    public SpriteStroke stroke;
+    public boolean canBeginStroke(){return tool==2&&!browsingSprites&&stroke==null&&!pendingStroke()&&(mode==Mode.CANVAS||mode==Mode.NAVIGATE)&&(drawTool==DrawTool.BRUSH||drawTool==DrawTool.ERASER);}
+    public boolean beginStrokeAt(int x,int y){
+        if(!canBeginStroke())return false;
+        cursorX=clamp(x,selection().width-1);cursorY=clamp(y,selection().height-1);
+        stroke=new SpriteStroke(cart,selection(),drawTool==DrawTool.ERASER?0:color,cursorX,cursorY);mode=Mode.STROKE;return true;
+    }
+    public void strokePoint(int x,int y){
+        if(mode!=Mode.STROKE||stroke==null)return;
+        cursorX=clamp(x,stroke.scope.width-1);cursorY=clamp(y,stroke.scope.height-1);stroke.point(cursorX,cursorY);
+    }
+    public void restoreFreehand(byte[] bytes){
+        if(tool!=2||sharedEdit!=null||copying()||move!=null||transforming()||recoloring()||uses!=null||codeDraft!=null||pendingStroke())throw new IllegalArgumentException("Finish the existing draft first.");
+        SpriteStroke restored=SpriteStroke.restore(bytes,cart);
+        stroke=restored;region=restored.scope;browsingSprites=false;cursorX=restored.x;cursorY=restored.y;color=restored.color;
+        drawTool=color==0?DrawTool.ERASER:DrawTool.BRUSH;mode=Mode.STROKE;
+    }
+    public boolean bufferInsertion(){return copyAsset!=null&&copyReturn!=Mode.ASSETS;}
+    public void restoreBufferInsertion(SpriteAsset asset,int x,int y){
+        if(tool!=2||stroke!=null||sharedEdit!=null||pendingStroke()||move!=null||transforming()||recoloring())return;
+        if(asset.width%8!=0||asset.height%8!=0||x<0||y<0||x%8!=0||y%8!=0||x+asset.width>128||y+asset.height>128)throw new IllegalArgumentException("Invalid buffer placement");
+        copyAsset=asset;copySource=new SpriteRegion(0,0,asset.width,asset.height);copyX=x;copyY=y;copyReturn=Mode.CANVAS;mode=Mode.COPY_PLACE;
+    }
     private boolean resourceEdit(WorkshopCartridge next,String label,Mode origin)throws Exception{
         boolean shared=false;
         for(int y=64;y<128&&!shared;y++)for(int x=0;x<128;x++)if(cart.sheetPixel(x,y)!=next.sheetPixel(x,y)){shared=true;break;}
@@ -52,7 +80,8 @@ public final class WorkshopSession {
         Mode origin=Mode.valueOf(restored.origin);WorkshopCartridge expected=null;
         if(tool==3){if(origin!=Mode.NAVIGATE)throw new IllegalArgumentException("The resource context changed. Saved resources were preserved.");}
         else switch(origin){
-            case CANVAS:if(copying()||move!=null||transforming()||recoloring())throw new IllegalArgumentException("Finish the resource operation first.");break;
+            case STROKE:if(stroke==null||mode!=Mode.STROKE)throw new IllegalArgumentException("The stroke context could not be restored.");expected=stroke.preview(cart);break;
+            case CANVAS:if(stroke!=null||copying()||move!=null||transforming()||recoloring())throw new IllegalArgumentException("Finish the resource operation first.");break;
             case COPY_CONFIRM:if(copySource==null||(mode!=Mode.COPY_PLACE&&mode!=Mode.COPY_CONFIRM))throw new IllegalArgumentException("The copy context could not be restored.");expected=copyCandidate();break;
             case MOVE:if(move==null||move.phase!=2||mode!=Mode.MOVE)throw new IllegalArgumentException("The move context could not be restored.");expected=move.preview(cart);break;
             case TRANSFORM:if(!transformAllowed()||mode!=Mode.TRANSFORM)throw new IllegalArgumentException("The transform context could not be restored.");expected=transformPreview;break;
@@ -65,6 +94,7 @@ public final class WorkshopSession {
     private WorkshopCartridge copyCandidate(){return copyAsset==null?cart.copyRegion(copySource,copyDestination()):cart.insert(copyAsset,copyDestination());}
     private void finishResourceOperation(Mode context){
         switch(context){
+            case STROKE:stroke=null;mode=Mode.CANVAS;break;
             case COPY_CONFIRM:
                 SpriteRegion target=copyDestination();copySource=null;copyAsset=null;
                 if(target.y==0&&target.width==16&&target.height==16&&target.x%16==0)openSprite(target.x/16);
@@ -77,7 +107,7 @@ public final class WorkshopSession {
         }
     }
     public void openUses(boolean create){
-        if(sharedEdit!=null||copying()||move!=null||transforming()||recoloring()||codeDraft!=null||pendingStroke()||mapEditor.modal()||flagDraft!=null)return;
+        if(stroke!=null||sharedEdit!=null||copying()||move!=null||transforming()||recoloring()||codeDraft!=null||pendingStroke()||mapEditor.modal()||flagDraft!=null)return;
         try{uses=new GameUses(cart,tool);mode=Mode.USES;
             if(create){if(tool==3)uses.addMap(mapEditor.x,mapEditor.y);else uses.addSprite(selection());}
         }catch(Exception e){fail(e);}
@@ -186,7 +216,7 @@ public final class WorkshopSession {
         if(action==Action.CANCEL){uses=null;mode=tool==2&&browsingSprites?Mode.SHEET:Mode.NAVIGATE;}
         if(action==Action.UNDO||action==Action.REDO){
             mode=Mode.NAVIGATE;act(action);
-            if(mode==Mode.ERROR){overlayReturn=Mode.USES;return;}
+            if(mode==Mode.ERROR){errorReturn=Mode.USES;return;}
             uses=new GameUses(cart,g.returnTool);uses.move(g.index);mode=Mode.USES;
         }
     }
@@ -218,7 +248,7 @@ public final class WorkshopSession {
         if(a==Action.MENU){r.menu=0;r.page=GameRules.Page.MENU;}
         if(a==Action.CANCEL){uses.logic=null;uses.screen=GameUses.Screen.LIST;}
         if(a==Action.UNDO||a==Action.REDO){
-            int tool=uses.returnTool;mode=Mode.NAVIGATE;act(a);if(mode==Mode.ERROR){overlayReturn=Mode.USES;return;}
+            int tool=uses.returnTool;mode=Mode.NAVIGATE;act(a);if(mode==Mode.ERROR){errorReturn=Mode.USES;return;}
             uses=new GameUses(cart,tool);uses.logic=new GameRules(cart);uses.logic.index=Math.min(r.index,Math.max(0,uses.logic.entries.size()-1));uses.screen=GameUses.Screen.LOGIC;mode=Mode.USES;
         }
     }
@@ -703,7 +733,7 @@ public final class WorkshopSession {
     }
     /** Restore only a validated draft; always re-show the replacement before saving. */
     public void restoreCopy(int x,int y,String returnMode){
-        if(sharedEdit!=null||tool!=2||pendingStroke()||cart.empty(selection()))return;
+        if(stroke!=null||sharedEdit!=null||tool!=2||pendingStroke()||cart.empty(selection()))return;
         Mode origin;
         try{origin=Mode.valueOf(returnMode);}catch(IllegalArgumentException e){return;}
         if(origin!=Mode.SHEET&&origin!=Mode.CANVAS&&origin!=Mode.NAVIGATE)return;
@@ -714,6 +744,7 @@ public final class WorkshopSession {
     public String notice = "Сохранено", error = "";
     private Mode paletteReturn = Mode.NAVIGATE;
     private Mode overlayReturn = Mode.NAVIGATE;
+    private Mode errorReturn = Mode.NAVIGATE;
     public WorkshopSession(WorkshopCartridge cart, Port port) { this.cart = cart; this.port = port; }
     public WorkshopCartridge cart() { return cart; }
     public boolean canUndo() { return !undo.isEmpty(); }
@@ -733,6 +764,7 @@ public final class WorkshopSession {
     }
     public SpriteRegion selection(){return region==null?new SpriteRegion(spriteSlot*16,0,16,16):region;}
     public WorkshopCartridge canvasPreview(){
+        if(stroke!=null)return stroke.preview(cart);
         if(!pendingStroke())return cart;
         return drawTool==DrawTool.LINE?cart.withLine(selection(),lineX,lineY,cursorX,cursorY,color)
             :ovalTool()?cart.withOval(selection(),lineX,lineY,cursorX,cursorY,color,drawTool==DrawTool.FILLED_OVAL)
@@ -766,10 +798,10 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        overlayReturn = mode==Mode.SHARED||mode==Mode.USES||mode==Mode.CODE||mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE||mode==Mode.ASSET_CATEGORY?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
+        errorReturn = mode==Mode.DRAW_TOOLS||mode==Mode.STROKE||mode==Mode.SHARED||mode==Mode.USES||mode==Mode.CODE||mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE||mode==Mode.ASSET_CATEGORY?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
-        if(pendingStroke())return;
+        if(stroke!=null||pendingStroke())return;
         if (mode != Mode.NAVIGATE && mode != Mode.CANVAS && mode != Mode.SHEET) return;
         if(mapEditor.modal()||flagDraft!=null)return;
         if (tool == Math.floorMod(next,4)) return;
@@ -781,7 +813,7 @@ public final class WorkshopSession {
         focus = clamp(target, maxFocus()); act(Action.CONFIRM);
     }
     public void openSprite(int slot) {
-        if(sharedEdit!=null||copying()||pendingStroke()||transforming()||recoloring()||move!=null)return;
+        if(stroke!=null||sharedEdit!=null||copying()||pendingStroke()||transforming()||recoloring()||move!=null)return;
         if (slot < 0 || slot >= WorkshopCartridge.SPRITE_COUNT) throw new IllegalArgumentException("Sprite slot out of range");
         spriteSlot = slot; sheetFocus = slot; browsingSprites = false;
         region=null;cursorX=clamp(cursorX,15);cursorY=clamp(cursorY,15);zoom=false;
@@ -795,7 +827,7 @@ public final class WorkshopSession {
     }
     public void openHero(){
         if(!cart.hasHero())return;
-        if(sharedEdit!=null||copying()||pendingStroke()||transforming()||recoloring()||move!=null)return;
+        if(stroke!=null||sharedEdit!=null||copying()||pendingStroke()||transforming()||recoloring()||move!=null)return;
         HeroBinding h=cart.hero();
         if(h.image.sharesMap()){notice="Редактор общей области с картой ещё не готов";return;}
         if(h.card()>=0){openSprite(h.card());return;}
@@ -871,7 +903,7 @@ public final class WorkshopSession {
     private void edit(int which) { field = which; draft = cart.value(which); mode = Mode.VALUE; }
     public void act(Action action) {
         try {
-            if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = overlayReturn; return; }
+            if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = errorReturn; return; }
             if(mode==Mode.SHARED){
                 if(action==Action.CONTEXT)sharedEdit.mapView=!sharedEdit.mapView;
                 if(action==Action.LEFT)sharedEdit.step(-1);if(action==Action.RIGHT)sharedEdit.step(1);
@@ -879,6 +911,13 @@ public final class WorkshopSession {
                 if(action==Action.TEST){port.launch(sharedEdit.candidate(cart).bytes());return;}
                 if(action==Action.CANCEL||action==Action.UNDO){mode=Mode.valueOf(sharedEdit.origin);sharedEdit=null;notice="Saved resources unchanged";return;}
                 if(action==Action.CONFIRM){Mode context=Mode.valueOf(sharedEdit.origin);save(sharedEdit.candidate(cart),true);sharedEdit=null;finishResourceOperation(context);notice="Resources saved together; Y Undo";}
+                return;
+            }
+            if(mode==Mode.STROKE){
+                if(action==Action.CANCEL||action==Action.UNDO){stroke=null;mode=Mode.CANVAS;notice="Stroke cancelled";return;}
+                if(action==Action.TEST){port.launch(stroke.preview(cart).bytes());return;}
+                if(action==Action.CONFIRM){if(!resourceEdit(stroke.preview(cart),"Sprite stroke",Mode.STROKE)){stroke=null;mode=Mode.CANVAS;}return;}
+                if(action==Action.UP||action==Action.DOWN||action==Action.LEFT||action==Action.RIGHT){moveCursor(action);strokePoint(cursorX,cursorY);}
                 return;
             }
             if(mode==Mode.USES){usesAction(action);return;}
@@ -975,7 +1014,7 @@ public final class WorkshopSession {
                     if(action==Action.DOWN)pointCopy(copyX/8,copyY/8+1);
                     if(action==Action.CONFIRM)mode=Mode.COPY_CONFIRM;
                 }else if(action==Action.CONFIRM){
-                    if(!resourceEdit(copyCandidate(),copyAsset==null?"Copy sprite pixels":"Insert library sprite",Mode.COPY_CONFIRM)){finishResourceOperation(Mode.COPY_CONFIRM);notice="Pixels copied; Y Undo";}
+                    if(!resourceEdit(copyCandidate(),copyAsset==null?"Copy sprite pixels":bufferInsertion()?"Paste sprite buffer":"Insert library sprite",Mode.COPY_CONFIRM)){finishResourceOperation(Mode.COPY_CONFIRM);notice="Pixels copied; Y Undo";}
                 }
                 if(action==Action.TEST&&mode==Mode.COPY_CONFIRM)port.launch(copyCandidate().bytes());
                 return; // No launch, tab switching, undo or implicit commit during placement.
@@ -1013,6 +1052,18 @@ public final class WorkshopSession {
                 if(action==Action.UP)drawToolCursor=clamp(drawToolCursor-1,drawMenuCount()-1);
                 if(action==Action.DOWN)drawToolCursor=clamp(drawToolCursor+1,drawMenuCount()-1);
                 if(action==Action.CONFIRM){
+                    if(drawToolCursor==strokeMenuIndex()){
+                        mode=Mode.CANVAS;if(drawTool!=DrawTool.ERASER)drawTool=DrawTool.BRUSH;beginStrokeAt(cursorX,cursorY);return;
+                    }
+                    if(drawToolCursor==bufferCopyIndex()){
+                        port.writeSpriteBuffer(SpriteAsset.capture(cart,selection(),"Sprite buffer",port.projectOrigin()));
+                        mode=Mode.CANVAS;notice="Pixels copied to buffer; available in any project";return;
+                    }
+                    if(drawToolCursor==bufferPasteIndex()){
+                        SpriteAsset asset=port.readSpriteBuffer();if(asset==null){notice="Buffer is empty. Copy a region first.";return;}
+                        if(asset.width%8!=0||asset.height%8!=0)throw new IllegalArgumentException("Buffer placement requires whole 8x8 tiles.");
+                        copyAsset=asset;copySource=new SpriteRegion(0,0,asset.width,asset.height);copyReturn=Mode.CANVAS;suggestCopyPlace();return;
+                    }
                     if(drawToolCursor==moveMenuIndex()){
                         moveReturn=overlayReturn;move=new SpriteMove(selection(),cursorX,cursorY);mode=Mode.MOVE;return;
                     }

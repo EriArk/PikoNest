@@ -1,5 +1,16 @@
 # PikoNest — путь к полному Android-продукту
 
+**Lab 0.0.75 - connected sprite strokes and buffer (partial G01/G02):** touch
+brush/eraser drags and controller strokes collect one recoverable pixel draft;
+Cancel/Test preserve saved bytes and Apply creates one Undo transaction. Shared
+sprite/map consequences are reviewed once for the complete stroke. A persistent
+sprite buffer copies independent pixels between projects through existing paste
+review. Native Blank authoring, buffer/stroke process-death recovery, byte-exact
+Undo/Redo and official PICO-8 draft Test/return passed; all 16,384 frame pixels
+matched. All 52 previous project/library files stayed unchanged. [Evidence and
+limits](showcase/0.0.75-en/README.md). Richer zoom/pan, allocation and remaining map
+operations keep package 3 open; physical and owner acceptance remain separate.
+
 **Lab 0.0.74 - shared sprite operations (partial G01-G03):** full-sheet copy
 and library insertion, overlapping snapshot copy/move, flips/rotation and color
 replacement now use the shared map/gfx review. Back retains operation intent;

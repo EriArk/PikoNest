@@ -1,5 +1,7 @@
 # PikoNest — English website gallery
 
+[0.0.75: connected strokes and a cross-project sprite buffer](0.0.75-en/README.md) - seven native English captures, ordinary saved cart and exact scope.
+
 [Lab 0.0.74: full-sheet copy, transform/color/move and official draft Test](0.0.74-en/README.md). Seven unedited English device captures; partial G01-G03.
 
 [Lab 0.0.73: shared sprite/map review, native recovery and official draft Test](0.0.73-en/README.md). Six unedited English device captures; partial G01-G03.
