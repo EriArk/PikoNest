@@ -21,5 +21,5 @@ function _draw()
  pset(x+2,y-1,1)
  line(x-2,y+3,x+2,y+3,1)
  print("DPAD: MOVE   O: "..stars,21,108,7)
- print("START: MENU / SHUTDOWN",20,119,6)
+ print("SELECT: EXIT MENU",30,119,6)
 end

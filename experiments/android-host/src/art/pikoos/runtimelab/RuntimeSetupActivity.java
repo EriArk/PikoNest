@@ -8,7 +8,7 @@ import android.view.*;
 import art.pikoos.lab.core.RuntimeSetup;
 import art.pikoos.lab.core.WorkshopSession.Action;
 
-/** Purchased archive validation and isolated runtime probe, not permanent activation. */
+/** Purchased archive preparation, trial launch and runtime-data entry. */
 public final class RuntimeSetupActivity extends Activity {
     private static final int PICK=71;
     private RuntimeSetup state;private RuntimeSetupView view;private ControllerInput input;private RuntimeArchiveJob job;
@@ -48,7 +48,7 @@ public final class RuntimeSetupActivity extends Activity {
         state.arm64=java.util.Arrays.asList(Build.SUPPORTED_ABIS).contains("arm64-v8a");
         state.adapterPresent=new ExternalPicoBackend(this).detect().launcherPresent;
         boolean swap=getSharedPreferences("library-ui",0).getBoolean("swapAB",false);
-        view=new RuntimeSetupView(this,state,swap);input=new ControllerInput(view::action,()->swap);
+        view=new RuntimeSetupView(this,state,swap);input=new ControllerInput(this::action,()->swap);
         setContentView(view);view.requestFocus();immersive();
         try{
             RuntimeArchiveJob.Saved archive=RuntimeArchiveJob.saved(this);
@@ -58,6 +58,10 @@ public final class RuntimeSetupActivity extends Activity {
         }catch(Exception e){state.problem="Не удалось прочитать запись об архиве. Выбери ZIP снова.";}
     }
     private void attach(RuntimeArchiveJob next){if(job!=null)job.detach(listener);job=next;job.attach(listener);}
+    void action(Action action){
+        if(action==Action.MENU&&!state.busy&&!state.testing){startActivity(new Intent(this,RuntimeDataActivity.class));return;}
+        view.action(action);
+    }
     private void launchPrepared(){
         try{
             ExternalPicoBackend backend=new ExternalPicoBackend(this);backend.checkProbeAvailable();

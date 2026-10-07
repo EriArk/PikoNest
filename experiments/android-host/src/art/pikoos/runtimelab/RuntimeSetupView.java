@@ -54,7 +54,7 @@ final class RuntimeSetupView extends View {
         fit(state.busy?"Preparing...":(swap?"B":"A")+(state.testing?"  Return to test":state.verified?"  Prepare & test":"  Choose ZIP"),left+16,buttonY+32,23,state.busy?6:10,width-30);
         fit(state.notice.isEmpty()?(state.adapterPresent?"Runtime adapter available":"Runtime preparation is required"):state.notice,left,buttonY+75,16,13,width);
         rect(0,h-45,w,45,0);text((swap?"A":"B")+(state.busy?" Cancel":" Back"),left,h-16,18,6);
-        if(!state.busy&&!state.testing)text("X Other ZIP",left+width-145,h-16,18,14);
+        if(!state.busy&&!state.testing){text("Select Data",left+110,h-16,17,14);text("X Other ZIP",left+width-145,h-16,18,14);}
         c.restore();
     }
     @Override public boolean onTouchEvent(MotionEvent event){
@@ -62,7 +62,7 @@ final class RuntimeSetupView extends View {
         if(event.getActionMasked()==MotionEvent.ACTION_DOWN){downX=x;downY=y;return true;}
         if(event.getActionMasked()==MotionEvent.ACTION_UP){
             if(Math.abs(x-downX)<20&&Math.abs(y-downY)<20){
-                if(y>=h-45)action(x<w/2?Action.CANCEL:Action.CONTEXT);
+                if(y>=h-45){if(x>w/3&&x<2*w/3&&getContext() instanceof RuntimeSetupActivity)((RuntimeSetupActivity)getContext()).action(Action.MENU);else action(x<w/2?Action.CANCEL:Action.CONTEXT);}
                 else if(y>=buttonY&&y<=buttonY+49)action(Action.CONFIRM);
             }performClick();return true;
         }return true;

@@ -2,7 +2,9 @@
 from pathlib import Path
 import sys, hashlib, struct, shutil, tarfile, io, xml.etree.ElementTree as ET
 
-app, repo, boot_source = map(Path, sys.argv[1:])
+app, repo, boot_source = map(Path, sys.argv[1:4])
+package = sys.argv[4] if len(sys.argv)>4 else 'art.pikoos.runtimelab'
+assert package in ('art.pikoos.runtimelab','art.pikoos.cleanlab')
 assets = app / 'assets'
 # Private runtime home, independent of the old wrapper's shared folder.
 bootstrap=assets/'package.dat'; buffer=io.BytesIO()
@@ -26,11 +28,14 @@ ET.register_namespace('android', ns)
 def a(name): return '{'+ns+'}'+name
 manifest = ET.parse(app / 'AndroidManifest.xml')
 root = manifest.getroot()
-root.set('package', 'art.pikoos.runtimelab')
+root.set('package', package)
 root.set(a('installLocation'), 'internalOnly')
 host = ET.parse(repo / 'experiments/android-host/AndroidManifest.xml').getroot()
+if package != 'art.pikoos.runtimelab':
+    host = ET.fromstring(ET.tostring(host,encoding='unicode').replace('art.pikoos.runtimelab',package))
 application = root.find('application')
 application.set(a('label'), 'PikoNest')
+if package != 'art.pikoos.runtimelab': application.set(a('label'),'PikoNest validation')
 application.set(a('debuggable'), 'true')
 application.set(a('allowBackup'), 'false')
 application.set(a('theme'), '@android:style/Theme.Material.Light.NoActionBar')
@@ -44,11 +49,11 @@ for node in list(application):
         application.remove(node)
     elif node.tag == 'activity' and node.get(a('name')) == 'com.godot.game.GodotApp':
         node.set(a('process'), ':runtime')
-        node.set(a('taskAffinity'),'art.pikoos.runtimelab.runtime')
+        node.set(a('taskAffinity'),package+'.runtime')
         node.set(a('exported'), 'false')
         for intent in list(node.findall('intent-filter')): node.remove(intent)
     elif node.tag == 'provider':
-        node.set(a('authorities'), node.get(a('authorities')).replace('io.wip.pico8','art.pikoos.runtimelab'))
+        node.set(a('authorities'), node.get(a('authorities')).replace('io.wip.pico8',package))
 for node in host.find('application'):
     application.append(node)
 root.append(host.find('queries'))
@@ -59,7 +64,7 @@ ET.SubElement(application, 'meta-data', {a('name'):'art.pikoos.integrated',a('va
 for kind, name, extra in [
     ('activity','ProbeActivity',{a('theme'):'@android:style/Theme.Translucent.NoTitleBar'}),
     ('activity','DiagnosticActivity',{a('theme'):'@android:style/Theme.Translucent.NoTitleBar'}),
-    ('provider','ProbeStatusProvider',{a('authorities'):'art.pikoos.runtimelab.runtime'}),
+    ('provider','ProbeStatusProvider',{a('authorities'):package+'.runtime'}),
 ]:
     ET.SubElement(application,kind,{a('name'):'art.pikoos.runtimeexperiment.'+name,
         a('exported'):'false',a('process'):':runtime',**extra})
@@ -78,12 +83,12 @@ config = config.replace('versionName: 1.6.6','versionName: '+host.get(a('version
 boot = boot_source.read_text(encoding='utf-8')
 old = 'static var PUBLIC_FOLDER = "/sdcard/Documents/pico8"'
 assert boot.count(old)==1
-boot = boot.replace(old,'static var PUBLIC_FOLDER: String:\n\tget:\n\t\treturn APPDATA_FOLDER + "/runtime-data"')
+boot = boot.replace(old,'static var PUBLIC_FOLDER: String:\n\tget:\n\t\tvar pointer = APPDATA_FOLDER + "/runtime-home.txt"\n\t\tif FileAccess.file_exists(pointer):\n\t\t\tvar key = FileAccess.get_file_as_string(pointer)\n\t\t\tvar valid = RegEx.new()\n\t\t\tvalid.compile("^[0-9a-f]{12}$")\n\t\t\tif valid.search(key) != null and FileAccess.file_exists(APPDATA_FOLDER + "/rh/" + key + "/.pikonest-home"):\n\t\t\t\treturn APPDATA_FOLDER + "/rh/" + key\n\t\t\tpush_error("PikoNest runtime home needs review")\n\t\t\treturn ""\n\t\treturn APPDATA_FOLDER + "/runtime-data"')
 start,end=boot.index('func _ready() -> void:'),boot.index('\nconst BOOTSTRAP_PACKAGE_VERSION')
 boot = boot[:start]+'''func _ready() -> void:
 	await get_tree().process_frame
 	set_ui_state()
-	if not FileAccess.file_exists("user://package/pikonest-ready"):
+	if PUBLIC_FOLDER.is_empty() or not FileAccess.file_exists("user://package/pikonest-ready"):
 		push_error("PikoNest runtime is not prepared")
 		get_tree().quit()
 		return

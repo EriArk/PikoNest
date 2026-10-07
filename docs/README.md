@@ -1,6 +1,6 @@
 # PikoNest: current scope and development map
 
-**Lab 0.0.70 · Android first · No public APK release.** The complete creator is
+**Lab 0.0.71 · Android first · No public APK release.** The complete creator is
 still in development. Original code uses the [MIT License](../LICENSE).
 
 ## What exists today
@@ -12,7 +12,7 @@ still in development. Original code uses the [MIT License](../LICENSE).
 | Animation/camera | Shared English forms, create/reopen/reorder and draft Test for recognized uses | Event bindings and wider lifecycle acceptance |
 | Backgrounds | Sprite-strip layers through the common Workshop path, ordering, parameters and recovery | Broader layer representations and complete scene workflows |
 | Rules/code | Numeric state, input/conditions, add/set/reset and readouts without a Lua cursor | Coordinate/resource/event bindings and a complete original game from blank |
-| Storage/runtime | One APK; purchased-runtime preparation, Play/Test/return and Home/resume on Retroid | Clean install, complete saves migration, modern Android target and crash/boot recovery |
+| Storage/runtime | One APK; verified data merge, official save retention, isolated clean setup, Play/Test/return and interrupted-setup retry on Retroid | Complete onboarding/frontend migration, rollback, modern target and crash/boot matrix |
 | Audio/reuse | Audio scope planned; bounded sprite/parameter reuse exists | SFX/music editors, event bindings and dependency-aware reuse |
 
 Unsupported editor operations preserve unfamiliar source. Templates do not lock
@@ -21,14 +21,14 @@ Technical PIKOOS IDs remain until the [coordinated migration](PROJECT_NAME.md).
 
 ## Next implementation work
 
-1. Complete the one-APK foundation: verify old runtime-data migration, clean
-   installation and interrupted-session recovery. The first integrated build uses
-   owner-approved target SDK 28; modern-target execution remains mandatory.
-2. Connect rules/state to resource coordinates and events for a simple original
-   game without Lua wiring.
-3. Complete basic editors and connected workflows before expanding genre presets.
+1. Connect rules/state to resource coordinates for a simple original game without
+   Lua wiring, using the now-demonstrated integrated runtime.
+2. Complete basic editors and connected workflows before expanding genre presets.
+3. Continue runtime/storage acceptance alongside creation: frontend migration,
+   rollback, full onboarding and crash/boot matrix. Owner-approved target SDK 28
+   remains temporary; modern-target execution is mandatory before release.
 
-[Current one-APK evidence](showcase/0.0.70-en/README.md) ·
+[Current one-APK evidence](showcase/0.0.71-en/README.md) ·
 [The ordered 14-package plan](ROADMAP.md).
 
 The full roadmap is **foundations → an original playable game → world/movement →

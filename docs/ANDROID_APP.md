@@ -31,19 +31,20 @@ installed independently; do not assume it is disposable or part of the migration
 Lab 0.0.70 integrates the adapter in the main APK, with one launcher activity.
 On Retroid, preparation, Play/Test/return and Home/resume passed with the old helper
 disabled; 48 project/library files matched their backups. The independently
-installed wrapper stayed untouched. Clean installation and full saves/settings
-migration remain open. The owner approved interim target SDK 28; modern-target
+installed wrapper stayed untouched. Lab 0.0.71 adds a verified old-data merge,
+cartdata retention, clean private installation and interrupted setup retry; full
+factory-clean onboarding, frontend settings and boot/crash acceptance remain open. The owner approved interim target SDK 28; modern-target
 execution is mandatory R10. See [the decision](SINGLE_APK.md) and
-[evidence](showcase/0.0.70-en/README.md). Unknown/interrupted session recovery is part of
+[evidence](showcase/0.0.71-en/README.md). Unknown/interrupted session recovery is part of
 that package, not a reason to bypass the current session guard. Audit bundled
 third-party components and distribution notices before shipping them. Existing
 technical identifiers stay unchanged until the coordinated naming migration.
 Retire obsolete development apps only after verified data transfer and successful
 launch/return; hiding their icons does not satisfy the requirement.
 
-Host 0.0.30 / Runtime Test 4 can prepare and launch an isolated runtime candidate
+Historical host 0.0.30 / Runtime Test 4 could prepare and launch an isolated runtime candidate
 from the user's verified Raspberry Pi ZIP. Existing games still use the working
-installation. Clean-install bootstrap and permanent activation remain pending.
+installation. The integrated path supersedes this two-app probe; see current evidence above.
 See [setup](FIRST_RUN_SETUP.md) and [device evidence](design/android-runtime-probe-30/README.md).
 
 ## Adaptive handheld experience

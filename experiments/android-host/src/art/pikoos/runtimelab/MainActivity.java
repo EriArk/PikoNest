@@ -612,21 +612,28 @@ public final class MainActivity extends Activity {
     }
     private void onRuntimeResume(){
         if(backend==null||session==null)return;
-        if(backend.hasSession()&&!backend.sessionEnded()){
+        art.pikoos.lab.core.RuntimeSession.Phase observed=backend.hasSession()?backend.sessionPhase():art.pikoos.lab.core.RuntimeSession.Phase.EXITED;
+        if(backend.hasSession()&&!art.pikoos.lab.core.RuntimeSession.ended(observed)){
             runtimeGate=new LaunchView(this,this::runtimeAction,libraryPrefs.getBoolean("swapAB",false));
             runtimeGate.busy=false;runtimeGate.active=true;
             runtimeGate.message="A game is still open. Return to continue or finish it.";
-            if(backend.sessionPhase()==art.pikoos.lab.core.RuntimeSession.Phase.PREPARING)runtimeGate.message="PICO-8 is starting. Return to check the game.";
-            if(backend.sessionPhase()==art.pikoos.lab.core.RuntimeSession.Phase.UNKNOWN){runtimeGate.recovery=true;runtimeGate.message="The previous session could not be identified. X checks whether its runtime is idle and preserves the record as interrupted. It never closes a running game.";}
+            if(observed==art.pikoos.lab.core.RuntimeSession.Phase.PREPARING)runtimeGate.message="PICO-8 is starting. Return to check the game.";
+            if(observed==art.pikoos.lab.core.RuntimeSession.Phase.UNKNOWN){runtimeGate.recovery=true;runtimeGate.message="The previous session could not be identified. X checks whether its runtime is idle and preserves the record as interrupted. It never closes a running game.";}
             setContentView(runtimeGate);runtimeGate.requestFocus();return;
         }
         if(runtimeGate!=null){runtimeGate=null;setContentView(showingFolders?folderView:showingPlay?playView:showingLibrary?shelf:surface);}
+        SharedPreferences setup=getSharedPreferences("runtime-setup",0);
+        if(setup.getBoolean("dispatched",false)){
+            setup.edit().putBoolean("dispatched",false).commit();
+            play.notice=observed==art.pikoos.lab.core.RuntimeSession.Phase.INTERRUPTED?"The PICO-8 test was interrupted. You can try again in runtime setup.":"The PICO-8 test has ended.";
+            playView.invalidate();
+        }
         if(session!=null&&awaitingReturn&&leftForRuntime){
             awaitingReturn=false;leftForRuntime=false;libraryPrefs.edit().putBoolean("awaitingReturn",false).apply();
             getSharedPreferences("moon-garden-ui",MODE_PRIVATE).edit().putBoolean("awaitingReturn",false).apply();
             if(playPrefs.getBoolean("runtime",false)){
                 playPrefs.edit().putBoolean("runtime",false).apply();
-                if(!showingPlay)showPlay();else{play.busy=false;play.notice="Back in Play. Choose your next game.";playView.invalidate();}
+                if(!showingPlay)showPlay();play.busy=false;play.notice=observed==art.pikoos.lab.core.RuntimeSession.Phase.INTERRUPTED?"The game was interrupted. Your library is ready.":"Back in Play. Choose your next game.";playView.invalidate();
             }else{session.notice="Сохранено";surface.invalidate();}
             Log.i(TAG,"host_resumed tool="+session.tool+" focus="+session.focus+" result=unknown");
         }

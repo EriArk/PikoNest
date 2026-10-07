@@ -1,5 +1,13 @@
 # Runtime startup, resume and exit experiment
 
+The shared adapter source in integrated host 0.0.71 adds a separate kernel-boot
+stamp and bounded concurrent own-UID census. Parent disappearance is insufficient
+when an open activity/orphan remains. Missing boot evidence is UNKNOWN with
+explicit idle recovery. The installed legacy revision 9 was not rebuilt/replaced
+for this slice; its prior evidence remains historical. New ordinary installs use
+the integrated APK, not this separate research adapter. See
+[current runtime boundaries](../../docs/SINGLE_APK.md).
+
 2026-10-03. Bounded bootstrap fix for the upstream Android wrapper
 ([Macs75/pico8-android](https://github.com/Macs75/pico8-android), release 1.6.6).
 The adapter sources are now also packaged inside the default host APK (0.0.70);

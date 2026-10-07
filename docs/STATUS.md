@@ -1,5 +1,17 @@
 # Состояние PikoNest
 
+**Lab 0.0.71 - runtime data import and isolated clean setup:** old PICO-8 data
+is selected read-only through SAF, reviewed for conflicts, copied and verified
+before atomically switching homes. On Retroid: 84 source files unchanged, 48
+project/library files unchanged; ordinary cartdata survived the switch (1 to 2).
+An empty private validation installation imported the purchased archive, prepared
+its own backend and ran Play plus Workshop Test/return. Interrupted setup no longer
+leaves a stale dispatched flag. The disposable package was removed after EXITED;
+independent apps/data stayed intact and audio stayed muted.
+[Evidence and exact limits](showcase/0.0.71-en/README.md). This is not complete
+factory-clean onboarding, frontend-settings migration, boot/crash acceptance or
+modern-target support. The next creation package is C02.4/G04 coordinate bindings.
+
 **Lab 0.0.70 — первый единый APK:** Play, Workshop и адаптер официального runtime
 собраны в `art.pikoos.runtimelab`, одна иконка PikoNest. По решению владельца
 временно используется target SDK 28. На Retroid проверены подготовка купленного

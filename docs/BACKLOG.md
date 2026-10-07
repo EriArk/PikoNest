@@ -1,11 +1,15 @@
 # PikoNest — задачи полного цикла
 
-**Обновление 2026-10-07, lab 0.0.70:** первый пакет единого APK реализован частично
-на базе `fc62b89`: внутренняя подготовка runtime, Play/Test/возврат и Home/resume
-проверены на Retroid без активного helper. 48 файлов проектов/библиотеки сохранены.
-R09/R03 остаются открыты: следующий шаг — перенос runtime-данных и чистая установка,
-затем прерывание/восстановление. R10 фиксирует обязательный современный Android target.
-[Свидетельства](showcase/0.0.70-en/README.md). Этот порядок уточняет старый приоритет ниже.
+**Обновление 2026-10-07, lab 0.0.71:** runtime-данные переносятся через
+read-only SAF → review → проверенная копия → атомарное переключение. На Retroid
+84 исходных файла и 48 файлов проектов/библиотеки сохранены; cartdata пережила
+переключение. Изолированная чистая установка подготовила runtime, запустила Play
+и Workshop Test/возврат. Исправлен stale dispatched после прерывания пробы.
+R09/R03/R05 остаются частичными: старые frontend-private настройки, rollback,
+полный crash/boot и чистое устройство без сторонних wrapper ещё не приняты.
+R10 — обязательный современный Android target. Следующий пакет создания —
+связи правил с координатами C02.4/G04; инфраструктурные остатки идут параллельно.
+[Свидетельства](showcase/0.0.71-en/README.md).
 
 Версия плана: 2026-10-04. Основание: [аудит](STATUS.md), [этапы](ROADMAP.md),
 [сценарии приёмки](ACCEPTANCE.md). ID ниже локальные. GitHub:
@@ -95,6 +99,14 @@ Q08 (дополнительные языки) следует после англ
 
 ## R. Официальный runtime, установка и долговременные данные — M5
 
+0.0.71 adds bounded runtime-home migration (R05/R09): copy selected data-folder
+files, global conflict policy, source/current/candidate hash checks, atomic active
+pointer, previous homes retained. Import limit: 512 MiB / 20,000 files, 16 staged
+imports/homes; these are PikoNest safeguards, not PICO-8 limits. R01/R03/R08 have
+isolated clean-install and interruption evidence; no factory-clean, physical boot
+or complete provider/disk-full acceptance is claimed. Frontend-private preferences
+outside the selected folder and a user rollback/cleanup path remain R09 work.
+
 Источники: [setup](FIRST_RUN_SETUP.md), [adapter](../experiments/runtime-restart/README.md),
 [связанные файлы](DEPENDENT_CARTRIDGES.md), [проба](design/android-runtime-probe-30/README.md).
 
@@ -108,7 +120,7 @@ Q08 (дополнительные языки) следует после англ
 | R06 | Исследование / A01 | Матрица official runtime version/ABI/Android, определение версии и backend capabilities, смена runtime | «ZIP структурно читается», «архитектура подходит» и «эта версия проверена» различаются; инструкция архива соответствует backend, неподдержанная версия не маскируется |
 | R07 | Исследование / R02, P02, R05 | Splore: выбранные Downloads, реальные BBS-cache/зависимости, индекс Play, offline; восстановление переноса | Скачать новую игру, увидеть на полке, перезапустить без сети и сыграть; потеря папки не теряет загрузку; multicart проверен отдельно |
 | R08 | Частично / R01, R02, R06, R07, P02 | Полный первый запуск и тот же путь в Settings; четыре назначения, правильный ZIP, progress/retry, отложенная настройка и продолжение Test/external | Чистая установка проходит ACC-06; отмена сохраняет сделанное; редактор доступен без runtime; нет обязательного аккаунта, курса или имени проекта |
-| R09 | Частично, 0.0.70 / A01, A06, R01, R03; #9/#10 | Один APK и одна иконка PikoNest: встроить адаптер запуска, убрать обязательную установку helper/runtime APK; сохранить границу backend и импорт купленного runtime. Требование владельца 2026-10-07 | Чистая установка работает без внешних wrapper-пакетов; Play/Test/возврат и восстановление проверены. Проверенный перенос проектов/сохранений/библиотеки предшествует удалению старых lab-приложений; proprietary runtime не включён в APK |
+| R09 | Частично, 0.0.71 / A01, A06, R01, R03; #9/#10 | Один APK и одна иконка PikoNest: встроить адаптер запуска, убрать обязательную установку helper/runtime APK; сохранить границу backend и импорт купленного runtime. Требование владельца 2026-10-07 | Чистая установка работает без внешних wrapper-пакетов; Play/Test/возврат и восстановление проверены. Проверенный перенос проектов/сохранений/библиотеки предшествует удалению старых lab-приложений; proprietary runtime не включён в APK |
 | R10 | Исследование / R09, R06 | Современный Android target: заменить зависимость от исполнения writable app-private файлов; сохранить импорт официального runtime и backend | Запуск/выход/восстановление проверены на современных Android при актуальном target; не простая смена manifest, не встраивание proprietary binaries. SDK 28 разрешён владельцем только для первой интеграции |
 
 ## L. Играть и внешние лаунчеры — M5

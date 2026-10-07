@@ -42,9 +42,12 @@ above when diagnosing that behavior.
 ## Optional device work
 
 The APK builds without proprietary PICO-8. Import the purchased Raspberry Pi ZIP
-through runtime setup; 0.0.70 prepares and launches it within the main application.
-No separate helper is required by the integrated path. Clean-device onboarding
-and full migration remain unfinished; preserve old apps/data while validating.
+through runtime setup; 0.0.71 prepares and launches it within the main application.
+No separate helper is required by the integrated path. Old data-folder import and
+isolated clean private setup are checked; factory-clean onboarding and full
+migration remain unfinished. Preserve old apps/data while validating.
+The optional [clean validation variant](experiments/android-integrated/README.md#isolated-clean-install-validation)
+uses its own private namespace; it is not a second deliverable APK.
 The separate adapter build is only a legacy migration/research option.
 
 ```powershell

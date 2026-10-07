@@ -2,7 +2,8 @@ param(
     [Parameter(Mandatory=$true)][string]$Dex,
     [Parameter(Mandatory=$true)][string]$Output,
     [string]$JdkRoot = 'C:\Program Files\Android\Android Studio\jbr',
-    [string]$SdkRoot = (Join-Path $env:LOCALAPPDATA 'Android\Sdk')
+    [string]$SdkRoot = (Join-Path $env:LOCALAPPDATA 'Android\Sdk'),
+    [switch]$ValidationOnly
 )
 $ErrorActionPreference = 'Stop'
 $pikoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
@@ -26,7 +27,8 @@ $pikoAssets = Join-Path $pikoDecoded 'assets'
 Copy-Item (Join-Path $pikoAssets 'package.dat') (Join-Path $pikoBuild 'original.dat')
 Run $pikoJava @((Join-Path $pikoRuntime 'PatchBootstrap.java'),(Join-Path $pikoBuild 'original.dat'),(Join-Path $pikoAssets 'package.dat'),(Join-Path $pikoRuntime 'audio-session.sh'))
 & (Join-Path $pikoRuntime 'PatchLaunch.ps1') -Source $pikoRun -Assets $pikoAssets
-Run py @('-3',(Join-Path $PSScriptRoot 'prepare.py'),$pikoDecoded,$pikoRoot,$pikoBoot)
+$pikoPackage='art.pikoos.runtimelab';if($ValidationOnly){$pikoPackage='art.pikoos.cleanlab'}
+Run py @('-3',(Join-Path $PSScriptRoot 'prepare.py'),$pikoDecoded,$pikoRoot,$pikoBoot,$pikoPackage)
 Copy-Item -LiteralPath $Dex -Destination (Join-Path $pikoDecoded 'classes2.dex')
 $pikoUnsigned = Join-Path $pikoBuild 'unsigned.apk'
 $pikoAligned = Join-Path $pikoBuild 'aligned.apk'

@@ -4,7 +4,8 @@ param(
     [string]$BuildToolsVersion = '36.0.0',
     [string]$Platform = 'android-34',
     [switch]$HostOnly,
-    [switch]$SkipCoreTests
+    [switch]$SkipCoreTests,
+    [switch]$ValidationOnly
 )
 $ErrorActionPreference = 'Stop'
 $pikoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
@@ -27,6 +28,18 @@ $pikoCore = @(Get-ChildItem (Join-Path $PSScriptRoot 'core') -Recurse -Filter '*
 $pikoCore += @(Get-ChildItem (Join-Path $pikoRoot 'experiments\p8-roundtrip\core') -Recurse -Filter '*.java' | ForEach-Object FullName)
 $pikoSources = @(Get-ChildItem (Join-Path $PSScriptRoot 'src') -Recurse -Filter '*.java' | ForEach-Object FullName)
 if(-not $HostOnly) { $pikoSources += @(Get-ChildItem (Join-Path $pikoRoot 'experiments\runtime-restart\android') -Recurse -Filter '*.java' | ForEach-Object FullName) }
+if($ValidationOnly) {
+    if($HostOnly){throw 'Clean validation requires the integrated runtime'}
+    $pikoValidationSources=Join-Path $pikoBuild 'validation-sources'
+    New-Item -ItemType Directory -Force $pikoValidationSources | Out-Null
+    $pikoCounter=0
+    $pikoSources=@($pikoSources | ForEach-Object {
+        $pikoCounter++;$pikoCopy=Join-Path $pikoValidationSources ("source$pikoCounter\"+[IO.Path]::GetFileName($_))
+        New-Item -ItemType Directory -Force ([IO.Path]::GetDirectoryName($pikoCopy)) | Out-Null
+        [IO.File]::WriteAllText($pikoCopy,[IO.File]::ReadAllText($_).Replace('art.pikoos.runtimelab','art.pikoos.cleanlab'),[Text.UTF8Encoding]::new($false))
+        $pikoCopy
+    })
+}
 $pikoTests = @(Get-ChildItem (Join-Path $PSScriptRoot 'tests') -Filter '*.java' | ForEach-Object FullName)
 
 # Compile/test the domain with the JDK alone, proving no Android dependency.
@@ -68,6 +81,8 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeDiagnos
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeMenuTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeSessionTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeRecoveryTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeHomeMigrationTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeBootIdentityTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaEditorTest',(Join-Path $PSScriptRoot 'assets\blank.p8'),(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'FolderSetupTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LauncherPathTest')
@@ -120,8 +135,9 @@ if (-not (Test-Path -LiteralPath $pikoKey)) {
     Invoke-PikoTool (Join-Path $JdkRoot 'bin\keytool.exe') @('-genkeypair','-keystore',$pikoKey,'-storepass','android','-keypass','android','-alias','pikoos-lab','-keyalg','RSA','-keysize','2048','-validity','3650','-dname','CN=PIKOOS Runtime Lab')
 }
 $pikoApk = Join-Path $pikoArtifacts 'pikoos-runtime-lab.apk'
+if($ValidationOnly){$pikoApk=Join-Path $pikoArtifacts 'pikonest-clean-validation.apk'}
 if(-not $HostOnly) {
-    & (Join-Path $pikoRoot 'experiments\android-integrated\package.ps1') -Dex (Join-Path $pikoBuild 'dex\classes.dex') -Output $pikoApk -JdkRoot $JdkRoot -SdkRoot $SdkRoot
+    & (Join-Path $pikoRoot 'experiments\android-integrated\package.ps1') -Dex (Join-Path $pikoBuild 'dex\classes.dex') -Output $pikoApk -JdkRoot $JdkRoot -SdkRoot $SdkRoot -ValidationOnly:$ValidationOnly
     return
 }
 Invoke-PikoTool $pikoJava @('-jar',(Join-Path $pikoTools 'lib\apksigner.jar'),'sign','--ks',$pikoKey,'--ks-key-alias','pikoos-lab','--ks-pass','pass:android','--key-pass','pass:android','--out',$pikoApk,$pikoAligned)

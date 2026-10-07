@@ -1,10 +1,11 @@
 # PikoNest Android host experiment
 
-**Current lab: 0.0.70.** The default build now packages Workshop and the runtime
-adapter in one APK. [Build inputs](../android-integrated/README.md),
-[device evidence and remaining gates](../../docs/showcase/0.0.70-en/README.md).
-Play/Test/return and Home/resume passed on Retroid with the old helper disabled.
-Clean setup, old save migration and modern Android target remain open.
+**Current lab: 0.0.71.** One APK contains Workshop and the runtime adapter.
+Verified old-data copy/merge retains source and prior homes. Retroid checks cover
+cartdata retention, isolated clean private installation, Play/Workshop Test/return
+and retry after interrupted setup. [Build inputs](../android-integrated/README.md),
+[evidence and remaining gates](../../docs/showcase/0.0.71-en/README.md).
+Full onboarding, frontend-settings migration, boot matrix and modern target remain open.
 
 **0.0.69:** Rules & state connects numeric starting values, input,
 conditions, add/set/reset and live readouts without a Lua cursor. Forms, order,

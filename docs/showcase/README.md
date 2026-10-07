@@ -1,8 +1,9 @@
 # PikoNest — English website gallery
 
-Latest: [0.0.70 one Android application](0.0.70-en/README.md) — original Retroid
-captures of setup, Play, resume, Workshop Test and return. Earlier editor packs
-remain useful for the individual tools.
+Latest: [0.0.71 runtime data import](0.0.71-en/README.md) — six original English
+Retroid captures: conflict review, verified import, retained save, clean Play and
+Workshop Test. [0.0.70 one Android application](0.0.70-en/README.md) records the
+first integration and Home/resume. Earlier editor packs remain useful for tools.
 
 Also: [0.0.69 Rules & state](0.0.69-en/README.md) — eight English captures of
 starting values, input/conditions, reset, readouts and export from a blank project.

@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-07",
+  "version": "0.0.71",
+  "device": "Retroid Pocket Classic",
+  "android": 14,
+  "dimensions": [
+    1240,
+    1080
+  ],
+  "method": "Original ADB screencap; no image editing",
+  "artifacts_sha256": {
+    "initial_main": "5a19e5edb23b5a39f5eb8974bb66f5f428cef198b67c0d2a7d042afeea6a1ba2",
+    "initial_clean": "774013a7479e852c2d31db251882014d1783cb6e937e3ebdcb92a3f23cc2fa8e",
+    "final_main": "50f19d71bdc492639b2fda4ff91afd5a7e3dd128bf3b0ca8b658fa5b90443447",
+    "final_clean": "5e93fb4b10df8a6ecba5c2a2b614426f9ef395f8768645517c5fb1a1f6d29df9"
+  },
+  "validation_package": "art.pikoos.cleanlab, temporary isolated test install; removed after confirmed EXITED",
+  "captures": [
+    {
+      "file": "01-data-review.png",
+      "caption": "Review old PICO-8 data and keep current conflicts by default.",
+      "artifact": "final_main",
+      "sha256": "bb8a45fc63ad8def6dfbf924f56d8c6882fb585863ca89d39d7752ed681e27d4"
+    },
+    {
+      "file": "02-conflict-choice.png",
+      "caption": "Browse conflicts and select imported versions; this review was cancelled, not applied.",
+      "artifact": "final_main",
+      "sha256": "a7541568f96a8f4647090262ffd810de2e4749cadda0a9d3ee7dc4e57b41a9a8"
+    },
+    {
+      "file": "03-import-complete.png",
+      "caption": "Verified copy activated; old home and selected source retained.",
+      "artifact": "initial_main",
+      "sha256": "f662decf2f7903b73906051f61f33fe3e954bab006d8c8a9a3563c11243e9e57"
+    },
+    {
+      "file": "04-save-after-import.png",
+      "caption": "Ordinary official PICO-8 cartdata increased from one to two launches across migration.",
+      "artifact": "initial_main",
+      "sha256": "0d231b7fddce1720788232d6272f7b20b0f877a4ccbba00d4b0584689306d53b"
+    },
+    {
+      "file": "05-clean-play.png",
+      "caption": "Little Lights in official PICO-8 after setup in an empty private installation.",
+      "artifact": "final_clean",
+      "sha256": "706012bab2f11781cd7e54b949e06877db50ab63c7d3af662ab7024ec23710fa"
+    },
+    {
+      "file": "06-clean-workshop-test.png",
+      "caption": "Moon Garden Workshop Test in that installation; normal exit returned to the same project.",
+      "artifact": "final_clean",
+      "sha256": "9c94f7589b38e9c03861feefc74ce21e62a83bbfa8b7e70422ce64dbaaeec90e"
+    }
+  ]
+}

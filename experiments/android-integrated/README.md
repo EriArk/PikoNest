@@ -32,3 +32,29 @@ The owner approved target SDK 28 for this first integration. See
 Upstream MIT and native font notices are packaged. Complete transitive binary
 licensing/source obligations remain a pre-release task; source MIT does not
 relicense Godot, bootstrap libraries or third-party artwork.
+
+## Isolated clean-install validation
+
+For an empty private installation without clearing the owner's current app:
+
+```powershell
+./experiments/android-host/build.ps1 -ValidationOnly -JdkRoot 'C:\Program Files\Android\Android Studio\jbr'
+adb -s YOUR_DEVICE_SERIAL install .local/artifacts/pikonest-clean-validation.apk
+adb -s YOUR_DEVICE_SERIAL shell am start -n art.pikoos.cleanlab/.MainActivity
+```
+
+This opt-in variant changes the host namespace and launcher label only; portable
+core, packaged backend and setup/Play/Test code stay the same. It does not copy
+preferences, rootfs or purchased files from the main package. Select your purchased
+Raspberry Pi archive and games folder through the normal UI, then verify setup,
+Play/Test and return. Do not install if an unknown package with that ID exists.
+After preserving evidence and confirming its game has exited, uninstall only
+`art.pikoos.cleanlab`. Do not clear the main app or uninstall independent wrappers.
+The default build/output remains the single product APK; the validation variant
+is not a product delivery or release. `-ValidationOnly` cannot be combined with
+`-HostOnly`.
+
+The initial private runtime home remains `files/runtime-data`. Verified old-data
+import may activate `files/rh/<key>` via AtomicFile; the boot script resolves only
+a validated pointer and ready marker. SAF sources are never used as executable
+paths. See [migration and acceptance boundaries](../../docs/SINGLE_APK.md).

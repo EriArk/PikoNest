@@ -1,8 +1,18 @@
 # Первый запуск: папки и официальный PICO-8
 
-Статус: требования владельца и предлагаемый сценарий. Полный мастер ещё не реализован.
-Работающий эксперимент использует отдельный Android-wrapper; это доказательство
-запуска, но не готовая автоматическая установка внутри PikoNest.
+Current status, **0.0.71**: one APK prepares the user's purchased Raspberry Pi ZIP
+and runs official ARM64 PICO-8 in its own private backend. Folders → R PICO-8 →
+Select Data opens read-only old-data import with conflict review and verified
+activation; source and prior home stay intact. Isolated clean private installation,
+Play, Workshop Test/return and interrupted setup were exercised on Retroid.
+[Evidence](showcase/0.0.71-en/README.md) · [Ownership and limits](SINGLE_APK.md).
+
+The complete first-run wizard is still unfinished: automatic introduction,
+activation of all four user destinations, Splore indexing, loss-of-access recovery
+and full old frontend settings migration remain required. A clean test namespace
+on a device with an independent wrapper installed is not factory-clean acceptance.
+The following 0.0.30 / Runtime Test 4 notes describe the historical two-app probe,
+not the current integrated delivery path.
 
 Срез **0.0.30 / Runtime Test 4** расширяет подключение: **Папки → R PICO-8**.
 A выбирает ZIP через Android, а после проверки готовит отдельный пробный запуск.
