@@ -89,6 +89,12 @@ intentional until the [coordinated migration](docs/PROJECT_NAME.md).
   consistency checks, not an APK rebuild.
 - Include versioned screenshots for meaningful UI changes and describe the
   verified interaction. Preserve the PICO-8 style and controller-first operation.
+- Update [PROJECT_STATUS.md](PROJECT_STATUS.md) and [CHANGELOG.md](CHANGELOG.md)
+  with each completed meaningful batch, including design/documentation batches.
+  Use plain English for posts and the website: what changed, what was actually
+  checked, what remains and where to find images. Keep prototypes and plans
+  distinct from implemented features; development builds are not releases.
+  Detailed status and task ownership remain in the planning documents.
 - Keep purchased binaries, credentials, device serials and personal paths out of
   submissions. Share a minimal owned cart instead of another author's full game.
 

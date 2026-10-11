@@ -1,5 +1,13 @@
 # PikoNest: current scope and development map
 
+For public updates, start with [PROJECT_STATUS](../PROJECT_STATUS.md) and
+[CHANGELOG](../CHANGELOG.md). They summarize current progress in plain English
+and link versioned screenshots. Detailed evidence and task status remain here.
+
+**Current direction, 8 October 2026:** simplify the complete creation journey.
+The [creation-flow prototype](design/creation-flow-2026-10-08/README.md) is design
+material awaiting screen review; the Android baseline below remains 0.0.75.
+
 **Lab 0.0.75 - connected sprite strokes and buffer (partial G01/G02):** touch
 brush/eraser drags and controller strokes collect one recoverable pixel draft;
 Cancel/Test preserve saved bytes and Apply creates one Undo transaction. Shared
@@ -32,10 +40,11 @@ Technical PIKOOS IDs remain until the [coordinated migration](PROJECT_NAME.md).
 
 ## Next implementation work
 
-1. Complete the basic sprite/map editors, including continuous strokes, zoom/pan, cross-project buffers and
-   resource allocation; connect them to the existing placement workflow.
-2. Continue state/event animation, camera/background and other connected workflows
-   before expanding genre presets.
+1. Review the proposed creation screens, then connect Blank → Draw → Place →
+   Edit → Test/return with safe automatic resource placement (UX06–UX07).
+2. Connect selected-element behaviors and rules, then the needed animation/audio
+   and two small editable starters (UX08–UX09). Finish general tools within those
+   complete workflows; existing zoom/map/editor gaps remain required.
 3. Continue runtime/storage acceptance alongside creation: frontend migration,
    rollback, full onboarding and crash/boot matrix. Owner-approved target SDK 28
    remains temporary; modern-target execution is mandatory before release.
@@ -43,7 +52,7 @@ Technical PIKOOS IDs remain until the [coordinated migration](PROJECT_NAME.md).
 [Shared sprite-operation evidence](showcase/0.0.74-en/README.md) |
 [Current creation evidence and exported game](showcase/0.0.72-en/README.md) ·
 [One-APK setup evidence](showcase/0.0.71-en/README.md) ·
-[The ordered 14-package plan](ROADMAP.md).
+[Current sequence and the full product plan](ROADMAP.md).
 
 The full roadmap is **foundations → an original playable game → world/movement →
 audio/rules/effects → reuse/remix/multicart → independent setup → Android acceptance**.

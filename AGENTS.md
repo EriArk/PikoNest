@@ -503,6 +503,21 @@ The exact framework/language for the app has not been frozen by this document. D
 
 ## 14. Documentation discipline
 
+Owner requirement (2026-10-11): maintain root `PROJECT_STATUS.md` and
+`CHANGELOG.md` after every completed meaningful work batch. These are the
+plain-language English sources for posts and website updates. PROJECT_STATUS
+is a dated current snapshot: demonstrated capabilities, design-only work,
+remaining limits, next steps and suitable screenshots. CHANGELOG records dated
+user-visible changes, actual validation and material limitations, newest first.
+Backfill only from verified records and state the covered period. Distinguish
+implemented behavior, prototypes, plans and owner acceptance; lab versions are
+not releases. Link evidence and image provenance, avoid private details, and
+keep wording understandable without task IDs or implementation jargon.
+Update both in the same change as the work they describe; meaningful docs/design
+batches count, routine checks alone do not need filler entries. Detailed technical
+status stays in `docs/STATUS.md`, sequence in `docs/ROADMAP.md`, task IDs in
+`docs/BACKLOG.md`; the two public files summarize these without replacing them.
+
 Owner decision (2026-10-06): GitHub Actions are disabled. Keep builds and tests
 local; do not introduce CI workflows, bot updates, automated merges or automated
 releases without a new owner decision. Static issue/PR templates are allowed.
