@@ -219,6 +219,7 @@ public final class MainActivity extends Activity {
             restoreCodeDraft();
             restoreUses();
             try{session.restorePresets(prefs.getString("presetPanel",""));}catch(Exception e){session.fail(new Exception("Набор не восстановлен. Форма и исходник сохранены: "+e.getMessage()));}
+            restoreGame();
             sessions.put(id,next);
         }else{
             activeId=id;session=next;prefs=getSharedPreferences(id+"-ui",MODE_PRIVATE);
@@ -484,8 +485,10 @@ public final class MainActivity extends Activity {
         if(session.uses!=null)usesRecoveryFailed.remove(activeId);
         if(session.sharedEdit!=null)sharedRecoveryFailed.remove(activeId);
         if(session.stroke!=null)strokeRecoveryFailed.remove(activeId);
+        if(session.game!=null)gameRecoveryFailed.remove(activeId);
         libraryPrefs.edit().putString("active",activeId).putBoolean("swapAB",session.swapAB).apply();
         prefs.edit().putInt("tool",session.tool).putInt("focus",session.focus)
+            .putString("gameCanvas",session.game==null?(gameRecoveryFailed.contains(activeId)?prefs.getString("gameCanvas",""):""):Base64.encodeToString(session.game.encode(),Base64.NO_WRAP))
             .putInt("mapX",session.mapEditor.x).putInt("mapY",session.mapEditor.y).putInt("mapTile",session.mapEditor.tile)
             .putString("mapTool",session.mapEditor.tool.name()).putString("mapDraft",session.mapEditor.encode())
             .putString("freehand",session.stroke==null?(strokeRecoveryFailed.contains(activeId)?prefs.getString("freehand",""):""):Base64.encodeToString(session.stroke.encode(),Base64.NO_WRAP))
@@ -606,6 +609,13 @@ public final class MainActivity extends Activity {
     private final java.util.Set<String> strokeRecoveryFailed=new java.util.HashSet<>();
     private final java.util.Set<String> sharedRecoveryFailed=new java.util.HashSet<>();
     private final java.util.Set<String> usesRecoveryFailed=new java.util.HashSet<>();
+    private final java.util.Set<String> gameRecoveryFailed=new java.util.HashSet<>();
+    private void restoreGame(){
+        gameRecoveryFailed.remove(activeId);String encoded=prefs.getString("gameCanvas","");
+        if(!encoded.isEmpty())try{session.restoreGame(Base64.decode(encoded,Base64.NO_WRAP));}
+        catch(Exception e){gameRecoveryFailed.add(activeId);session.fail(e);}
+        else if(!prefs.contains("mode")&&new art.pikoos.lab.core.GameCanvas(session.cart()).blocked.isEmpty())session.openGame();
+    }
     private void restoreUses(){
         usesRecoveryFailed.remove(activeId);String encoded=prefs.getString("gameUses","");
         if(!encoded.isEmpty())try{if(session.codeDraft!=null)throw new IllegalArgumentException("Сначала заверши восстановленный черновик кода");session.restoreUses(Base64.decode(encoded,Base64.NO_WRAP));}

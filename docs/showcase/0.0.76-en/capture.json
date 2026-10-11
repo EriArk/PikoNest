@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-11",
+  "build": "0.0.76",
+  "device": "Retroid Pocket Classic",
+  "android": 14,
+  "image_size": [
+    1240,
+    1080
+  ],
+  "unedited": true,
+  "final_apk_sha256": "9245c19baa0d9743ed5206df4cd6e6dcd0dbbd0bbf99e484bedfce6a65a3f042",
+  "runtime_capture_apk_sha256": "540102b1139150fc9b9397e314b9de78b86dc7cbb94e2f0071b00c5ca30dba07",
+  "runtime_capture_note": "Before final UI-label, pointer-tracking and journal-validation corrections; same ordinary cartridge. Final APK separately installed and reopened.",
+  "core_suite_invocations": 72,
+  "final_focused_checks": 16504,
+  "official_frame_pixel_mismatches": 0,
+  "official_frame_pixels_compared": 16384,
+  "prior_project_library_files_unchanged": 52,
+  "input_evidence": "ADB gamepad/keyboard key events and touch; not owner physical-controller acceptance",
+  "public_apk_release": false,
+  "files": {
+    "01-game-view.png": "d62e302baa5c951668afe9e328ccb39dccd3985461367f22ffcee51448f054c4",
+    "02-sprite-actions.png": "ff2f023f4c27487945b48658c8751b2ff942367fa639b6f5008fcf66872ff3ea",
+    "03-appearance.png": "dab2bc09ad1fb1da373fea405be218390e3784f7fbb5f1cd3c9b5677091a987e",
+    "04-shared-appearance.png": "a564a5cdaa031dfb49e39422df331b01ea444a661d2078167d045253a07adabb",
+    "05-place-sprite.png": "2f8cf5e0e72def4cfeb8d3a4225bd4b125168c3a39eb66d398b25b2fbe450f9f",
+    "06-official-runtime.png": "ce15b4f478a5a1e923f91a56c8a6f3c00a84da76d27a0de729b1c3f71a53839f",
+    "two-mushrooms.p8": "02a018fb2e40bdaebc61263570a31914c4c79fc780d8f2846ec14d7ecbff67f3"
+  }
+}

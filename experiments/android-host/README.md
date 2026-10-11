@@ -1,5 +1,14 @@
 # PikoNest Android host experiment
 
+**Lab 0.0.76 — first native Game view (partial UX07):** new Blank projects can
+create, draw and place a sprite without entering sheet addresses or coordinate
+bindings. Select it to edit, move, duplicate or remove it; shared appearances
+have explicit edit-all/independent choices. Atomic save/Undo, source-checked
+recovery and isolated official Test/return were demonstrated on Retroid.
+This first path recognizes static sprite draw code; other tools remain accessible.
+[Six screenshots, saved cart and exact limits](../../docs/showcase/0.0.76-en/README.md).
+
+
 **Lab 0.0.75 - connected sprite strokes and buffer (partial G01/G02):** touch
 brush/eraser drags and controller strokes collect one recoverable pixel draft;
 Cancel/Test preserve saved bytes and Apply creates one Undo transaction. Shared
@@ -38,7 +47,7 @@ ran movement, goal and reset in official PICO-8 and exported byte-for-byte.
 [Evidence, cartridge and limits](../../docs/showcase/0.0.72-en/README.md).
 Next: general sprite/map editors; event animation/audio and full ACC-01 remain open.
 
-**Current lab: 0.0.75.** One APK contains Workshop and the runtime adapter.
+**Current lab: 0.0.76.** One APK contains Workshop and the runtime adapter.
 Verified old-data copy/merge retains source and prior homes. Retroid checks cover
 cartdata retention, isolated clean private installation, Play/Workshop Test/return
 and retry after interrupted setup. [Build inputs](../android-integrated/README.md),

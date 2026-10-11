@@ -8,6 +8,20 @@ Game view, действия выбранного элемента, безопа�
 Прежние ограничения G/N/S/B и приёмка сохраняются; историческое «далее» ниже
 не задаёт текущую очередь. Новые ID развивают issue #2/#6 без отдельного roadmap.
 
+**2026-10-11 — Lab 0.0.76, first native Game view (partial UX07):**
+Blank → draw → place → select → edit/duplicate → Test/return now works without
+manual sprite-sheet slots or coordinate bindings in a conservative static-draw
+subset. Safe upper-sheet allocation reserves pixels, transparent draw references,
+map references, flags and tile zero. Shared appearance offers edit-all or an
+independent copy. Done uses the existing atomic save/Undo path; source-checked
+pixel/placement drafts recover after process closure. 72 core suites passed;
+native recovery, exact Undo/Redo, independent coloring and official PICO-8 Test
+passed, with 16,384 frame pixels matching. All 52 prior project/library files
+were unchanged. [Six captures, cartridge and limits](showcase/0.0.76-en/README.md).
+Rules/behavior, animation/camera/map/audio and library insertion are not yet
+connected to Game view; All tools remains available. UX07 and physical/novice/
+owner acceptance stay open. No APK release.
+
 **Lab 0.0.75 - connected sprite strokes and buffer (partial G01/G02):** touch
 brush/eraser drags and controller strokes collect one recoverable pixel draft;
 Cancel/Test preserve saved bytes and Apply creates one Undo transaction. Shared
@@ -112,7 +126,7 @@ Q08 (дополнительные языки) следует после англ
 | UX04 | Частично / 0.0.68; UX03, N03/G04 | Общий путь фоновых полос: создать, выбрать ресурс, изменить, копировать, переставить, скрыть, удалить; journal v5, Apply/Undo и Test черновика. [Свидетельства](showcase/0.0.68-en/README.md) | Реализован bounded flat draw без Lua и героя; обычный экспорт проверен в core. Физический успешный Test/возврат, полный экспорт из приложения и приёмка владельца остаются открытыми. Порядок/неизвестный код сохранны; N03.3 не расширялся |
 | UX05 | План / UX03; G01/G03, M/S/B, Q01/Q02 | Распространять проверенные правила при завершении остальных базовых редакторов | Каждый подключённый инструмент проходит общий UX-контракт; библиотеки/категории/избранное сохранены, core workflows не ждут полной косметической миграции |
 | UX06 | Дизайн подготовлен 2026-10-08; обсуждение экранов открыто / UX01; #2/#6 | [Путь создания](CREATION_EXPERIENCE.md): blank и два старта, game view, контекстная правка, автоматизация, контроллер; [макет](design/creation-flow-2026-10-08/README.md) | Направление согласовано. Конкретные экраны и спорные переходы рассмотрены владельцем; макет не закрывает Android/runtime/физическую приёмку |
-| UX07 | План / UX06; G01–G04, A02/A03, P03 | Game view и единый путь Add → Draw → Place → Edit → Test; безопасное размещение ресурса без ручного слота в поддержанном новом проекте | С контроллера создать своё изображение, поставить несколько экземпляров, изменить один/общую графику, Undo, save/reopen и Test/точный возврат; Cancel/сбой/внешняя правка не портят источник. Из blank без скрытого героя и без ручных x/y-переменных |
+| UX07 | Частично lab 0.0.76: static Blank, draw/place, shared/independent edit, Undo/recovery/Test; широкий контекст и приёмка открыты / UX06; G01–G04, A02/A03, P03 | Game view и единый путь Add → Draw → Place → Edit → Test; безопасное размещение ресурса без ручного слота в поддержанном новом проекте | С контроллера создать своё изображение, поставить несколько экземпляров, изменить один/общую графику, Undo, save/reopen и Test/точный возврат; Cancel/сбой/внешняя правка не портят источник. Из blank без скрытого героя и без ручных x/y-переменных |
 | UX08 | План / UX07; C02.4, M01/M02, G04, H02 | Поведение и понятные правила у выбранного элемента; автоматическая связка обычного Lua, именованные цели, once/held/state-entry, цель и перезапуск | Общими средствами создать оба сценария CREATION_EXPERIENCE; изменить правило и цель, удалить поведение, Undo/reopen/Test/экспорт; запускается вне PikoNest. Связь N/S закрывается соответствующими задачами, не имитируется |
 | UX09 | План / UX08; необходимые N01/S01–S03/S05, T01, H01/H02, Q01 | Два небольших изменяемых старта, добровольная помощь, приёмка новичком | ACC-09 из blank и старта, включая игру без героя; нет ручных адресов/callback/координатных связей. Удаление стартового содержимого не лишает инструментов. Полные редакторы и ACC-01–03 остаются отдельными воротами |
 

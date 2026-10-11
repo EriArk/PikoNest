@@ -1,5 +1,19 @@
 # Базовые инструменты: завершённость и порядок работ
 
+**2026-10-11 — Lab 0.0.76, first native Game view (partial UX07):**
+Blank → draw → place → select → edit/duplicate → Test/return now works without
+manual sprite-sheet slots or coordinate bindings in a conservative static-draw
+subset. Safe upper-sheet allocation reserves pixels, transparent draw references,
+map references, flags and tile zero. Shared appearance offers edit-all or an
+independent copy. Done uses the existing atomic save/Undo path; source-checked
+pixel/placement drafts recover after process closure. 72 core suites passed;
+native recovery, exact Undo/Redo, independent coloring and official PICO-8 Test
+passed, with 16,384 frame pixels matching. All 52 prior project/library files
+were unchanged. [Six captures, cartridge and limits](showcase/0.0.76-en/README.md).
+Rules/behavior, animation/camera/map/audio and library insertion are not yet
+connected to Game view; All tools remains available. UX07 and physical/novice/
+owner acceptance stay open. No APK release.
+
 **Уточнение владельца 2026-10-08:** завершённость измеряется простотой целого
 создания игры, а не только набором операций. [CREATION_EXPERIENCE](CREATION_EXPERIENCE.md)
 задаёт путь от Game view, действий выбранного элемента и автоматической подготовки

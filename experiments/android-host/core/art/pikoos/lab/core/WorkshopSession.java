@@ -7,7 +7,7 @@ import java.util.Arrays;
 public final class WorkshopSession {
     public enum Action { UP, DOWN, LEFT, RIGHT, CONFIRM, CANCEL, PREVIOUS, NEXT, TEST, UNDO, REDO, CONTEXT, MENU,
         SPRITE_SHEET, NEW_SPRITE, COPY_SPRITE, ASSIGN_HERO, DRAW_TOOLS, REGION, ZOOM, ASSETS, CHECK }
-    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE, DIAGNOSTIC, ASSET_CATEGORY, USES, SHARED, STROKE }
+    public enum Mode { NAVIGATE, VALUE, CANVAS, PALETTE, SHEET, HELP, MENU, ERROR, DRAW_TOOLS, REGION, HERO, COPY_PLACE, COPY_CONFIRM, ASSETS, ASSET_SAVE, NAME, TRANSFORM, RECOLOR, MOVE, CODE, DIAGNOSTIC, ASSET_CATEGORY, USES, SHARED, STROKE, GAME }
     public enum DrawTool { BRUSH, ERASER, FILL, LINE, PICKER, RECTANGLE, FILLED_RECTANGLE, OVAL, FILLED_OVAL }
     // Keep existing operation entries 5/6 stable while adding brushes after them.
     public static int moveMenuIndex(){return DrawTool.values().length+2;}
@@ -44,6 +44,32 @@ public final class WorkshopSession {
     private final int[] toolFocus = new int[4];
     public final MapEditor mapEditor=new MapEditor();
     public GameUses uses;
+    public GameCanvas game;
+    public void openGame(){
+        try{
+            if(uses!=null||codeDraft!=null||stroke!=null||sharedEdit!=null||pendingStroke()||copying()||move!=null||transforming()||recoloring()||mapEditor.modal()||flagDraft!=null||presets!=null||assetDraft!=null||nameEditor!=null||!(mode==Mode.NAVIGATE||mode==Mode.CANVAS||mode==Mode.SHEET))
+                throw new IllegalArgumentException("Finish or cancel the current edit before opening Game view.");
+            game=new GameCanvas(cart);mode=Mode.GAME;
+        }catch(Exception e){fail(e);}
+    }
+    public void restoreGame(byte[] bytes){
+        if(uses!=null||codeDraft!=null||stroke!=null||sharedEdit!=null||mode==Mode.ERROR||pendingStroke()||copying()||mapEditor.modal()||flagDraft!=null)throw new IllegalArgumentException("Finish the recovered edit first. Game view draft was kept.");
+        game=GameCanvas.restore(bytes,cart);mode=Mode.GAME;
+    }
+    private void gameAction(Action action)throws Exception{
+        GameCanvas.Command command=game.act(action);
+        if(command==GameCanvas.Command.TEST){port.launch(game.blocked.isEmpty()?game.candidate(cart).bytes():cart.bytes());return;}
+        if(command==GameCanvas.Command.TOOLS){game=null;mode=Mode.NAVIGATE;return;}
+        if(command==GameCanvas.Command.PROJECTS){port.library();return;}
+        if(command==GameCanvas.Command.SAVE){
+            int index=game.operation==GameCanvas.Operation.ADD||game.operation==GameCanvas.Operation.DUPLICATE?game.uses.entries.size():game.selected;
+            save(game.candidate(cart),true);game=new GameCanvas(cart);game.selected=Math.min(index,Math.max(0,game.uses.entries.size()-1));game.focus=game.uses.entries.isEmpty()?0:game.selected+1;notice="Saved";return;
+        }
+        if(command==GameCanvas.Command.UNDO||command==GameCanvas.Command.REDO){
+            boolean returning=command==GameCanvas.Command.REDO;ArrayDeque<WorkshopCartridge> from=returning?redo:undo,to=returning?undo:redo;
+            if(!from.isEmpty()){WorkshopCartridge previous=cart;save(from.peek(),false);from.pop();to.push(previous);game=new GameCanvas(cart);notice=returning?"Redone":"Undone";}
+        }
+    }
     public SharedEdit sharedEdit;
     public SpriteStroke stroke;
     public boolean canBeginStroke(){return tool==2&&!browsingSprites&&stroke==null&&!pendingStroke()&&(mode==Mode.CANVAS||mode==Mode.NAVIGATE)&&(drawTool==DrawTool.BRUSH||drawTool==DrawTool.ERASER);}
@@ -798,6 +824,7 @@ public final class WorkshopSession {
     }
     public void fail(Exception e) {
         error = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
+        if(mode==Mode.GAME){errorReturn=Mode.GAME;mode=Mode.ERROR;return;}
         errorReturn = mode==Mode.DRAW_TOOLS||mode==Mode.STROKE||mode==Mode.SHARED||mode==Mode.USES||mode==Mode.CODE||mode==Mode.MOVE||mode==Mode.RECOLOR||mode==Mode.TRANSFORM||mode==Mode.NAME||mode==Mode.COPY_CONFIRM||mode==Mode.ASSETS||mode==Mode.ASSET_SAVE||mode==Mode.ASSET_CATEGORY?mode:mode==Mode.HERO?Mode.HERO:pendingStroke()?Mode.CANVAS:tool == 2 && browsingSprites ? Mode.SHEET : Mode.NAVIGATE; mode = Mode.ERROR;
     }
     public void switchTool(int next) {
@@ -904,6 +931,7 @@ public final class WorkshopSession {
     public void act(Action action) {
         try {
             if (mode == Mode.ERROR) { if (action == Action.CANCEL || action == Action.CONFIRM) mode = errorReturn; return; }
+            if(mode==Mode.GAME){gameAction(action);return;}
             if(mode==Mode.SHARED){
                 if(action==Action.CONTEXT)sharedEdit.mapView=!sharedEdit.mapView;
                 if(action==Action.LEFT)sharedEdit.step(-1);if(action==Action.RIGHT)sharedEdit.step(1);
@@ -1101,7 +1129,7 @@ public final class WorkshopSession {
                     if (menuItem == 0) { mode = overlayReturn; act(menuRedo ? Action.REDO : Action.UNDO); }
                     if (menuItem == 1) { swapAB = !swapAB; notice = "Кнопки изменены"; }
                     if (menuItem == 2) {if(tool==3){mode=overlayReturn;mapEditor.tools();}else mode = Mode.HELP;}
-                    if (menuItem == 3) mode = overlayReturn;
+                    if (menuItem == 3) {mode=overlayReturn;openGame();}
                     if (menuItem == 4) { mode = overlayReturn; port.library(); }
                     if (menuItem == 5) { mode = overlayReturn; showAssets(); }
                     if (menuItem == 6 || menuItem == 7) { mode = overlayReturn; openUses(menuItem == 7); }

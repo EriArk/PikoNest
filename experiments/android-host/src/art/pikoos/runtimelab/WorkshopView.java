@@ -42,6 +42,7 @@ final class WorkshopView extends View {
     static final int[] COLORS = art.pikoos.lab.core.PicoPalette.COLORS;
     private final WorkshopSession s;
     private final UsesSurface usesSurface;
+    private final GameSurface gameSurface;
     private final Runnable changed;
     private final String projectTitle;
     private final Paint p = new Paint();
@@ -70,12 +71,14 @@ final class WorkshopView extends View {
     WorkshopView(Context context, WorkshopSession session, String projectTitle, Runnable changed) {
         super(context); s=session; this.changed=changed;this.projectTitle=projectTitle;
         usesSurface=new UsesSurface(this,s,projectTitle);
+        gameSurface=new GameSurface(this,s,projectTitle);
         PixelText.configure(context,p);
         p.setAntiAlias(false); p.setFilterBitmap(false);
         setFocusable(true); setFocusableInTouchMode(true);
         setContentDescription("Мастерская PIKOOS. Крестовина: выбор, A: подтвердить, B: назад, L/R: инструмент, Start: тест.");
     }
     void action(Action a) { if(s.uses!=null&&usesSurface.handle(a))return; s.act(a); changed.run(); invalidate(); }
+    void gameChanged(){changed.run();invalidate();}
     boolean codeKey(KeyEvent event){
         if(s.presets!=null)return false;
         if(s.mode!=Mode.CODE||s.codeDraft==null||(event.getSource()&InputDevice.SOURCE_GAMEPAD)==InputDevice.SOURCE_GAMEPAD)return false;
@@ -136,6 +139,7 @@ final class WorkshopView extends View {
         if(getHeight()/scale<480) scale=getHeight()/480f;
         w=getWidth()/scale;h=getHeight()/scale;bodyBottom=h-44;
         c.save();c.scale(scale,scale);hits.clear();spriteArea=null;placementArea=null;mapArea=null;
+        if(s.game!=null&&(s.mode==Mode.GAME||s.mode==Mode.ERROR)){gameSurface.draw(c,scale,w,h);c.restore();return;}
         if(s.uses!=null&&(s.mode==Mode.USES||s.mode==Mode.ERROR)){usesSurface.draw(c,scale,w,h);c.restore();return;}
         if(s.sharedEdit!=null&&(s.mode==Mode.SHARED||s.mode==Mode.ERROR)){sharedReview();if(s.mode==Mode.ERROR)dialog();c.restore();return;}
         rect(0,0,w,h,1); rect(0,0,w,42,2);rect(0,42,w,4,0);
@@ -156,7 +160,7 @@ final class WorkshopView extends View {
         if(s.codeDraft!=null&&(s.mode==Mode.CODE||s.mode==Mode.ERROR)){
             luaEditor();if(s.mode==Mode.ERROR)dialog();c.restore();return;
         }
-        fitted(projectTitle,16,82,28,7,w-130);text("game.p8",w-98,80,18,13);
+        fitted(projectTitle,16,82,28,7,w-148);button("Game view",w-140,50,132,44,false,()->{s.openGame();changed.run();invalidate();});
         rect(0,100,w,2,13);
         String[] tabs={"Overview","Code","Sprites","Map"};
         for(int i=0;i<4;i++) { final int tab=i;float x=12+i*(w-24)/4,tw=(w-24)/4;
@@ -1534,7 +1538,7 @@ final class WorkshopView extends View {
                 fitted((returning?"Вернуть":"Отменить")+" · "+count,x+10,dy+83,20,selected?(count>0?1:7):count>0?7:13,historyWidth-20);
                 hit(x,dy+54,historyWidth,44,()->{s.menuItem=0;s.menuRedo=returning;action(Action.CONFIRM);});
             }
-            String[] labels={"",s.swapAB?"B выбор / A назад":"A выбор / B назад",s.tool==3?"Инструменты карты":"Как это работает","Вернуться к проекту","Мои игры","Ресурсы · библиотека","Размещения в игре",s.tool==3?"Использовать карту в игре":"Использовать спрайт в игре"};
+            String[] labels={"",s.swapAB?"B выбор / A назад":"A выбор / B назад",s.tool==3?"Инструменты карты":"Как это работает","Game view","Мои игры","Ресурсы · библиотека","Размещения в игре",s.tool==3?"Использовать карту в игре":"Использовать спрайт в игре"};
             for(int i=1;i<8;i++){final int n=i;button(labels[i],dx+16,dy+104+(i-1)*38,dw-32,34,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
             text("Y отменить · R2 вернуть",dx+20,dy+398,16,6);
             text("История — в текущем сеансе",dx+20,dy+422,16,13);
@@ -1595,6 +1599,7 @@ final class WorkshopView extends View {
         s.strokePoint(strokeViewX+px,strokeViewY+py);
     }
     @Override public boolean onTouchEvent(MotionEvent event) {
+        if(s.game!=null&&(s.mode==Mode.GAME||s.mode==Mode.ERROR))return gameSurface.touch(event);
         if(s.uses!=null&&(s.mode==Mode.USES||s.mode==Mode.ERROR))return usesSurface.touch(event);
         float x=event.getX()/scale,y=event.getY()/scale;
         if(strokeTouchArea!=null){

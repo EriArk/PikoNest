@@ -219,10 +219,13 @@ Later additions include terrain automation, richer reusable configured elements
 and broader starters. They do not displace missing SFX/music/code tools or
 runtime/storage acceptance. See the revised sequence in ROADMAP.
 
-Before coding the new workshop shell, review three concrete choices with the
-owner: game view as project home; selected-element action list; Done/Undo for
-safe operations with review reserved for actual consequences. Agreement with the
-general direction is recorded; acceptance of these particular screens is pending.
+The owner continued development after the design study. Lab 0.0.76 implements
+a bounded native trial: new Blank projects enter Game view, selected placements
+have short actions, and safe appearance/placement changes use Done/Undo. Shared
+resources retain an explicit choice. [Demonstrated scope](showcase/0.0.76-en/README.md).
+This is not the full shell migration or either complete game journey above.
+Owner acceptance of the particular screens and physical novice flow is pending;
+use that review before extending the same interaction to the remaining tools.
 
 The measurable gate is **ACC-09** in [ACCEPTANCE](ACCEPTANCE.md):
 complete both blank and starter journeys without developer coaching or manual

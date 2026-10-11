@@ -1,5 +1,7 @@
 # PikoNest — English website gallery
 
+[0.0.76: draw, place and edit from Game view](0.0.76-en/README.md) — six native English captures, ordinary mushroom cartridge and scope of the first connected path.
+
 [0.0.75: connected strokes and a cross-project sprite buffer](0.0.75-en/README.md) - seven native English captures, ordinary saved cart and exact scope.
 
 [Lab 0.0.74: full-sheet copy, transform/color/move and official draft Test](0.0.74-en/README.md). Seven unedited English device captures; partial G01-G03.

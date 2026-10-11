@@ -569,6 +569,14 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
+Current native baseline (2026-10-11): lab 0.0.76 implements partial UX07 Game view
+for Blank/static sprite placements. Continue the connected path toward UX08;
+do not expand automatic allocation to unknown Lua based on empty graphics or
+metadata alone. Keep All tools reachable and retain source-checked draft recovery.
+See `docs/showcase/0.0.76-en/README.md` for evidence and exact limits. Owner and
+physical-controller acceptance remain open.
+
+
 The foundation-first list below is the original bootstrap order. The launch,
 round-trip and bounded controller experiments now exist. Follow the current
 completion path in `docs/ROADMAP.md` and the basic-editor audit in `docs/CORE_TOOLS.md`:
