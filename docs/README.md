@@ -1,5 +1,18 @@
 # PikoNest: current scope and development map
 
+**2026-10-18 — Lab 0.0.77, connected small-game loop (partial UX07/UX08):**
+Game view now connects selected-sprite movement, contact collection/win/loss,
+linked switches, goals and restart through ordinary Lua. Native Blank authoring
+produced a collection game and a hero-free switch game; both reopened and
+exported exactly. Official PICO-8 outcomes/reset, draft recovery, Undo/Redo and
+isolated Test/return/cancel and final-APK reopening passed. The collection export also ran
+outside PikoNest. 73 core suites plus final focused checks (16,504 / 96) passed;
+59 existing project/library/save files stayed unchanged. [Evidence, eleven
+captures and two carts](showcase/0.0.77-en/README.md); [tool contract](GAME_BEHAVIORS.md).
+This remains a bounded 16-sprite recipe, not arbitrary Lua editing or a completed
+beta. Animation/audio/map connections, broader rules and physical/novice/owner
+acceptance remain open. Next connect N/S tools to this same creation path.
+
 For public updates, start with [PROJECT_STATUS](../PROJECT_STATUS.md) and
 [CHANGELOG](../CHANGELOG.md). They summarize current progress in plain English
 and link versioned screenshots. Detailed evidence and task status remain here.
@@ -28,7 +41,7 @@ matched. All 52 previous project/library files stayed unchanged. [Evidence and
 limits](showcase/0.0.75-en/README.md). Richer zoom/pan, allocation and remaining map
 operations keep package 3 open; physical and owner acceptance remain separate.
 
-**Lab 0.0.76 · Android first · No public APK release.** The complete creator is
+**Lab 0.0.77 · Android first · No public APK release.** The complete creator is
 still in development. Original code uses the [MIT License](../LICENSE).
 
 ## What exists today

@@ -1,5 +1,9 @@
 # PikoNest — English website gallery
 
+[0.0.77: two playable games from Blank](0.0.77-en/README.md) — eleven native
+English captures: movement, contacts, goals, linked switches, official play and
+verified export. Includes both ordinary `.p8` files; no public APK release.
+
 [0.0.76: draw, place and edit from Game view](0.0.76-en/README.md) — six native English captures, ordinary mushroom cartridge and scope of the first connected path.
 
 [0.0.75: connected strokes and a cross-project sprite buffer](0.0.75-en/README.md) - seven native English captures, ordinary saved cart and exact scope.
@@ -8,7 +12,7 @@
 
 [Lab 0.0.73: shared sprite/map review, native recovery and official draft Test](0.0.73-en/README.md). Six unedited English device captures; partial G01-G03.
 
-Latest: [0.0.72 rules move sprites](0.0.72-en/README.md) — eight original English
+Earlier: [0.0.72 rules move sprites](0.0.72-en/README.md) — eight original English
 Retroid captures of coordinate bindings, rules, a UI-authored game in official
 PICO-8, goal/reset and verified export. Includes the exact exported `.p8`.
 Full physical-controller and independent export acceptance remain open.

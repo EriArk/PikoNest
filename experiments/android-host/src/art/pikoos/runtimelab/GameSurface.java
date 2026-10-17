@@ -31,14 +31,15 @@ final class GameSurface {
     private void footer(String primary,Action action,String secondary,Action back){
         float y=height-88;rect(0,y,width,88,1);rect(16,y,width-32,1,13);
         button(primary,8,y+4,width/2-12,40,true,()->act(action));button(secondary,width/2+4,y+4,width/2-12,40,false,()->act(back));
-        button("Start  Test",8,y+44,width/2-12,40,false,()->act(Action.TEST));
-        String extra=game().screen==GameCanvas.Screen.DRAW?"X  Color":game().screen==GameCanvas.Screen.PLACE?"D-pad  Move":"D-pad  Navigate";
-        button(extra,width/2+4,y+44,width/2-12,40,false,()->{if(game().screen==GameCanvas.Screen.DRAW)act(Action.CONTEXT);});
+        button(game().editingField?"Left  Decrease":"Start  Test",8,y+44,width/2-12,40,false,()->act(game().editingField?Action.LEFT:Action.TEST));
+        String extra=game().editingField?"Right  Increase":game().screen==GameCanvas.Screen.DRAW?"X  Color":game().screen==GameCanvas.Screen.PLACE?"D-pad  Move":"D-pad  Navigate";
+        button(extra,width/2+4,y+44,width/2-12,40,false,()->{if(game().editingField)act(Action.RIGHT);else if(game().screen==GameCanvas.Screen.DRAW)act(Action.CONTEXT);});
     }
     void draw(Canvas c,float s,float w,float h){
         canvas=c;scale=s;width=w;height=h;hits.clear();imageArea=null;GameCanvas g=game();
         rect(0,0,w,h,1);text("PikoNest",16,30,24,14,w-144);text(g.draft()?"Draft":"Saved",w-108,28,18,g.draft()?10:6,94);
-        text(project+" / "+g.title(),16,64,24,7,w-32);
+        text(project,160,28,16,6,w-280);
+        text(g.title(),16,64,24,7,w-32);
         String yes=session.swapAB?"B":"A",back=session.swapAB?"A":"B";
         if(session.mode==WorkshopSession.Mode.ERROR){
             text("Could not complete this action",16,112,22,9,w-32);
@@ -73,21 +74,25 @@ final class GameSurface {
             int sx,sy,sw,sh;
             if(g.screen==GameCanvas.Screen.PLACE){sx=g.x;sy=g.y;sw=r.width;sh=r.height;}
             else{GameUses.Entry e=g.uses.entries.get(g.selected);SpriteRegion region=g.region(g.selected);sx=e.x();sy=e.y();sw=region.width;sh=region.height;}
-            canvas.save();canvas.clipRect(imageArea);outline(left+sx*side/128,top+sy*side/128,sw*side/128,sh*side/128,10);canvas.restore();
+            canvas.save();canvas.clipRect(imageArea);outline(left+sx*side/128,top+sy*side/128,sw*side/128,sh*side/128,10);
+            if(g.screen==GameCanvas.Screen.BEHAVIOR){PlayModel.Element e=g.settings.elements.get(g.selected);int other=e.rule>=1&&e.rule<=3?e.target:e.rule==4?e.neighbor:-1;if(other>=0&&other<g.settings.elements.size()&&other!=g.selected){PlayModel.Element t=g.settings.elements.get(other);outline(left+t.x*side/128,top+t.y*side/128,t.w*side/128,t.h*side/128,12);}}
+            canvas.restore();
         }
         if(g.screen==GameCanvas.Screen.PALETTE){
             float px=wide?listX:16,py=wide?top+20:listY,cell=Math.min((wide?listW:w-32)/8,40);
             for(int n=0;n<16;n++){final int color=n;float cx=px+n%8*cell,cy=py+n/8*cell;rect(cx+2,cy+2,cell-4,cell-4,n);if(g.focus==n)outline(cx,cy,cell,cell,7);hits.add(new Hit(cx,cy,cell,cell,()->{g.focus=color;act(Action.CONFIRM);}));}
         }else if(menu){
             int visible=Math.max(1,(int)((bottom-listY)/38)),first=Math.max(0,Math.min(Math.max(0,rows.length-visible),g.focus-visible/2));
-            for(int n=first;n<Math.min(rows.length,first+visible);n++){final int row=n;button(rows[n],listX,listY+(n-first)*38,listW,36,g.focus==n,()->{g.focus=row;act(Action.CONFIRM);});}
+            for(int n=first;n<Math.min(rows.length,first+visible);n++){final int row=n;button(rows[n],listX,listY+(n-first)*38,listW,36,g.focus==n,()->{if(g.editingField){if(row==g.focus)act(Action.RIGHT);return;}g.focus=row;act(Action.CONFIRM);});}
+            if(wide&&(g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.SETTINGS)){wrap(g.guidance(),listX,listY+Math.min(rows.length,visible)*38+18,listW,Math.max(0,(int)((bottom-listY-Math.min(rows.length,visible)*38)/26)));}
             if(rows.length>visible){rect(w-7,listY,2,visible*38,13);rect(w-8,listY+(visible*38-10)*g.focus/(rows.length-1),4,10,14);}
             if(wide&&g.screen==GameCanvas.Screen.SHARED)wrap(g.sharedUses()+" placements use these pixels"+(g.mapReference()?"; map tiles also refer to them.":"."),listX,listY+rows.length*38+16,listW,4);
             if(wide&&g.screen==GameCanvas.Screen.HOME&&g.uses.entries.isEmpty())wrap(g.blocked.isEmpty()?"Start with your own sprite. Draw it, then place it in the game.":g.blocked,listX,listY+rows.length*38+16,listW,4);
         }else if(g.screen==GameCanvas.Screen.PLACE&&wide){
             text("Choose a position",listX,top+24,22,7,listW);wrap("Move with the D-pad or tap the game. Done saves the whole change.",listX,top+62,listW,5);
         }
-        if(g.screen==GameCanvas.Screen.DRAW)footer(yes+"  Paint",Action.CONFIRM,back+"  Done / options",Action.CANCEL);
+        if(g.editingField)footer(yes+"  Keep value",Action.CONFIRM,back+"  Revert",Action.CANCEL);
+        else if(g.screen==GameCanvas.Screen.DRAW)footer(yes+"  Paint",Action.CONFIRM,back+"  Done / options",Action.CANCEL);
         else if(g.screen==GameCanvas.Screen.PLACE)footer(yes+"  Done",Action.CONFIRM,back+(g.operation==GameCanvas.Operation.ADD?"  Draw again":"  Cancel"),Action.CANCEL);
         else footer(yes+"  Select",Action.CONFIRM,back+(g.screen==GameCanvas.Screen.HOME?"  Projects":"  Back"),Action.CANCEL);
     }

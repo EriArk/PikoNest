@@ -1,5 +1,25 @@
 # PikoNest — путь к полному Android-продукту
 
+## Current completion package — 18 October 2026
+
+The owner requested a substantial connected batch toward a usable beta baseline.
+Lab 0.0.77 implements three related blocks: selected-element behavior; game
+interaction/goals/restart; continued editing/recovery/Test/export. Two Blank
+journeys are technically demonstrated, including independent collection export.
+[Evidence](showcase/0.0.77-en/README.md) · [bounded tool contract](GAME_BEHAVIORS.md).
+UX07/UX08 remain partial; this is not a declaration of beta readiness.
+
+| Next complete block | Existing task ownership | Ready when |
+| --- | --- | --- |
+| Animate and sound the same games | N01/N03, S01–S05, G04, UX08 | Create/edit/save/reopen resources; bind supported states/events; draft Test and ordinary export work without a Lua cursor |
+| Finish usable world/audio tools, then small starters | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | Tools work from Blank and independently of genre; a novice can modify a starter or build the equivalent game |
+| Independent Android setup and reliable ownership of data | P/R tasks, single-APK modern target follow-up, Q05 | Fresh setup with the purchased runtime, user folders, backup/recovery/update and external launches pass without developer intervention |
+| Device, novice and owner acceptance | Q01–Q04/Q06/Q07, ACC-01–09 | Complete journeys work with physical controls on supported screens; remaining English/errors are covered; owner findings are resolved |
+
+Existing mandatory acceptance criteria are not waived for the word “beta”.
+Public APK publication remains a separate owner gate. The broader M0–M6 plan
+below stays in force; this table orders the next connected work, not preset growth.
+
 ## Текущая очередь после решения владельца 2026-10-08
 
 **Сначала упрощаем целый путь создания.** [Новый сценарий](CREATION_EXPERIENCE.md)

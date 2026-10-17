@@ -1,5 +1,18 @@
 # Состояние PikoNest
 
+**2026-10-18 — Lab 0.0.77, connected small-game loop (partial UX07/UX08):**
+Game view now connects selected-sprite movement, contact collection/win/loss,
+linked switches, goals and restart through ordinary Lua. Native Blank authoring
+produced a collection game and a hero-free switch game; both reopened and
+exported exactly. Official PICO-8 outcomes/reset, draft recovery, Undo/Redo and
+isolated Test/return/cancel and final-APK reopening passed. The collection export also ran
+outside PikoNest. 73 core suites plus final focused checks (16,504 / 96) passed;
+59 existing project/library/save files stayed unchanged. [Evidence, eleven
+captures and two carts](showcase/0.0.77-en/README.md); [tool contract](GAME_BEHAVIORS.md).
+This remains a bounded 16-sprite recipe, not arbitrary Lua editing or a completed
+beta. Animation/audio/map connections, broader rules and physical/novice/owner
+acceptance remain open. Next connect N/S tools to this same creation path.
+
 **2026-10-11 — Lab 0.0.76, first native Game view (partial UX07):**
 Blank → draw → place → select → edit/duplicate → Test/return now works without
 manual sprite-sheet slots or coordinate bindings in a conservative static-draw

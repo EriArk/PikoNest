@@ -76,6 +76,14 @@ preview, история, Test и ошибки; UX04 проверяет это н
 
 - [ ] Собственная простая игра без открытия Lua; готовый игровой шаблон не заменяет создание.
 
+2026-10-18: [Game view 0.0.77](showcase/0.0.77-en/README.md) adds two native
+Blank journeys without Lua: movement/contact collection with a hazard, and linked
+switches without a hero. Observed official outcomes/reset, native behavior recovery,
+exact Undo/Redo, draft Test/return/cancel and final-APK reopening, reopen and exact exports.
+Collection export also ran in official PICO-8 outside PikoNest. This is technical
+progress toward ACC-01/ACC-09, not closure: injected input and a touched Android
+Save button do not prove physical, novice or owner acceptance. N/S remain open.
+
 2026-10-07: [числовой сценарий 0.0.69](showcase/0.0.69-en/README.md)
 собран через UI из нового blank без открытия Lua: начальные значения, кнопочный
 ввод, условие цели, сброс и два индикатора. Проверены сохранение, восстановление

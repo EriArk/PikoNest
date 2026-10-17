@@ -1,5 +1,18 @@
 # PikoNest — задачи полного цикла
 
+**2026-10-18 — Lab 0.0.77, connected small-game loop (partial UX07/UX08):**
+Game view now connects selected-sprite movement, contact collection/win/loss,
+linked switches, goals and restart through ordinary Lua. Native Blank authoring
+produced a collection game and a hero-free switch game; both reopened and
+exported exactly. Official PICO-8 outcomes/reset, draft recovery, Undo/Redo and
+isolated Test/return/cancel and final-APK reopening passed. The collection export also ran
+outside PikoNest. 73 core suites plus final focused checks (16,504 / 96) passed;
+59 existing project/library/save files stayed unchanged. [Evidence, eleven
+captures and two carts](showcase/0.0.77-en/README.md); [tool contract](GAME_BEHAVIORS.md).
+This remains a bounded 16-sprite recipe, not arbitrary Lua editing or a completed
+beta. Animation/audio/map connections, broader rules and physical/novice/owner
+acceptance remain open. Next connect N/S tools to this same creation path.
+
 **Текущий приоритет 2026-10-08:** UX06 → UX07 → UX08 → связанные N/S и UX09
 по [ROADMAP](ROADMAP.md). Владелец согласовал упрощение целого процесса:
 Game view, действия выбранного элемента, безопасная автоматическая подготовка,
@@ -126,8 +139,8 @@ Q08 (дополнительные языки) следует после англ
 | UX04 | Частично / 0.0.68; UX03, N03/G04 | Общий путь фоновых полос: создать, выбрать ресурс, изменить, копировать, переставить, скрыть, удалить; journal v5, Apply/Undo и Test черновика. [Свидетельства](showcase/0.0.68-en/README.md) | Реализован bounded flat draw без Lua и героя; обычный экспорт проверен в core. Физический успешный Test/возврат, полный экспорт из приложения и приёмка владельца остаются открытыми. Порядок/неизвестный код сохранны; N03.3 не расширялся |
 | UX05 | План / UX03; G01/G03, M/S/B, Q01/Q02 | Распространять проверенные правила при завершении остальных базовых редакторов | Каждый подключённый инструмент проходит общий UX-контракт; библиотеки/категории/избранное сохранены, core workflows не ждут полной косметической миграции |
 | UX06 | Дизайн подготовлен 2026-10-08; обсуждение экранов открыто / UX01; #2/#6 | [Путь создания](CREATION_EXPERIENCE.md): blank и два старта, game view, контекстная правка, автоматизация, контроллер; [макет](design/creation-flow-2026-10-08/README.md) | Направление согласовано. Конкретные экраны и спорные переходы рассмотрены владельцем; макет не закрывает Android/runtime/физическую приёмку |
-| UX07 | Частично lab 0.0.76: static Blank, draw/place, shared/independent edit, Undo/recovery/Test; широкий контекст и приёмка открыты / UX06; G01–G04, A02/A03, P03 | Game view и единый путь Add → Draw → Place → Edit → Test; безопасное размещение ресурса без ручного слота в поддержанном новом проекте | С контроллера создать своё изображение, поставить несколько экземпляров, изменить один/общую графику, Undo, save/reopen и Test/точный возврат; Cancel/сбой/внешняя правка не портят источник. Из blank без скрытого героя и без ручных x/y-переменных |
-| UX08 | План / UX07; C02.4, M01/M02, G04, H02 | Поведение и понятные правила у выбранного элемента; автоматическая связка обычного Lua, именованные цели, once/held/state-entry, цель и перезапуск | Общими средствами создать оба сценария CREATION_EXPERIENCE; изменить правило и цель, удалить поведение, Undo/reopen/Test/экспорт; запускается вне PikoNest. Связь N/S закрывается соответствующими задачами, не имитируется |
+| UX07 | Частично lab 0.0.76–77: поведение сохраняется при правке размещений; static Blank, draw/place, shared/independent edit, Undo/recovery/Test; широкий контекст и приёмка открыты / UX06; G01–G04, A02/A03, P03 | Game view и единый путь Add → Draw → Place → Edit → Test; безопасное размещение ресурса без ручного слота в поддержанном новом проекте | С контроллера создать своё изображение, поставить несколько экземпляров, изменить один/общую графику, Undo, save/reopen и Test/точный возврат; Cancel/сбой/внешняя правка не портят источник. Из blank без скрытого героя и без ручных x/y-переменных |
+| UX08 | Частично lab 0.0.77: движение, контакты, связанные переключатели, цель/reset, UI Blank/Test/export; расширенные правила и приёмка открыты / UX07; C02.4, M01/M02, G04, H02 | Поведение и понятные правила у выбранного элемента; автоматическая связка обычного Lua, именованные цели, once/held/state-entry, цель и перезапуск | Общими средствами создать оба сценария CREATION_EXPERIENCE; изменить правило и цель, удалить поведение, Undo/reopen/Test/экспорт; запускается вне PikoNest. Связь N/S закрывается соответствующими задачами, не имитируется |
 | UX09 | План / UX08; необходимые N01/S01–S03/S05, T01, H01/H02, Q01 | Два небольших изменяемых старта, добровольная помощь, приёмка новичком | ACC-09 из blank и старта, включая игру без героя; нет ручных адресов/callback/координатных связей. Удаление стартового содержимого не лишает инструментов. Полные редакторы и ACC-01–03 остаются отдельными воротами |
 
 ## A. Производственные границы и общие контракты — M0, поперёк этапов

@@ -4,13 +4,18 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
-/** First game-first authoring slice. Ordinary flat static draw calls remain the source of truth. */
+/** Game-first authoring over static placements and a verified ordinary-Lua behavior recipe. */
 public final class GameCanvas {
-    public enum Screen { HOME, ACTIONS, SIZE, DRAW, DRAW_MENU, PALETTE, PLACE, SHARED, DELETE }
-    public enum Operation { NONE, ADD, APPEARANCE, INDEPENDENT, MOVE, DUPLICATE }
+    public enum Screen { HOME, ACTIONS, SIZE, DRAW, DRAW_MENU, PALETTE, PLACE, SHARED, DELETE, BEHAVIOR, SETTINGS }
+    public enum Operation { NONE, ADD, APPEARANCE, INDEPENDENT, MOVE, DUPLICATE, CONFIG }
     public enum Command { NONE, SAVE, TEST, TOOLS, PROJECTS, UNDO, REDO }
     public final WorkshopCartridge base;
     public final GameUses uses;
+    public final PlayModel play;
+    private final WorkshopCartridge layoutBase;
+    public PlayModel settings;
+    public boolean editingField;
+    private int fieldBefore;
     public final String blocked;
     public Screen screen=Screen.HOME;
     public Operation operation=Operation.NONE;
@@ -20,14 +25,14 @@ public final class GameCanvas {
     private int[] pixels;
     private int background=1;
     public GameCanvas(WorkshopCartridge cart){
-        base=cart;uses=new GameUses(cart,0);String reason="";
+        base=cart;play=PlayModel.read(cart);layoutBase=play==null?cart:play.layout(cart);uses=new GameUses(layoutBase,0);String reason="";
         try{recognize();}catch(IllegalArgumentException e){reason=e.getMessage();}
         blocked=reason;
     }
     private void recognize(){
         // Full-source allowlist, not a search for a marker or an apparently empty sheet.
         if(!uses.blocked.isEmpty())throw unsupported();
-        String mask=new LuaContext(base.code()).masked();int phase=0;
+        String mask=new LuaContext(layoutBase.code()).masked();int phase=0;
         for(String line:mask.split("\\r\\n|\\r|\\n")){
             String t=line.trim();if(t.isEmpty())continue;
             if(phase==0&&t.matches("function\\s+_draw\\s*\\(\\s*\\)")){phase=1;continue;}
@@ -41,7 +46,7 @@ public final class GameCanvas {
         if(phase!=3)throw unsupported();
         for(GameUses.Entry e:uses.entries)if(e.linked()||(!e.kind().equals("spr")&&!e.kind().equals("sspr")))throw unsupported();
     }
-    private static IllegalArgumentException unsupported(){return new IllegalArgumentException("Game view currently supports Blank and static sprite placements. Open All tools for this project's code, maps and other resources.");}
+    private static IllegalArgumentException unsupported(){return new IllegalArgumentException("Game view currently supports Blank, static sprites and Game view behaviors. Open All tools for this project's code, maps and other resources.");}
     private void supported(){if(!blocked.isEmpty())throw new IllegalArgumentException(blocked);}
     public boolean draft(){return operation!=Operation.NONE;}
     public SpriteRegion region(){return target;}
@@ -51,12 +56,14 @@ public final class GameCanvas {
     }
     public String title(){
         switch(screen){case DRAW:case DRAW_MENU:case PALETTE:return "Appearance";case PLACE:return operation==Operation.MOVE?"Move sprite":"Place sprite";
-            case SIZE:return "New sprite";case SHARED:return "Shared appearance";case DELETE:return "Remove sprite?";case ACTIONS:return "Sprite "+(selected+1);default:return "Game view";}
+            case BEHAVIOR:return "Sprite "+(selected+1)+" / Behavior";case SETTINGS:return "Game rules";case SIZE:return "New sprite";case SHARED:return "Shared appearance";case DELETE:return "Remove sprite?";case ACTIONS:return "Sprite "+(selected+1);default:return "Game view";}
     }
     public String[] rows(){
         switch(screen){
-            case HOME:{ArrayList<String> rows=new ArrayList<>();rows.add("+ Add sprite");if(blocked.isEmpty())for(int n=0;n<uses.entries.size();n++)rows.add("Sprite "+(n+1));Collections.addAll(rows,"All tools","Undo","Redo","Projects");return rows.toArray(new String[0]);}
-            case ACTIONS:return new String[]{"Appearance","Move","Duplicate","Remove","Back"};
+            case HOME:{ArrayList<String> rows=new ArrayList<>();rows.add("+ Add sprite");if(blocked.isEmpty())for(int n=0;n<uses.entries.size();n++)rows.add("Sprite "+(n+1));if(blocked.isEmpty())rows.add("Game rules");Collections.addAll(rows,"All tools","Undo","Redo","Projects");return rows.toArray(new String[0]);}
+            case ACTIONS:return new String[]{"Appearance","Move","Duplicate","Remove","Behavior","Back"};
+            case BEHAVIOR:{PlayModel.Element e=settings.elements.get(selected);String[] labels={"Move: "+PlayModel.MOVEMENT[e.movement],"Speed: "+e.speed,"Rule: "+new String[]{"None","Collect","Win","Lose","Toggle"}[e.rule],"By: Sprite "+(e.target+1),"Starts: "+(e.on==1?"On":"Off"),"Also: "+(e.neighbor<0?"None":"Sprite "+(e.neighbor+1))};ArrayList<String> result=new ArrayList<>();for(int f:formFields())result.add(labels[f]);result.add("Save behavior");result.add("Discard changes");return result.toArray(new String[0]);}
+            case SETTINGS:return new String[]{"Goal: "+(settings.goal==2?"All on":PlayModel.GOALS[settings.goal]),"Background: "+settings.background,"Save rules","Discard changes"};
             case SIZE:return new String[]{"Small  /  8 x 8","Medium  /  16 x 16","Wide  /  32 x 16","Large  /  32 x 32","Cancel"};
             case DRAW_MENU:return new String[]{operation==Operation.ADD?"Next: place":"Done: save","Choose color",eraser?"Use brush":"Use eraser","Keep drawing","Discard changes"};
             case SHARED:return new String[]{"Edit all uses","Make independent","Back"};
@@ -86,7 +93,7 @@ public final class GameCanvas {
     public int sharedUses(){SpriteRegion r=region(selected);int count=0;for(int n=0;n<uses.entries.size();n++)if(overlaps(r,region(n)))count++;return count;}
     public boolean mapReference(){SpriteRegion r=region(selected);P8Map map=base.map();for(int yy=0;yy<64;yy++)for(int xx=0;xx<128;xx++){int t=map.tile(xx,yy);if(t!=0&&overlaps(r,new SpriteRegion(t%16*8,t/16*8,8,8)))return true;}return false;}
     private void start(Operation op){
-        supported();SpriteRegion original=region(selected);
+        supported();if(op==Operation.DUPLICATE&&play!=null&&uses.entries.size()>=16)throw new IllegalArgumentException("This behavior editor currently supports 16 sprites.");SpriteRegion original=region(selected);
         if(op==Operation.APPEARANCE&&original.sharesMap())throw new IllegalArgumentException("This sprite shares pixels with map data. Use the sprite editor in All tools for its consequence review, or make an independent copy here.");
         SpriteRegion next=op==Operation.INDEPENDENT?allocate(original.width,original.height):original;
         int[] copy=new int[original.width*original.height];for(int yy=0;yy<original.height;yy++)for(int xx=0;xx<original.width;xx++)copy[yy*original.width+xx]=base.pixel(original,xx,yy);
@@ -94,6 +101,7 @@ public final class GameCanvas {
         screen=(op==Operation.MOVE||op==Operation.DUPLICATE)?Screen.PLACE:Screen.DRAW;
     }
     public void add(int size){
+        if(play!=null&&uses.entries.size()>=16)throw new IllegalArgumentException("This behavior editor currently supports 16 sprites. Existing data was kept; All tools remains available.");
         int[] widths={8,16,32,32},heights={8,16,16,32};if(size<0||size>=4)throw new IllegalArgumentException("Choose a sprite size");
         SpriteRegion next=allocate(widths[size],heights[size]);target=next;pixels=new int[target.width*target.height];operation=Operation.ADD;
         x=(128-target.width)/2;y=(128-target.height)/2;cursorX=cursorY=0;eraser=false;screen=Screen.DRAW;focus=0;
@@ -103,9 +111,10 @@ public final class GameCanvas {
         for(int n=uses.entries.size()-1;n>=0;n--){GameUses.Entry e=uses.entries.get(n);SpriteRegion r=region(n);if(px>=e.x()&&py>=e.y()&&px<e.x()+r.width&&py<e.y()+r.height){selected=n;focus=n+1;return;}}
     }}
     private static int clamp(int v,int lo,int hi){return Math.max(lo,Math.min(hi,v));}
-    private void home(){screen=Screen.HOME;operation=Operation.NONE;target=null;pixels=null;focus=uses.entries.isEmpty()?0:selected+1;}
+    private void home(){settings=null;editingField=false;screen=Screen.HOME;operation=Operation.NONE;target=null;pixels=null;focus=uses.entries.isEmpty()?0:selected+1;}
     public Command act(WorkshopSession.Action a){
         if(a==WorkshopSession.Action.TEST)return Command.TEST;
+        if(screen==Screen.BEHAVIOR||screen==Screen.SETTINGS)return formAction(a);
         if(screen==Screen.DRAW){
             if(a==WorkshopSession.Action.LEFT)cursorX=clamp(cursorX-1,0,target.width-1);if(a==WorkshopSession.Action.RIGHT)cursorX=clamp(cursorX+1,0,target.width-1);
             if(a==WorkshopSession.Action.UP)cursorY=clamp(cursorY-1,0,target.height-1);if(a==WorkshopSession.Action.DOWN)cursorY=clamp(cursorY+1,0,target.height-1);
@@ -136,10 +145,11 @@ public final class GameCanvas {
             case HOME:{int count=blocked.isEmpty()?uses.entries.size():0;
                 if(focus==0){supported();screen=Screen.SIZE;focus=1;}
                 else if(focus<=count){selected=focus-1;screen=Screen.ACTIONS;focus=0;}
-                else return new Command[]{Command.TOOLS,Command.UNDO,Command.REDO,Command.PROJECTS}[focus-count-1];break;}
+                else if(blocked.isEmpty()&&focus==count+1)configure(false);
+                else return new Command[]{Command.TOOLS,Command.UNDO,Command.REDO,Command.PROJECTS}[focus-count-1-(blocked.isEmpty()?1:0)];break;}
             case ACTIONS:
                 if(focus==0){if(sharedUses()>1||mapReference()||region(selected).sharesMap()){screen=Screen.SHARED;focus=0;}else start(Operation.APPEARANCE);}
-                else if(focus==1)start(Operation.MOVE);else if(focus==2)start(Operation.DUPLICATE);else if(focus==3){screen=Screen.DELETE;focus=0;}else home();break;
+                else if(focus==1)start(Operation.MOVE);else if(focus==2)start(Operation.DUPLICATE);else if(focus==3){screen=Screen.DELETE;focus=0;}else if(focus==4)configure(true);else home();break;
             case SIZE:if(focus==4)home();else add(focus);break;
             case DRAW_MENU:
                 if(focus==0){if(operation==Operation.ADD){boolean visible=false;for(int p:pixels)visible|=p!=0;if(!visible)throw new IllegalArgumentException("Paint at least one visible pixel before placing the sprite.");screen=Screen.PLACE;}else return Command.SAVE;}
@@ -151,49 +161,91 @@ public final class GameCanvas {
     }
     public WorkshopCartridge candidate(WorkshopCartridge current){
         if(!Arrays.equals(base.bytes(),current.bytes()))throw new IllegalArgumentException("The project changed. The saved source and this draft were kept; reopen the project before editing.");
-        supported();if(!draft()&&screen!=Screen.DELETE)return base;
-        GameUses edit=new GameUses(base,0);edit.index=selected;
-        if(screen==Screen.DELETE){edit.delete();return edit.proposal().candidate(base);}
-        WorkshopCartridge next=base;
+        supported();if(operation==Operation.CONFIG)return settings.write(base);if(!draft()&&screen!=Screen.DELETE)return base;
+        GameUses edit=new GameUses(layoutBase,0);edit.index=selected;
+        if(screen==Screen.DELETE){edit.delete();return finish(edit.proposal().candidate(layoutBase));}
+        WorkshopCartridge next=layoutBase;
         if(operation==Operation.ADD||operation==Operation.APPEARANCE||operation==Operation.INDEPENDENT){
             int[] sheet=new int[128*128];for(int yy=0;yy<128;yy++)for(int xx=0;xx<128;xx++)sheet[yy*128+xx]=base.sheetPixel(xx,yy);
             for(int yy=0;yy<target.height;yy++)for(int xx=0;xx<target.width;xx++)sheet[(target.y+yy)*128+target.x+xx]=pixels[yy*target.width+xx];
-            next=base.withSheetPixels(sheet);
+            next=layoutBase.withSheetPixels(sheet);
         }
-        if(operation==Operation.APPEARANCE)return next;
+        if(operation==Operation.APPEARANCE)return finish(next);
         if(operation==Operation.ADD)edit.addSprite(target);else if(operation==Operation.DUPLICATE)edit.duplicate();else edit.edit();
         if(operation==Operation.INDEPENDENT){
             if(edit.kind.equals("spr"))edit.values[0]=target.y/8*16+target.x/8;
             else{edit.values[0]=target.x;edit.values[1]=target.y;}
         }
         edit.values[edit.coordinateField(0)]=x;edit.values[edit.coordinateField(1)]=y;
-        WorkshopCartridge code=edit.proposal().candidate(base);
-        LuaDraft combined=new LuaDraft(next,0);combined.selectAll();combined.replace(code.code());return combined.edit().candidate(next);
+        WorkshopCartridge code=edit.proposal().candidate(layoutBase);
+        LuaDraft combined=new LuaDraft(next,0);combined.selectAll();combined.replace(code.code());return finish(combined.edit().candidate(next));
+    }
+    private WorkshopCartridge finish(WorkshopCartridge result){return play==null?result:play.withLayout(result,operation,selected,screen==Screen.DELETE).write(result);}
+    public void configure(boolean element){supported();settings=PlayModel.fromStatic(base);operation=Operation.CONFIG;screen=element?Screen.BEHAVIOR:Screen.SETTINGS;focus=0;editingField=false;}
+    public int[] formFields(){if(screen==Screen.SETTINGS)return new int[]{0,1};PlayModel.Element e=settings.elements.get(selected);ArrayList<Integer> f=new ArrayList<>();f.add(0);if(e.movement!=0)f.add(1);f.add(2);if(e.rule>=1&&e.rule<=3)f.add(3);if(e.rule==4){f.add(4);f.add(5);}int[] result=new int[f.size()];for(int n=0;n<result.length;n++)result[n]=f.get(n);return result;}
+    private int field(){int focus=formFields()[this.focus];if(screen==Screen.SETTINGS)return focus==0?settings.goal:settings.background;PlayModel.Element e=settings.elements.get(selected);return new int[]{e.movement,e.speed,e.rule,e.target,e.on,e.neighbor+1}[focus];}
+    private void field(int v){int focus=formFields()[this.focus];if(screen==Screen.SETTINGS){if(focus==0)settings.goal=v;else settings.background=v;return;}PlayModel.Element e=settings.elements.get(selected);switch(focus){case 0:e.movement=v;break;case 1:e.speed=v;break;case 2:e.rule=v;break;case 3:e.target=v;break;case 4:e.on=v;break;case 5:e.neighbor=v-1;break;}}
+    private Command formAction(WorkshopSession.Action a){
+        int fields=formFields().length;
+        if(editingField){
+            if(a==WorkshopSession.Action.CONFIRM)editingField=false;
+            else if(a==WorkshopSession.Action.CANCEL){field(fieldBefore);editingField=false;}
+            else if(a==WorkshopSession.Action.LEFT||a==WorkshopSession.Action.RIGHT||a==WorkshopSession.Action.UP||a==WorkshopSession.Action.DOWN){
+                int delta=a==WorkshopSession.Action.LEFT||a==WorkshopSession.Action.DOWN?-1:1;
+                int active=formFields()[focus];int max=screen==Screen.SETTINGS?(active==0?2:15):new int[]{3,4,4,settings.elements.size()-1,1,settings.elements.size()}[active];
+                int min=screen==Screen.BEHAVIOR&&active==1?1:0;field(clamp(field()+delta,min,max));
+                // Adding speed before the rule row must keep the active field selected.
+                for(int n=0;n<formFields().length;n++)if(formFields()[n]==active){focus=n;break;}
+            }return Command.NONE;
+        }
+        if(a==WorkshopSession.Action.CANCEL){home();return Command.NONE;}
+        if(a==WorkshopSession.Action.UP)focus=Math.max(0,focus-1);
+        if(a==WorkshopSession.Action.DOWN)focus=Math.min(fields+1,focus+1);
+        if(a==WorkshopSession.Action.CONFIRM){if(focus<fields){fieldBefore=field();editingField=true;}else if(focus==fields)return Command.SAVE;else home();}
+        return Command.NONE;
+    }
+    public String guidance(){
+        if(settings==null)return play==null?"Draw, place, then add Behavior.":play.readiness();
+        if(screen==Screen.SETTINGS)return settings.readiness();
+        PlayModel.Element e=settings.elements.get(selected);
+        int active=focus<formFields().length?formFields()[focus]:-1;
+        if(active==0||active==1)return "Directions move this sprite. Higher speed is faster. It stops at the screen edge.";
+        if(active==3||e.rule>=1&&e.rule<=3)return "When the chosen sprite overlaps this sprite: "+(e.rule==1?"collect this sprite once.":e.rule==2?"win the game.":e.rule==3?"lose the game.":"choose a touch rule first.");
+        if(active==5)return "Also toggle another switch with this one. Set that sprite to Toggle first.";
+        return "Toggle: left/right select a switch, O changes it once per press. X restarts the game.";
     }
     public int[] image(){
-        WorkshopCartridge cart=draft()?candidate(base):base;GameUses list=new GameUses(cart,0);int[] image=new int[128*128];Arrays.fill(image,background);
+        WorkshopCartridge cart=operation==Operation.CONFIG?settings.layout(base):draft()?candidate(base):base;PlayModel model=PlayModel.read(cart);if(model!=null)cart=model.layout(cart);GameUses list=new GameUses(cart,0);int[] image=new int[128*128];Arrays.fill(image,settings==null?background:settings.background);
         if(!blocked.isEmpty())return image;
         for(GameUses.Entry e:list.entries){SpriteRegion r=e.kind().equals("spr")?new SpriteRegion(e.values[0]%16*8,e.values[0]/16*8,8,8):new SpriteRegion(e.values[0],e.values[1],e.values[2],e.values[3]);
             for(int yy=0;yy<r.height;yy++)for(int xx=0;xx<r.width;xx++){int dx=e.x()+xx,dy=e.y()+yy,p=cart.pixel(r,xx,yy);if(p!=0&&dx>=0&&dx<128&&dy>=0&&dy<128)image[dy*128+dx]=p;}
         }return image;
     }
     public byte[] encode(){try{
-        ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(bytes);o.writeInt(1);byte[] source=base.bytes();o.writeInt(source.length);o.write(source);
+        ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(bytes);o.writeInt(2);byte[] source=base.bytes();o.writeInt(source.length);o.write(source);
         o.writeUTF(screen.name());o.writeUTF(operation.name());for(int v:new int[]{selected,focus,color,cursorX,cursorY,x,y})o.writeInt(v);o.writeBoolean(eraser);
-        o.writeBoolean(target!=null);if(target!=null){for(int v:new int[]{target.x,target.y,target.width,target.height})o.writeInt(v);for(int p:pixels)o.writeByte(p);}return bytes.toByteArray();
+        o.writeBoolean(target!=null);if(target!=null){for(int v:new int[]{target.x,target.y,target.width,target.height})o.writeInt(v);for(int p:pixels)o.writeByte(p);}o.writeBoolean(settings!=null);if(settings!=null){settings.encode(o);o.writeBoolean(editingField);o.writeInt(fieldBefore);}return bytes.toByteArray();
     }catch(IOException e){throw new IllegalStateException(e);}}
     public static GameCanvas restore(byte[] bytes,WorkshopCartridge cart){try{
-        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));if(i.readInt()!=1)throw new IOException();int length=i.readInt();if(length<0||length>2*1024*1024||length>i.available())throw new IOException();byte[] source=new byte[length];i.readFully(source);
+        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version!=1&&version!=2)throw new IOException();int length=i.readInt();if(length<0||length>2*1024*1024||length>i.available())throw new IOException();byte[] source=new byte[length];i.readFully(source);
         if(!Arrays.equals(source,cart.bytes()))throw new IOException("The project changed; its source was preserved.");
         GameCanvas g=new GameCanvas(cart);g.screen=Screen.valueOf(i.readUTF());g.operation=Operation.valueOf(i.readUTF());g.selected=i.readInt();g.focus=i.readInt();g.color=i.readInt();g.cursorX=i.readInt();g.cursorY=i.readInt();g.x=i.readInt();g.y=i.readInt();g.eraser=i.readBoolean();
         if(i.readBoolean()){g.target=new SpriteRegion(i.readInt(),i.readInt(),i.readInt(),i.readInt());g.pixels=new int[g.target.width*g.target.height];for(int n=0;n<g.pixels.length;n++){g.pixels[n]=i.readUnsignedByte();if(g.pixels[n]>15)throw new IOException();}}
+        if(version==1&&g.blocked.isEmpty()){if(g.screen==Screen.HOME&&g.focus>g.uses.entries.size())g.focus++;if(g.screen==Screen.ACTIONS&&g.focus==4)g.focus=5;}
+        if(version==2&&i.readBoolean()){g.settings=PlayModel.decode(i);g.editingField=i.readBoolean();g.fieldBefore=i.readInt();}
         if(i.available()!=0||g.color<0||g.color>15||g.selected<0||g.selected>=Math.max(1,g.uses.entries.size())||g.focus<0||g.focus>Math.max(16,g.rows().length)||g.x<-32768||g.x>32767||g.y<-32768||g.y>32767)throw new IOException();
         boolean editing=g.screen==Screen.DRAW||g.screen==Screen.DRAW_MENU||g.screen==Screen.PALETTE||g.screen==Screen.PLACE;
-        if(g.draft()!=editing||g.draft()!=(g.target!=null))throw new IOException();
+        if((g.operation!=Operation.NONE&&g.operation!=Operation.CONFIG)!=editing||editing!=(g.target!=null))throw new IOException();
+        boolean form=g.screen==Screen.BEHAVIOR||g.screen==Screen.SETTINGS;
+        if(form!=(g.settings!=null)||form!=(g.operation==Operation.CONFIG)||g.editingField&&!form)throw new IOException();
+        if(form){PlayModel original=PlayModel.fromStatic(cart);if(g.settings.elements.size()!=original.elements.size()||!g.settings.prefix.equals(original.prefix)||!g.settings.newline.equals(original.newline))throw new IOException();
+            PlayModel checked=g.settings.copy();for(int n=0;n<checked.elements.size();n++){PlayModel.Element a=checked.elements.get(n),b=original.elements.get(n);if(a.sx!=b.sx||a.sy!=b.sy||a.w!=b.w||a.h!=b.h||a.x!=b.x||a.y!=b.y)throw new IOException();a.rule=0;a.neighbor=-1;}checked.validate();
+            if(g.editingField){if(g.focus>=g.formFields().length)throw new IOException();int active=g.formFields()[g.focus];int min=g.screen==Screen.BEHAVIOR&&active==1?1:0,max=g.screen==Screen.SETTINGS?(active==0?2:15):new int[]{3,4,4,16,1,16}[active];if(g.fieldBefore<min||g.fieldBefore>max)throw new IOException();}
+        }
         if(g.screen==Screen.PALETTE&&g.focus>15||g.rows().length>0&&g.focus>=g.rows().length)throw new IOException();
         if(g.screen!=Screen.HOME&&!g.blocked.isEmpty())throw new IOException();
-        if((g.screen==Screen.ACTIONS||g.screen==Screen.SHARED||g.screen==Screen.DELETE||g.draft()&&g.operation!=Operation.ADD)&&g.uses.entries.isEmpty())throw new IOException();
-        if(g.draft()){
+        if((g.screen==Screen.ACTIONS||g.screen==Screen.SHARED||g.screen==Screen.DELETE||g.draft()&&g.operation!=Operation.ADD&&g.screen!=Screen.SETTINGS)&&g.uses.entries.isEmpty())throw new IOException();
+        if(editing){
             g.supported();if(g.cursorX<0||g.cursorX>=g.target.width||g.cursorY<0||g.cursorY>=g.target.height)throw new IOException();
             SpriteRegion expected=g.operation==Operation.ADD||g.operation==Operation.INDEPENDENT?g.allocate(g.target.width,g.target.height):g.region(g.selected);
             if(expected.x!=g.target.x||expected.y!=g.target.y||expected.width!=g.target.width||expected.height!=g.target.height)throw new IOException();

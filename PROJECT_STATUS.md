@@ -1,124 +1,100 @@
 # PikoNest — project status
 
-Updated **11 October 2026**. A plain-language snapshot for project posts and the
-website. For dated changes, use [CHANGELOG.md](CHANGELOG.md).
+Updated **18 October 2026 (UTC)**. A plain-language snapshot for posts and the
+website. Dated changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## At a glance
 
 PikoNest is a PICO-8 player and game-making workshop for Android handhelds.
-The aim is to make small games with a controller, with optional touch and Lua
-editing. Users bring their own purchased official PICO-8 runtime.
+Users bring their purchased official PICO-8 runtime. Play, Workshop and runtime
+setup live in one development APK; there is no public APK release yet.
 
 | Item | Current position |
 | --- | --- |
-| Stage | Early development; the complete beginner-friendly creator is unfinished |
-| Android baseline | Development build **0.0.76**, installed and checked on 11 October 2026 |
-| Latest product work | First native Game view: draw, place and edit sprites, 11 October 2026 |
-| Current focus | Making the whole creation process easier, starting with editing directly from the game view |
-| Distribution | One development APK; no public APK release yet |
+| Stage | Early development; a small connected creation loop is demonstrated |
+| Android baseline | **0.0.77**, installed and checked on Retroid Pocket Classic |
+| Latest work | Two games created from Blank without opening Lua |
+| Current focus | Complete the same creation path with animation and sound |
 | Platforms | Android first; Linux later |
 
-The first part of the simpler creation interface is now in the development APK.
-It works with Blank projects and static sprite placements. The broader design,
-including nearby behavior/rule/audio tools, is still being implemented.
+## What works in the development build
 
-## What already works in the development build
+- **Play and Workshop in one app.** Browse local games, launch using imported
+  official PICO-8 and return. External-launch and storage work also has bounded
+  demonstrated paths; broader device acceptance remains open.
+- **Draw directly from Game view.** Add a sprite, paint it and place it. Select
+  it to move, duplicate, remove or change its appearance. Shared graphics offer
+  edit-all or an independent copy; the app handles safe resource placement.
+- **Give sprites behavior.** Choose directional movement and speed, contact
+  collection/win/loss, or switches with optional links to another switch.
+  Settings appear when relevant. There is no mandatory hero.
+- **Give the game a goal.** Collect all items or turn all switches on, with
+  ordinary PICO-8 win/loss and restart logic generated automatically.
+- **Keep editing after adding rules.** Appearance, position, duplication and
+  safe removal preserve behavior. Rule targets survive unrelated deletions;
+  referenced sprites cannot be removed silently.
+- **Test, recover, undo and export.** Supported drafts survive app closure and
+  can run separately from saved work. Changes use one Save/Undo transaction.
+  Both new games exported exactly; the collection export also ran independently
+  in official PICO-8 outside PikoNest.
+- **Use the existing tools.** Sprite-sheet/map editing, shared-memory review,
+  continuous strokes, a persistent sprite buffer, asset reuse and recognized
+  animation/camera/background/code forms remain available through All tools.
 
-- **Play and Workshop in one app.** Browse local games or work on projects, then
-  run them using the imported official PICO-8 runtime. Launch and return have
-  been demonstrated on Retroid Pocket Classic.
-- **Start from the game view.** In a new Blank project, draw a sprite and place
-  it without choosing sheet addresses or wiring coordinates. Select it to edit,
-  move, duplicate or remove it. Shared graphics can be edited together or copied
-  independently. Drawing and placement save as one change with one Undo.
-- **Create and edit graphics.** Draw sprites, work with sprite-sheet regions and
-  tile maps, copy and transform graphics, and review changes that affect shared
-  sprite/map memory.
-- **Continuous drawing and reuse.** Touch and controller stroke workflows keep
-  a stroke together for cancellation and Undo. A one-item sprite buffer carries
-  pixels between projects and survives restarting the editor process.
-- **Connect graphics to a game.** Supported sprite/map placements, animation,
-  camera and background forms work with recognized cartridge code.
-- **Make simple rules without opening Lua.** Starting values, input, conditions,
-  changes to values and coordinate connections have been demonstrated. A small
-  game was made from Blank through the app, tested in official PICO-8 and exported.
-- **Keep work through interruptions.** Supported editing drafts can be restored;
-  unfinished changes can be tested separately from the saved cartridge. Verified
-  runtime-data copying and interrupted setup recovery also exist.
+The native evidence covers a collection game with a hazard and a separate
+linked-switch game, both authored through the app. It includes official runtime
+outcomes/reset, reopening, draft Test/return, exact export and preservation of
+59 existing files. Tests passed, but injected input is not physical-controller,
+novice or owner acceptance. [Images, carts and limits](docs/showcase/0.0.77-en/README.md).
 
-These are demonstrated, bounded workflows. They do not mean every valid PICO-8
-cartridge is fully editable or that the entire creator has passed acceptance.
-[Detailed scope and evidence](docs/STATUS.md).
+## What is still unfinished
 
-## The broader experience: partly implemented
+Game view currently recognizes a bounded ordinary-Lua recipe: up to 16 sprite
+placements, simple movement/contact/toggle rules and fixed outcome text. Unknown
+Lua is preserved and uses All tools. These are editor limits, not PICO-8 limits.
+The preview shows initial positions, not simulated game execution.
 
-New Blank projects now open on the game being made. Appearance, position,
-duplication and removal are connected in the first static-sprite workflow, with
-safe automatic resource placement. Nearby behavior, rules and sound actions are
-next. Unknown or more complex cartridge code still uses the existing All tools
-path; the app preserves it rather than guessing how to rewrite it.
+Still required: event-driven animation/audio, general SFX/music editing, maps and
+camera connected to the simpler path, broader rules, library insertion and
+multi-type reuse, remaining sprite/map operations, complete onboarding/storage
+and recovery, modern Android compatibility, English coverage and wider device
+and physical-controller validation. Undo history is session-local. The Android
+export picker still used touch in this batch.
 
-Two journeys guide this design: a small exploration/collection game and a light
-puzzle without a hero. Both have a blank-project path and an editable starter
-path. Templates provide a starting point; they never lock access to tools.
-
-The browser prototype explores selection, drawing, placement, rules and a
-simulated play/return loop. It is **design material**, with no cartridge writing,
-resource allocator or official PICO-8 execution. Specific screens still await
-owner review. [Design and prototype](docs/design/creation-flow-2026-10-08/README.md).
-
-## What still needs to be finished
-
-- The complete, unassisted beginner journey from Blank to an original game.
-- Broader automatic resource allocation, library insertion into Game view and
-  the remaining sprite/map operations.
-- General SFX/music editors, event-driven animation/audio and connected effects.
-- Dependency-aware reuse of more asset types across projects.
-- Complete folder setup, migration, recovery and modern Android compatibility.
-- Full English coverage, physical-controller acceptance and broader screen/device
-  testing. Additional languages follow the English version.
-
-Ordinary `.p8` files remain the game source. Proprietary runtime binaries are
-never bundled. Publishing an APK requires separate owner approval after product
-acceptance; development progress is not release approval.
+The browser creation-flow prototype remains design material. Native work now
+covers the two small blank-project journeys above; editable starter content,
+learning and the complete unassisted beginner experience remain unfinished.
+No public beta or release readiness is claimed.
 
 ## What comes next
 
-1. Review the first native Game view on the handheld and complete its remaining
-   interaction/acceptance work. The static Blank workflow is demonstrated.
-2. Connect selected-element behaviors, rules, goals and restart, including the
-   hero-free puzzle path. Extend source recognition and previews safely with it.
-3. Add the required animation/audio connections and validate two small starters
-   through the same tools.
-4. Finish the remaining editors, reuse/remix and runtime/storage work, then run
-   full Android and owner acceptance.
+1. Connect animation and SFX to the selected sprite and supported game events,
+   including create/edit/save/reopen/Test rather than just parameter presets.
+2. Complete the required audio/music and map/camera creation workflows, then
+   validate a small pair of editable starters through the same general tools.
+3. Finish independent setup, storage/backup/recovery and Android compatibility;
+   run both journeys on supported screen/control configurations.
+4. Have a novice and the owner complete and review the intended paths, fix the
+   findings, then obtain separate approval for any public APK release.
 
-[The roadmap](docs/ROADMAP.md) owns the sequence; [the backlog](docs/BACKLOG.md)
-owns task status. This summary does not create a second plan.
+[ROADMAP](docs/ROADMAP.md) owns the sequence; [BACKLOG](docs/BACKLOG.md) owns task
+status. This summary does not replace either plan or waive acceptance gates.
 
 ## Images for posts and the website
 
 | Material | Use it for | Required context |
 | --- | --- | --- |
-| [0.0.76 screenshots](docs/showcase/0.0.76-en/README.md) | Game view, drawing/placement, shared and independent appearances | Real native trial; static-sprite scope, not the complete creator |
-| [0.0.75 screenshots](docs/showcase/0.0.75-en/README.md) | Drawing strokes, copying a sprite between projects, testing edits | Real development-build captures; not a public release |
-| [0.0.72 workflow](docs/showcase/0.0.72-en/README.md) | A small original game made from Blank through the tools | A limited demonstrated workflow; the complete creator remains unfinished |
-| [Full screenshot index](docs/showcase/README.md) | Play, maps, animation, camera and backgrounds | Keep each image's build and capture notes; packs show different stages |
-| [Creation-flow study](docs/design/creation-flow-2026-10-08/README.md) | Discussing the proposed simpler Workshop | Label as a **design prototype**, not an implemented Android screen |
+| [0.0.77 screenshots and two games](docs/showcase/0.0.77-en/README.md) | Movement, contact, goals, linked switches, official play and export | Native development build; bounded creation path, not a public beta |
+| [0.0.76 screenshots](docs/showcase/0.0.76-en/README.md) | Drawing/placement and shared/independent appearance | Earlier static Game view slice |
+| [Full screenshot index](docs/showcase/README.md) | Play, maps, animation, camera and other tools | Keep each pack's version and provenance |
+| [Creation-flow study](docs/design/creation-flow-2026-10-08/README.md) | The broader proposed experience | Label as design, not an Android feature |
 
 ## Short update to adapt for a post
 
-PikoNest's simpler creation flow has reached the Android app. Start with a blank
-game, draw a sprite and place it directly in the game view. Select it to move,
-duplicate or change its appearance; shared images can be edited together or made
-independent. The app handles safe sprite-sheet placement and keeps unfinished
-work through a restart. The new path was checked on Retroid with official PICO-8.
-It currently covers static sprites; easy behavior/rule setup and the complete
-beginner game-making journey are next. There is no public APK release yet.
-
-## How this file stays current
-
-Update this snapshot after each completed meaningful work batch, together with
-CHANGELOG.md. Keep implemented behavior, demonstrated results, prototypes and
-plans distinct. Link the relevant evidence, retain useful limitations, and update
-the date only when reviewing the snapshot. Technical detail stays in `docs/`.
+PikoNest can now turn a blank project into two kinds of small playable games
+without opening Lua. Draw a sprite, give it movement or an interaction, choose a
+goal, then test it in official PICO-8. We built a collection game with a hazard
+and a linked-switch puzzle with no hero. Both saved, reopened and exported
+correctly; the collection game also ran outside PikoNest. The next work connects
+animation and sound to this same simple workflow. The complete creator and
+public release are still ahead.

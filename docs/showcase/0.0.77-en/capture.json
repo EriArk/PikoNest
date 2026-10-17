@@ -1,0 +1,64 @@
+{
+  "date_utc": "2026-10-18",
+  "local_date": "2026-10-19",
+  "build": "0.0.77",
+  "device": "Retroid Pocket Classic",
+  "android": 14,
+  "official_runtime": "PICO-8 0.2.7",
+  "image_size": [
+    1240,
+    1080
+  ],
+  "unedited": true,
+  "final_apk_sha256": "30da4a83fb44cc4e048b97c35d3bf0710f4912b0798b6a1f15975350b8610dc9",
+  "authoring_and_first_runtime_apk_sha256": "e444e65fc9892a36cb7d9a03c7563a9185602358f5ac61f9db3f9f511c279a59",
+  "capture_apk": {
+    "01-game-view.png": "30da4a83fb44cc4e048b97c35d3bf0710f4912b0798b6a1f15975350b8610dc9",
+    "02-movement.png": "a66f697173cb51abf269999a761bd824205019df92ec2964eba5eaf9ad71f119",
+    "03-contact-rule.png": "a66f697173cb51abf269999a761bd824205019df92ec2964eba5eaf9ad71f119",
+    "04-game-rules.png": "a66f697173cb51abf269999a761bd824205019df92ec2964eba5eaf9ad71f119",
+    "05-switch-game.png": "a66f697173cb51abf269999a761bd824205019df92ec2964eba5eaf9ad71f119",
+    "06-linked-switches.png": "a66f697173cb51abf269999a761bd824205019df92ec2964eba5eaf9ad71f119",
+    "07-collection-win.png": "e444e65fc9892a36cb7d9a03c7563a9185602358f5ac61f9db3f9f511c279a59",
+    "08-linked-switches-running.png": "e444e65fc9892a36cb7d9a03c7563a9185602358f5ac61f9db3f9f511c279a59",
+    "09-switch-win.png": "e444e65fc9892a36cb7d9a03c7563a9185602358f5ac61f9db3f9f511c279a59",
+    "10-draft-test.png": "a66f697173cb51abf269999a761bd824205019df92ec2964eba5eaf9ad71f119",
+    "11-export-saved.png": "e444e65fc9892a36cb7d9a03c7563a9185602358f5ac61f9db3f9f511c279a59"
+  },
+  "final_build_note": "UI/draft-Test captures use the preceding build with the same gameplay generator. Final APK additionally migrates v1 menu focus and fixes the touch Decrease hit region. Installed; Decrease/Revert tested without runtime launch; both projects reopened and exact saved bytes retained. Other intermediate APKs were not installed.",
+  "core_suite_invocations": 73,
+  "final_focused_checks": {
+    "GameCanvasTest": 16504,
+    "PlayModelTest": 96
+  },
+  "previous_project_library_save_files_unchanged": 59,
+  "native_workflows": [
+    "Blank authoring of both games without opening Lua or injecting project data",
+    "Collection: movement, contact loss, collection win, restart",
+    "Switches: linked toggles, all-on goal, stable held-input frames, exact initial frame after restart",
+    "Behavior process-close recovery; byte-exact Undo/Redo",
+    "Updated UI build isolated draft Test, preserved saved bytes, return and cancel",
+    "Both SAF exports read back byte-for-byte",
+    "Collection export executed in an independent official-runtime wrapper under a separate UID",
+    "Final handoff APK: touch Decrease/Revert does not launch Test; both saved games reopen unchanged"
+  ],
+  "input_evidence": "ADB controller/keyboard events and touch; not owner physical-controller or novice acceptance",
+  "final_media_state": "STREAM_MUSIC muted=true, effective volume 0",
+  "public_apk_release": false,
+  "files": {
+    "01-game-view.png": "a3118a822f3043177fb06d43a827a3dd6d0ed8e488e43259a184242b1de98ddf",
+    "02-movement.png": "c36df53e0d3755ffdd588f030f5ed3024fd3bab7501789111dee7d55d1ea7aac",
+    "03-contact-rule.png": "b40c932becec8d56e73af8d7f4ba2be1bcf1a97a5049f64ae08a1ca67a5d7777",
+    "04-game-rules.png": "cd7b925cdf93afb5558e483f75a67d93eb66ce4436390c6bf130ccdd0b454217",
+    "05-switch-game.png": "b9cf5929a3309b55e2247b5e40d75b6b8dd83a2db806e48e4f27273efcef2782",
+    "06-linked-switches.png": "7e6b64c3f422a16331a0bed8ba0c44756ff803b421ae3a91939bd3c1c61ae773",
+    "07-collection-win.png": "c28abf7bbbc346d61073e9aba31256af34247e29938d9430342d39185f370646",
+    "08-linked-switches-running.png": "e5089317a513c1902de98af0a44be470597a2a9272e544be40910bc1cc1a447c",
+    "09-switch-win.png": "cdefd0c721dab353fd1872bef1dc38e977b8f119e6d4c51d05bb19bf938ffe58",
+    "10-draft-test.png": "5e7e74211b88359894281680a27998e10f4b13822479d8fa9a34438879ddaaff",
+    "11-export-saved.png": "d17b28a72e7376d11ca773e0b9e9ddce18f6778873a28719032f98994eace0dd",
+    "collection.p8": "bddc0c658c4e9da81fa3a7f9a348a176ef88e0d6e321515c6c9ca5b56aafe37c",
+    "switches.p8": "d657c59471abf52819919920db84130a680d201eb0547708f93b90e810205ca9"
+  },
+  "ui_and_draft_test_apk_sha256": "a66f697173cb51abf269999a761bd824205019df92ec2964eba5eaf9ad71f119"
+}

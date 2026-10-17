@@ -15,6 +15,7 @@ copy of official PICO-8; this project does not supply it.
 [Project status](PROJECT_STATUS.md) · [Development changelog](CHANGELOG.md) —
 plain-language progress, next steps and links to images for posts and the website.
 
+[Build two small games without opening Lua](docs/showcase/0.0.77-en/README.md) |
 [Draw and place directly in Game view](docs/showcase/0.0.76-en/README.md) |
 [Paint strokes and reuse sprites across projects](docs/showcase/0.0.75-en/README.md) |
 [A game made from Blank through the tools](docs/showcase/0.0.72-en/README.md) ·

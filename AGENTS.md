@@ -569,12 +569,16 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
-Current native baseline (2026-10-11): lab 0.0.76 implements partial UX07 Game view
-for Blank/static sprite placements. Continue the connected path toward UX08;
-do not expand automatic allocation to unknown Lua based on empty graphics or
-metadata alone. Keep All tools reachable and retain source-checked draft recovery.
-See `docs/showcase/0.0.76-en/README.md` for evidence and exact limits. Owner and
-physical-controller acceptance remain open.
+Current native baseline (2026-10-18): lab 0.0.77 adds partial UX08 to Game view:
+movement, contact collect/win/loss, linked switches, goals and restart. Two Blank
+UI-authored games reached official runtime and exact export; the collection
+export also ran outside PikoNest. Behavior survives placement/appearance edits,
+Undo/recovery and source checks. This is a bounded 16-sprite ordinary-Lua recipe,
+not a universal object model or complete beta. Keep unknown Lua intact and All
+tools reachable. Next connect N/S animation/audio workflows to the same creation
+path; broader map/rules/storage/modern-target and acceptance work remains required.
+See `docs/GAME_BEHAVIORS.md` and `docs/showcase/0.0.77-en/README.md`.
+Physical-controller, novice and owner acceptance remain open.
 
 
 The foundation-first list below is the original bootstrap order. The launch,

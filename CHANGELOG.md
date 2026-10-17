@@ -2,13 +2,48 @@
 
 Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
-There is no public APK release as of 11 October 2026.
+There is no public APK release as of 18 October 2026.
 
 This file was started on 11 October 2026 and backfilled from documented work
 from 5 October onward. It is a curated history, not a complete commit log.
 Earlier work is recorded in [the technical status](docs/STATUS.md) and
 [versioned evidence](docs/showcase/README.md). See
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for the current overall picture.
+
+## 2026-10-18 — Playable games from Game view (0.0.77)
+
+**Implemented and demonstrated in the Android development app.**
+
+- Added selected-sprite movement, speed, collect/win/lose contact rules and
+  switches that can also toggle another switch. No mandatory hero or Lua cursor.
+- Added game goals, restart and background color. Forms hide irrelevant fields;
+  linked targets are visible in the preview, and long headings no longer hide
+  the tool name or target number in the checked layout. Older saved menu focus
+  migrates, and touch field adjustment keeps its own action area.
+- Appearance, move, duplicate and safe removal continue to work after adding
+  behavior. Dependent rules protect targets; removing unrelated sprites keeps
+  references connected to the same elements.
+- Behavior and game rules reopen from ordinary `.p8` Lua. Full-source checks
+  refuse unfamiliar code; comments survive conversion. Draft recovery, field
+  revert, isolated Test and one-step Undo/Redo cover these settings.
+- Created a collection game and a hero-free switch game through the native UI
+  from Blank. Added eleven English screenshots and both exact exported carts.
+
+**Checked:** 73 local core suite invocations; final focused suites of 16,504 and
+96 checks. Native creation, behavior draft recovery, exact Undo/Redo, official
+PICO-8 movement/contact loss/collection win/switch goal/restart, draft
+Test/return/cancel and final-APK reopening, reopening and byte-exact SAF export. Collection export ran
+independently outside PikoNest. All 59 checked pre-existing project/library/save
+files stayed unchanged. The final installed device was verified muted.
+
+**Still limited:** a recognized recipe with 16 sprite placements and simple
+rules, not an arbitrary visual Lua editor. No new animation/audio/map connections,
+custom outcome text or general physics. Export Save used touch; physical controls,
+novice and owner acceptance remain open. Final UI/parser corrections have separate
+artifact provenance from the initial authoring captures. No public APK release.
+
+[Images, exported games and full evidence](docs/showcase/0.0.77-en/README.md) /
+[Behavior tool guide](docs/GAME_BEHAVIORS.md).
 
 ## 2026-10-11 — Draw and place from Game view (0.0.76)
 
