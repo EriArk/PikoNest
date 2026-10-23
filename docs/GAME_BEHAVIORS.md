@@ -8,9 +8,9 @@ model or promise to visually edit arbitrary Lua. All tools remains reachable.
 
 1. Create a **Blank** project. Add, draw and place a sprite.
 2. Select it, open **Behavior**, choose **D-pad** movement and a speed, then save.
-3. Add another sprite. Give it the **Collect** rule and choose the moving sprite
-   under **Touched by** (lab 0.0.79). The collectible disappears once when their rectangles overlap.
-4. Open **Game rules**, choose **Collect all**, then save. Duplicate or draw more
+3. Add another sprite. Open **On contact / press**, choose **Collect this / When touched**,
+   then choose the moving element in the visual picker (lab 0.0.80). The collectible disappears once when their rectangles overlap.
+4. Open **Game rules**, choose **All collected**, then save. Duplicate or draw more
    collectibles as desired. Each placement has its own collected state.
 5. Optionally add a **Lose** contact rule to a hazard, or a **Win** rule to a goal.
 6. **Start / Test** runs the game in the imported official PICO-8. PICO-8 **X**
@@ -41,9 +41,54 @@ The preview is explicitly a starting layout, not a simulated running game.
 
 [Exact scope and verification](showcase/0.0.79-en/README.md).
 
+## Element names (0.0.80)
+
+Select an element and open **Name**. Enter up to 24 characters with the controller
+keyboard or touch, then Save name. D-pad navigates; A types, X erases, Y changes
+case, shoulders switch language; move down from the last keyboard row to Save.
+B cancels. Empty text restores the color-based description. Start tests a separate
+draft and does not save. Names belong to placements, not their shared graphics.
+Duplicate display labels are disambiguated, including suffix collisions.
+
+Names persist as optional ordinary Lua comments:
+`-- pikonest:name:1:<index>:<source rectangle and initial position>:<UTF-8 hex>`.
+Only comments outside Lua strings/block comments are read. They do not authorize
+source recognition, change runtime behavior or require PikoNest to run the cart.
+UTF-8 is encoded into ASCII comment bytes to avoid changing source encoding.
+Controls/formatting characters, malformed encodings and duplicate annotations are
+refused. The unchanged .p8 source remains available through All tools.
+
+Supported Game view edits update each annotation with its placement. Duplication
+copies the name; renaming that copy is independent. Deletion reindexes remaining
+names, and frame reorder/copy/painting retain element identity. If an external
+layout edit makes a recorded binding disagree with the current layout, Game view
+refuses automatic edits and offers All tools instead of guessing the intended
+identity. Revert/review that external edit or its name comments there. General
+All tools placement edits do not yet maintain these annotations automatically.
+
+The [official PICO-8 0.2.7 manual](https://www.lexaloffle.com/dl/docs/pico-8_manual.html)
+documents ordinary comments, the first two source lines used for cartridge label
+text, and distinct token/character/compressed-size budgets. The writer preserves
+leading title/author comments and puts annotations after at least two source
+lines; it adds blank lines when necessary. Comments add source/compressed size,
+so this is not a complete budget-verification claim. PNG/ROM budget checks and
+new official-runtime acceptance remain open. Clearing the last name can retain
+added blank lines; Undo restores the exact pre-edit cart.
+
+## Explicit movement and interaction choices (0.0.80)
+
+Movement and interaction fields open readable choice lists. Choosing collect,
+win or lose continues to the target picker. Cancelling the picker restores the
+previous interaction and returns to that choice list; cancelling the list returns
+to the unchanged form. Save behavior commits the whole edit once. Target and
+choice drafts recover against the exact original source. Movement/non-contact
+choices may be previewed through Test; contact choices first need a target.
+
+[Validation and remaining acceptance](showcase/0.0.80-en/README.md).
+
 ## Editing contract
 
-- Navigate to a field, A edits, directions adjust, A keeps the value and B
+- Numeric fields: A edits, directions adjust, A keeps the value and B
   reverts that field. Save commits the whole behavior or rule change as one
   Undo transaction. B outside a field discards this form's changes.
 - Speed appears only for moving sprites; contact targets only for contact rules;

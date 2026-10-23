@@ -1,5 +1,40 @@
 # PikoNest: единая мастерская на портативке
 
+## Named elements and explicit choices — lab 0.0.80
+
+The next implemented slice of #17 keeps the existing workshop and ordinary Lua.
+It is locally checked; native/controller/novice/owner acceptance is still open.
+
+- **Name** is an element action, not a sprite-sheet resource rename. Two uses of
+  one graphic can have different names. The keyboard starts in English; D-pad
+  selects letters, A types, X erases, Y changes case and shoulder buttons switch
+  EN/RU. Move down from the last letter row to Save name or Cancel. Touch offers
+  the same controls. Start remains Test rather than silently saving the name.
+- Names are optional and limited to 24 characters by this editor. Empty restores
+  the automatic visual label. Duplicate names get distinct A/B/C suffixes;
+  suffixes also avoid collisions with an explicit name such as `Switch A`.
+- Names follow supported placement edits, duplication/removal and first-frame
+  changes. Save/Undo and recovery use the same cart transaction. Export/reopen
+  needs no external name database. Names are optional Lua comments, not runtime
+  objects or inferred gameplay roles. See [storage and compatibility](GAME_BEHAVIORS.md#element-names-0080).
+- **Movement** opens named options: stay in place, all directions, horizontal or
+  vertical. **On contact / press** opens collect, win, lose, toggle or no action.
+  This replaces cycling an unexplained field through unrelated actions.
+- Choosing a contact action leads directly to the visual target picker. Confirm
+  keeps the action/target in the behavior draft; Cancel returns to the choice list
+  and restores the previous action. Cancelling the list leaves the form unchanged.
+  Save behavior still commits once; choosing a row alone does not save the cart.
+- Start previews a highlighted movement/non-contact choice. A contact choice must
+  first identify its touching element; the existing clear prerequisite message
+  applies. Target selection then supports isolated draft Test as before.
+
+Remaining #17 work: clearer goal choices and a readable overview of configured
+rules, consistent entry/return/edit/remove flow, then the two complete native
+journeys, animation checks and novice/owner review when console use is allowed.
+This slice does not add arbitrary event graphs or claim all novice friction is gone.
+
+---
+
 ## Visual relationships — lab 0.0.79
 
 This is the first implemented slice of [issue #17](https://github.com/EriArk/PikoNest/issues/17),

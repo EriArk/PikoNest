@@ -1,5 +1,16 @@
 # Creation experience: from an idea to a playable game
 
+## Latest implementation — 23 October 2026, lab 0.0.80
+
+Elements can now have user-defined names, including independent names for two
+uses of one sprite. Movement and interaction open explicit options; contact
+choices immediately ask which other element touches them. Cancellation restores
+the previous interaction, and names survive supported edits/export/reopen.
+These changes advance #17 on the current engine. Native/novice/owner review is
+still pending; console use remains paused. Next improve goals and the configured
+rule overview/return flow. [Contract](UX_DIRECTION.md#named-elements-and-explicit-choices--lab-0080)
+and [validation](showcase/0.0.80-en/README.md).
+
 ## Current implementation boundary — 23 October 2026
 
 [Issue #17](https://github.com/EriArk/PikoNest/issues/17) refines this approved

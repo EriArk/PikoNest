@@ -35,8 +35,8 @@ final class GameSurface {
         float y=height-88;rect(0,y,width,88,1);rect(16,y,width-32,1,13);
         button(primary,8,y+4,width/2-12,40,true,()->act(action));button(secondary,width/2+4,y+4,width/2-12,40,false,()->act(back));
         button(game().editingField?"Left  Decrease":"Start  Test",8,y+44,width/2-12,40,false,()->act(game().editingField?Action.LEFT:Action.TEST));
-        String extra=game().editingField?"Right  Increase":game().screen==GameCanvas.Screen.DRAW?"X  Color":game().screen==GameCanvas.Screen.PLACE?"D-pad  Move":"D-pad  List";
-        button(extra,width/2+4,y+44,width/2-12,40,false,()->{if(game().editingField)act(Action.RIGHT);else if(game().screen==GameCanvas.Screen.DRAW)act(Action.CONTEXT);});
+        String extra=game().editingField?"Right  Increase":game().screen==GameCanvas.Screen.NAME?"X  Erase":game().screen==GameCanvas.Screen.DRAW?"X  Color":game().screen==GameCanvas.Screen.PLACE?"D-pad  Move":"D-pad  List";
+        button(extra,width/2+4,y+44,width/2-12,40,false,()->{if(game().editingField)act(Action.RIGHT);else if(game().screen==GameCanvas.Screen.DRAW||game().screen==GameCanvas.Screen.NAME)act(Action.CONTEXT);});
     }
     void draw(Canvas c,float s,float w,float h){
         canvas=c;scale=s;width=w;height=h;hits.clear();imageArea=null;GameCanvas g=game();
@@ -49,9 +49,10 @@ final class GameSurface {
             wrap(session.error,16,150,w-32,Math.max(3,(int)((h-250)/26)));
             footer(yes+"  Return",Action.CONFIRM,back+"  Return",Action.CANCEL);return;
         }
+        if(g.screen==GameCanvas.Screen.NAME){nameEditor(yes,back);return;}
         boolean draw=g.screen==GameCanvas.Screen.DRAW||g.screen==GameCanvas.Screen.DRAW_MENU||g.screen==GameCanvas.Screen.PALETTE;
         boolean wide=w>=540;float top=104,bottom=h-104,side;
-        boolean contextual=g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.RELATION||g.screen==GameCanvas.Screen.ACTIONS||g.screen==GameCanvas.Screen.SETTINGS;
+        boolean contextual=g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.RELATION||g.screen==GameCanvas.Screen.ACTIONS||g.screen==GameCanvas.Screen.SETTINGS||g.screen==GameCanvas.Screen.CHOICE;
         if(!draw)text("Starting layout",16,87,14,6,w-32);
         String[] rows=g.rows();boolean menu=rows.length>0;
         float listX=16,listY=top,listW=w-32;
@@ -106,7 +107,7 @@ final class GameSurface {
             float px=wide?listX:16,py=wide?top+20:listY,cell=Math.min((wide?listW:w-32)/8,40);
             for(int n=0;n<16;n++){final int color=n;float cx=px+n%8*cell,cy=py+n/8*cell;rect(cx+2,cy+2,cell-4,cell-4,n);if(g.focus==n)outline(cx,cy,cell,cell,7);hits.add(new Hit(cx,cy,cell,cell,()->{g.focus=color;act(Action.CONFIRM);}));}
         }else if(menu){
-            int rowHeight=g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.SETTINGS?50:40;
+            int rowHeight=g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.SETTINGS||g.screen==GameCanvas.Screen.CHOICE?50:40;
             int visible=Math.max(1,(int)((bottom-listY)/rowHeight)),first=Math.max(0,Math.min(Math.max(0,rows.length-visible),g.focus-visible/2));
             for(int n=first;n<Math.min(rows.length,first+visible);n++){
                 final int row=n;float yy=listY+(n-first)*rowHeight;int element=g.rowElement(row);
@@ -124,11 +125,32 @@ final class GameSurface {
         }else if(g.screen==GameCanvas.Screen.PLACE&&wide){
             text("Choose a position",listX,top+24,22,7,listW);wrap("Move with the D-pad or tap the game. Done saves the whole change.",listX,top+62,listW,5);
         }
-        if(g.screen==GameCanvas.Screen.RELATION)footer(yes+"  Confirm",Action.CONFIRM,back+"  Cancel",Action.CANCEL);
+        if(g.screen==GameCanvas.Screen.CHOICE)footer(yes+"  Choose",Action.CONFIRM,back+"  Cancel",Action.CANCEL);
+        else if(g.screen==GameCanvas.Screen.RELATION)footer(yes+"  Confirm",Action.CONFIRM,back+"  Cancel",Action.CANCEL);
         else if(g.editingField)footer(yes+"  Keep value",Action.CONFIRM,back+"  Revert",Action.CANCEL);
         else if(g.screen==GameCanvas.Screen.DRAW)footer(yes+"  Paint",Action.CONFIRM,back+"  Done / options",Action.CANCEL);
         else if(g.screen==GameCanvas.Screen.PLACE)footer(yes+"  Done",Action.CONFIRM,back+(g.operation==GameCanvas.Operation.ADD?"  Draw again":"  Cancel"),Action.CANCEL);
         else footer(yes+"  Select",Action.CONFIRM,back+(g.screen==GameCanvas.Screen.HOME?"  Projects":"  Back"),Action.CANCEL);
+    }
+    private void nameEditor(String yes,String back){
+        GameCanvas g=game();NameEditor e=g.nameDraft;
+        text(g.label(g.selected),16,87,18,6,width-122);text(e.text().length()+" / "+e.limit,width-100,87,18,6,84);
+        rect(16,96,width-32,40,e.replaceAll?2:0);outline(16,96,width-32,40,10);
+        text(e.text().isEmpty()?"(automatic label)":e.text(),24,124,20,e.text().isEmpty()?6:7,width-48);
+        float control=(width-40)/3;
+        button("Y Case",16,144,control,34,false,()->act(Action.UNDO));
+        button(e.latin?"L/R EN":"L/R RU",20+control,144,control,34,false,()->act(Action.NEXT));
+        button(e.replaceAll?"All":"Append",24+control*2,144,control,34,false,()->act(Action.MENU));
+        float top=192,rowHeight=Math.min(40,(height-top-88-48)/5),cell=(width-32)/10;
+        for(int n=0;n<e.count();n++){
+            final int key=n;char ch=e.character(n);
+            button(ch==' '?"_":String.valueOf(ch),16+n%10*cell,top+n/10*rowHeight,cell-2,rowHeight-2,g.focus==0&&e.key==n,()->{g.focus=0;e.key=key;act(Action.CONFIRM);});
+        }
+        float y=top+5*rowHeight+8;
+        button("Save name",16,y,(width-40)/2,36,g.focus==1,()->{g.focus=1;act(Action.CONFIRM);});
+        button("Cancel",24+(width-40)/2,y,(width-40)/2,36,g.focus==2,()->act(Action.CANCEL));
+        if(!e.warning.isEmpty())text(e.warning,16,184,18,9,width-32);
+        footer(yes+(g.focus==0?"  Type":"  Select"),Action.CONFIRM,back+"  Cancel",Action.CANCEL);
     }
     private void elementOutline(int index,float side,int color){
         GameUses.Entry e=game().uses.entries.get(index);SpriteRegion r=game().region(index);

@@ -1,5 +1,9 @@
 # PikoNest — English website gallery
 
+[0.0.80: element names and explicit behavior choices](0.0.80-en/README.md) —
+local implementation/validation record; no new native images. Names, guided
+contact selection and recovery are implemented; device/novice/owner review is open.
+
 [0.0.79: visual elements and relationship selection](0.0.79-en/README.md) —
 implementation/local validation only; no new native screenshot pack. Console use
 remains paused. Issue #17 and physical/novice/owner acceptance stay open.

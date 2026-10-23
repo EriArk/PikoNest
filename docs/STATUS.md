@@ -1,5 +1,17 @@
 # Состояние PikoNest
 
+**2026-10-23 — Lab 0.0.80, named elements and explicit behavior choices (partial UX07/UX08, #17):**
+Elements can now be named with a controller/touch keyboard. Names appear in the
+list and relationship picker, survive supported layout/frame edits, and travel
+with the ordinary `.p8` as optional comments. Duplicate labels are disambiguated;
+clearing a name restores the visual description. Movement and interaction fields
+now open explicit choice lists. Contact actions continue directly to the visual
+target picker; cancelling that step restores the prior interaction.
+Focused core checks pass, including named animation reorder/allocation/recovery.
+No device actions or new official-runtime execution occurred; console use remains
+paused. [Scope and validation](showcase/0.0.80-en/README.md). Goal selection,
+overview/return ergonomics and native/novice/owner acceptance keep #17 open.
+
 **2026-10-23 — Lab 0.0.79, first visual relationship slice (partial UX07/UX08, [issue #17](https://github.com/EriArk/PikoNest/issues/17)):**
 Game view now lists element thumbnails with color-based descriptions, opens actions
 from a canvas selection, and picks contact targets / linked switches visually.

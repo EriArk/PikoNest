@@ -6,14 +6,17 @@ public final class NameEditor {
     private static final String RU="абвгдеёжзийклмнопрстуфхцчшщъыьэюя0123456789 -_.!?+";
     private static final String EN="abcdefghijklmnopqrstuvwxyz0123456789 -_.!?+:()/&'=";
     private String text;
+    public final int limit;
+    private final boolean english;
     public int key;
     public boolean latin,uppercase=true,replaceAll=true;
     public String warning="";
-    public NameEditor(String initial){restoreText(initial);}
+    public NameEditor(String initial){this(initial,LIMIT,false);}
+    public NameEditor(String initial,int limit,boolean english){if(limit<1||limit>LIMIT)throw new IllegalArgumentException("Invalid name limit");this.limit=limit;this.english=english;latin=english;restoreText(initial);}
     public String text(){return text;}
     public void restoreText(String value){
-        if(value==null||value.length()>LIMIT)throw new IllegalArgumentException("Название слишком длинное");
-        for(int i=0;i<value.length();i++)if(Character.isISOControl(value.charAt(i)))throw new IllegalArgumentException("Недопустимый символ в названии");
+        if(value==null||value.length()>limit)throw new IllegalArgumentException(english?"Name is too long":"Название слишком длинное");
+        for(int i=0;i<value.length();i++)if(Character.isISOControl(value.charAt(i)))throw new IllegalArgumentException(english?"Invalid name character":"Недопустимый символ в названии");
         text=value;
     }
     public int count(){return (latin?EN:RU).length();}
@@ -30,7 +33,7 @@ public final class NameEditor {
     public void type(int index){
         char c=character(index);if(c==0)return;key=index;warning="";
         if(replaceAll){text="";replaceAll=false;}
-        if(text.length()>=LIMIT){warning="Достигнут предел: 80 символов";return;}
+        if(text.length()>=limit){warning=english?"Limit: "+limit+" characters":"Достигнут предел: 80 символов";return;}
         text+=c;
     }
     public void erase(){
@@ -40,6 +43,6 @@ public final class NameEditor {
         replaceAll=false;
     }
     public String value(){
-        String value=text.trim();if(value.isEmpty()){warning="Название не должно быть пустым";return null;}return value;
+        String value=text.trim();if(value.isEmpty()){warning=english?"Enter a name":"Название не должно быть пустым";return null;}return value;
     }
 }

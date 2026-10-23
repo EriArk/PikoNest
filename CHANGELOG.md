@@ -10,6 +10,36 @@ Earlier work is recorded in [the technical status](docs/STATUS.md) and
 [versioned evidence](docs/showcase/README.md). See
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for the current overall picture.
 
+## 2026-10-23 — Name elements and choose behavior clearly (0.0.80)
+
+**Implemented and locally checked; device and owner acceptance remain open.**
+
+- Added optional element names with a controller/touch keyboard. The visual list
+  and relationship picker show those names. Shared graphics can have independent
+  names; duplicates get distinct labels. Empty names restore visual descriptions.
+- Names survive supported moves, copies, deletion and animation-frame changes,
+  and travel with an exported `.p8`. Save/Undo and recoverable draft Test use the
+  same protected workflow. Existing title/author header lines stay intact.
+- Movement and interaction now open explicit choice lists. Contact actions lead
+  directly to the visual target picker; cancelling it restores the previous
+  interaction instead of leaving an unfinished change behind.
+- Fixed named animation allocation after changing the first frame, so users can
+  continue copying frames and recover/test that draft before saving.
+
+**Checked:** 76 local core suite invocations and integrated APK packaging passed.
+Focused name/choice coverage passed 101 checks, alongside the existing Game view,
+behavior, relationship, animation and asset-name checks. Host-only layout previews
+covered compact, tall and wide sizes; they are not native screenshots or input proof.
+No console actions, installations or new official-runtime executions occurred.
+
+**Limits:** names currently have this editor's 24-character limit. External layout
+edits can make name bindings stale; the source is preserved and automatic edits
+stop until reviewed/reverted. General tools do not yet maintain those bindings
+in every placement operation. Goal/overview ergonomics, native journeys and novice/
+owner review remain open under issue #17. No public APK release.
+[Tool guide](docs/GAME_BEHAVIORS.md#element-names-0080) ·
+[exact evidence](docs/showcase/0.0.80-en/README.md).
+
 ## 2026-10-23 — Pick game relationships visually (0.0.79)
 
 **Implemented and locally checked; device and owner acceptance remain open.**

@@ -14,7 +14,7 @@ public final class PlayModelTest {
         public void launch(byte[] b){launched=b;}
     }
     static void row(WorkshopSession s,int n){s.game.focus=n;s.act(Action.CONFIRM);}
-    static void field(WorkshopSession s,int n,int times){int at=0;while(s.game.formFields()[at]!=n)at++;row(s,at);for(int i=0;i<Math.abs(times);i++)s.act(times>0?Action.RIGHT:Action.LEFT);s.act(Action.CONFIRM);}
+    static void field(WorkshopSession s,int n,int times){int at=0;while(s.game.formFields()[at]!=n)at++;row(s,at);if(s.game.screen==GameCanvas.Screen.CHOICE)s.game.focus=Math.max(0,Math.min(s.game.rows().length-2,s.game.focus+times));else for(int i=0;i<Math.abs(times);i++)s.act(times>0?Action.RIGHT:Action.LEFT);s.act(Action.CONFIRM);if(s.game.screen==GameCanvas.Screen.RELATION&&s.game.relationshipChoices().length>0)s.act(Action.CONFIRM);}
     static WorkshopSession session(WorkshopCartridge c,Port p){WorkshopSession s=new WorkshopSession(c,p);s.openGame();return s;}
     static void sprite(WorkshopSession s,int x,int y){row(s,0);row(s,0);s.game.paint(0,0);s.act(Action.CANCEL);row(s,0);s.game.point(x,y);s.act(Action.CONFIRM);}
     static void behavior(WorkshopSession s,int n){row(s,n+1);row(s,4);}
@@ -23,8 +23,8 @@ public final class PlayModelTest {
             WorkshopCartridge blank=GameCanvasTest.cart("-- function is a comment\nfunction _draw()\n cls(1)\nend\n",nl);
             Port p=new Port();WorkshopSession s=session(blank,p);sprite(s,20,50);sprite(s,90,50);
             WorkshopCartridge staticCart=s.cart();
-            GameCanvas legacy=new GameCanvas(staticCart);legacy.focus=legacy.uses.entries.size()+1;byte[] v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-10);java.nio.ByteBuffer.wrap(v1).putInt(1);GameCanvas migrated=GameCanvas.restore(v1,staticCart);check(migrated.act(Action.CONFIRM)==GameCanvas.Command.TOOLS,"v1 All tools focus migrates");
-            legacy.screen=GameCanvas.Screen.ACTIONS;legacy.focus=4;v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-10);java.nio.ByteBuffer.wrap(v1).putInt(1);migrated=GameCanvas.restore(v1,staticCart);migrated.act(Action.CONFIRM);check(migrated.screen==GameCanvas.Screen.HOME,"v1 Back focus migrates");
+            GameCanvas legacy=new GameCanvas(staticCart);legacy.focus=legacy.uses.entries.size()+1;byte[] v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-20);java.nio.ByteBuffer.wrap(v1).putInt(1);GameCanvas migrated=GameCanvas.restore(v1,staticCart);check(migrated.act(Action.CONFIRM)==GameCanvas.Command.TOOLS,"v1 All tools focus migrates");
+            legacy.screen=GameCanvas.Screen.ACTIONS;legacy.focus=4;v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-20);java.nio.ByteBuffer.wrap(v1).putInt(1);migrated=GameCanvas.restore(v1,staticCart);migrated.act(Action.CONFIRM);check(migrated.screen==GameCanvas.Screen.HOME,"v1 Back focus migrates");
             behavior(s,0);field(s,0,1);field(s,1,1);
             row(s,1);s.act(Action.RIGHT);byte[] journal=s.game.encode();
             WorkshopSession recovered=session(staticCart,p);recovered.restoreGame(journal);check(recovered.game.editingField,"field editing recovers");recovered.act(Action.CANCEL);
@@ -63,7 +63,7 @@ public final class PlayModelTest {
             WorkshopCartridge fake=GameCanvasTest.cart("--[[function _init()\n game_count=99\nend]]\nfunction _draw()\n cls(1)\nend\n",nl);WorkshopCartridge ordinary=PlayModel.fromStatic(fake).write(fake);check(PlayModel.read(ordinary)!=null,"fake header in comment is not treated as source");
             WorkshopSession one=session(blank,new Port());sprite(one,5,5);behavior(one,0);field(one,2,1);
             GameCanvas invalid=GameCanvas.restore(one.game.encode(),one.cart());check(invalid.settings.elements.get(0).rule==1,"unfinished missing target recovers");refused(()->invalid.candidate(one.cart()));
-            one.act(Action.CANCEL);check(one.game.play==null,"discard invalid behavior preserves static source");
+            one.act(Action.CANCEL);one.act(Action.CANCEL);one.act(Action.CANCEL);check(one.game.play==null,"discard invalid behavior preserves static source");
             WorkshopSession empty=session(blank,new Port());row(empty,1);field(empty,1,2);byte[] ej=empty.game.encode();empty.restoreGame(ej);row(empty,2);check(empty.game.play.background==3,"empty game settings recover and save");sprite(empty,10,10);check(empty.game.play.elements.size()==1,"add to empty configured game");
             // Removing an earlier unreferenced sprite rebinds target indices, not visual identity.
             PlayModel rebind=PlayModel.fromStatic(staticCart);rebind.elements.add(rebind.elements.get(1).copy());rebind.elements.get(2).rule=1;rebind.elements.get(2).target=1;

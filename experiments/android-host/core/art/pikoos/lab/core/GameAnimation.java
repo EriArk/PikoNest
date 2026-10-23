@@ -14,9 +14,11 @@ public final class GameAnimation {
     public boolean editing;
     public String notice="";
     private byte[] paintBefore;
+    private final GameElementNames names;
     private final List<SpriteRegion> editedRegions=new ArrayList<>();
     public GameAnimation(WorkshopCartridge base,int element){
         this.base=base;this.element=element;model=PlayModel.fromStatic(base);resources=base;
+        names=GameElementNames.read(base,new GameUses(model.layout(base),0));
         PlayModel.Element e=model.elements.get(element);
         if(e.animation==null)e.animation=new PlayAnimation(new SpriteRegion(e.sx,e.sy,e.w,e.h));
     }
@@ -27,7 +29,7 @@ public final class GameAnimation {
     public void value(int v){if(focus==0)sequence().mode=v;else if(focus==1)frame=v;else current().ticks=v;}
     public void step(int delta){int min=focus==2?1:0,max=focus==0?2:focus==1?sequence().frames.size()-1:150;value(Math.max(min,Math.min(max,value()+delta)));}
     private void syncFirst(){PlayModel.Element e=model.elements.get(element);SpriteRegion r=sequence().frames.get(0).region;e.sx=r.x;e.sy=r.y;}
-    private SpriteRegion allocate(){PlayModel.Element e=model.elements.get(element);return new GameCanvas(model.write(resources)).allocate(e.w,e.h);}
+    private SpriteRegion allocate(){PlayModel.Element e=model.elements.get(element);return new GameCanvas(candidate()).allocate(e.w,e.h);}
     private void edited(SpriteRegion r){for(SpriteRegion old:editedRegions)if(old.x==r.x&&old.y==r.y&&old.width==r.width&&old.height==r.height)return;editedRegions.add(r);}
     private WorkshopCartridge copyPixels(SpriteRegion from,SpriteRegion to){int[] pixels=new int[from.width*from.height];for(int y=0;y<from.height;y++)for(int x=0;x<from.width;x++)pixels[y*from.width+x]=resources.pixel(from,x,y);WorkshopCartridge next=pixels(resources,to,pixels);edited(to);return next;}
     public void duplicate(){
@@ -62,8 +64,8 @@ public final class GameAnimation {
         if(paintBefore==null)return;
         try{GameAnimation prior=decode(new DataInputStream(new ByteArrayInputStream(paintBefore)),base);model=prior.model;resources=prior.resources;frame=prior.frame;editedRegions.clear();editedRegions.addAll(prior.editedRegions);paintBefore=null;notice="Frame edit discarded.";}catch(IOException ex){throw new IllegalStateException(ex);}
     }
-    public WorkshopCartridge candidate(){return model.write(resources);}
-    public WorkshopCartridge candidate(int[] pixels){return model.write(pixels(resources,current().region,pixels));}
+    public WorkshopCartridge candidate(){return names.apply(model.write(resources));}
+    public WorkshopCartridge candidate(int[] pixels){return names.apply(model.write(pixels(resources,current().region,pixels)));}
     public String guidance(){if(!notice.isEmpty())return notice;if(sequence().mode==1)return "Plays while position changes. Standing still returns to frame 1.";if(sequence().mode==2)return "Plays while this switch is on. Off returns to frame 1.";return "Copy a frame, draw a new pose, then Test. Save commits the whole sequence.";}
     void encode(DataOutputStream out)throws IOException{
         out.writeInt(element);model.encode(out);model.encodeAnimations(out);byte[] data=resources.bytes();out.writeInt(data.length);out.write(data);
