@@ -1,5 +1,19 @@
 # Состояние PikoNest
 
+**2026-10-23 — Lab 0.0.85, tile art inside the map (partial G01–G04, UX08):**
+Create an 8×8 tile directly from the map, paint with controller/touch, review it
+and keep it as the brush and selected cell without creating a game object. Existing
+tiles offer explicit edit-all or an independent copy; references and flags are
+preserved, with lower/shared tiles copied into safe upper storage. Nested tile
+strokes/history, Test, map placement, flags and world settings share source-checked
+recovery and one Save/Undo. Journal v10 reads earlier v1–9 drafts. [Guide](WORLD_EDITOR.md) ·
+[local checks and host previews](showcase/0.0.85-en/README.md). Console use remains
+paused; no installation or new official-runtime/physical/owner acceptance. New
+allocation is upper tiles 1–127 in recognized projects; broader map operations,
+collision, door triggers and parallax stay unfinished. Next connect two small
+editable starter journeys through the same general tools; complete outstanding
+device journeys when authorized.
+
 **2026-10-23 — Lab 0.0.84, Game view world/map/camera (partial G03/G04, N02, UX08):**
 Recognized projects now configure field size, paint/erase upper-map tiles and choose
 fixed, element-follow or room-step cameras from Game view. The editor pans when

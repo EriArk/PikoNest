@@ -66,6 +66,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'SoundWorkflowT
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'MusicDataTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'MusicWorkflowTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'WorldWorkflowTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'TileWorkflowTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'GameAnimationTest',$pikoRoot)
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'FlagsTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'TileProbeTest')

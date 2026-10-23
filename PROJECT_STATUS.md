@@ -12,39 +12,37 @@ setup live in one development APK; there is no public APK release yet.
 | Item | Current position |
 | --- | --- |
 | Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.84** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | World/map/camera editing connected to Game view; device acceptance pending |
-| Current focus | New-tile creation inside the map, then small editable starters; device journeys when permitted |
+| Android baseline | **0.0.85** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | Tile art creation/editing inside the map; device acceptance pending |
+| Current focus | Two small editable starters using the general tools; device journeys when permitted |
 | Platforms | Android first; Linux later |
 
-## Latest implementation: a larger world for your game (0.0.84)
+## Latest implementation: make your own map tiles (0.0.85)
 
-Choose a field larger than one screen, paint it with the cartridge's tiles, and
-set a fixed, following or room-changing camera from Game view. Follow any element;
-a map can also work without a hero or moving object. Moving and selecting objects
-beyond the first screen now pans the editor view. Scores and messages keep their
-screen positions while the game world scrolls.
+Draw a new tile directly from the map, review it and start painting scenery with
+it. No separate object or Lua editing is needed. When changing an existing tile,
+choose whether to update all its uses or make an independent copy for one cell.
+Copies keep the tile's flags; other graphics and map data stay intact.
 
-Map cells, field size and camera settings save together. One Undo reverses the
-whole change; drafts retain painting, tile selection and field edits after recovery.
-Existing animation, music, sounds and shared graphics memory remain intact.
-[Scope and validation](docs/showcase/0.0.84-en/README.md).
+Test unfinished art without saving. Tile pixels, map placement and camera
+settings save together, with one Undo. Palette selection, menus and interrupted
+touch strokes recover with the draft. [Scope and validation](docs/showcase/0.0.85-en/README.md).
 
-**Checked locally:** 82 core suite invocations and the integrated APK build passed.
-New checks cover world placement, camera targets, map preservation, failed saves,
-recovery and exact Undo/Redo. Host Lua traces checked movement bounds, room edges,
-restart and drawing order. Compact/tall/wide layouts received host review.
+**Checked locally:** 83 core suite invocations and the integrated APK build passed.
+New checks cover drawing, copying, shared resources, failed saves, recovery and
+exact Undo/Redo. Actual drafts from the previous version still restore. Compact,
+tall and wide layouts received host review; two labeled host previews are linked below.
 
-**Still pending:** official-runtime world/camera execution, real-device controls,
-exported-cart playback and novice/owner journeys for labs 0.0.78–84. Console use
-remains paused. No installation, new native screenshot pack or public release.
-[Issue #17](https://github.com/EriArk/PikoNest/issues/17) remains open for visual
-journey acceptance.
+**Still pending:** official-runtime tile/world/camera/audio/animation execution,
+real-device controls, exported-cart playback and novice/owner journeys for labs
+0.0.78–85. Console use remains paused. No installation, new native screenshot pack
+or public release. [Issue #17](https://github.com/EriArk/PikoNest/issues/17) remains
+open for visual journey acceptance.
 
-The new map brush currently uses existing tiles and upper map rows. Drawing a new
-tile directly in that context is the next gap to close. Collision, door triggers,
-parallax and broader map operations remain separate unfinished work. General tools
-stay accessible in every project; automatic world wiring requires recognized code.
+New tiles use safe upper-sheet storage in recognized projects. In-place editing
+of lower/shared tiles remains in All tools. Collision, door triggers, parallax
+and broader map operations remain unfinished. General tools stay accessible in
+every project; automatic wiring and allocation require recognized code.
 
 ## Previously demonstrated in the development app
 
@@ -101,11 +99,11 @@ No public beta or release readiness is claimed.
 
 ## What comes next
 
-1. Create tile art directly in the map workflow, preserving shared-data safety.
-   When console use is authorized, verify the named collection/switch journeys,
-   animation, audio and world/camera editing, then repair observed UX findings.
-2. Connect two small editable starters using the same general tools, and complete
-   remaining world/audio operations and contextual learning.
+1. Connect two small editable starters using the same general tools and contextual
+   guidance. Templates must not lock tools or replace the Blank creation path.
+2. When console use is authorized, verify the named collection/switch journeys,
+   animation, audio and world/tile/camera editing, then repair observed UX findings.
+   Complete remaining core-tool/library operations and contextual learning.
 3. Finish independent setup, storage/backup/recovery and Android compatibility;
    run both journeys on supported screen/control configurations.
 4. Have a novice and the owner complete and review the intended paths, fix the
@@ -118,6 +116,7 @@ status. This summary does not replace either plan or waive acceptance gates.
 
 | Material | Use it for | Required context |
 | --- | --- | --- |
+| [0.0.85 tile editor previews](docs/showcase/0.0.85-en/README.md) | Tile painting and review | Host-rendered production UI; not native screenshots or device acceptance |
 | [0.0.77 screenshots and two games](docs/showcase/0.0.77-en/README.md) | Movement, contact, goals, linked switches, official play and export | Native development build; bounded creation path, not a public beta |
 | [0.0.76 screenshots](docs/showcase/0.0.76-en/README.md) | Drawing/placement and shared/independent appearance | Earlier static Game view slice |
 | [Full screenshot index](docs/showcase/README.md) | Play, maps, animation, camera and other tools | Keep each pack's version and provenance |
@@ -125,9 +124,9 @@ status. This summary does not replace either plan or waive acceptance gates.
 
 ## Short update to adapt for a post
 
-PikoNest's main creation screen can now build a world bigger than one screen.
-Paint the map, place objects across it, and choose a camera that stays still,
-follows an element or switches between rooms. The map and camera save and undo
-together, while existing animation and audio stay intact. Local tests and the
-Android build pass; handheld and beginner review are still ahead. Next is drawing
-new tiles without leaving the map, followed by a small pair of editable starters.
+PikoNest now lets you draw new tiles right inside the map workflow. Paint a tile,
+review it, then use it across your scenery. Change every use or make a separate
+copy for one cell. Art, map and camera save and undo together, and unfinished
+strokes recover with the draft. Local tests and the Android build pass; handheld
+and beginner review are still ahead. Next: two small editable starting games
+using the same tools.

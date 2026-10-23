@@ -1,5 +1,9 @@
 # PikoNest — English website gallery
 
+[0.0.85: draw and reuse tile art inside the map](0.0.85-en/README.md) —
+new tiles, shared edits, independent copies and one recoverable world transaction.
+Includes two clearly labeled host layout previews, not native screenshots.
+
 [0.0.84: Game view world, map and camera](0.0.84-en/README.md) — field size,
 tile painting, world placement and fixed/follow/room cameras in one recoverable
 transaction. Local validation only; no new native screenshots or device claim.

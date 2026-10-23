@@ -1,11 +1,12 @@
 # Базовые инструменты: завершённость и порядок работ
 
-Lab 0.0.84 connects field size, upper-map painting/erasing and fixed/follow/room
-cameras to Game view, with world placement/picking, one Save/Undo and recoverable
-map/settings history. [Contract](WORLD_EDITOR.md) and [evidence](showcase/0.0.84-en/README.md).
-Direct tile creation in context, collision/transitions, parallax, broader map
-operations and native acceptance remain open. Next close the new-tile gap before
-small editable starter journeys. Historical next-step notes below are superseded.
+Lab 0.0.85 adds in-context tile creation, controller/touch painting, explicit
+edit-all/copy, shared-data protection and nested stroke recovery to the world/map
+workflow introduced in 0.0.84. Art, flags, map cells and world settings save/undo
+together. [Contract](WORLD_EDITOR.md) and [evidence](showcase/0.0.85-en/README.md).
+Collision/transitions, parallax, broader map operations and native acceptance
+remain open. Next connect two small editable starter journeys using these same
+general tools. Historical next-step notes below are superseded.
 
 Lab 0.0.83 connects music patterns, nested SFX phrase editing and game start
 playback through one composition draft/save/Undo. Three/four-part policies make

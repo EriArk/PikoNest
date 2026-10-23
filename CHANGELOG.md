@@ -10,6 +10,31 @@ Earlier work is recorded in [the technical status](docs/STATUS.md) and
 [versioned evidence](docs/showcase/README.md). See
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for the current overall picture.
 
+## 2026-10-23 — Draw new tiles without leaving the map (0.0.85)
+
+**Implemented and locally checked; official runtime and device acceptance remain open.**
+
+- Create tile art from the map, paint with controls or touch, choose colors and
+  erase, then review and place it. The new tile becomes the brush for more cells.
+- Change every use of a shared tile or make an independent copy for one cell.
+  Copies keep flags; other objects, animation frames and shared memory stay intact.
+- Test an unfinished tile without saving. Keep adds it to the world draft;
+  one Save/Undo covers art, map and camera. Discard leaves no unused new tile.
+- Recover unfinished strokes, palette selection, menus and drawing history.
+  Previous world drafts remain readable. No Lua editing or placed object is required.
+
+**Checked:** 83 local core suite invocations and the integrated APK build passed.
+The new workflow suite passed 33,004 assertions, mostly protected-pixel comparisons;
+actual previous-version drafts passed six recovery checks. Compact/tall/wide
+layouts received host review. Two labeled host previews are in the repository.
+
+**Limits:** new tiles use safe upper-sheet slots in recognized projects; lower
+shared tiles can be copied, while their in-place editing stays in All tools.
+Broader map operations, collision and door/parallax tools remain unfinished.
+No installation, native screenshots, official execution or public release occurred.
+Next: two small editable starters using these same general tools.
+[Guide](docs/WORLD_EDITOR.md) · [evidence and host previews](docs/showcase/0.0.85-en/README.md).
+
 ## 2026-10-23 — Build a larger world from Game view (0.0.84)
 
 **Implemented and locally checked; official runtime and device acceptance remain open.**

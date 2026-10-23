@@ -18,7 +18,7 @@ final class GameSurface {
     private Canvas canvas;
     private float width,height,scale;
     private RectF imageArea;
-    private boolean painting;
+    private boolean painting,tilePainting;
     private int lastX,lastY,pointer;
     private static final class Hit {final RectF area;final Runnable run;Hit(float x,float y,float w,float h,Runnable r){area=new RectF(x,y,x+w,y+h);run=r;}}
     GameSurface(WorkshopView v,WorkshopSession s,String title){view=v;session=s;project=title;PixelText.configure(v.getContext(),paint);paint.setAntiAlias(false);paint.setFilterBitmap(false);}
@@ -141,7 +141,7 @@ final class GameSurface {
         else footer(yes+"  Select",Action.CONFIRM,back+(g.screen==GameCanvas.Screen.HOME?"  Projects":"  Back"),Action.CANCEL);
     }
     private void worldEditor(String yes,String back){
-        GameCanvas g=game();WorldEditor e=g.world;boolean grid=e.page==WorldEditor.Page.PAINT||e.page==WorldEditor.Page.TILES;
+        GameCanvas g=game();WorldEditor e=g.world;if(e.art!=null){tileArtEditor(yes,back);return;}boolean grid=e.page==WorldEditor.Page.PAINT||e.page==WorldEditor.Page.TILES;
         boolean wide=width>=540;float top=104,bottom=height-100;
         float side=grid?Math.min(width-32,bottom-top-36):wide?Math.min(width*.43f,bottom-top-110):100;
         float left=grid?(width-side)/2:16,listX=wide&&!grid?side+40:16,listY=wide&&!grid?top:top+side+24,listW=width-listX-48;
@@ -169,7 +169,40 @@ final class GameSurface {
         button(yes+(e.editing?"  Keep":e.page==WorldEditor.Page.PAINT?"  Paint":"  Select"),8,fy+4,width/2-12,40,true,()->act(Action.CONFIRM));
         button(back+(e.editing?"  Revert":e.page==WorldEditor.Page.PAINT?"  Options":"  Back"),width/2+4,fy+4,width/2-12,40,false,()->act(Action.CANCEL));
         button(e.editing?"Left  -":"Start  Test",8,fy+44,width/2-12,40,false,()->act(e.editing?Action.LEFT:Action.TEST));
-        button(e.editing?"Right  +":grid?(e.page==WorldEditor.Page.TILES?"X  Empty":"X  Tile"):"Menu  Save",width/2+4,fy+44,width/2-12,40,false,()->act(e.editing?Action.RIGHT:grid?Action.CONTEXT:Action.MENU));
+        button(e.editing?"Right  +":grid?(e.page==WorldEditor.Page.TILES?"X  Create":"X  Tile"):"Menu  Save",width/2+4,fy+44,width/2-12,40,false,()->act(e.editing?Action.RIGHT:grid?Action.CONTEXT:Action.MENU));
+    }
+    private void tilePicture(TileArt t,float x,float y,float size,boolean before){
+        for(int py=0;py<8;py++)for(int px=0;px<8;px++){int p=before?t.beforePixel(px,py):t.pixel(px,py);rect(x+px*size/8,y+py*size/8,size/8,size/8,p==0?(px+py)%2==0?0:5:p);}
+        outline(x-1,y-1,size+2,size+2,13);
+    }
+    private void tileArtEditor(String yes,String back){
+        GameCanvas g=game();WorldEditor e=g.world;TileArt t=e.art;boolean wide=width>=540;
+        text(t.mode==TileArt.Mode.ALL?"Changes every use of this tile":"Places a tile at "+t.mapX+", "+t.mapY,16,87,18,6,width-32);
+        float top=110,bottom=height-100,side,listY,listX=16,listW=width-64;
+        if(t.page==TileArt.Page.DRAW||t.page==TileArt.Page.PALETTE){
+            side=Math.min(wide?width*.46f:width-32,bottom-top-(t.page==TileArt.Page.PALETTE?108:40));float left=wide?16:(width-side)/2;
+            tilePicture(t,left,top,side,false);imageArea=new RectF(left,top,left+side,top+side);
+            for(int n=1;n<8;n++){rect(left+n*side/8,top,1,side,13);rect(left,top+n*side/8,side,1,13);}
+            outline(left+t.x*side/8,top+t.y*side/8,side/8,side/8,7);
+            text(t.eraser?"Eraser / transparent":"Color "+t.color+(t.color==0?" / transparent":" / 8 x 8 tile"),left,top+side+25,18,7,wide?side:width-left-16);
+            if(wide){float mx=left+side+32,ms=Math.min(width-mx-16,160);int[] indices=e.image(),colors=new int[16384];for(int n=0;n<16384;n++)colors[n]=PicoPalette.COLORS[indices[n]];bitmap.setPixels(colors,0,128,0,0,128,128);canvas.drawBitmap(bitmap,null,new RectF(mx,top,mx+ms,top+ms),paint);outline(mx+(t.mapX*8-e.previewX())*ms/128,top+(t.mapY*8-e.previewY())*ms/128,ms/16,ms/16,10);wrap("Map preview. Test runs this draft; Keep returns to map painting.",mx,top+ms+28,width-mx-16,Math.max(0,(int)((bottom-top-ms-16)/26)));}
+            if(t.page==TileArt.Page.PALETTE){float cell=Math.min((width-32)/8,40),px=16,py=top+side+38;
+                for(int n=0;n<16;n++){final int color=n;float cx=px+n%8*cell,cy=py+n/8*cell;rect(cx+2,cy+2,cell-4,cell-4,n);if(g.focus==n)outline(cx,cy,cell,cell,7);hits.add(new Hit(cx,cy,cell,cell,()->{g.focus=color;act(Action.CONFIRM);}));}
+            }
+        }else{
+            float ts=wide?100:64;tilePicture(t,16,top,ts,true);tilePicture(t,32+ts,top,ts,false);
+            text("Before",16,top+ts+24,18,6,ts+12);text("After",32+ts,top+ts+24,18,7,ts+12);
+            if(wide){listX=2*ts+64;listY=top;listW=width-listX-48;wrap(t.summary(),16,top+ts+62,listX-32,Math.max(1,(int)((bottom-top-ts-48)/26)));}
+            else{wrap(t.mode==TileArt.Mode.ALL?"Keep changes all uses.":"Keep adds this tile to the map draft.",2*ts+48,top+18,width-2*ts-64,4);listY=top+ts+40;}
+            String[] rows=g.rows();int visible=Math.max(1,(int)((bottom-listY)/50)),first=Math.max(0,Math.min(Math.max(0,rows.length-visible),g.focus-visible/2));
+            for(int n=first;n<Math.min(rows.length,first+visible);n++){final int row=n;button(rows[n],listX,listY+(n-first)*50,listW,48,g.focus==n,()->{g.focus=row;act(Action.CONFIRM);});}
+            if(rows.length>visible){button("^",width-44,listY,32,40,false,()->act(Action.UP));button("v",width-44,bottom-40,32,40,false,()->act(Action.DOWN));}
+        }
+        float fy=height-88;rect(0,fy,width,88,1);rect(16,fy,width-32,1,13);
+        button(yes+(t.page==TileArt.Page.DRAW?"  Paint":"  Select"),8,fy+4,width/2-12,40,true,()->act(Action.CONFIRM));
+        button(back+(t.page==TileArt.Page.DRAW?"  Options":"  Back"),width/2+4,fy+4,width/2-12,40,false,()->act(Action.CANCEL));
+        button("Start  Test",8,fy+44,width/2-12,40,false,()->act(Action.TEST));
+        button(t.page==TileArt.Page.DRAW?"X  Color":t.page==TileArt.Page.PALETTE?"Right  Color":"Y  Undo",width/2+4,fy+44,width/2-12,40,false,()->act(t.page==TileArt.Page.DRAW?Action.CONTEXT:t.page==TileArt.Page.PALETTE?Action.RIGHT:Action.UNDO));
     }
     private void soundEditor(String yes,String back,SoundEditor s){
         GameCanvas g=game();float bottom=height-104,listY=112,listX=16,listW=width-64;
@@ -256,9 +289,21 @@ final class GameSurface {
     private void paintTo(int x,int y){int dx=Math.abs(x-lastX),sx=lastX<x?1:-1,dy=-Math.abs(y-lastY),sy=lastY<y?1:-1,err=dx+dy;
         while(true){game().paint(lastX,lastY);if(lastX==x&&lastY==y)break;int twice=2*err;if(twice>=dy){err+=dy;lastX+=sx;}if(twice<=dx){err+=dx;lastY+=sy;}}
     }
+    private int tileX(float x){return Math.max(0,Math.min(7,(int)((x-imageArea.left)*8/imageArea.width())));}
+    private int tileY(float y){return Math.max(0,Math.min(7,(int)((y-imageArea.top)*8/imageArea.height())));}
     boolean touch(MotionEvent e){
         float x=e.getX()/scale,y=e.getY()/scale;GameCanvas g=game();
-        if(e.getActionMasked()==MotionEvent.ACTION_CANCEL){painting=false;return true;}
+        TileArt tile=g.world==null?null:g.world.art;
+        if(e.getActionMasked()==MotionEvent.ACTION_CANCEL){painting=false;if(tilePainting&&tile!=null){tile.endStroke();changed();}tilePainting=false;return true;}
+        if(tilePainting&&(tile==null||tile.page!=TileArt.Page.DRAW||session.mode==WorkshopSession.Mode.ERROR)){if(tile!=null)tile.endStroke();tilePainting=false;}
+        if(session.mode!=WorkshopSession.Mode.ERROR&&tile!=null&&tile.page==TileArt.Page.DRAW&&e.getActionMasked()==MotionEvent.ACTION_DOWN&&imageArea!=null&&imageArea.contains(x,y)){
+            tilePainting=true;pointer=e.getPointerId(0);tile.beginStroke(tileX(x),tileY(y));changed();return true;
+        }
+        if(tilePainting){
+            int at=e.findPointerIndex(pointer);if(at<0){tile.endStroke();tilePainting=false;changed();return true;}
+            boolean end=e.getActionMasked()==MotionEvent.ACTION_UP||e.getActionMasked()==MotionEvent.ACTION_POINTER_UP&&e.getPointerId(e.getActionIndex())==pointer;
+            if(e.getActionMasked()==MotionEvent.ACTION_MOVE||end){for(int n=0;n<e.getHistorySize();n++)tile.strokePoint(tileX(e.getHistoricalX(at,n)/scale),tileY(e.getHistoricalY(at,n)/scale));tile.strokePoint(tileX(e.getX(at)/scale),tileY(e.getY(at)/scale));if(end){tile.endStroke();tilePainting=false;}changed();}return true;
+        }
         if(session.mode!=WorkshopSession.Mode.ERROR&&e.getActionMasked()==MotionEvent.ACTION_DOWN&&g.screen==GameCanvas.Screen.DRAW&&imageArea!=null&&imageArea.contains(x,y)){
             painting=true;pointer=e.getPointerId(0);lastX=px(x);lastY=py(y);g.paint(lastX,lastY);changed();return true;
         }

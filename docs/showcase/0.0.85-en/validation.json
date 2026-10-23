@@ -1,0 +1,66 @@
+{
+  "lab": "0.0.85",
+  "date": "2026-10-23",
+  "scope": "Map-context tile art; local implementation and validation only",
+  "build": {
+    "result": "passed",
+    "core_suite_invocations": 83,
+    "tile_workflow_assertions": 33004,
+    "world_workflow_assertions": 16496,
+    "apk_sha256": "435764234271c830783faa3ad13cdcc742f4683d066daed5683e3cd7a522d68c",
+    "one_launcher": true,
+    "godot_assets_verified": 263,
+    "official_runtime_bundled": false,
+    "installed": false
+  },
+  "legacy_journals": {
+    "produced_with": "previous lab 0.0.84 compiled classes",
+    "input_version": 9,
+    "current_version": 10,
+    "checks_passed": 6,
+    "coverage": [
+      "picker and exact candidate",
+      "world Undo",
+      "world Redo",
+      "active field",
+      "field revert",
+      "v10 reserialization"
+    ]
+  },
+  "layout_previews": {
+    "renderer": "Production GameSurface drawing calls through temporary Java2D Android adapters",
+    "logical_sizes": [
+      [
+        360,
+        480
+      ],
+      [
+        360,
+        800
+      ],
+      [
+        620,
+        540
+      ],
+      [
+        960,
+        540
+      ]
+    ],
+    "source_art": "Original grass test fixture and collection.p8 from lab 0.0.77",
+    "files": [
+      "host-tile-editor.png",
+      "host-tile-review.png"
+    ],
+    "native_screenshots": false,
+    "physical_input_verified": false
+  },
+  "pending": [
+    "Official-runtime tile/animation/audio/world journeys",
+    "Native installation and process recovery",
+    "Physical controls and touch on compact/wide devices",
+    "Independent exported-cart playback",
+    "Novice and owner acceptance",
+    "Public APK release approval"
+  ]
+}

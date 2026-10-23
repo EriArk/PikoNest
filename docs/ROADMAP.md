@@ -4,20 +4,20 @@
 
 The owner approved prioritizing a visual, contextual Game view over the next
 sound block. This refines UX07/UX08 rather than creating a second roadmap.
-Labs 0.0.81–84 connect goal/overview editing, SFX/events, music composition and
-world/map/camera editing to Game view. [Latest evidence](showcase/0.0.84-en/README.md).
-Native/runtime acceptance for labs 0.0.78–84 remains open. Console use is paused;
-the last complete native creation journey is still 0.0.77. Next independent work
-closes direct new-tile creation in the map context, then connects two small editable
-starter journeys using the same general tools. Range/library/advanced audio and
-broader map/camera operations remain unfinished; avoid repeated preset growth.
+Labs 0.0.81–85 connect goal/overview editing, SFX/events, music composition,
+world/map/camera editing and in-context tile art to Game view.
+[Latest evidence](showcase/0.0.85-en/README.md). Native/runtime acceptance for labs
+0.0.78–85 remains open. Console use is paused; the last complete native creation
+journey is still 0.0.77. Next independent work connects two small editable starter
+journeys using the same general tools. Range/library/advanced audio and broader
+map/camera operations remain unfinished; avoid repeated preset growth.
 
 | Next complete block | Existing task ownership | Ready when |
 | --- | --- | --- |
 | Resolve Game view findings from the complete journeys | UX07/UX08, #17 | Names, relationships, goal choices and rule overview/edit/return are locally implemented; complete native/novice review and repair observed friction; All tools stays reachable |
 | Prove both visual journeys and animation when console use is authorized | UX07/UX08, N01/G04, #17 | Blank collection and hero-free linked switches; preview/confirm/cancel, draft Test/return, recovery, Save/Undo/reopen/export; compact/wide physical controls, novice and owner review; native before/after evidence |
 | Complete audio creation and connection | S01–S05, UX08 | Basic SFX/event and music composition/shared-SFX/channel paths exist locally in 0.0.82–83; official Listen/Stop/Test/return/export and physical acceptance remain open, alongside range/library/advanced-audio work; respect system mute |
-| Close in-context tile creation, then small editable starters | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | Create tile art without leaving the map or inventing a placed object; retain shared-data review, Test/save/recovery; two small starters use the same genre-neutral world/audio/behavior tools |
+| Connect two small editable starters | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | In-context tile creation/copy/edit is locally implemented in 0.0.85; two small starters use the same genre-neutral world/audio/behavior tools and remain editable through them |
 | Independent Android setup and reliable data ownership | P/R tasks, modern target, Q05 | Fresh runtime/folder setup, backup/recovery/update and external launches without developer intervention |
 | Device, novice and owner acceptance | Q01–Q07, ACC-01–09 | Complete journeys on supported screens/physical controls; English/errors reviewed; owner findings resolved |
 

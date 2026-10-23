@@ -6,6 +6,17 @@
 
 Связи: [план](ROADMAP.md), [задачи](BACKLOG.md), [текущее состояние](STATUS.md).
 
+## 2026-10-23 tile-art acceptance still open
+
+Lab 0.0.85 adds map-context tile painting and shared/independent copies. When
+console access is authorized, create a tile from Blank using physical controls,
+paint repeated cells, edit all uses and make an independent variant. Repeat with
+touch drags/eraser, interrupted-stroke recovery, draft Test/return, failed save,
+Save/Undo/reopen/export. Verify flags, object/frame references, lower shared-memory
+preservation and compact/wide readability. Include a hero-free map and a novice
+finding New tile without developer guidance. Host previews are not native captures.
+[0.0.85 evidence](showcase/0.0.85-en/README.md).
+
 ## 2026-10-23 world/camera acceptance still open
 
 Lab 0.0.84 locally connects map painting and camera setup to Game view. When device
