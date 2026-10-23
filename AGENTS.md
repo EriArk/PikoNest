@@ -569,21 +569,20 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
-Current source/package (2026-10-23): lab 0.0.82 adds a general SFX editor and
-bounded Game view start/interaction/outcome sounds after the 0.0.79–81 visual UX
-slice. Source-checked recovery v7, isolated Listen/Test and atomic resource/binding
-Save/Undo are locally verified. Unknown Lua uses explicit resource slots; automatic
-allocation/wiring requires full known-source recognition. Preserve advanced audio
-data that the current editor cannot edit. See docs/SFX_EDITOR.md and
-docs/showcase/0.0.82-en/README.md.
+Current source/package (2026-10-23): lab 0.0.83 adds basic music composition after
+0.0.82 SFX/event editing. Ordinary patterns, nested phrase editing/copies, explicit
+three/four-part channel policies and game-start binding share one composition
+Save/Undo. Source-checked journal v8 retains v1–7 recovery. Unknown Lua supports
+explicit resource edits, not automatic allocation/wiring. Keep unsupported audio
+data intact. See docs/MUSIC_EDITOR.md and docs/showcase/0.0.83-en/README.md.
 
 Console use remains paused: no device actions until the owner explicitly allows
 it. Native/runtime, physical-controller, novice and owner acceptance remain open
-for labs 0.0.78–82 and issue #17. Next independent block: music patterns/composition,
-shared-SFX editing and explicit music/SFX channel policy, then world tools.
-Complete the visual/animation/audio journeys when authorized, repair actual
-findings, and keep the separate owner APK release gate. Follow the current ROADMAP
-rather than historical next-step notes.
+for labs 0.0.78–83 and issue #17. Next independent block: connect map/camera tools
+to the simpler Game view workflow. Music range/library/advanced-audio work remains
+in S01–S05; local implementation does not close official playback or novice gates.
+Complete outstanding visual/animation/audio journeys when authorized. Keep the
+separate owner APK release gate and follow the current ROADMAP.
 
 Historical source/package record (2026-10-23): lab 0.0.78 implements Game view animation
 sequences and movement/toggle-state bindings. Local suite/build and focused

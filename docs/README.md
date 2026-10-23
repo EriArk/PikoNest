@@ -1,7 +1,7 @@
 # PikoNest: current scope and development map
 
-Latest source/package: [0.0.82 sound creation and event binding](showcase/0.0.82-en/README.md).
-Tool contract: [SFX editor](SFX_EDITOR.md). Labs 0.0.78–82 are implemented with local validation; their complete native/runtime
+Latest source/package: [0.0.83 music composition](showcase/0.0.83-en/README.md).
+Tool contracts: [SFX](SFX_EDITOR.md) and [Music](MUSIC_EDITOR.md). Labs 0.0.78–83 are implemented with local validation; their complete native/runtime
 journeys remain pending while console use is paused. The last complete native
 creation journey is 0.0.77 below. Follow [ROADMAP](ROADMAP.md) for current order.
 

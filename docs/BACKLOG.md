@@ -1,5 +1,18 @@
 # PikoNest — задачи полного цикла
 
+**2026-10-23 — Lab 0.0.83, connected music composition (partial S01/S04/S05, UX08):**
+A general Music tool edits ordinary 64-pattern/four-part sequences, loop/stop flags,
+shared phrase selection and confirmed copy/clear. The existing SFX editor opens
+inside the composition; phrase creation/copy/editing, pattern references and game
+start binding save as one recoverable Undo transaction. Three-part music explicitly
+reserves part 4 for effects; four-part music preserves it with interruption disclosed.
+Generated Lua restarts music on reset and stops it before result SFX. Unknown Lua
+uses explicit resources without guessed wiring. [Contract](MUSIC_EDITOR.md) ·
+[local validation](showcase/0.0.83-en/README.md). Console use remains paused; no
+native playback, installation or release. Range/library/advanced-audio work and
+physical/novice/owner acceptance remain open. Next connect map/camera authoring to
+the simpler Game view workflow; validate outstanding visual/audio journeys when authorized.
+
 **2026-10-23 — Lab 0.0.82, sound creation and event binding (partial S01–S03/S05, UX08):**
 A general SFX tool now edits 32-note sequences, pitch/volume/instrument/effect,
 speed/loop, note copy/rest and transpose. Explicit Listen prepares an isolated
@@ -331,11 +344,11 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 
 | ID | Статус / зависит от | Работа | Критерий закрытия |
 | --- | --- | --- | --- |
-| S01 | Частично 0.0.82 / A03 | Семантические SFX/music-модели, ноты/тембры/эффекты/скорость/петли, pattern flags/channel references, пользовательские инструменты целевой версии | Точные round-trip и targeted edits; совместно используемые SFX и инструменты имеют зависимости; сравнение с официальным PICO-8 |
+| S01 | Частично 0.0.82–83 / A03 | Семантические SFX/music-модели, ноты/тембры/эффекты/скорость/петли, pattern flags/channel references, пользовательские инструменты целевой версии | Точные round-trip и targeted edits; совместно используемые SFX и инструменты имеют зависимости; сравнение с официальным PICO-8 |
 | S02 | Частично 0.0.82 / S01 | Создать SFX/фразу с нуля, editable presets, pitch/volume/instrument/effect, паузы, copy/transpose, длина/loop, Undo | Написать свой эффект и музыкальную фразу с контроллера; курсор не меняет ноты; подробные параметры раскрываются по запросу |
 | S03 | Частично 0.0.82; runtime acceptance open / R03, S01 | Быстрое прослушивание, Play/Stop, позиция, отключаемое note audition, уважение системного mute; выбрать backend preview | Stop/выход действительно прекращает звук; нет самопроизвольной мелодии UI или включения громкости; отличие вспомогательного preview от official runtime явно проверено |
-| S04 | План / S02, S03 | Музыкальные паттерны/партии/последовательность, copy/insert/delete, loop start/end/stop, отдельная партия/вся композиция | Собрать и изменить короткую композицию, прослушать, сохранить, Test и вновь открыть в PICO-8; общий SFX не меняется молча в других местах |
-| S05 | Частично SFX 0.0.82; music pending / S04, M01 | Привязка SFX/music к известным событиям, просмотр обычных вызовов, совместное использование каналов и независимая копия ресурса | Эффект слышен вместе с музыкой предсказуемо; тихий/неуказанный в music слот не считается свободным от Lua; изменения отменяются вместе с назначением |
+| S04 | Частично 0.0.83 / S02, S03 | Музыкальные паттерны/партии/последовательность, copy/insert/delete, loop start/end/stop, отдельная партия/вся композиция | Собрать и изменить короткую композицию, прослушать, сохранить, Test и вновь открыть в PICO-8; общий SFX не меняется молча в других местах |
+| S05 | Частично SFX/music 0.0.82–83; official acceptance open / S04, M01 | Привязка SFX/music к известным событиям, просмотр обычных вызовов, совместное использование каналов и независимая копия ресурса | Эффект слышен вместе с музыкой предсказуемо; тихий/неуказанный в music слот не считается свободным от Lua; изменения отменяются вместе с назначением |
 
 ## B/T. Библиотека, ремикс, главы и жанры — M4
 

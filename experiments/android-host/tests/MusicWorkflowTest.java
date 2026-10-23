@@ -1,0 +1,39 @@
+import art.pikoos.lab.core.*;
+import art.pikoos.lab.core.WorkshopSession.*;
+import java.util.*;
+import java.nio.file.*;
+
+public final class MusicWorkflowTest {
+    static int checks;
+    static void check(boolean b,String why){checks++;if(!b)throw new AssertionError(why);}
+    static void same(byte[] a,byte[] b,String why){check(Arrays.equals(a,b),why);}
+    static MusicEditor e(WorkshopSession s){return s.game.music;}
+    static void row(WorkshopSession s,int n){s.game.focus=n;s.act(Action.CONFIRM);check(s.mode==Mode.GAME,"action: "+s.error);}
+    static void open(WorkshopSession s){String[] r=s.game.rows();for(int n=0;n<r.length;n++)if(r[n].equals("Music")){row(s,n);return;}throw new AssertionError("Music unavailable");}
+    static void keepPhrase(WorkshopSession s){row(s,35);row(s,0);check(e(s).sound==null&&e(s).page==MusicEditor.Page.PART,"nested phrase returns to part");}
+    public static void main(String[] args)throws Exception{
+        for(String nl:new String[]{"\n","\r\n"}){
+            WorkshopCartridge blank=SfxDataTest.cart(nl,"");PlayModelTest.Port port=new PlayModelTest.Port();WorkshopSession s=PlayModelTest.session(blank,port);open(s);row(s,0);row(s,0);row(s,2);
+            check(e(s).sound!=null&&e(s).sound.slot==8,"create phrase allocates safely");row(s,0);row(s,0);row(s,1);s.act(Action.RIGHT);s.restoreGame(s.game.encode());check(e(s).sound.editing&&e(s).sound.data.notes[0][0]==25,"nested note field recovers");s.act(Action.CANCEL);check(e(s).sound.data.notes[0][0]==24,"nested field reverts");row(s,5);s.act(Action.CANCEL);
+            s.act(Action.CONTEXT);check(new WorkshopCartridge(port.launched).code().contains("sfx(8,3)"),"nested audition is SFX");same(blank.bytes(),s.cart().bytes(),"audition does not save");keepPhrase(s);check(e(s).pattern(0).channels[0]==8,"new phrase assigned to part");same(blank.bytes(),s.cart().bytes(),"keeping phrase only changes composition draft");
+            row(s,5);row(s,6);row(s,9);row(s,0);check(e(s).musicStart==0&&e(s).musicParts==3,"three-part policy");s.act(Action.TEST);WorkshopCartridge candidate=new WorkshopCartridge(port.launched);check(candidate.code().contains("music(game_music,0,7)")&&candidate.sfx().get(8).audible()==2,"Test contains music binding and notes");same(blank.bytes(),s.cart().bytes(),"Test keeps saved bytes");
+            byte[] journal=s.game.encode();s.restoreGame(journal);port.fail=true;s.game.focus=0;s.act(Action.CONFIRM);check(s.mode==Mode.ERROR&&e(s).draft(),"failed save retains whole composition");port.fail=false;s.act(Action.CANCEL);row(s,0);WorkshopCartridge saved=s.cart();same(candidate.bytes(),saved.bytes(),"atomic commit exact");check(e(s).page==MusicEditor.Page.BANK,"save returns to pattern bank");s.act(Action.UNDO);same(blank.bytes(),s.cart().bytes(),"one Undo restores patterns notes and Lua");s.act(Action.REDO);same(saved.bytes(),s.cart().bytes(),"Redo exact");same(saved.bytes(),PlayModel.read(saved).write(saved).bytes(),"ordinary Lua canonical reopen");
+            row(s,0);row(s,7);row(s,0);check(e(s).index==1&&e(s).pattern(1).channels[0]==8,"copy pattern shares phrase");row(s,0);row(s,3);check(e(s).sound.slot==9,"independent part copy allocates new SFX");row(s,0);row(s,1);s.act(Action.RIGHT);s.act(Action.CONFIRM);s.act(Action.CANCEL);keepPhrase(s);check(e(s).candidate().sfx().get(8).notes[0][0]==24&&e(s).candidate().sfx().get(9).notes[0][0]==25,"independent phrase leaves original");
+            s.restoreGame(s.game.encode());row(s,5);s.act(Action.CANCEL);row(s,0);row(s,4);row(s,6);s.act(Action.CANCEL);row(s,1);row(s,5);row(s,6);check(e(s).candidate().music().track(0).equals(Arrays.asList(0,1)),"two-pattern loop ordinary flags");
+            // Fourth part is always explicit: use it, then reserve it without deleting notes.
+            row(s,3);row(s,0);row(s,8);row(s,5);row(s,9);row(s,1);check(e(s).candidate().code().contains("music(game_music,0,15)"),"four-part policy explicit");row(s,1);row(s,1);row(s,9);row(s,0);check(!e(s).pattern(1).active(3)&&e(s).pattern(1).sound(3)==8,"reserve part 4 retains underlying SFX");
+            s.act(Action.CONTEXT);check(new WorkshopCartridge(port.launched).code().contains("music(1,0,15)"),"composition audition starts selected pattern");s.restoreGame(s.game.encode());row(s,0);WorkshopCartridge song=s.cart();check(song.music().get(0).flags==1&&song.music().get(1).flags==2,"sequence saved");
+            row(s,1);row(s,8);row(s,1);check(e(s).pattern(1).flags==2,"clear confirmation cancel");row(s,8);row(s,0);check(e(s).pattern(1).silent()&&e(s).candidate().sfx().get(9).audible()==2,"clear leaves notes");s.act(Action.UNDO);check(e(s).pattern(1).flags==2,"composition draft Undo");s.act(Action.REDO);s.act(Action.MENU);row(s,2);check(!e(s).draft(),"discard clears draft history");same(song.bytes(),e(s).candidate().bytes(),"discard exact");
+            // Unknown Lua can edit explicit resources, but never allocate or wire automatically.
+            WorkshopCartridge unknown=PlayModel.code(song,"function _update() music(flr(rnd(64))) end\n");WorkshopSession u=PlayModelTest.session(unknown,new PlayModelTest.Port());open(u);row(u,0);row(u,0);u.game.focus=2;u.act(Action.CONFIRM);check(u.mode==Mode.ERROR,"unknown Lua allocation refused");u.act(Action.CANCEL);row(u,1);row(u,0);row(u,0);u.act(Action.CANCEL);keepPhrase(u);row(u,5);u.act(Action.MENU);row(u,0);check(u.cart().code().equals(unknown.code()),"explicit music/SFX edits preserve unknown Lua");
+            WorkshopCartridge named=GameRulesOverviewTest.fixture(nl);WorkshopSession names=PlayModelTest.session(named,new PlayModelTest.Port());open(names);row(names,0);row(names,9);row(names,1);row(names,0);check(new GameCanvas(names.cart()).label(0).equals(new GameCanvas(named).label(0)),"binding retains optional element names");
+            WorkshopCartridge modified=PlayModel.code(song,song.code().replace("music(game_music,0,7)","music(game_music,1,7)"));check(PlayModel.read(modified)==null,"unfamiliar music code is never normalized");
+            WorkshopSession guarded=PlayModelTest.session(song,new PlayModelTest.Port());open(guarded);row(guarded,1);row(guarded,3);row(guarded,4);MusicDataTest.refused(()->e(guarded).candidate());guarded.act(Action.MENU);row(guarded,2);same(song.bytes(),e(guarded).candidate().bytes(),"discard incompatible part change keeps saved source");
+            GameCanvas changed=new GameCanvas(song);changed.configure(false);changed=GameCanvas.restore(changed.encode(),song);check(changed.settings.musicStart==1,"behavior draft retains music");
+            WorkshopCartridge sprites=new WorkshopCartridge(Files.readAllBytes(Paths.get("docs/showcase/0.0.77-en/collection.p8")));PlayModel pm=PlayModel.read(sprites);pm.musicStart=0;WorkshopCartridge animated=pm.write(sprites);GameCanvas animation=new GameCanvas(animated);animation.animate();animation=GameCanvas.restore(animation.encode(),animated);check(animation.animation.model.musicStart==0,"animation recovery retains music");
+            WorkshopSession tools=PlayModelTest.session(unknown,new PlayModelTest.Port());tools.game=null;tools.mode=Mode.NAVIGATE;tools.act(Action.MENU);tools.menuItem=9;tools.act(Action.CONFIRM);check(e(tools).fromTools,"All tools entry");tools.restoreGame(tools.game.encode());tools.act(Action.CANCEL);check(tools.mode==Mode.NAVIGATE,"All tools return");MusicDataTest.refused(()->GameCanvas.restore(journal,song));
+            if(args.length>0&&nl.equals("\n")){Path dir=Paths.get(args[0]);Files.createDirectories(dir);pm.musicStart=0;pm.startSound=8;pm.winSound=9;pm.loseSound=10;pm.elements.get(1).sound=11;pm.elements.get(2).sound=12;Files.write(dir.resolve("music-events.p8"),pm.write(sprites).bytes());Files.write(dir.resolve("composition.p8"),song.bytes());}
+        }
+        System.out.println("MusicWorkflowTest: "+checks+" checks passed");
+    }
+}

@@ -26,7 +26,7 @@ public final class GameRulesOverviewTest {
         in.readInt();int source=in.readInt();in.skipBytes(source);in.readUTF();in.readUTF();in.skipBytes(28);in.readBoolean();if(in.readBoolean()||!in.readBoolean())throw new AssertionError();
         in.readUTF();in.readUTF();in.readInt();in.readInt();int count=in.readInt();in.skipBytes(count*48);in.readBoolean();in.readInt();
         for(int n=0;n<count;n++)if(in.readBoolean()){in.readInt();int frames=in.readInt();in.skipBytes(frames*20);}
-        int at=bytes.length-stream.available(),soundSize=12+count*4;byte[] old=new byte[bytes.length-soundSize-7];System.arraycopy(bytes,0,old,0,at);System.arraycopy(bytes,at+soundSize,old,at,old.length-at);java.nio.ByteBuffer.wrap(old).putInt(5);return old;
+        int at=bytes.length-stream.available(),soundSize=20+count*4;byte[] old=new byte[bytes.length-soundSize-8];System.arraycopy(bytes,0,old,0,at);System.arraycopy(bytes,at+soundSize,old,at,old.length-at);java.nio.ByteBuffer.wrap(old).putInt(5);return old;
     }
     public static void main(String[] args)throws Exception{
         for(String nl:new String[]{"\n","\r\n"}){

@@ -15,7 +15,7 @@ copy of official PICO-8; this project does not supply it.
 [Project status](PROJECT_STATUS.md) · [Development changelog](CHANGELOG.md) —
 plain-language progress, next steps and links to images for posts and the website.
 
-Latest code: [sound creation and event binding (0.0.82)](docs/showcase/0.0.82-en/README.md).
+Latest code: [music composition and shared audio editing (0.0.83)](docs/showcase/0.0.83-en/README.md).
 Local tests and packaging passed; new Game view/animation/audio device checks and images
 are pending. The completed native creation evidence is linked below.
 

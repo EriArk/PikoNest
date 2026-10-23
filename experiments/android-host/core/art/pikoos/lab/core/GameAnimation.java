@@ -68,19 +68,19 @@ public final class GameAnimation {
     public WorkshopCartridge candidate(int[] pixels){return names.apply(model.write(pixels(resources,current().region,pixels)));}
     public String guidance(){if(!notice.isEmpty())return notice;if(sequence().mode==1)return "Plays while position changes. Standing still returns to frame 1.";if(sequence().mode==2)return "Plays while this switch is on. Off returns to frame 1.";return "Copy a frame, draw a new pose, then Test. Save commits the whole sequence.";}
     void encode(DataOutputStream out)throws IOException{
-        out.writeInt(element);model.encode(out);model.encodeAnimations(out);model.encodeSounds(out);byte[] data=resources.bytes();out.writeInt(data.length);out.write(data);
+        out.writeInt(element);model.encode(out);model.encodeAnimations(out);model.encodeSounds(out);model.encodeMusic(out);byte[] data=resources.bytes();out.writeInt(data.length);out.write(data);
         out.writeInt(frame);out.writeInt(focus);out.writeInt(before);out.writeBoolean(editing);
         out.writeInt(editedRegions.size());for(SpriteRegion r:editedRegions)for(int v:new int[]{r.x,r.y,r.width,r.height})out.writeInt(v);
         out.writeInt(paintBefore==null?0:paintBefore.length);if(paintBefore!=null)out.write(paintBefore);
     }
-    static GameAnimation decode(DataInputStream in,WorkshopCartridge base)throws IOException{return decode(in,base,true);}
-    static GameAnimation decode(DataInputStream in,WorkshopCartridge base,boolean withSounds)throws IOException{
-        int element=in.readInt();GameAnimation a=new GameAnimation(base,element);a.model=PlayModel.decode(in);a.model.decodeAnimations(in);if(withSounds)a.model.decodeSounds(in);
+    static GameAnimation decode(DataInputStream in,WorkshopCartridge base)throws IOException{return decode(in,base,8);}
+    static GameAnimation decode(DataInputStream in,WorkshopCartridge base,int version)throws IOException{
+        int element=in.readInt();GameAnimation a=new GameAnimation(base,element);a.model=PlayModel.decode(in);a.model.decodeAnimations(in);if(version>=7)a.model.decodeSounds(in);if(version>=8)a.model.decodeMusic(in);
         int length=in.readInt();if(length<0||length>2*1024*1024||length>in.available())throw new IOException();byte[] bytes=new byte[length];in.readFully(bytes);a.resources=new WorkshopCartridge(bytes);
         a.frame=in.readInt();a.focus=in.readInt();a.before=in.readInt();a.editing=in.readBoolean();
         int regions=in.readInt();if(regions<0||regions>1024)throw new IOException();for(int n=0;n<regions;n++){SpriteRegion r=new SpriteRegion(in.readInt(),in.readInt(),in.readInt(),in.readInt());if(r.sharesMap())throw new IOException();a.editedRegions.add(r);}
         int checkpoint=in.readInt();if(checkpoint<0||checkpoint>2*1024*1024||checkpoint>in.available())throw new IOException();if(checkpoint>0){a.paintBefore=new byte[checkpoint];in.readFully(a.paintBefore);}
-        if(!withSounds&&a.paintBefore!=null){GameAnimation prior=decode(new DataInputStream(new ByteArrayInputStream(a.paintBefore)),base,false);ByteArrayOutputStream upgraded=new ByteArrayOutputStream();prior.encode(new DataOutputStream(upgraded));a.paintBefore=upgraded.toByteArray();}
+        if(version<8&&a.paintBefore!=null){GameAnimation prior=decode(new DataInputStream(new ByteArrayInputStream(a.paintBefore)),base,version);ByteArrayOutputStream upgraded=new ByteArrayOutputStream();prior.encode(new DataOutputStream(upgraded));a.paintBefore=upgraded.toByteArray();}
         if(a.frame<0||a.frame>=a.sequence().frames.size()||a.focus<0||a.focus>=a.rows().length||a.editing&&(a.focus>2||a.before<(a.focus==2?1:0)||a.before>(a.focus==0?2:a.focus==1?a.sequence().frames.size()-1:150)))throw new IOException();
         PlayModel original=PlayModel.fromStatic(base),checked=a.model.copy();
         if(checked.elements.size()!=original.elements.size())throw new IOException();

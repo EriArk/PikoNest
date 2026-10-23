@@ -23,6 +23,8 @@ public final class WorkshopCartridge {
     public byte[] bytes() { return document.bytes(); }
     public int pixel(SpriteRegion region,int x,int y){return graphics.pixel(region,x,y);}
     public int sheetPixel(int x,int y){return graphics.pixel(x,y);}
+    public P8Music music(){return new P8Music(document);}
+    public WorkshopCartridge withPattern(int index,P8Music.Pattern pattern){return edited(music().withPattern(index,pattern));}
     public P8Sfx sfx(){return new P8Sfx(document);}
     public WorkshopCartridge withSound(int slot,P8Sfx.Sound sound){return edited(sfx().withSound(slot,sound));}
     public P8Map map(){return new P8Map(document);}

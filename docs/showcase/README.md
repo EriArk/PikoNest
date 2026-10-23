@@ -1,5 +1,9 @@
 # PikoNest — English website gallery
 
+[0.0.83: music composition and shared audio editing](0.0.83-en/README.md) —
+patterns, nested phrase editing/copies, one composition transaction and explicit
+music/effects channel choices. Local validation only; no new native screenshots.
+
 [0.0.82: sound creation and event binding](0.0.82-en/README.md) — general SFX
 editing, shared-use review, independent copies and recoverable event assignment.
 Local validation only; no new native images or official audio playback claim.

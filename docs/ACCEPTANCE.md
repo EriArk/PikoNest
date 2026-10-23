@@ -6,6 +6,18 @@
 
 Связи: [план](ROADMAP.md), [задачи](BACKLOG.md), [текущее состояние](STATUS.md).
 
+## 2026-10-23 music acceptance still open
+
+Lab 0.0.83 adds local pattern/composition and nested phrase workflows. After device
+access is authorized, create two patterns and an independent phrase copy, compare
+loop/stop/unequal-speed/length behavior with official PICO-8, audition and stop
+without changing system mute, and return to an unsaved phrase. Test three-part
+music plus effects, explicit four-part interruption, win/loss stop order and restart.
+Save/Undo/recover/reopen/export the complete composition, compare protected files,
+and independently play the exported cart. Cover physical controls, compact/wide
+screens and novice/owner review. Local Lua traces stub audio and cannot close these
+gates. [0.0.83 evidence](showcase/0.0.83-en/README.md).
+
 ## 2026-10-23 audio acceptance still open
 
 Lab 0.0.82 adds locally tested SFX editing and event bindings; no sound was played

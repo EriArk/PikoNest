@@ -190,3 +190,18 @@ See [SFX_EDITOR](SFX_EDITOR.md) for controls, sharing and compatibility limits.
 Journal v7 adds sound settings/drafts while retaining v1–6 recovery, including
 legacy animation paint checkpoints. [0.0.82 local validation](showcase/0.0.82-en/README.md)
 does not prove native audio, physical input or owner acceptance.
+
+## Music composition and channel policy (0.0.83)
+
+The [Music tool](MUSIC_EDITOR.md) adds ordinary patterns and nested SFX phrase
+creation/editing. One Save/Undo covers notes, patterns and a start-music binding.
+Three musical parts explicitly mute part 4 in reachable patterns, preserving SFX
+references/notes; four parts preserve it and disclose interruption by effects.
+Music starts/restarts with the game and stops before contact/result SFX at an
+outcome. Other music events are not added. Existing no-music source stays exact.
+
+Behavior, animation and SFX edits retain the music binding. Journal v8 adds music
+settings and composition drafts while retaining old v1–7 recovery, including nested
+animation painting. No new sound/music rows are added to the rule overview; those
+bindings remain accessible from Sound effects and Music. [Local evidence](showcase/0.0.83-en/README.md)
+is separate from official playback, native controls and owner acceptance.

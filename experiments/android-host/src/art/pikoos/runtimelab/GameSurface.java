@@ -49,7 +49,8 @@ final class GameSurface {
             wrap(session.error,16,150,w-32,Math.max(3,(int)((h-250)/26)));
             footer(yes+"  Return",Action.CONFIRM,back+"  Return",Action.CANCEL);return;
         }
-        if(g.screen==GameCanvas.Screen.SOUND){soundEditor(yes,back);return;}
+        if(g.screen==GameCanvas.Screen.SOUND){soundEditor(yes,back,g.sound);return;}
+        if(g.screen==GameCanvas.Screen.MUSIC){if(g.music.sound!=null)soundEditor(yes,back,g.music.sound);else musicEditor(yes,back);return;}
         if(g.screen==GameCanvas.Screen.NAME){nameEditor(yes,back);return;}
         boolean draw=g.screen==GameCanvas.Screen.DRAW||g.screen==GameCanvas.Screen.DRAW_MENU||g.screen==GameCanvas.Screen.PALETTE;
         boolean wide=w>=540;float top=104,bottom=h-104,side;
@@ -138,8 +139,8 @@ final class GameSurface {
         else if(g.screen==GameCanvas.Screen.PLACE)footer(yes+"  Done",Action.CONFIRM,back+(g.operation==GameCanvas.Operation.ADD?"  Draw again":"  Cancel"),Action.CANCEL);
         else footer(yes+"  Select",Action.CONFIRM,back+(g.screen==GameCanvas.Screen.HOME?"  Projects":"  Back"),Action.CANCEL);
     }
-    private void soundEditor(String yes,String back){
-        GameCanvas g=game();SoundEditor s=g.sound;float bottom=height-104,listY=112,listX=16,listW=width-64;
+    private void soundEditor(String yes,String back,SoundEditor s){
+        GameCanvas g=game();float bottom=height-104,listY=112,listX=16,listW=width-64;
         text(s.draft()?"Sound draft":"64 slots / 32 notes",16,87,18,6,width-32);
         if(s.data!=null&&s.page!=SoundEditor.Page.REVIEW){
             float gx=16,gy=106,gw=width-32,gh=76,cell=gw/32;
@@ -154,7 +155,7 @@ final class GameSurface {
             int lines=s.page==SoundEditor.Page.REVIEW?Math.max(3,Math.min(5,(int)((height-320)/26))):3;
             wrap(s.summary(),16,112,width-32,lines);listY=122+lines*26;
         }
-        String[] rows=s.rows();int rowHeight=50,visible=Math.max(1,(int)((bottom-listY)/rowHeight));
+        String[] rows=g.rows();int rowHeight=50,visible=Math.max(1,(int)((bottom-listY)/rowHeight));
         int first=Math.max(0,Math.min(Math.max(0,rows.length-visible),g.focus-visible/2));
         for(int n=first;n<Math.min(rows.length,first+visible);n++){final int row=n;button(rows[n],listX,listY+(n-first)*rowHeight,listW,rowHeight-2,g.focus==n,()->{if(s.editing){if(row==g.focus)act(Action.RIGHT);return;}g.focus=row;act(Action.CONFIRM);});}
         if(rows.length>visible){button("^",width-44,listY,32,40,false,()->act(Action.UP));button("v",width-44,bottom-40,32,40,false,()->act(Action.DOWN));}
@@ -163,6 +164,19 @@ final class GameSurface {
         button(back+(s.editing?"  Revert":"  Back"),width/2+4,fy+4,width/2-12,40,false,()->act(Action.CANCEL));
         button(s.editing?"Left  -":"Start  Test",8,fy+44,width/2-12,40,false,()->act(s.editing?Action.LEFT:Action.TEST));
         button(s.editing?"Right  +":"X  Listen",width/2+4,fy+44,width/2-12,40,false,()->act(s.editing?Action.RIGHT:Action.CONTEXT));
+    }
+    private void musicEditor(String yes,String back){
+        GameCanvas g=game();MusicEditor m=g.music;float bottom=height-104,listY=204;
+        if(m.page==MusicEditor.Page.BANK){
+            float cell=(width-32)/16;for(int n=0;n<64;n++){final int at=n;float x=16+(n%16)*cell,y=86+(n/16)*18;P8Music.Pattern p=m.pattern(n);rect(x+1,y,cell-2,14,p.silent()?5:(p.flags&4)!=0?8:(p.flags&2)!=0?12:11);if(n==g.focus)outline(x,y,cell,15,10);hits.add(new Hit(x,y,cell,18,()->{g.focus=at;act(Action.CONFIRM);}));}
+            text("X listens / Menu reviews",16,180,18,6,width-32);listY=196;
+        }else{int lines=m.page==MusicEditor.Page.REVIEW||m.page==MusicEditor.Page.COPY||m.page==MusicEditor.Page.BIND?4:3;wrap(m.summary(),16,104,width-32,lines);listY=112+lines*26;}
+        String[] rows=m.rows();int visible=Math.max(1,(int)((bottom-listY)/50)),first=Math.max(0,Math.min(Math.max(0,rows.length-visible),g.focus-visible/2));
+        for(int n=first;n<Math.min(rows.length,first+visible);n++){final int at=n;button(rows[n],16,listY+(n-first)*50,width-64,48,g.focus==n,()->{g.focus=at;act(Action.CONFIRM);});}
+        if(rows.length>visible){button("^",width-44,listY,32,40,false,()->act(Action.UP));button("v",width-44,bottom-40,32,40,false,()->act(Action.DOWN));}
+        float fy=height-88;rect(0,fy,width,88,1);rect(16,fy,width-32,1,13);
+        button(yes+"  Select",8,fy+4,width/2-12,40,true,()->act(Action.CONFIRM));button(back+"  Back",width/2+4,fy+4,width/2-12,40,false,()->act(Action.CANCEL));
+        button("Start  Test",8,fy+44,width/2-12,40,false,()->act(Action.TEST));button("X  Listen",width/2+4,fy+44,width/2-12,40,false,()->act(Action.CONTEXT));
     }
     private void nameEditor(String yes,String back){
         GameCanvas g=game();NameEditor e=g.nameDraft;

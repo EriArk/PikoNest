@@ -93,10 +93,11 @@ Malformed/ambiguous resource framing is refused without mutation.
 
 ## Still required
 
-Music patterns/composition, music playback and channel policy; richer range
-copy/editing and multi-type library reuse; advanced filters/waveform editing;
+Basic [music composition and a three/four-part policy](MUSIC_EDITOR.md) are now
+implemented locally in 0.0.83. Remaining work includes richer range copy/editing
+and multi-type library reuse; advanced filters/waveform editing;
 actual audio comparison and complete physical-controller/novice acceptance.
-This tool does not replace a general music editor or prove a beta-ready journey.
+Neither local tool implementation proves a beta-ready journey.
 
 References checked for this implementation:
 [official PICO-8 0.2.7 manual — SFX editor, sfx and music](https://www.lexaloffle.com/dl/docs/pico-8_manual.html),

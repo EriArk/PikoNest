@@ -10,6 +10,32 @@ Earlier work is recorded in [the technical status](docs/STATUS.md) and
 [versioned evidence](docs/showcase/README.md). See
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for the current overall picture.
 
+## 2026-10-23 — Compose music inside your game project (0.0.83)
+
+**Implemented and locally checked; official audio and device acceptance remain open.**
+
+- Added a general Music tool for patterns, four parts, loop/stop flags and confirmed
+  pattern copy/clear. No Lua editing is needed for this resource workflow.
+- Parts open the existing note editor. Create a phrase, edit a shared one or make
+  an independent copy without leaving the composition. Notes, pattern references
+  and game-start assignment save and undo together; nested drafts recover.
+- Choose three musical parts plus a separate effects channel, or four parts with
+  possible interruption of the fourth. Muting retains the original phrase data.
+  Music restarts on reset and stops before contact/result effects at win/loss.
+- Listen uses isolated audition carts. Unknown code remains unchanged and uses
+  explicit resource selection; automatic allocation/wiring requires a recognized game.
+
+**Checked:** 81 local core suite invocations and integrated APK packaging passed.
+New data/workflow suites passed 548 and 218 assertions; seven host Lua assertions
+checked start/reset/result audio call order with stubbed audio. Actual older v6/v7
+animation/behavior drafts recovered. Compact/tall/wide host layouts were reviewed.
+No console actions, installation, new native screenshots or official playback occurred.
+
+**Limits:** range rearrangement, multi-type audio library reuse, advanced SFX data
+and room/result music events remain unfinished. Real playback, Stop/return, exported
+cart audio and physical/novice/owner acceptance remain open. No public APK release.
+[Music guide](docs/MUSIC_EDITOR.md) · [exact evidence](docs/showcase/0.0.83-en/README.md).
+
 ## 2026-10-23 — Create sounds and attach them to events (0.0.82)
 
 **Implemented and locally checked; official audio and device acceptance remain open.**

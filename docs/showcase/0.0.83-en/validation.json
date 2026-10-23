@@ -1,0 +1,125 @@
+{
+  "date": "2026-10-23",
+  "build": "0.0.83",
+  "baseline_commit": "f57d356",
+  "final_local_apk_sha256": "38a8e57b5db0f3d078cc5fdfb347a3f8e3cd22c7dd4435662bb266d0a5ab065b",
+  "final_apk_installed": false,
+  "full_local_suite_invocations": 81,
+  "full_suite_passed": true,
+  "focused_checks": {
+    "GameCanvasTest": 16504,
+    "PlayModelTest": 96,
+    "GameAnimationTest": 80199,
+    "GameRelationshipsTest": 81,
+    "GameIdentityTest": 101,
+    "GameRulesOverviewTest": 100,
+    "AssetNamingTest": 53,
+    "SfxDataTest": 2222,
+    "SoundWorkflowTest": 200,
+    "MusicDataTest": 548,
+    "MusicWorkflowTest": 218
+  },
+  "legacy_recovery": "Actual v6 and v7 animation/behavior drafts from lab81/82 restored, including nested paint checkpoint cancellation; v7 event sound binding retained",
+  "host_lua": {
+    "checks": 7,
+    "engine": "Lupa 2.6 Lua; generated += normalized; audio APIs stubbed, not official playback",
+    "traces": {
+      "start": [
+        [
+          "music",
+          -1
+        ],
+        [
+          "sfx",
+          -1,
+          3
+        ],
+        [
+          "music",
+          0,
+          0,
+          7
+        ],
+        [
+          "sfx",
+          8,
+          3
+        ]
+      ],
+      "win": [
+        [
+          "music",
+          -1
+        ],
+        [
+          "sfx",
+          11,
+          3
+        ],
+        [
+          "sfx",
+          9,
+          3
+        ]
+      ],
+      "loss": [
+        [
+          "music",
+          -1
+        ],
+        [
+          "sfx",
+          12,
+          3
+        ],
+        [
+          "sfx",
+          10,
+          3
+        ]
+      ]
+    }
+  },
+  "package_check": "One launcher, integrated runtime adapter, 263 Godot assets; no official PICO-8 binaries bundled",
+  "device_actions": false,
+  "official_runtime_executed": false,
+  "host_layout_review": {
+    "renderer": "Production GameSurface draw calls through temporary Java2D adapters; approximate Android drawing, not native evidence",
+    "logical_sizes": [
+      [
+        360,
+        480
+      ],
+      [
+        360,
+        800
+      ],
+      [
+        620,
+        540
+      ],
+      [
+        960,
+        540
+      ]
+    ],
+    "screens": [
+      "pattern bank",
+      "pattern parts and flags",
+      "phrase actions",
+      "music/effects channel policy",
+      "composition review",
+      "nested note editor"
+    ]
+  },
+  "images": [],
+  "pending": [
+    "official music/SFX fidelity, loop/timing comparison, Listen/Stop/replay/return and mute verification",
+    "native visual, animation and audio creation/export journeys",
+    "physical-controller, novice and owner review",
+    "music range rearrangement, cross-project audio library and advanced SFX data editing",
+    "additional music event bindings",
+    "world, Android/storage and other acceptance tasks in ROADMAP"
+  ],
+  "public_apk_release": false
+}

@@ -1,5 +1,18 @@
 # Состояние PikoNest
 
+**2026-10-23 — Lab 0.0.83, connected music composition (partial S01/S04/S05, UX08):**
+A general Music tool edits ordinary 64-pattern/four-part sequences, loop/stop flags,
+shared phrase selection and confirmed copy/clear. The existing SFX editor opens
+inside the composition; phrase creation/copy/editing, pattern references and game
+start binding save as one recoverable Undo transaction. Three-part music explicitly
+reserves part 4 for effects; four-part music preserves it with interruption disclosed.
+Generated Lua restarts music on reset and stops it before result SFX. Unknown Lua
+uses explicit resources without guessed wiring. [Contract](MUSIC_EDITOR.md) ·
+[local validation](showcase/0.0.83-en/README.md). Console use remains paused; no
+native playback, installation or release. Range/library/advanced-audio work and
+physical/novice/owner acceptance remain open. Next connect map/camera authoring to
+the simpler Game view workflow; validate outstanding visual/audio journeys when authorized.
+
 **2026-10-23 — Lab 0.0.82, sound creation and event binding (partial S01–S03/S05, UX08):**
 A general SFX tool now edits 32-note sequences, pitch/volume/instrument/effect,
 speed/loop, note copy/rest and transpose. Explicit Listen prepares an isolated
