@@ -126,7 +126,7 @@ Lab 0.0.78 adds [editable frame sequences and movement/switch-state bindings](GA
 Current editor limits: 16 placements; speed 1–4 pixels per update; one contact
 or toggle rule per placement; one optional linked switch; fixed rectangular
 graphics; a solid background; fixed outcome text. These are PikoNest limitations,
-not limits of PICO-8. Maps, audio events, richer conditions,
+not limits of PICO-8. Maps, music events, richer conditions,
 score/lives customization and library insertion still need connections to this
 creation path. Existing advanced tools remain available, but arbitrary code
 changes can take a project outside the recognized Game view subset.
@@ -172,3 +172,21 @@ generator or its supported rule types. The overview is not a second rule store.
 Game-view journal v6 adds semantic return context; v1–5 remain readable with their
 old focus/field behavior. Source equality and original layout checks still apply.
 [Local evidence and pending native acceptance](showcase/0.0.81-en/README.md).
+
+## Event sounds (0.0.82)
+
+Sound effects is a general resource editor, with optional bindings to recognized
+Game view start, interaction and outcome events. Selected-element Sound returns
+to that element after Save/Cancel. One save includes newly authored SFX data and
+its binding; Undo reverses both. Other behavior/animation/placement edits retain
+those bindings. Full source recognition and ordinary PICO-8 output still apply.
+
+All bound events use channel 3; later events replace earlier ones, and global
+outcomes run after contacts. Restart stops that channel and replays start. Holding
+a switch button or remaining on a result screen does not replay the sound. The
+sound event list handles these bindings; sound rows are not yet in the rule overview.
+See [SFX_EDITOR](SFX_EDITOR.md) for controls, sharing and compatibility limits.
+
+Journal v7 adds sound settings/drafts while retaining v1–6 recovery, including
+legacy animation paint checkpoints. [0.0.82 local validation](showcase/0.0.82-en/README.md)
+does not prove native audio, physical input or owner acceptance.

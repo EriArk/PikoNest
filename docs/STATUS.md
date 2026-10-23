@@ -1,5 +1,19 @@
 # Состояние PikoNest
 
+**2026-10-23 — Lab 0.0.82, sound creation and event binding (partial S01–S03/S05, UX08):**
+A general SFX tool now edits 32-note sequences, pitch/volume/instrument/effect,
+speed/loop, note copy/rest and transpose. Explicit Listen prepares an isolated
+runtime cart; Test uses the game draft. Known Game view projects allocate safe
+slots and bind start, interaction, win/loss sounds without Lua. Unknown code stays
+unchanged and uses explicit slots. Shared-use review, independent copies,
+source-checked recovery and atomic resource/binding Save/Undo are implemented.
+[Tool contract](SFX_EDITOR.md) · [local validation](showcase/0.0.82-en/README.md).
+Advanced audio data remains preserved but read-only. Music editing/channel policy,
+range operations, asset reuse and official audio/device acceptance remain open.
+Console use is paused; no installation, playback or public release is claimed.
+Next connect music patterns/composition and their safe shared-SFX/channel workflow;
+complete the outstanding visual/audio device journeys when authorized.
+
 **2026-10-23 — Lab 0.0.81, goal choices and a connected rules overview (partial UX07/UX08, #17):**
 Game rules opens a read-only overview of the recognized game's goal, background,
 movement, interactions and animations. Named entries open the relevant existing

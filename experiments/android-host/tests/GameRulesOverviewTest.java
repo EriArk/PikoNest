@@ -21,6 +21,13 @@ public final class GameRulesOverviewTest {
         cart=m.write(cart);GameElementNames names=GameElementNames.read(cart,new GameUses(m.layout(cart),0));
         for(int n=0;n<4;n++)names.values.set(n,new String[]{"Heart","Star","Moon","Sun"}[n]);return names.apply(cart);
     }
+    static byte[] legacyGoal(GameCanvas g)throws Exception{
+        byte[] bytes=g.encode();java.io.ByteArrayInputStream stream=new java.io.ByteArrayInputStream(bytes);java.io.DataInputStream in=new java.io.DataInputStream(stream);
+        in.readInt();int source=in.readInt();in.skipBytes(source);in.readUTF();in.readUTF();in.skipBytes(28);in.readBoolean();if(in.readBoolean()||!in.readBoolean())throw new AssertionError();
+        in.readUTF();in.readUTF();in.readInt();in.readInt();int count=in.readInt();in.skipBytes(count*48);in.readBoolean();in.readInt();
+        for(int n=0;n<count;n++)if(in.readBoolean()){in.readInt();int frames=in.readInt();in.skipBytes(frames*20);}
+        int at=bytes.length-stream.available(),soundSize=12+count*4;byte[] old=new byte[bytes.length-soundSize-7];System.arraycopy(bytes,0,old,0,at);System.arraycopy(bytes,at+soundSize,old,at,old.length-at);java.nio.ByteBuffer.wrap(old).putInt(5);return old;
+    }
     public static void main(String[] args)throws Exception{
         for(String nl:new String[]{"\n","\r\n"}){
             WorkshopCartridge original=fixture(nl);PlayModelTest.Port port=new PlayModelTest.Port();WorkshopSession s=PlayModelTest.session(original,port);
@@ -59,7 +66,7 @@ public final class GameRulesOverviewTest {
             row(empty,0);row(empty,0);empty.game.focus=2;check(empty.game.summary().contains("No switches yet"),"switch goal explains missing rules");empty.act(Action.CANCEL);empty.act(Action.CANCEL);check(empty.game.screen==GameCanvas.Screen.OVERVIEW,"empty draft cancellation returns safely");
             row(empty,1);choose(empty,1,0); // Numeric background editor still supports field cancellation.
             empty.act(Action.CANCEL);check(empty.game.screen==GameCanvas.Screen.OVERVIEW,"background cancellation returns to overview");
-            GameCanvas legacy=new GameCanvas(original);legacy.configure(false);legacy.focus=0;legacy.editingField=true;byte[] v5=legacy.encode();v5=Arrays.copyOf(v5,v5.length-6);java.nio.ByteBuffer.wrap(v5).putInt(5);
+            GameCanvas legacy=new GameCanvas(original);legacy.configure(false);legacy.focus=0;legacy.editingField=true;byte[] v5=legacyGoal(legacy);
             GameCanvas recovered=GameCanvas.restore(v5,original);recovered.act(Action.RIGHT);recovered.act(Action.CANCEL);check(recovered.settings.goal==0,"legacy numeric goal draft reverts old value");
             WorkshopCartridge unfamiliar=PlayModel.code(original,original.code()+"poke(0,1)\n");GameCanvas protectedCart=new GameCanvas(unfamiliar);PlayModelTest.refused(()->protectedCart.openOverview());same(unfamiliar.bytes(),protectedCart.base.bytes(),"unfamiliar Lua not normalized");
         }

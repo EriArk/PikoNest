@@ -10,6 +10,35 @@ Earlier work is recorded in [the technical status](docs/STATUS.md) and
 [versioned evidence](docs/showcase/README.md). See
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for the current overall picture.
 
+## 2026-10-23 — Create sounds and attach them to events (0.0.82)
+
+**Implemented and locally checked; official audio and device acceptance remain open.**
+
+- Added a general sound-effects editor: 32-note sequences, pitch, volume,
+  instruments, effects, rests, next-note copy, transpose, speed and loops.
+  Controller navigation selects notes without changing them accidentally.
+- Recognized games can create a sound for starting, collecting, toggling, winning
+  or losing. One Save/Undo covers both sound data and its assignment. Unfamiliar
+  imported Lua remains unchanged; it uses explicit sound-slot selection.
+- Shared-use review includes events, music and custom instruments. An independent
+  copy keeps the original and does not silently change other uses. Automatic
+  placement reserves referenced slots, including muted music references.
+- Listen prepares a separate audition cartridge; Test uses the game draft. Neither
+  saves the project or changes system volume. Notes, field revert and draft Undo
+  recover after closure; older animation/behavior drafts still restore.
+
+**Checked:** 79 local core suite invocations and integrated APK packaging passed.
+The new data/workflow suites passed 2,222 and 200 checks. A separate host Lua trace
+passed 16 event/stop/restart checks; this used stubbed audio calls, not official
+playback. Compact/tall/wide host layouts and real lab-0.0.81 draft migration passed.
+No device actions, installation or new official-runtime execution occurred.
+
+**Limits:** basic event sounds share channel 3; later sounds replace earlier ones.
+Music composition/channel handling, richer range edits and sound-library reuse are
+unfinished. Advanced imported filters/waveforms remain preserved but read-only.
+Physical-controller, novice and owner review remain open. No public APK release.
+[Sound tool guide](docs/SFX_EDITOR.md) · [exact evidence](docs/showcase/0.0.82-en/README.md).
+
 ## 2026-10-23 — See and edit how your game works (0.0.81)
 
 **Implemented and locally checked; device and owner acceptance remain open.**

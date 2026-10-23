@@ -15,8 +15,8 @@ copy of official PICO-8; this project does not supply it.
 [Project status](PROJECT_STATUS.md) · [Development changelog](CHANGELOG.md) —
 plain-language progress, next steps and links to images for posts and the website.
 
-Latest code: [game goals and a connected rule overview (0.0.81)](docs/showcase/0.0.81-en/README.md).
-Local tests and packaging passed; new Game view/animation device checks and images
+Latest code: [sound creation and event binding (0.0.82)](docs/showcase/0.0.82-en/README.md).
+Local tests and packaging passed; new Game view/animation/audio device checks and images
 are pending. The completed native creation evidence is linked below.
 
 [Build two small games without opening Lua](docs/showcase/0.0.77-en/README.md) |

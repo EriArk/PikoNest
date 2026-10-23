@@ -1,5 +1,11 @@
 # Базовые инструменты: завершённость и порядок работ
 
+Lab 0.0.82 adds a general SFX editor and bounded Game view event bindings:
+notes, speed/loop, explicit isolated Listen, safe allocation, shared-use review,
+independent copies and atomic Save/Undo/recovery. [Contract](SFX_EDITOR.md) and
+[local evidence](showcase/0.0.82-en/README.md). Music, advanced audio data editing,
+range operations/library reuse and native audio acceptance remain open.
+
 Lab 0.0.81 connects goal choices and an overview of existing Game view rules to
 behavior/animation editing, source-checked recovery and save/Undo. This is UX07/UX08
 work over the same bounded tools, not a new rule engine or completion of G/N/S.
@@ -196,7 +202,7 @@ Lua не является обязательным шагом. Повторно 
 | Камера | Формы положения/follow, ограничения и комнаты, reset для HUD | Понятный вход и выбор существующей настройки, связь с координатами/использованиями, безопасный порядок world/HUD | N02, G04, M05 |
 | Фоны | Список известных полос, создание/копия/параметры/порядок/удаление, Undo и восстановление | Подключение к отрисовке ещё зависит от места в коде; дополнительные оси и анимация расширяют возможности, но не устраняют этот разрыв | N03, G04 |
 | Правила и движение | Формы условий/действий, ограниченные операции ветвей, известные движение/столкновения/переходы | Явные связи ввода, состояния и выбранного использования; полный цикл изменения/удаления механики вместо роста каталога | M01–M05, C02 |
-| SFX и музыка | Сохранность исходных секций; общего редактора в текущем core нет | Создание собственных нот/фраз/паттернов, редактирование, Play/Stop, сохранение и привязка к событию | S01–S05 |
+| SFX и музыка | 0.0.82: общий SFX-редактор, ноты/тембр/эффект/скорость/петля, explicit Listen, shared review, Save/Undo/recovery и события Game view; проверено локально | Музыкальные паттерны/композиция, каналы, расширенные аудиоданные, диапазоны/библиотека, official playback/Stop/return и физическая приёмка | S01–S05 |
 | Эффекты | Требования и исследование | Базовый редактируемый эффект и его связь с событием; каталог пресетов не заменяет этот инструмент | M06 |
 
 Основания в коде:

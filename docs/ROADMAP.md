@@ -4,18 +4,19 @@
 
 The owner approved prioritizing a visual, contextual Game view over the next
 sound block. This refines UX07/UX08 rather than creating a second roadmap.
-Lab 0.0.81 completes the planned local goal/overview slice on top of names and
-visual relationships: explicit goals, connected rule editing and contextual return.
-[Evidence and limits](showcase/0.0.81-en/README.md). Native/runtime acceptance for
-labs 0.0.78–81 remains open. Console use is paused by the owner; the last complete
-native creation journey is still 0.0.77. Move independent code work to SFX rather
-than adding more recipes while these device checks await permission.
+Lab 0.0.81 completed the planned local goal/overview slice. Lab 0.0.82 now connects
+general sound creation to supported events: note editing, safe shared resources,
+explicit Listen, and atomic Save/Undo/recovery. [Evidence and limits](showcase/0.0.82-en/README.md).
+Native/runtime acceptance for labs 0.0.78–82 remains open. Console use is paused;
+the last complete native creation journey is still 0.0.77. Next independent work
+is music patterns/composition with shared-SFX and channel handling, followed by
+world tools. Do not substitute preset growth for these missing workflows.
 
 | Next complete block | Existing task ownership | Ready when |
 | --- | --- | --- |
 | Resolve Game view findings from the complete journeys | UX07/UX08, #17 | Names, relationships, goal choices and rule overview/edit/return are locally implemented; complete native/novice review and repair observed friction; All tools stays reachable |
 | Prove both visual journeys and animation when console use is authorized | UX07/UX08, N01/G04, #17 | Blank collection and hero-free linked switches; preview/confirm/cancel, draft Test/return, recovery, Save/Undo/reopen/export; compact/wide physical controls, novice and owner review; native before/after evidence |
-| Create and connect sound effects | S01–S03/S05, UX08 | Standard SFX resource editor, controller note entry, safe allocation/reuse, event binding, Save/reopen/Test/export; respect system mute |
+| Complete audio creation and connection | S01–S05, UX08 | Basic SFX/event workflow exists locally in 0.0.82; next music patterns/composition, shared-SFX/channel handling; then official Listen/Stop/Test/return/export and physical acceptance; respect system mute |
 | Finish world/audio tools, then small editable starters | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | Maps/camera, music and tools work from Blank and independently of genre; two starter journeys use those same tools |
 | Independent Android setup and reliable data ownership | P/R tasks, modern target, Q05 | Fresh runtime/folder setup, backup/recovery/update and external launches without developer intervention |
 | Device, novice and owner acceptance | Q01–Q07, ACC-01–09 | Complete journeys on supported screens/physical controls; English/errors reviewed; owner findings resolved |

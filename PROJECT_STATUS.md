@@ -12,34 +12,39 @@ setup live in one development APK; there is no public APK release yet.
 | Item | Current position |
 | --- | --- |
 | Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.81** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | Goals and a connected rule overview implemented; device acceptance pending |
-| Current focus | General sound-effect creation and event binding; visual device journeys when permitted |
+| Android baseline | **0.0.82** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | Sound creation and event bindings implemented; device acceptance pending |
+| Current focus | Music creation and shared audio resources; visual/audio device journeys when permitted |
 | Platforms | Android first; Linux later |
 
-## Latest implementation: see how your game works (0.0.81)
+## Latest implementation: make sounds for your game (0.0.82)
 
-Open Game rules to see the goal, background, movement, interactions and animations
-in one list. Entries use your element names and show the elements involved on the
-field. Select an entry to edit it; saving or cancelling brings you back to that
-rule. Removing a rule keeps you at the same element, and Undo restores it.
+Create a sound from notes, adjust its instrument, pitch, volume and effects, then
+set its speed or loop. Copy notes or transpose the phrase. The editor is available
+in any project; moving the cursor never changes the music by accident.
 
-Game goals now have clear choices: keep playing, collect all items, or turn all
-switches on. The field highlights the items/switches that count. If the game lacks
-the necessary interactions, a hint explains what to add. Removing movement or a
-switch cannot silently break an animation or linked switch; messages name what
-needs changing first. [Scope and validation](docs/showcase/0.0.81-en/README.md).
+For games recognized by Game view, choose when a sound should play: on starting,
+collecting an item, toggling a switch, winning or losing. Create a sound and assign
+it in one save, with Undo for the whole change. Shared sounds show their uses;
+an independent copy keeps the original. Imported unfamiliar code stays untouched.
+[Scope and validation](docs/showcase/0.0.82-en/README.md).
 
-**Checked locally:** core tests, Android packaging, draft Test generation,
-recovery, save failure and exact Undo/Redo. Compact/tall/wide layout previews were
-reviewed on the host. **Still pending:** real-device journeys, official runtime,
-physical controls, novice/owner review and new native screenshots for labs 0.0.78–81.
-Console use remains paused. These are development builds, not public releases.
+**Checked locally:** 79 core suite invocations, Android packaging, note/data
+preservation, draft recovery, failed saves and exact Undo/Redo. A host Lua check
+verified that interaction and result events do not repeatedly restart a sound.
+Compact/tall/wide layout previews were reviewed on the host.
 
-[Issue #17](https://github.com/EriArk/PikoNest/issues/17) stays open for that acceptance.
-The overview covers recognized Game view behavior; unfamiliar Lua remains in All
-tools. It is not a general event graph. Name-binding limits after external placement
-edits still apply. Sound/music creation and broader world tools remain unfinished.
+**Still pending:** actual sound playback/Stop/return in official PICO-8, real-device
+journeys, physical controls and novice/owner review for labs 0.0.78–82. Console use
+remains paused; no installation or new native screenshots were made. These are
+development builds, not public releases. [Issue #17](https://github.com/EriArk/PikoNest/issues/17)
+remains open for the earlier visual journey acceptance.
+
+This first sound tool is not a music composition editor. Advanced imported audio
+settings are preserved but cannot yet be edited. Safe automatic slot placement
+and event assignment require a recognized game; unfamiliar Lua uses explicit
+resource selection. The generated events share one audio channel, so a later
+sound replaces an earlier one. Music and shared-channel work comes next.
 
 ## Previously demonstrated in the development app
 
@@ -78,8 +83,8 @@ placements, simple movement/contact/toggle rules and fixed outcome text. Unknown
 Lua is preserved and uses All tools. These are editor limits, not PICO-8 limits.
 The preview shows initial positions, not simulated game execution.
 
-Still required: animation device acceptance and broader event clips, audio bindings,
-general SFX/music editing, maps and
+Still required: animation/audio device acceptance and broader event clips, music
+composition and channel handling, advanced SFX editing and reuse, maps and
 camera connected to the simpler path, broader rules, library insertion and
 multi-type reuse, remaining sprite/map operations, complete onboarding/storage
 and recovery, modern Android compatibility, English coverage and wider device
@@ -93,9 +98,9 @@ No public beta or release readiness is claimed.
 
 ## What comes next
 
-1. Implement general SFX creation and binding to supported events. When console
-   use is authorized, verify the named collection/switch journeys, goal/overview
-   editing and animation on device, then address the observed UX findings.
+1. Connect music patterns/composition to the sound editor, including shared
+   resources and explicit channel handling. When console use is authorized, verify
+   the named collection/switch journeys, animation and audio, then fix UX findings.
 2. Complete the required audio/music and map/camera creation workflows, then
    validate a small pair of editable starters through the same general tools.
 3. Finish independent setup, storage/backup/recovery and Android compatibility;
@@ -117,9 +122,9 @@ status. This summary does not replace either plan or waive acceptance gates.
 
 ## Short update to adapt for a post
 
-PikoNest now shows how your game works in one place: its goal, movement,
-interactions and animations. Pick a rule to change it, then return to the same
-place. Goals have clear choices and highlight the items or switches involved.
-If removing a rule would break a connection, the editor explains what needs
-changing first. Local checks and the Android build pass; handheld and beginner
-review are still ahead. Sound tools are the next development block.
+PikoNest now has its first sound-effects editor. Make a little sound from notes,
+change its instrument and rhythm, then attach it to collecting an item, switching
+something on, winning or losing — without writing Lua. Shared sounds can be copied
+before editing, and a single Undo reverses both the sound and its assignment.
+Local checks and the Android build pass. Actual handheld playback and beginner
+review are still ahead; music composition is the next development block.

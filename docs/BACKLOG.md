@@ -1,5 +1,19 @@
 # PikoNest — задачи полного цикла
 
+**2026-10-23 — Lab 0.0.82, sound creation and event binding (partial S01–S03/S05, UX08):**
+A general SFX tool now edits 32-note sequences, pitch/volume/instrument/effect,
+speed/loop, note copy/rest and transpose. Explicit Listen prepares an isolated
+runtime cart; Test uses the game draft. Known Game view projects allocate safe
+slots and bind start, interaction, win/loss sounds without Lua. Unknown code stays
+unchanged and uses explicit slots. Shared-use review, independent copies,
+source-checked recovery and atomic resource/binding Save/Undo are implemented.
+[Tool contract](SFX_EDITOR.md) · [local validation](showcase/0.0.82-en/README.md).
+Advanced audio data remains preserved but read-only. Music editing/channel policy,
+range operations, asset reuse and official audio/device acceptance remain open.
+Console use is paused; no installation, playback or public release is claimed.
+Next connect music patterns/composition and their safe shared-SFX/channel workflow;
+complete the outstanding visual/audio device journeys when authorized.
+
 **2026-10-23 — Lab 0.0.81, goal choices and a connected rules overview (partial UX07/UX08, #17):**
 Game rules opens a read-only overview of the recognized game's goal, background,
 movement, interactions and animations. Named entries open the relevant existing
@@ -317,11 +331,11 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 
 | ID | Статус / зависит от | Работа | Критерий закрытия |
 | --- | --- | --- | --- |
-| S01 | План / A03 | Семантические SFX/music-модели, ноты/тембры/эффекты/скорость/петли, pattern flags/channel references, пользовательские инструменты целевой версии | Точные round-trip и targeted edits; совместно используемые SFX и инструменты имеют зависимости; сравнение с официальным PICO-8 |
-| S02 | План / S01, A05 | Создать SFX/фразу с нуля, editable presets, pitch/volume/instrument/effect, паузы, copy/transpose, длина/loop, Undo | Написать свой эффект и музыкальную фразу с контроллера; курсор не меняет ноты; подробные параметры раскрываются по запросу |
-| S03 | Исследование / R03, S01 | Быстрое прослушивание, Play/Stop, позиция, отключаемое note audition, уважение системного mute; выбрать backend preview | Stop/выход действительно прекращает звук; нет самопроизвольной мелодии UI или включения громкости; отличие вспомогательного preview от official runtime явно проверено |
+| S01 | Частично 0.0.82 / A03 | Семантические SFX/music-модели, ноты/тембры/эффекты/скорость/петли, pattern flags/channel references, пользовательские инструменты целевой версии | Точные round-trip и targeted edits; совместно используемые SFX и инструменты имеют зависимости; сравнение с официальным PICO-8 |
+| S02 | Частично 0.0.82 / S01 | Создать SFX/фразу с нуля, editable presets, pitch/volume/instrument/effect, паузы, copy/transpose, длина/loop, Undo | Написать свой эффект и музыкальную фразу с контроллера; курсор не меняет ноты; подробные параметры раскрываются по запросу |
+| S03 | Частично 0.0.82; runtime acceptance open / R03, S01 | Быстрое прослушивание, Play/Stop, позиция, отключаемое note audition, уважение системного mute; выбрать backend preview | Stop/выход действительно прекращает звук; нет самопроизвольной мелодии UI или включения громкости; отличие вспомогательного preview от official runtime явно проверено |
 | S04 | План / S02, S03 | Музыкальные паттерны/партии/последовательность, copy/insert/delete, loop start/end/stop, отдельная партия/вся композиция | Собрать и изменить короткую композицию, прослушать, сохранить, Test и вновь открыть в PICO-8; общий SFX не меняется молча в других местах |
-| S05 | План / S04, M01 | Привязка SFX/music к известным событиям, просмотр обычных вызовов, совместное использование каналов и независимая копия ресурса | Эффект слышен вместе с музыкой предсказуемо; тихий/неуказанный в music слот не считается свободным от Lua; изменения отменяются вместе с назначением |
+| S05 | Частично SFX 0.0.82; music pending / S04, M01 | Привязка SFX/music к известным событиям, просмотр обычных вызовов, совместное использование каналов и независимая копия ресурса | Эффект слышен вместе с музыкой предсказуемо; тихий/неуказанный в music слот не считается свободным от Lua; изменения отменяются вместе с назначением |
 
 ## B/T. Библиотека, ремикс, главы и жанры — M4
 

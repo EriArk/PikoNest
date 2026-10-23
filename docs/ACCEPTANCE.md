@@ -6,6 +6,18 @@
 
 Связи: [план](ROADMAP.md), [задачи](BACKLOG.md), [текущее состояние](STATUS.md).
 
+## 2026-10-23 audio acceptance still open
+
+Lab 0.0.82 adds locally tested SFX editing and event bindings; no sound was played
+on a device. Once console use is authorized, create an effect from Blank using
+physical controls, set speed/loop, Listen/Stop/replay/return, and verify mute stays
+unchanged. Bind start, collection/toggle and win/loss; confirm one-shot events,
+restart and same-frame channel priority. Edit a shared sound, make an independent
+copy, cancel/Undo/recover/reopen and export it to ordinary PICO-8. Compare notes,
+custom instruments and loops with official playback, and preserve imported
+advanced audio data. Music composition and shared-channel acceptance remain
+separate unfinished work. [Contract](SFX_EDITOR.md) · [evidence](showcase/0.0.82-en/README.md).
+
 ## 2026-10-23 contextual Game view acceptance still open
 
 Labs 0.0.79–81 add visual relationships, names, explicit choices and a connected

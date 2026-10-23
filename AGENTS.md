@@ -569,18 +569,21 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
-Owner-approved priority (2026-10-23, issue #17): finish the visual, contextual
-Game view workflow before the next sound block. Lab 0.0.81 adds explicit goals,
-participant highlighting and an overview of configured movement/interactions/animations
-on top of the 0.0.79–80 visual relationships and names. Overview edits return to
-the originating rule/element after save/discard; source-checked recovery includes
-that context. This planned local UX slice is implemented, not owner-accepted.
-Console use is paused by the owner: no device actions until explicitly allowed.
-Native/runtime, physical-controller, novice and owner acceptance remain open for
-labs 0.0.78–81. Continue independent code work with general SFX creation/event
-binding; revisit visual journeys when device access is authorized and fix observed
-findings. Follow the current ROADMAP, not historical next-step notes.
-See docs/showcase/0.0.81-en/README.md.
+Current source/package (2026-10-23): lab 0.0.82 adds a general SFX editor and
+bounded Game view start/interaction/outcome sounds after the 0.0.79–81 visual UX
+slice. Source-checked recovery v7, isolated Listen/Test and atomic resource/binding
+Save/Undo are locally verified. Unknown Lua uses explicit resource slots; automatic
+allocation/wiring requires full known-source recognition. Preserve advanced audio
+data that the current editor cannot edit. See docs/SFX_EDITOR.md and
+docs/showcase/0.0.82-en/README.md.
+
+Console use remains paused: no device actions until the owner explicitly allows
+it. Native/runtime, physical-controller, novice and owner acceptance remain open
+for labs 0.0.78–82 and issue #17. Next independent block: music patterns/composition,
+shared-SFX editing and explicit music/SFX channel policy, then world tools.
+Complete the visual/animation/audio journeys when authorized, repair actual
+findings, and keep the separate owner APK release gate. Follow the current ROADMAP
+rather than historical next-step notes.
 
 Historical source/package record (2026-10-23): lab 0.0.78 implements Game view animation
 sequences and movement/toggle-state bindings. Local suite/build and focused

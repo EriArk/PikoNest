@@ -1538,8 +1538,8 @@ final class WorkshopView extends View {
                 fitted((returning?"Вернуть":"Отменить")+" · "+count,x+10,dy+83,20,selected?(count>0?1:7):count>0?7:13,historyWidth-20);
                 hit(x,dy+54,historyWidth,44,()->{s.menuItem=0;s.menuRedo=returning;action(Action.CONFIRM);});
             }
-            String[] labels={"",s.swapAB?"B выбор / A назад":"A выбор / B назад",s.tool==3?"Инструменты карты":"Как это работает","Game view","Мои игры","Ресурсы · библиотека","Размещения в игре",s.tool==3?"Использовать карту в игре":"Использовать спрайт в игре"};
-            for(int i=1;i<8;i++){final int n=i;button(labels[i],dx+16,dy+104+(i-1)*38,dw-32,34,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
+            String[] labels={"",s.swapAB?"B выбор / A назад":"A выбор / B назад",s.tool==3?"Инструменты карты":"Как это работает","Game view","Мои игры","Ресурсы · библиотека","Размещения в игре",s.tool==3?"Использовать карту в игре":"Использовать спрайт в игре","Sound effects"};
+            for(int i=1;i<9;i++){final int n=i;button(labels[i],dx+16,dy+104+(i-1)*34,dw-32,32,s.menuItem==i,()->{s.menuItem=n;action(Action.CONFIRM);});}
             text("Y отменить · R2 вернуть",dx+20,dy+398,16,6);
             text("История — в текущем сеансе",dx+20,dy+422,16,13);
         } else if(s.mode==Mode.HELP) {

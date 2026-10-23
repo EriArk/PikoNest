@@ -1,0 +1,101 @@
+{
+  "date": "2026-10-23",
+  "build": "0.0.82",
+  "baseline_commit": "c747934",
+  "final_local_apk_sha256": "025642afe2021af7be0f33059ade1562f61730293511ab0b7e8c592d21046f7a",
+  "final_apk_installed": false,
+  "full_local_suite_invocations": 79,
+  "full_suite_passed": true,
+  "focused_checks": {
+    "GameCanvasTest": 16504,
+    "PlayModelTest": 96,
+    "GameAnimationTest": 80199,
+    "GameRelationshipsTest": 81,
+    "GameIdentityTest": 101,
+    "GameRulesOverviewTest": 100,
+    "AssetNamingTest": 53,
+    "SfxDataTest": 2222,
+    "SoundWorkflowTest": 200
+  },
+  "legacy_recovery": "Actual lab81 v6 drafts generated with prior compiled classes: animation painting, nested checkpoint cancel after v7 re-encode, and behavior form restored",
+  "host_lua": {
+    "checks": 16,
+    "engine": "Lupa 2.6 / Lua, generated += normalized; API calls stubbed, not official audio playback",
+    "traces": {
+      "collect_then_win": [
+        [
+          11,
+          3
+        ],
+        [
+          9,
+          3
+        ]
+      ],
+      "lose": [
+        [
+          10,
+          3
+        ]
+      ],
+      "switch_win": [
+        [
+          13,
+          3
+        ]
+      ],
+      "listen_stop_replay": [
+        [
+          -1,
+          3
+        ],
+        [
+          8,
+          3
+        ]
+      ]
+    }
+  },
+  "package_check": "One launcher, integrated runtime adapter, 263 Godot assets; no official PICO-8 binaries bundled",
+  "device_actions": false,
+  "official_runtime_executed": false,
+  "host_layout_review": {
+    "renderer": "Production GameSurface draw calls through temporary Java2D adapters; approximate Android drawing, not native evidence",
+    "logical_sizes": [
+      [
+        360,
+        480
+      ],
+      [
+        360,
+        800
+      ],
+      [
+        620,
+        540
+      ],
+      [
+        960,
+        540
+      ]
+    ],
+    "screens": [
+      "SFX bank",
+      "note sequence",
+      "note properties",
+      "speed and loop",
+      "shared-use review",
+      "event bindings"
+    ]
+  },
+  "images": [],
+  "pending": [
+    "official audio fidelity, Listen/Stop/replay/return and mute verification",
+    "native collection and hero-free switch journeys including animation and audio",
+    "physical-controller, novice and owner review",
+    "music patterns/composition and shared channel handling",
+    "advanced SFX data editing, range operations and multi-type library reuse",
+    "other open Android/storage/world/acceptance tasks in ROADMAP"
+  ],
+  "public_apk_release": false
+}

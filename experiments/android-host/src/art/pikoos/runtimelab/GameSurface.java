@@ -34,8 +34,8 @@ final class GameSurface {
     private void footer(String primary,Action action,String secondary,Action back){
         float y=height-88;rect(0,y,width,88,1);rect(16,y,width-32,1,13);
         button(primary,8,y+4,width/2-12,40,true,()->act(action));button(secondary,width/2+4,y+4,width/2-12,40,false,()->act(back));
-        button(game().editingField?"Left  Decrease":"Start  Test",8,y+44,width/2-12,40,false,()->act(game().editingField?Action.LEFT:Action.TEST));
-        String extra=game().editingField?"Right  Increase":game().screen==GameCanvas.Screen.NAME?"X  Erase":game().screen==GameCanvas.Screen.DRAW?"X  Color":game().screen==GameCanvas.Screen.PLACE?"D-pad  Move":"D-pad  List";
+        button(game().editingField?"Left  -":"Start  Test",8,y+44,width/2-12,40,false,()->act(game().editingField?Action.LEFT:Action.TEST));
+        String extra=game().editingField?"Right  +":game().screen==GameCanvas.Screen.NAME?"X  Erase":game().screen==GameCanvas.Screen.DRAW?"X  Color":game().screen==GameCanvas.Screen.PLACE?"D-pad  Move":"D-pad  List";
         button(extra,width/2+4,y+44,width/2-12,40,false,()->{if(game().editingField)act(Action.RIGHT);else if(game().screen==GameCanvas.Screen.DRAW||game().screen==GameCanvas.Screen.NAME)act(Action.CONTEXT);});
     }
     void draw(Canvas c,float s,float w,float h){
@@ -49,6 +49,7 @@ final class GameSurface {
             wrap(session.error,16,150,w-32,Math.max(3,(int)((h-250)/26)));
             footer(yes+"  Return",Action.CONFIRM,back+"  Return",Action.CANCEL);return;
         }
+        if(g.screen==GameCanvas.Screen.SOUND){soundEditor(yes,back);return;}
         if(g.screen==GameCanvas.Screen.NAME){nameEditor(yes,back);return;}
         boolean draw=g.screen==GameCanvas.Screen.DRAW||g.screen==GameCanvas.Screen.DRAW_MENU||g.screen==GameCanvas.Screen.PALETTE;
         boolean wide=w>=540;float top=104,bottom=h-104,side;
@@ -136,6 +137,32 @@ final class GameSurface {
         else if(g.screen==GameCanvas.Screen.DRAW)footer(yes+"  Paint",Action.CONFIRM,back+"  Done / options",Action.CANCEL);
         else if(g.screen==GameCanvas.Screen.PLACE)footer(yes+"  Done",Action.CONFIRM,back+(g.operation==GameCanvas.Operation.ADD?"  Draw again":"  Cancel"),Action.CANCEL);
         else footer(yes+"  Select",Action.CONFIRM,back+(g.screen==GameCanvas.Screen.HOME?"  Projects":"  Back"),Action.CANCEL);
+    }
+    private void soundEditor(String yes,String back){
+        GameCanvas g=game();SoundEditor s=g.sound;float bottom=height-104,listY=112,listX=16,listW=width-64;
+        text(s.draft()?"Sound draft":"64 slots / 32 notes",16,87,18,6,width-32);
+        if(s.data!=null&&s.page!=SoundEditor.Page.REVIEW){
+            float gx=16,gy=106,gw=width-32,gh=76,cell=gw/32;
+            rect(gx,gy,gw,gh,0);
+            for(int n=0;n<32;n++){final int note=n;int[] v=s.data.notes[n];float x=gx+n*cell,bar=v[2]==0?2:8+v[0]*(gh-12)/63;
+                rect(x+1,gy+gh-bar,Math.max(1,cell-2),bar,v[2]==0?5:new int[]{12,11,9,8,14,10,6,15}[v[1]%8]);
+                if(n==s.note)outline(x,gy,cell,gh,10);
+                hits.add(new Hit(x,gy,cell,gh,()->{if(s.editing)return;s.note=note;if(s.page==SoundEditor.Page.EDIT)g.focus=note;changed();}));
+            }
+            int[] v=s.data.notes[s.note];text("Note "+(s.note+1)+" / "+(v[2]==0?"Rest":P8Sfx.pitch(v[0])+" / volume "+v[2]),16,207,20,7,width-32);listY=222;
+        }else{
+            int lines=s.page==SoundEditor.Page.REVIEW?Math.max(3,Math.min(5,(int)((height-320)/26))):3;
+            wrap(s.summary(),16,112,width-32,lines);listY=122+lines*26;
+        }
+        String[] rows=s.rows();int rowHeight=50,visible=Math.max(1,(int)((bottom-listY)/rowHeight));
+        int first=Math.max(0,Math.min(Math.max(0,rows.length-visible),g.focus-visible/2));
+        for(int n=first;n<Math.min(rows.length,first+visible);n++){final int row=n;button(rows[n],listX,listY+(n-first)*rowHeight,listW,rowHeight-2,g.focus==n,()->{if(s.editing){if(row==g.focus)act(Action.RIGHT);return;}g.focus=row;act(Action.CONFIRM);});}
+        if(rows.length>visible){button("^",width-44,listY,32,40,false,()->act(Action.UP));button("v",width-44,bottom-40,32,40,false,()->act(Action.DOWN));}
+        float fy=height-88;rect(0,fy,width,88,1);rect(16,fy,width-32,1,13);
+        button(yes+(s.editing?"  Keep":"  Select"),8,fy+4,width/2-12,40,true,()->act(Action.CONFIRM));
+        button(back+(s.editing?"  Revert":"  Back"),width/2+4,fy+4,width/2-12,40,false,()->act(Action.CANCEL));
+        button(s.editing?"Left  -":"Start  Test",8,fy+44,width/2-12,40,false,()->act(s.editing?Action.LEFT:Action.TEST));
+        button(s.editing?"Right  +":"X  Listen",width/2+4,fy+44,width/2-12,40,false,()->act(s.editing?Action.RIGHT:Action.CONTEXT));
     }
     private void nameEditor(String yes,String back){
         GameCanvas g=game();NameEditor e=g.nameDraft;

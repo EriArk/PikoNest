@@ -1,5 +1,9 @@
 # PikoNest — English website gallery
 
+[0.0.82: sound creation and event binding](0.0.82-en/README.md) — general SFX
+editing, shared-use review, independent copies and recoverable event assignment.
+Local validation only; no new native images or official audio playback claim.
+
 [0.0.81: goal choices and a connected rules overview](0.0.81-en/README.md) —
 local implementation/validation only; no new native screenshots. Includes goal
 participants, rule editing/return and recoverable drafts. Device acceptance is open.

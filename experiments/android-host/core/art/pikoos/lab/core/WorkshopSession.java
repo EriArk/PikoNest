@@ -58,7 +58,8 @@ public final class WorkshopSession {
     }
     private void gameAction(Action action)throws Exception{
         GameCanvas.Command command=game.act(action);
-        if(command==GameCanvas.Command.TEST){port.launch(game.blocked.isEmpty()?game.candidate(cart).bytes():cart.bytes());return;}
+        if(command==GameCanvas.Command.TEST){port.launch(game.sound!=null||game.blocked.isEmpty()?game.candidate(cart).bytes():cart.bytes());return;}
+        if(command==GameCanvas.Command.LISTEN){port.launch(game.sound.preview().bytes());return;}
         if(command==GameCanvas.Command.TOOLS){game=null;mode=Mode.NAVIGATE;return;}
         if(command==GameCanvas.Command.PROJECTS){port.library();return;}
         if(command==GameCanvas.Command.SAVE){
@@ -1120,8 +1121,8 @@ public final class WorkshopSession {
             }
             if (mode == Mode.MENU) {
                 if (action == Action.UNDO || action == Action.REDO) { mode = overlayReturn; act(action); return; }
-                if (action == Action.UP) menuItem = clamp(menuItem - 1, 7);
-                if (action == Action.DOWN) menuItem = clamp(menuItem + 1, 7);
+                if (action == Action.UP) menuItem = clamp(menuItem - 1, 8);
+                if (action == Action.DOWN) menuItem = clamp(menuItem + 1, 8);
                 if (menuItem == 0 && action == Action.LEFT) menuRedo = false;
                 if (menuItem == 0 && action == Action.RIGHT) menuRedo = true;
                 if (action == Action.CANCEL || action == Action.MENU) mode = overlayReturn;
@@ -1130,6 +1131,7 @@ public final class WorkshopSession {
                     if (menuItem == 1) { swapAB = !swapAB; notice = "Кнопки изменены"; }
                     if (menuItem == 2) {if(tool==3){mode=overlayReturn;mapEditor.tools();}else mode = Mode.HELP;}
                     if (menuItem == 3) {mode=overlayReturn;openGame();}
+                    if (menuItem == 8) {mode=overlayReturn;openGame();if(mode==Mode.GAME)game.openSounds(true);}
                     if (menuItem == 4) { mode = overlayReturn; port.library(); }
                     if (menuItem == 5) { mode = overlayReturn; showAssets(); }
                     if (menuItem == 6 || menuItem == 7) { mode = overlayReturn; openUses(menuItem == 7); }
