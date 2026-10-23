@@ -1,5 +1,9 @@
 # PikoNest — English website gallery
 
+[0.0.79: visual elements and relationship selection](0.0.79-en/README.md) —
+implementation/local validation only; no new native screenshot pack. Console use
+remains paused. Issue #17 and physical/novice/owner acceptance stay open.
+
 [0.0.78: animation implementation and validation record](0.0.78-en/README.md) —
 local checks only for the new animation workflow; no new animation screenshots
 or official-runtime playback claim. The last completed native image pack is below.

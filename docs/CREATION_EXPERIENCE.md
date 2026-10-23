@@ -1,5 +1,17 @@
 # Creation experience: from an idea to a playable game
 
+## Current implementation boundary — 23 October 2026
+
+[Issue #17](https://github.com/EriArk/PikoNest/issues/17) refines this approved
+direction: finish the contextual Game view journey before the next sound block.
+Lab 0.0.79 implements thumbnails, visual descriptions and cancellable contact/
+switch relationship picking in the existing native UI. Local tests/build passed;
+console use is paused, so device and novice/owner acceptance remains open.
+Names, broader direct actions and complete visual journeys are still unfinished.
+See [interaction contract](UX_DIRECTION.md#visual-relationships--lab-0079),
+[validation](showcase/0.0.79-en/README.md) and the current [ROADMAP](ROADMAP.md).
+The design examples below are not claims that every screen exists.
+
 8 October 2026. Owner-approved **direction**, with a proposed interaction design.
 The review prototype is not an Android build or an implemented feature.
 Lab 0.0.75 remains the demonstrated application baseline.

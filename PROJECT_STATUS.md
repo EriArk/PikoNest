@@ -12,24 +12,34 @@ setup live in one development APK; there is no public APK release yet.
 | Item | Current position |
 | --- | --- |
 | Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.78** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | Game view frame authoring and movement/switch-state animation implemented; device acceptance pending |
-| Current focus | Verify animation on device when permitted, then create/connect sound effects |
+| Android baseline | **0.0.79** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | Visual element/relationship selection implemented; animation and new UI device acceptance pending |
+| Current focus | Finish contextual Game view UX from issue #17; device checks when permitted |
 | Platforms | Android first; Linux later |
 
-## Latest implementation: animation (0.0.78)
+## Latest implementation: choose relationships visually (0.0.79)
 
-Select a sprite, copy/draw frames, change their order and durations, and choose
-continuous playback, movement playback or playback while a switch is on. The
-app prepares ordinary PICO-8 Lua and protects shared graphics with independent
-copies. Save/Undo, draft Test generation and source-checked recovery are covered
-by local tests. [Scope and validation](docs/showcase/0.0.78-en/README.md).
+The Elements list now shows sprite thumbnails and readable color descriptions.
+Select an element on the field to open its actions. To choose what touches it,
+or which switch changes with it, select the other element visually from the
+field or list. The editor highlights the connection and describes the behavior.
+The list also reaches overlapping, transparent and off-field elements.
 
-**Not yet demonstrated on the device:** the complete animation journey, official
-playback, final package installation, export and new screenshots. The owner
-paused console use after an initial install/project-copy check. That boundary is
-intentional; these features must not yet be described as verified on Retroid.
-General sound/music editing is still unfinished.
+Confirm keeps the choice; Cancel restores the previous choice. Draft Test can
+try the highlighted candidate without saving. Recovery retains this choice and
+returns to the same field. Saved projects still contain ordinary PICO-8 Lua.
+[Scope and validation](docs/showcase/0.0.79-en/README.md).
+
+This is the first part of [issue #17](https://github.com/EriArk/PikoNest/issues/17),
+not the complete simpler workshop. Custom names, a more direct behavior flow
+and novice/owner review remain ahead. Color labels do not guess gameplay roles.
+The view explicitly shows the **starting layout**, not a game simulation.
+
+**Checked locally:** core workflows and Android packaging. **Not yet checked on
+the device:** the new selection journey, official Test/return, physical controls
+or new screenshots. Console use remains paused by the owner. The previous
+[animation implementation](docs/showcase/0.0.78-en/README.md) also still needs its
+native/runtime acceptance. Sound and music tools remain unfinished.
 
 ## Previously demonstrated in the development app
 
@@ -83,8 +93,9 @@ No public beta or release readiness is claimed.
 
 ## What comes next
 
-1. Complete native/official-runtime animation checks when console use is authorized;
-   then implement general SFX creation and binding to supported game events.
+1. Finish clear contextual Game view actions and element identity. When console
+   use is authorized, verify collection/switch journeys and animation on device;
+   then implement general SFX creation and binding to supported events.
 2. Complete the required audio/music and map/camera creation workflows, then
    validate a small pair of editable starters through the same general tools.
 3. Finish independent setup, storage/backup/recovery and Android compatibility;
@@ -106,10 +117,9 @@ status. This summary does not replace either plan or waive acceptance gates.
 
 ## Short update to adapt for a post
 
-PikoNest can now turn a blank project into two kinds of small playable games
-without opening Lua. Draw a sprite, give it movement or an interaction, choose a
-goal, then test it in official PICO-8. We built a collection game with a hazard
-and a linked-switch puzzle with no hero. Both saved, reopened and exported
-correctly; the collection game also ran outside PikoNest. The next work connects
-animation and sound to this same simple workflow. The complete creator and
-public release are still ahead.
+We are making PikoNest easier to understand while building a game. Elements now
+have thumbnails, and you can choose a contact target or linked switch visually
+instead of remembering sprite numbers. The editor highlights the connection and
+explains what it will do. You can try a choice without saving it, cancel it, or
+recover the draft later. Local checks pass; handheld testing and the broader UX
+work are still ahead. This is development progress, not a public release.

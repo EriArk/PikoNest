@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-23",
+  "build": "0.0.79",
+  "baseline_commit": "1a9bc2bb68574e49a3366cbfc55fc65f974b8db4",
+  "issue": "https://github.com/EriArk/PikoNest/issues/17",
+  "final_local_apk_sha256": "ed45df302bd9adf10cea667cf9e4e706adca432c4d4c55aedc50ff081e3832eb",
+  "final_apk_installed": false,
+  "full_local_suite_invocations": 75,
+  "full_suite_passed": true,
+  "focused_checks": {
+    "GameCanvasTest": 16504,
+    "PlayModelTest": 96,
+    "GameAnimationTest": 80199,
+    "GameRelationshipsTest": 82
+  },
+  "package_check": "One launcher, integrated runtime adapter, 263 Godot assets, no official PICO-8 binaries bundled",
+  "device_actions": false,
+  "official_runtime_executed": false,
+  "host_layout_review": {
+    "renderer": "Production GameSurface draw calls through temporary Java2D Android drawing adapters; approximate font/rasterization, not native Android",
+    "logical_sizes": [
+      [
+        360,
+        480
+      ],
+      [
+        360,
+        800
+      ],
+      [
+        620,
+        540
+      ],
+      [
+        960,
+        540
+      ]
+    ],
+    "status": "Private diagnostic previews; not new native evidence or website screenshots"
+  },
+  "images": [],
+  "pending": [
+    "custom names and broader contextual behavior flow",
+    "native relationship selection and animation journeys",
+    "official draft Test/return and ordinary export",
+    "physical controls on compact/wide devices",
+    "native captures and novice/owner review"
+  ],
+  "public_apk_release": false
+}

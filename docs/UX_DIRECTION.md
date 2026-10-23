@@ -1,5 +1,39 @@
 # PikoNest: единая мастерская на портативке
 
+## Visual relationships — lab 0.0.79
+
+This is the first implemented slice of [issue #17](https://github.com/EriArk/PikoNest/issues/17),
+inside UX07/UX08. It does not complete or visually approve the whole proposal.
+
+- Game view lists **Elements** with sprite thumbnails and color descriptions.
+  Descriptions are derived from visible pixels, not guessed game roles. Matching
+  descriptions receive A/B/C suffixes. They are display labels, not persistent
+  names or sprite-sheet addresses; appearance/order changes may change them.
+- A canvas tap opens the selected placement's actions. The controller list reaches
+  every placement, including transparent, overlapping and off-field ones. Canvas
+  selection uses the top eligible placement; use the list to disambiguate overlap.
+- **Touched by** opens contact candidates excluding self. **Also toggle** offers
+  other configured switches and **No linked switch**. Missing prerequisites are
+  explained. The picker never invents a hero or configures another object silently.
+- D-pad navigation or a tap selects a candidate. Other candidates are outlined;
+  the source is yellow, the candidate blue, with a visible connection line.
+  **A confirms; B cancels** to the originating field. Tap selection also waits for
+  explicit confirmation. Off-field/empty elements retain a thumbnail/list label.
+- The canvas says **Starting layout**. The relationship sentence explains the
+  highlighted candidate; it is not a live game simulation. **Start / Test** uses
+  the official runtime via the existing isolated-draft path. The candidate can
+  be tested without changing the saved cart or committing the picker value.
+- Recovery stores candidate focus and the return field against the exact source.
+  Save commits one behavior edit/Undo; failure retains the draft. Legacy journals
+  remain supported. Existing unknown-Lua and shared-resource protection remains.
+
+Code and local tests exist; actual native/controller/novice review is pending.
+Custom names and the broader direct-action flow remain next work, followed by
+full collection/switch journeys and the outstanding animation proof when console
+use is allowed. See [validation](showcase/0.0.79-en/README.md).
+
+---
+
 **Решение владельца 2026-10-08: простота полного пути создания.** Игра на экране
 становится основным входом в правку, выбранный элемент ведёт к его графике,
 поведению и звуку; безопасную подготовку ресурсов и обычного Lua выполняет

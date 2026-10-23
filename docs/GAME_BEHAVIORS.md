@@ -9,7 +9,7 @@ model or promise to visually edit arbitrary Lua. All tools remains reachable.
 1. Create a **Blank** project. Add, draw and place a sprite.
 2. Select it, open **Behavior**, choose **D-pad** movement and a speed, then save.
 3. Add another sprite. Give it the **Collect** rule and choose the moving sprite
-   under **By**. The collectible disappears once when their rectangles overlap.
+   under **Touched by** (lab 0.0.79). The collectible disappears once when their rectangles overlap.
 4. Open **Game rules**, choose **Collect all**, then save. Duplicate or draw more
    collectibles as desired. Each placement has its own collected state.
 5. Optionally add a **Lose** contact rule to a hazard, or a **Win** rule to a goal.
@@ -21,12 +21,25 @@ model or promise to visually edit arbitrary Lua. All tools remains reachable.
 ## Make a game without a hero
 
 Draw and place several sprites, then give each the **Toggle** rule. Left/right
-selects a switch and PICO-8 **O** toggles it. **Also** optionally links another
+selects a switch and PICO-8 **O** toggles it. **Also toggle** optionally links another
 already-configured switch: one press changes both. **Starts** sets its initial
-state. **All on** supplies a completion condition. Design the links and
+state. **All switches on** supplies a completion condition. Design the links and
 starting states so the puzzle is solvable; this version does not solve it for you.
 Direction buttons also move any configured moving sprites, so mixing movement
 and switch selection deliberately shares those controls.
+
+## Visual selection (0.0.79; native acceptance pending)
+
+Elements have thumbnails and color descriptions instead of placement numbers.
+Contact and switch target fields open a visual picker: choose from the field or
+list, then A confirms or B cancels. The list includes overlapping, transparent
+and off-field placements; switch links only offer other configured switches.
+Test runs the highlighted candidate in an isolated cart without confirming it.
+Recovery returns to that candidate and field. Save commits the complete behavior.
+These descriptions are not custom names and do not infer a character/object role.
+The preview is explicitly a starting layout, not a simulated running game.
+
+[Exact scope and verification](showcase/0.0.79-en/README.md).
 
 ## Editing contract
 

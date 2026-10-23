@@ -10,6 +10,37 @@ Earlier work is recorded in [the technical status](docs/STATUS.md) and
 [versioned evidence](docs/showcase/README.md). See
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for the current overall picture.
 
+## 2026-10-23 — Pick game relationships visually (0.0.79)
+
+**Implemented and locally checked; device and owner acceptance remain open.**
+
+- Added sprite thumbnails and color descriptions to the Elements list. Canvas
+  selection opens the selected element's actions; the list also reaches
+  overlapping, transparent and off-field placements.
+- Contact targets and linked switches now use a visual picker, candidate
+  outlines and a connection line, with a short explanation of the relationship.
+  Switch links offer other configured switches and an explicit no-link option.
+- Confirm keeps the selection; Cancel returns to the original field unchanged.
+  Draft Test can try the highlighted candidate without saving or confirming it.
+  Recovery retains candidate focus, and Save/Undo remains one complete edit.
+- Added clearer behavior/goal labels and an explicit Starting layout label.
+  The existing official runtime remains the execution authority.
+- Updated the UX audit and existing roadmap around issue #17: the contextual
+  creation experience takes priority over the next sound block.
+
+**Checked:** full local core suite (75 invocations), Android compilation and
+integrated APK packaging; 82 focused relationship checks cover candidate filters,
+controller selection, overlap/off-field access, Test/cancel/recovery, save failure,
+Undo/reopen and stale-source refusal. Host-only layout inspection informed compact
+labels and description placement; it is not native screenshot or touch evidence.
+
+**Limits:** no device actions, new runtime pass or native captures in this batch.
+Custom names, broader contextual actions and complete novice/owner acceptance
+remain unfinished. Color descriptions may change when appearance/order changes.
+Issue #17 and beta acceptance remain open. No public APK release.
+[Interaction contract](docs/UX_DIRECTION.md#visual-relationships--lab-0079) ·
+[exact evidence](docs/showcase/0.0.79-en/README.md).
+
 ## 2026-10-23 — Animation from the selected sprite (0.0.78)
 
 **Implemented and locally tested; native playback acceptance is pending.**

@@ -1,5 +1,36 @@
 # Аудит единого опыта PikoNest — 2026-10-04
 
+## Follow-up — 23 October 2026: Game view relationships
+
+[Issue #17](https://github.com/EriArk/PikoNest/issues/17) identifies a workflow
+problem, not a missing theme. The owner approved addressing this before sound.
+The prior native evidence makes the gap concrete:
+
+- [Contact form, 0.0.77](showcase/0.0.77-en/03-contact-rule.png): the user must
+  translate `Sprite 2`, `Rule: Collect` and `By: Sprite 1` back to the game image.
+  Target outlines help, but choosing still means adjusting a numeric reference.
+- [Linked switches, 0.0.77](showcase/0.0.77-en/06-linked-switches.png): similar
+  appearances and numeric targets make relationships hard to recognize. General
+  movement help does not explain the selected link.
+- Overlap, transparent resources and elements outside the field require a list
+  equivalent; canvas hit testing alone cannot be the complete interaction.
+
+Lab 0.0.79 addresses that first slice in the existing Java/Canvas UI: thumbnails,
+visual descriptions, relationship picking, field/list highlights and a sentence
+explaining the selected relationship. These are implemented and locally checked;
+new native, novice and owner acceptance is still open. See
+[the exact interaction contract](UX_DIRECTION.md#visual-relationships--lab-0079).
+
+Remaining #17 work: owner-defined names, a more direct contextual action flow,
+clear beginner movement/contact/toggle/goal choices, selection/re-entry review,
+and both full native journeys. No new scene model, runtime or parallel simulation
+is introduced. UX07/UX08 and ROADMAP retain task/sequence ownership.
+
+---
+
+The original 2026-10-04 audit follows; its no-code-change statement applies to
+that historical audit only.
+
 **Продолжение 2026-10-08:** владелец согласовал упрощение целого процесса создания.
 Технически доступные операции всё ещё требуют ручного соединения ресурсов,
 координат и правил; это отдельная проблема сверх визуальной согласованности.

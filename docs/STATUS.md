@@ -1,5 +1,18 @@
 # Состояние PikoNest
 
+**2026-10-23 — Lab 0.0.79, first visual relationship slice (partial UX07/UX08, [issue #17](https://github.com/EriArk/PikoNest/issues/17)):**
+Game view now lists element thumbnails with color-based descriptions, opens actions
+from a canvas selection, and picks contact targets / linked switches visually.
+Candidates have field outlines and a connection line; the same list reaches
+transparent, overlapping and off-field placements with a controller. A confirms,
+B cancels, and Test previews the highlighted candidate without saving it.
+Recovery retains the candidate and return field; Save/Undo still commits one
+ordinary-Lua change. The starting layout is explicitly labelled as a preview.
+Full local tests/build passed; console use remains paused. No device installation,
+new runtime pass or native screenshots are claimed. Custom names, the wider
+contextual behavior flow, physical/novice/owner acceptance and issue #17 remain open.
+[Scope and evidence](showcase/0.0.79-en/README.md). This UX work precedes the next audio block.
+
 **2026-10-23 — Lab 0.0.78, Game view animation (partial N01/G04/UX08):**
 Selected sprites now have editable frame sequences, independent copies, painting,
 per-frame durations/order/removal and Loop / When moving / When on bindings.

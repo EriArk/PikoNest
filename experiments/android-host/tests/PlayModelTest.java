@@ -23,8 +23,8 @@ public final class PlayModelTest {
             WorkshopCartridge blank=GameCanvasTest.cart("-- function is a comment\nfunction _draw()\n cls(1)\nend\n",nl);
             Port p=new Port();WorkshopSession s=session(blank,p);sprite(s,20,50);sprite(s,90,50);
             WorkshopCartridge staticCart=s.cart();
-            GameCanvas legacy=new GameCanvas(staticCart);legacy.focus=legacy.uses.entries.size()+1;byte[] v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-2);java.nio.ByteBuffer.wrap(v1).putInt(1);GameCanvas migrated=GameCanvas.restore(v1,staticCart);check(migrated.act(Action.CONFIRM)==GameCanvas.Command.TOOLS,"v1 All tools focus migrates");
-            legacy.screen=GameCanvas.Screen.ACTIONS;legacy.focus=4;v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-2);java.nio.ByteBuffer.wrap(v1).putInt(1);migrated=GameCanvas.restore(v1,staticCart);migrated.act(Action.CONFIRM);check(migrated.screen==GameCanvas.Screen.HOME,"v1 Back focus migrates");
+            GameCanvas legacy=new GameCanvas(staticCart);legacy.focus=legacy.uses.entries.size()+1;byte[] v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-10);java.nio.ByteBuffer.wrap(v1).putInt(1);GameCanvas migrated=GameCanvas.restore(v1,staticCart);check(migrated.act(Action.CONFIRM)==GameCanvas.Command.TOOLS,"v1 All tools focus migrates");
+            legacy.screen=GameCanvas.Screen.ACTIONS;legacy.focus=4;v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-10);java.nio.ByteBuffer.wrap(v1).putInt(1);migrated=GameCanvas.restore(v1,staticCart);migrated.act(Action.CONFIRM);check(migrated.screen==GameCanvas.Screen.HOME,"v1 Back focus migrates");
             behavior(s,0);field(s,0,1);field(s,1,1);
             row(s,1);s.act(Action.RIGHT);byte[] journal=s.game.encode();
             WorkshopSession recovered=session(staticCart,p);recovered.restoreGame(journal);check(recovered.game.editingField,"field editing recovers");recovered.act(Action.CANCEL);
@@ -48,7 +48,7 @@ public final class PlayModelTest {
             behavior(s,2);field(s,2,4);field(s,4,1);row(s,s.game.rows().length-2);check(s.game.play.elements.get(2).on==1,"switch starts on");
             for(int n=0;n<2;n++){behavior(s,n);field(s,2,4);row(s,s.game.rows().length-2);}
             row(s,4);field(s,0,1);row(s,2);check(s.game.play.goal==2,"switch goal");
-            behavior(s,0);field(s,5,2);row(s,s.game.rows().length-2);
+            behavior(s,0);field(s,5,1);row(s,s.game.rows().length-2);
             check(s.game.play.elements.get(0).neighbor==1,"linked switch saved");
             byte[] linkSource=s.cart().bytes();behavior(s,1);field(s,2,-4);row(s,s.game.rows().length-2);check(s.mode==Mode.ERROR,"linked switch cannot silently stop being a switch");s.act(Action.CANCEL);s.act(Action.CANCEL);same(linkSource,s.cart().bytes(),"refused switch edit preserves source");
             WorkshopCartridge puzzle=s.cart();same(puzzle.bytes(),s.game.play.write(puzzle).bytes(),"canonical write exact");

@@ -1,22 +1,28 @@
 # PikoNest — путь к полному Android-продукту
 
-## Current completion package — 23 October 2026
+## Current completion package — 23 October 2026, issue #17
 
-Lab 0.0.78 implements Game view frame authoring and movement/switch-state
-animation in code. Local tests/build passed; final device/runtime acceptance is
-pending because the owner paused console use. [Exact evidence](showcase/0.0.78-en/README.md).
-The prior 0.0.77 two-game runtime/export proof remains the last completed native
-creation journey. Do not present the new animation journey as demonstrated yet.
+The owner approved prioritizing a visual, contextual Game view over the next
+sound block. This refines UX07/UX08 rather than creating a second roadmap.
+Lab 0.0.79 implements the first slice: thumbnails, field selection and visual
+contact/switch relationships with cancellable selection and draft Test/recovery.
+[Evidence and limits](showcase/0.0.79-en/README.md). Lab 0.0.78 animation also
+remains pending native/runtime acceptance. Console use is paused by the owner.
+The last complete native creation journey is still 0.0.77.
 
-| Next complete block | Task ownership | Ready when |
+| Next complete block | Existing task ownership | Ready when |
 | --- | --- | --- |
-| Finish animation acceptance when the console is available | N01/G04, UX08 | Final APK; UI frame authoring/recovery/Undo; official movement and linked-switch playback; ordinary export; English captures |
-| Create and connect sound effects | S01–S03/S05, UX08 | General standard SFX resource model/editor, controller note entry, safe allocation/reuse, event binding, Save/reopen/Test/export; respect system mute |
-| Finish world/audio tools, then small editable starters | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | Maps/camera, music and necessary tools work from Blank and independently of genre; two starter journeys use those same tools |
+| Finish contextual Game view interactions | UX07/UX08, #17 | Clear selected-element identity and names; movement/contact/toggle actions and game goals form a readable flow; existing All tools stays reachable; no sheet IDs or Lua wiring required |
+| Prove both visual journeys and animation when console use is authorized | UX07/UX08, N01/G04, #17 | Blank collection and hero-free linked switches; preview/confirm/cancel, draft Test/return, recovery, Save/Undo/reopen/export; compact/wide physical controls, novice and owner review; native before/after evidence |
+| Create and connect sound effects | S01–S03/S05, UX08 | Standard SFX resource editor, controller note entry, safe allocation/reuse, event binding, Save/reopen/Test/export; respect system mute |
+| Finish world/audio tools, then small editable starters | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | Maps/camera, music and tools work from Blank and independently of genre; two starter journeys use those same tools |
 | Independent Android setup and reliable data ownership | P/R tasks, modern target, Q05 | Fresh runtime/folder setup, backup/recovery/update and external launches without developer intervention |
 | Device, novice and owner acceptance | Q01–Q07, ACC-01–09 | Complete journeys on supported screens/physical controls; English/errors reviewed; owner findings resolved |
 
 All required acceptance criteria and the separate owner APK release gate remain.
+Work locally while console access is paused; do not substitute host previews for
+native captures or treat an unperformed device check as a prerequisite to useful
+code/documentation work. Historical next-step notes below do not override this queue.
 
 ## Previous completion package — 18 October 2026
 
