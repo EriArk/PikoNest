@@ -12,40 +12,39 @@ setup live in one development APK; there is no public APK release yet.
 | Item | Current position |
 | --- | --- |
 | Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.83** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | Music composition and shared phrase editing implemented; device acceptance pending |
-| Current focus | Maps/camera in the simpler creation path; device journeys when permitted |
+| Android baseline | **0.0.84** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | World/map/camera editing connected to Game view; device acceptance pending |
+| Current focus | New-tile creation inside the map, then small editable starters; device journeys when permitted |
 | Platforms | Android first; Linux later |
 
-## Latest implementation: compose music for your game (0.0.83)
+## Latest implementation: a larger world for your game (0.0.84)
 
-Arrange musical phrases into patterns, set where a section loops or stops, and
-create or edit its notes without leaving the composition. Phrases can be shared,
-or copied independently before changing them. Copying/clearing a pattern asks for
-confirmation and keeps its sound data available for reuse.
+Choose a field larger than one screen, paint it with the cartridge's tiles, and
+set a fixed, following or room-changing camera from Game view. Follow any element;
+a map can also work without a hero or moving object. Moving and selecting objects
+beyond the first screen now pans the editor view. Scores and messages keep their
+screen positions while the game world scrolls.
 
-Attach the composition to the game's start. Choose three musical parts with a
-separate channel for effects, or all four parts with possible interruption of the
-fourth. Music restarts with the game and stops before result effects on win/loss.
-All notes, patterns and the assignment save together, with one Undo and recoverable
-nested drafts. Unfamiliar imported Lua remains untouched.
-[Scope and validation](docs/showcase/0.0.83-en/README.md).
+Map cells, field size and camera settings save together. One Undo reverses the
+whole change; drafts retain painting, tile selection and field edits after recovery.
+Existing animation, music, sounds and shared graphics memory remain intact.
+[Scope and validation](docs/showcase/0.0.84-en/README.md).
 
-**Checked locally:** 81 core suite invocations and the integrated APK build passed.
-New music checks cover data preservation, shared/copy editing, sequence flow,
-channel choices, failed saves, recovery and exact Undo/Redo. Host Lua checks confirm
-start/reset/result call order. Compact/tall/wide layouts received host review.
+**Checked locally:** 82 core suite invocations and the integrated APK build passed.
+New checks cover world placement, camera targets, map preservation, failed saves,
+recovery and exact Undo/Redo. Host Lua traces checked movement bounds, room edges,
+restart and drawing order. Compact/tall/wide layouts received host review.
 
-**Still pending:** actual music/SFX playback, Stop/return, mute and exported-cart
-audio in official PICO-8; real-device, physical-controller and novice/owner journeys
-for labs 0.0.78–83. Console use remains paused. No installation, native screenshot
-pack or public release was made. [Issue #17](https://github.com/EriArk/PikoNest/issues/17)
-remains open for visual journey acceptance.
+**Still pending:** official-runtime world/camera execution, real-device controls,
+exported-cart playback and novice/owner journeys for labs 0.0.78–84. Console use
+remains paused. No installation, new native screenshot pack or public release.
+[Issue #17](https://github.com/EriArk/PikoNest/issues/17) remains open for visual
+journey acceptance.
 
-This is basic composition. Range rearrangement, music/SFX library reuse, advanced
-sound settings and further music events remain unfinished. Game-start wiring and
-automatic phrase allocation require recognized Game view code; explicit resource
-editing remains available for other projects.
+The new map brush currently uses existing tiles and upper map rows. Drawing a new
+tile directly in that context is the next gap to close. Collision, door triggers,
+parallax and broader map operations remain separate unfinished work. General tools
+stay accessible in every project; automatic world wiring requires recognized code.
 
 ## Previously demonstrated in the development app
 
@@ -67,6 +66,9 @@ editing remains available for other projects.
   can run separately from saved work. Changes use one Save/Undo transaction.
   Both new games exported exactly; the collection export also ran independently
   in official PICO-8 outside PikoNest.
+- **Compose audio.** Create effects, bind supported events, arrange music patterns,
+  edit shared or copied phrases and choose how music shares channels with effects.
+  This is locally implemented; official audio and device acceptance remain open.
 - **Use the existing tools.** Sprite-sheet/map editing, shared-memory review,
   continuous strokes, a persistent sprite buffer, asset reuse and recognized
   animation/camera/background/code forms remain available through All tools.
@@ -85,8 +87,8 @@ Lua is preserved and uses All tools. These are editor limits, not PICO-8 limits.
 The preview shows initial positions, not simulated game execution.
 
 Still required: animation/audio device acceptance and broader event clips, music
-range editing and reuse, advanced SFX tools, maps and
-camera connected to the simpler path, broader rules, library insertion and
+range editing and reuse, advanced SFX tools, direct tile creation in the map,
+collision/door/parallax workflows, broader rules, library insertion and
 multi-type reuse, remaining sprite/map operations, complete onboarding/storage
 and recovery, modern Android compatibility, English coverage and wider device
 and physical-controller validation. Undo history is session-local. The Android
@@ -99,11 +101,11 @@ No public beta or release readiness is claimed.
 
 ## What comes next
 
-1. Connect map/camera tools to the simpler Game view creation path. When console
-   use is authorized, verify the named collection/switch journeys, animation and
-   audio, then fix the observed UX findings.
-2. Complete the required audio/music and map/camera creation workflows, then
-   validate a small pair of editable starters through the same general tools.
+1. Create tile art directly in the map workflow, preserving shared-data safety.
+   When console use is authorized, verify the named collection/switch journeys,
+   animation, audio and world/camera editing, then repair observed UX findings.
+2. Connect two small editable starters using the same general tools, and complete
+   remaining world/audio operations and contextual learning.
 3. Finish independent setup, storage/backup/recovery and Android compatibility;
    run both journeys on supported screen/control configurations.
 4. Have a novice and the owner complete and review the intended paths, fix the
@@ -123,9 +125,9 @@ status. This summary does not replace either plan or waive acceptance gates.
 
 ## Short update to adapt for a post
 
-PikoNest now has a basic music composition workflow. Arrange phrases into patterns,
-write their notes right there, and choose where the tune loops or stops. Shared
-phrases can be copied before editing, and one Undo reverses the whole composition
-change. Music can start with your game and leave a separate channel for sound
-effects. Local tests and the Android build pass; real handheld playback and
-beginner review are still ahead. Maps and camera are next in the simpler workflow.
+PikoNest's main creation screen can now build a world bigger than one screen.
+Paint the map, place objects across it, and choose a camera that stays still,
+follows an element or switches between rooms. The map and camera save and undo
+together, while existing animation and audio stay intact. Local tests and the
+Android build pass; handheld and beginner review are still ahead. Next is drawing
+new tiles without leaving the map, followed by a small pair of editable starters.

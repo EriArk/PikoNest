@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-23",
+  "build": "0.0.84",
+  "baseline_commit": "88a38cd",
+  "final_local_apk_sha256": "81f3ba6c711a413ccaa4df46d438038c3ee6684dc3c06a1dda88fb9257e8770b",
+  "final_apk_installed": false,
+  "full_local_suite_invocations": 82,
+  "full_suite_passed": true,
+  "final_patch_validation": "Relationship viewport entry/return: WorldWorkflowTest 16496 and GameRelationshipsTest 81; final Android packaging refreshed with SkipCoreTests",
+  "focused_checks": {
+    "WorldWorkflowTest": 16496,
+    "GameCanvasTest": 16504,
+    "PlayModelTest": 96,
+    "GameAnimationTest": 80199,
+    "GameRelationshipsTest": 81,
+    "GameIdentityTest": 101,
+    "GameRulesOverviewTest": 100,
+    "AssetNamingTest": 53,
+    "SfxDataTest": 2222,
+    "SoundWorkflowTest": 200,
+    "MusicDataTest": 548,
+    "MusicWorkflowTest": 218
+  },
+  "legacy_recovery": "Actual lab83 v8 home, behavior and nested animation paint journals recovered; four explicit checks, including nested cancel and old All tools focus",
+  "journal_version": 9,
+  "host_lua": {
+    "checks": 17,
+    "engine": "Lupa 2.6 Lua with += normalized and PICO APIs stubbed; not official PICO-8 execution",
+    "traces": {
+      "world-follow": {
+        "initial_camera": [
+          [
+            "camera",
+            120,
+            80
+          ],
+          [
+            "camera"
+          ]
+        ],
+        "final_restart_position": [
+          180,
+          140
+        ]
+      },
+      "world-rooms": {
+        "initial_camera": [
+          [
+            "camera",
+            128,
+            128
+          ],
+          [
+            "camera"
+          ]
+        ],
+        "final_restart_position": [
+          124,
+          0
+        ]
+      }
+    }
+  },
+  "host_layouts": {
+    "renderer": "Production GameSurface with temporary Java2D adapters, Monocraft; not native screenshots",
+    "logical_sizes": [
+      [
+        360,
+        480
+      ],
+      [
+        360,
+        800
+      ],
+      [
+        620,
+        540
+      ],
+      [
+        960,
+        540
+      ]
+    ],
+    "reviewed": [
+      "world settings",
+      "map painting",
+      "tile picker",
+      "camera choices",
+      "target choice",
+      "review",
+      "Game view",
+      "world placement"
+    ]
+  },
+  "device_access": "paused by owner",
+  "official_runtime_checked": false,
+  "public_release": false,
+  "open_acceptance": [
+    "official camera/map/animation/audio execution",
+    "physical input and compact/wide layouts",
+    "Test/return and independent exported cart",
+    "device recovery",
+    "novice and owner review"
+  ]
+}

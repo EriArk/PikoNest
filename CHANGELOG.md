@@ -10,6 +10,34 @@ Earlier work is recorded in [the technical status](docs/STATUS.md) and
 [versioned evidence](docs/showcase/README.md). See
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for the current overall picture.
 
+## 2026-10-23 — Build a larger world from Game view (0.0.84)
+
+**Implemented and locally checked; official runtime and device acceptance remain open.**
+
+- Choose field dimensions, paint/erase map tiles and choose a fixed, following or
+  room-changing camera without editing Lua. No hero or moving object is required.
+- Place and select objects beyond the first screen; the editor pans to keep them
+  in view. Movement uses world bounds, while scores/messages stay on the screen.
+- Map cells and camera settings share one Save/Undo. Draft history, picker,
+  field revert and cursor recover together. Failed saves keep the draft.
+- Camera targets are protected from accidental deletion. Existing animation,
+  music, sound and shared map/graphics data remain intact. Unknown Lua uses the
+  existing independent tools without guessed wiring.
+
+**Checked:** 82 local core suite invocations and integrated APK packaging passed.
+The new workflow suite passed 16,496 assertions (including repeated byte/pixel
+preservation checks). Seventeen host Lua assertions covered movement bounds,
+room edges, restart and drawing order. Actual older v8 drafts also recovered,
+including a nested animation paint checkpoint; journal readers retain v1–8.
+Production drawing code received compact/tall/wide host layout review. A final
+relationship-viewport correction passed focused checks and refreshed packaging.
+
+**Limits:** the connected brush uses existing tiles and upper map rows. Direct
+new-tile drawing in context is next. Collision, door triggers, parallax and broader
+map operations remain unfinished. No console actions, installation, new native
+screenshots, official execution or public APK release occurred.
+[World guide](docs/WORLD_EDITOR.md) · [exact evidence](docs/showcase/0.0.84-en/README.md).
+
 ## 2026-10-23 — Compose music inside your game project (0.0.83)
 
 **Implemented and locally checked; official audio and device acceptance remain open.**

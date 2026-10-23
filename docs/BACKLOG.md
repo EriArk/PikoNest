@@ -1,5 +1,19 @@
 # PikoNest — задачи полного цикла
 
+**2026-10-23 — Lab 0.0.84, Game view world/map/camera (partial G03/G04, N02, UX08):**
+Recognized projects now configure field size, paint/erase upper-map tiles and choose
+fixed, element-follow or room-step cameras from Game view. The editor pans when
+selecting/moving off-screen elements; generated movement uses world bounds, and
+HUD drawing resets the camera. One source-checked draft/save/Undo covers map and
+wiring. Old v1–8 drafts remain readable (current journal v9); animation/audio and
+shared-memory data are preserved. [Contract](WORLD_EDITOR.md) ·
+[local validation](showcase/0.0.84-en/README.md). Native/official-runtime, physical,
+novice and owner acceptance remain open; console use is paused. This connected
+map brush uses existing tiles and upper rows only; new-tile creation in context,
+collision, door transitions, parallax and broader map operations remain partial.
+Next finish in-context tile creation, then two small editable starter journeys
+using the same tools. Device journeys resume only when authorized.
+
 **2026-10-23 — Lab 0.0.83, connected music composition (partial S01/S04/S05, UX08):**
 A general Music tool edits ordinary 64-pattern/four-part sequences, loop/stop flags,
 shared phrase selection and confirmed copy/clear. The existing SFX editor opens

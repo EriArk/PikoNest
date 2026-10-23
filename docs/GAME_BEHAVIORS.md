@@ -4,6 +4,11 @@ Lab 0.0.77 adds a bounded creation path to the existing native Game view.
 This is an ordinary PICO-8 Lua recipe, not a new runtime, universal entity
 model or promise to visually edit arbitrary Lua. All tools remains reachable.
 
+Lab 0.0.84 optionally adds a [world, map and camera](WORLD_EDITOR.md). Movement
+then stops at the field boundary instead of the first screen. The same contact,
+switch, animation and audio behavior remains available. Existing games without
+world settings keep their source unchanged. Official/device acceptance is pending.
+
 ## Make a small collection game
 
 1. Create a **Blank** project. Add, draw and place a sprite.

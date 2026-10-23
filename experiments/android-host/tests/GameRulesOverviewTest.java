@@ -26,7 +26,7 @@ public final class GameRulesOverviewTest {
         in.readInt();int source=in.readInt();in.skipBytes(source);in.readUTF();in.readUTF();in.skipBytes(28);in.readBoolean();if(in.readBoolean()||!in.readBoolean())throw new AssertionError();
         in.readUTF();in.readUTF();in.readInt();in.readInt();int count=in.readInt();in.skipBytes(count*48);in.readBoolean();in.readInt();
         for(int n=0;n<count;n++)if(in.readBoolean()){in.readInt();int frames=in.readInt();in.skipBytes(frames*20);}
-        int at=bytes.length-stream.available(),soundSize=20+count*4;byte[] old=new byte[bytes.length-soundSize-8];System.arraycopy(bytes,0,old,0,at);System.arraycopy(bytes,at+soundSize,old,at,old.length-at);java.nio.ByteBuffer.wrap(old).putInt(5);return old;
+        int at=bytes.length-stream.available(),soundSize=20+count*4;byte[] old=new byte[bytes.length-soundSize-17];System.arraycopy(bytes,0,old,0,at);System.arraycopy(bytes,at+soundSize,old,at,old.length-at);java.nio.ByteBuffer.wrap(old).putInt(5);return old;
     }
     public static void main(String[] args)throws Exception{
         for(String nl:new String[]{"\n","\r\n"}){
@@ -57,7 +57,7 @@ public final class GameRulesOverviewTest {
             // A nested interaction selection keeps its overview origin across Test/recovery/cancel.
             open(s,1,"Collect");choose(s,2,2);check(s.game.screen==GameCanvas.Screen.RELATION,"contact picker opens from overview");s.restoreGame(s.game.encode());s.act(Action.CANCEL);s.act(Action.CANCEL);s.act(Action.CANCEL);
             check(s.game.screen==GameCanvas.Screen.OVERVIEW&&s.game.rowElement(s.game.focus)==1,"nested cancellations return to originating element");
-            open(s,3,"Toggle");WorkshopCartridge forgedBase=s.cart();byte[] forged=s.game.encode();java.nio.ByteBuffer.wrap(forged,forged.length-4,4).putInt(-2);PlayModelTest.refused(()->GameCanvas.restore(forged,forgedBase));
+            open(s,3,"Toggle");WorkshopCartridge forgedBase=s.cart();byte[] forged=s.game.encode();java.nio.ByteBuffer.wrap(forged,forged.length-15,4).putInt(-2);PlayModelTest.refused(()->GameCanvas.restore(forged,forgedBase));
             byte[] stale=s.game.encode();WorkshopCartridge current=s.cart();PlayModelTest.refused(()->GameCanvas.restore(stale,original));
             s.act(Action.CANCEL);s.act(Action.CANCEL);check(s.game.screen==GameCanvas.Screen.HOME&&s.game.focus==s.game.uses.entries.size()+1,"Back returns to Game rules entrance");
             same(current.bytes(),new GameCanvas(new WorkshopCartridge(current.bytes())).candidate(current).bytes(),"reopen/export remain ordinary exact cart");

@@ -49,13 +49,14 @@ final class GameSurface {
             wrap(session.error,16,150,w-32,Math.max(3,(int)((h-250)/26)));
             footer(yes+"  Return",Action.CONFIRM,back+"  Return",Action.CANCEL);return;
         }
+        if(g.screen==GameCanvas.Screen.WORLD){worldEditor(yes,back);return;}
         if(g.screen==GameCanvas.Screen.SOUND){soundEditor(yes,back,g.sound);return;}
         if(g.screen==GameCanvas.Screen.MUSIC){if(g.music.sound!=null)soundEditor(yes,back,g.music.sound);else musicEditor(yes,back);return;}
         if(g.screen==GameCanvas.Screen.NAME){nameEditor(yes,back);return;}
         boolean draw=g.screen==GameCanvas.Screen.DRAW||g.screen==GameCanvas.Screen.DRAW_MENU||g.screen==GameCanvas.Screen.PALETTE;
         boolean wide=w>=540;float top=104,bottom=h-104,side;
         boolean contextual=g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.RELATION||g.screen==GameCanvas.Screen.ACTIONS||g.screen==GameCanvas.Screen.SETTINGS||g.screen==GameCanvas.Screen.CHOICE||g.screen==GameCanvas.Screen.GOAL||g.screen==GameCanvas.Screen.OVERVIEW;
-        if(!draw)text("Starting layout",16,87,14,6,w-32);
+        if(!draw)text("Starting layout"+(g.viewX!=0||g.viewY!=0?" / "+g.viewX+", "+g.viewY:""),16,87,14,6,w-32);
         String[] rows=g.rows();boolean menu=rows.length>0;
         float listX=16,listY=top,listW=w-32;
         if(wide){side=Math.min(bottom-top,w*.55f-24);listX=side+40;listW=w-listX-16;}
@@ -84,13 +85,13 @@ final class GameSurface {
             }
         }else if(g.blocked.isEmpty()&&!g.uses.entries.isEmpty()&&!g.globalRuleSelection()||g.screen==GameCanvas.Screen.PLACE){
             int sx,sy,sw,sh;
-            if(g.screen==GameCanvas.Screen.PLACE){sx=g.x;sy=g.y;sw=r.width;sh=r.height;}
-            else{GameUses.Entry e=g.uses.entries.get(g.selected);SpriteRegion region=g.region(g.selected);sx=e.x();sy=e.y();sw=region.width;sh=region.height;}
+            if(g.screen==GameCanvas.Screen.PLACE){sx=g.x-g.viewX;sy=g.y-g.viewY;sw=r.width;sh=r.height;}
+            else{GameUses.Entry e=g.uses.entries.get(g.selected);SpriteRegion region=g.region(g.selected);sx=e.x()-g.viewX;sy=e.y()-g.viewY;sw=region.width;sh=region.height;}
             canvas.save();canvas.clipRect(imageArea);outline(left+sx*side/128,top+sy*side/128,sw*side/128,sh*side/128,10);
             if(g.screen==GameCanvas.Screen.RELATION)for(int candidate:g.relationshipChoices())if(candidate>=0)elementOutline(candidate,side,13);
             int other=g.relatedElement();
             if(other>=0){GameUses.Entry t=g.uses.entries.get(other);SpriteRegion tr=g.region(other);paint.setColor(PicoPalette.COLORS[12]);paint.setStrokeWidth(1);
-                canvas.drawLine(left+(sx+sw/2f)*side/128,top+(sy+sh/2f)*side/128,left+(t.x()+tr.width/2f)*side/128,top+(t.y()+tr.height/2f)*side/128,paint);
+                canvas.drawLine(left+(sx+sw/2f)*side/128,top+(sy+sh/2f)*side/128,left+(t.x()-g.viewX+tr.width/2f)*side/128,top+(t.y()-g.viewY+tr.height/2f)*side/128,paint);
                 elementOutline(other,side,12);outline(left+sx*side/128,top+sy*side/128,sw*side/128,sh*side/128,10);
             }
             canvas.restore();
@@ -138,6 +139,37 @@ final class GameSurface {
         else if(g.screen==GameCanvas.Screen.DRAW)footer(yes+"  Paint",Action.CONFIRM,back+"  Done / options",Action.CANCEL);
         else if(g.screen==GameCanvas.Screen.PLACE)footer(yes+"  Done",Action.CONFIRM,back+(g.operation==GameCanvas.Operation.ADD?"  Draw again":"  Cancel"),Action.CANCEL);
         else footer(yes+"  Select",Action.CONFIRM,back+(g.screen==GameCanvas.Screen.HOME?"  Projects":"  Back"),Action.CANCEL);
+    }
+    private void worldEditor(String yes,String back){
+        GameCanvas g=game();WorldEditor e=g.world;boolean grid=e.page==WorldEditor.Page.PAINT||e.page==WorldEditor.Page.TILES;
+        boolean wide=width>=540;float top=104,bottom=height-100;
+        float side=grid?Math.min(width-32,bottom-top-36):wide?Math.min(width*.43f,bottom-top-110):100;
+        float left=grid?(width-side)/2:16,listX=wide&&!grid?side+40:16,listY=wide&&!grid?top:top+side+24,listW=width-listX-48;
+        int[] indices=e.image(),colors=new int[16384];for(int n=0;n<colors.length;n++)colors[n]=PicoPalette.COLORS[indices[n]];
+        bitmap.setPixels(colors,0,128,0,0,128,128);RectF area=new RectF(left,top,left+side,top+side);canvas.drawBitmap(bitmap,null,area,paint);outline(left-1,top-1,side+2,side+2,13);
+        text(e.world.width/16+" x "+e.world.height/16+" screens / "+(e.world.tiles?"Map on":"Map hidden"),16,87,18,6,width-32);
+        if(grid){
+            float cell=side/16;boolean tiles=e.page==WorldEditor.Page.TILES;int selected=tiles?e.brush.choice:(e.brush.y-e.top())*16+e.brush.x-e.left();
+            for(int n=0;n<256;n++){final int index=n;float x=left+(n%16)*cell,y=top+(n/16)*cell;
+                if(!tiles){rect(x,y,cell,1,5);rect(x,y,1,cell,5);}
+                hits.add(new Hit(x,y,cell,cell,()->{if(tiles)e.brush.choice=index;else{e.point(e.left()+index%16,e.top()+index/16);e.paint();}changed();}));
+            }
+            outline(left+selected%16*cell,top+selected/16*cell,cell,cell,10);
+            text(tiles?"Tile "+e.brush.choice+(e.brush.choice==0?" / Empty":" / A keeps it"):(e.brush.tile==0?"Eraser":"Tile "+e.brush.tile)+" at "+e.brush.x+", "+e.brush.y,left,top+side+26,18,7,side);
+        }else{
+            float sx=wide?16:left+side+16,sy=wide?top+side+28:top+18,sw=wide?side:width-sx-16;
+            wrap(e.summary(),sx,sy,sw,wide?Math.max(1,(int)((bottom-sy)/26)):4);
+            String[] rows=g.rows();int visible=Math.max(1,(int)((bottom-listY)/50)),first=Math.max(0,Math.min(Math.max(0,rows.length-visible),g.focus-visible/2));
+            for(int n=first;n<Math.min(rows.length,first+visible);n++){final int row=n;float y=listY+(n-first)*50;
+                button(rows[n],listX,y,listW,48,g.focus==n,()->{if(e.editing){if(row==g.focus)act(Action.RIGHT);return;}g.focus=row;act(Action.CONFIRM);});
+            }
+            if(rows.length>visible){button("^",width-44,listY,32,40,false,()->act(Action.UP));button("v",width-44,bottom-40,32,40,false,()->act(Action.DOWN));}
+        }
+        float fy=height-88;rect(0,fy,width,88,1);rect(16,fy,width-32,1,13);
+        button(yes+(e.editing?"  Keep":e.page==WorldEditor.Page.PAINT?"  Paint":"  Select"),8,fy+4,width/2-12,40,true,()->act(Action.CONFIRM));
+        button(back+(e.editing?"  Revert":e.page==WorldEditor.Page.PAINT?"  Options":"  Back"),width/2+4,fy+4,width/2-12,40,false,()->act(Action.CANCEL));
+        button(e.editing?"Left  -":"Start  Test",8,fy+44,width/2-12,40,false,()->act(e.editing?Action.LEFT:Action.TEST));
+        button(e.editing?"Right  +":grid?(e.page==WorldEditor.Page.TILES?"X  Empty":"X  Tile"):"Menu  Save",width/2+4,fy+44,width/2-12,40,false,()->act(e.editing?Action.RIGHT:grid?Action.CONTEXT:Action.MENU));
     }
     private void soundEditor(String yes,String back,SoundEditor s){
         GameCanvas g=game();float bottom=height-104,listY=112,listX=16,listW=width-64;
@@ -200,7 +232,7 @@ final class GameSurface {
     }
     private void elementOutline(int index,float side,int color){
         GameUses.Entry e=game().uses.entries.get(index);SpriteRegion r=game().region(index);
-        outline(imageArea.left+e.x()*side/128,imageArea.top+e.y()*side/128,r.width*side/128,r.height*side/128,color);
+        outline(imageArea.left+(e.x()-game().viewX)*side/128,imageArea.top+(e.y()-game().viewY)*side/128,r.width*side/128,r.height*side/128,color);
     }
     private void drawThumbnail(int index,float x,float y,float size){
         SpriteRegion r=game().region(index);int[] colors=new int[32*32];int longest=Math.max(r.width,r.height);
@@ -242,7 +274,7 @@ final class GameSurface {
         if(e.getActionMasked()==MotionEvent.ACTION_UP){
             if(session.mode!=WorkshopSession.Mode.ERROR&&imageArea!=null&&imageArea.contains(x,y)&&(g.screen==GameCanvas.Screen.HOME||g.screen==GameCanvas.Screen.PLACE||g.screen==GameCanvas.Screen.RELATION)){
                 int px=(int)((x-imageArea.left)*128/imageArea.width()),py=(int)((y-imageArea.top)*128/imageArea.height());
-                if(g.screen==GameCanvas.Screen.PLACE)g.point(px,py);
+                if(g.screen==GameCanvas.Screen.PLACE)g.point(px+g.viewX,py+g.viewY);
                 else if(g.pickElementAt(px,py)&&g.screen==GameCanvas.Screen.HOME){act(Action.CONFIRM);return true;}
                 changed();return true;
             }

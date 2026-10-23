@@ -6,9 +6,9 @@ import java.util.regex.*;
 
 /** Game-first authoring over static placements and a verified ordinary-Lua behavior recipe. */
 public final class GameCanvas {
-    public enum Screen { HOME, ACTIONS, SIZE, DRAW, DRAW_MENU, PALETTE, PLACE, SHARED, DELETE, BEHAVIOR, SETTINGS, ANIMATION, RELATION, NAME, CHOICE, GOAL, OVERVIEW, SOUND, MUSIC }
-    public enum Operation { NONE, ADD, APPEARANCE, INDEPENDENT, MOVE, DUPLICATE, CONFIG, ANIMATION, RENAME, SOUND, MUSIC }
-    public enum Command { NONE, SAVE, TEST, TOOLS, PROJECTS, UNDO, REDO, LISTEN, CLOSE_SOUND, CLOSE_MUSIC }
+    public enum Screen { HOME, ACTIONS, SIZE, DRAW, DRAW_MENU, PALETTE, PLACE, SHARED, DELETE, BEHAVIOR, SETTINGS, ANIMATION, RELATION, NAME, CHOICE, GOAL, OVERVIEW, SOUND, MUSIC, WORLD }
+    public enum Operation { NONE, ADD, APPEARANCE, INDEPENDENT, MOVE, DUPLICATE, CONFIG, ANIMATION, RENAME, SOUND, MUSIC, WORLD }
+    public enum Command { NONE, SAVE, TEST, TOOLS, PROJECTS, UNDO, REDO, LISTEN, CLOSE_SOUND, CLOSE_MUSIC, CLOSE_WORLD }
     public final WorkshopCartridge base;
     public final GameUses uses;
     public final PlayModel play;
@@ -17,6 +17,8 @@ public final class GameCanvas {
     public GameAnimation animation;
     public SoundEditor sound;
     public MusicEditor music;
+    public WorldEditor world;
+    public int viewX,viewY;
     public boolean editingField;
     private int fieldBefore;
     private int relationshipField=-1,relationshipReturnFocus;
@@ -42,6 +44,7 @@ public final class GameCanvas {
         try{recognize();parsed=GameElementNames.read(cart,uses);}catch(IllegalArgumentException e){reason=e.getMessage();}
         names=parsed;blocked=reason;
         List<SpriteRegion> regions=new ArrayList<>();if(blocked.isEmpty())for(int n=0;n<uses.entries.size();n++)regions.add(region(n));labels=new GameElementLabels(cart,regions,names.values);
+        if(play!=null&&play.world!=null){viewX=play.world.offset(play,true);viewY=play.world.offset(play,false);}
     }
     private void recognize(){
         // Full-source allowlist, not a search for a marker or an apparently empty sheet.
@@ -60,9 +63,9 @@ public final class GameCanvas {
         if(phase!=3)throw unsupported();
         for(GameUses.Entry e:uses.entries)if(e.linked()||(!e.kind().equals("spr")&&!e.kind().equals("sspr")))throw unsupported();
     }
-    private static IllegalArgumentException unsupported(){return new IllegalArgumentException("Game view currently supports Blank, static sprites and Game view behaviors. Open All tools for this project's code, maps and other resources.");}
+    private static IllegalArgumentException unsupported(){return new IllegalArgumentException("Game view currently supports Blank, static sprites and Game view behaviors. Open All tools for this project's code and other resources.");}
     private void supported(){if(!blocked.isEmpty())throw new IllegalArgumentException(blocked);}
-    public boolean draft(){return music!=null?music.draft():sound!=null?sound.draft():operation!=Operation.NONE;}
+    public boolean draft(){return world!=null?world.draft():music!=null?music.draft():sound!=null?sound.draft():operation!=Operation.NONE;}
     public SpriteRegion region(){return target;}
     public int pixel(int px,int py){return pixels[py*target.width+px];}
     public SpriteRegion region(int index){
@@ -80,17 +83,18 @@ public final class GameCanvas {
     private void beginRelationship(int field){
         relationshipReturnFocus=focus;relationshipField=field;screen=Screen.RELATION;editingField=false;
         PlayModel.Element e=settings.elements.get(selected);int before=field==3?e.target:e.neighbor;focus=0;
-        int[] choices=relationshipChoices();for(int n=0;n<choices.length;n++)if(choices[n]==before)focus=n;
+        int[] choices=relationshipChoices();for(int n=0;n<choices.length;n++)if(choices[n]==before)focus=n;frameSelection();
     }
     private void endRelationship(boolean confirm){
         if(relationshipFromChoice&&!confirm){int chosen=settings.elements.get(selected).rule;settings.elements.get(selected).rule=choiceBefore;screen=Screen.CHOICE;focus=chosen;}
         else{screen=Screen.BEHAVIOR;focus=relationshipReturnFocus;choiceField=-1;}
-        relationshipField=-1;relationshipFromChoice=false;
+        relationshipField=-1;relationshipFromChoice=false;frameSelection();
     }
     private Command relationshipAction(WorkshopSession.Action a){
         if(a==WorkshopSession.Action.CANCEL){endRelationship(false);return Command.NONE;}
         if(a==WorkshopSession.Action.UP||a==WorkshopSession.Action.LEFT)focus=Math.max(0,focus-1);
         if(a==WorkshopSession.Action.DOWN||a==WorkshopSession.Action.RIGHT)focus=Math.min(rows().length-1,focus+1);
+        frameSelection();
         if(a==WorkshopSession.Action.CONFIRM){
             int[] choices=relationshipChoices();
             if(focus<choices.length){PlayModel.Element e=settings.elements.get(selected);if(relationshipField==3)e.target=choices[focus];else e.neighbor=choices[focus];endRelationship(true);}
@@ -131,6 +135,7 @@ public final class GameCanvas {
     }
     /** Hit testing never makes overlap or transparency a prerequisite for list selection. */
     public boolean pickElementAt(int px,int py){
+        px+=viewX;py+=viewY;
         if(!blocked.isEmpty()||screen!=Screen.HOME&&screen!=Screen.RELATION)return false;
         for(int n=uses.entries.size()-1;n>=0;n--){
             GameUses.Entry e=uses.entries.get(n);SpriteRegion r=region(n);
@@ -156,19 +161,22 @@ public final class GameCanvas {
         return e.movement==0?"No behavior yet. Choose Behavior to add movement or an interaction.":"Directions move this "+(e.movement==2?"horizontally":e.movement==3?"vertically":"across the field")+".";
     }
     private String contactAction(){int rule=settings.elements.get(selected).rule;return rule==1?"collect it once":rule==2?"win the game":"lose the game";}
+    public void openWorld(){supported();world=new WorldEditor(base);screen=Screen.WORLD;operation=Operation.WORLD;focus=0;}
     public void openMusic(boolean fromTools){MusicEditor next=new MusicEditor(base,fromTools);music=next;screen=Screen.MUSIC;operation=Operation.MUSIC;focus=0;}
     public void openSounds(boolean fromTools){SoundEditor next=new SoundEditor(base,fromTools);sound=next;screen=Screen.SOUND;operation=Operation.SOUND;focus=0;}
     public String title(){
+        if(world!=null)return world.title();
         if(music!=null)return music.title();
         if(sound!=null)return sound.title();
         switch(screen){case DRAW:case DRAW_MENU:case PALETTE:return "Appearance";case PLACE:return operation==Operation.MOVE?"Move sprite":"Place sprite";
             case OVERVIEW:return "How the game works";case GOAL:return "Choose a game goal";case NAME:return "Name this element";case CHOICE:return choiceField==0?"How does it move?":"What should happen?";case RELATION:return relationshipField==3?"Choose who touches this":"Choose another switch";case ANIMATION:return "Animation: "+label(selected);case BEHAVIOR:return "Behavior: "+label(selected);case SETTINGS:return "Game rules";case SIZE:return "New sprite";case SHARED:return "Shared appearance";case DELETE:return "Remove sprite?";case ACTIONS:return label(selected);default:return "Game view";}
     }
     public String[] rows(){
+        if(world!=null)return world.rows();
         if(music!=null)return music.rows();
         if(sound!=null)return sound.rows();
         switch(screen){
-            case HOME:{ArrayList<String> rows=new ArrayList<>();rows.add("+ Add sprite");if(blocked.isEmpty())for(int n=0;n<uses.entries.size();n++)rows.add(label(n));if(blocked.isEmpty())rows.add("Game rules");Collections.addAll(rows,"Sound effects","Music","All tools","Undo","Redo","Projects");return rows.toArray(new String[0]);}
+            case HOME:{ArrayList<String> rows=new ArrayList<>();rows.add("+ Add sprite");if(blocked.isEmpty())for(int n=0;n<uses.entries.size();n++)rows.add(label(n));if(blocked.isEmpty())rows.add("Game rules");Collections.addAll(rows,"Sound effects","Music");if(blocked.isEmpty())rows.add("World & camera");Collections.addAll(rows,"All tools","Undo","Redo","Projects");return rows.toArray(new String[0]);}
             case ACTIONS:return new String[]{"Edit appearance","Move on field","Duplicate","Remove","Behavior","Animation","Name","Sound","Back"};
             case OVERVIEW:{ArrayList<String> r=new ArrayList<>();for(GameRulesOverview.Entry e:overview().entries)r.add(e.row);r.add("Back to game");return r.toArray(new String[0]);}
             case GOAL:return new String[]{"Keep playing\nNo automatic win","Win by collecting\nAll items","Win with switches\nAll switches on","Cancel"};
@@ -213,21 +221,30 @@ public final class GameCanvas {
         SpriteRegion next=op==Operation.INDEPENDENT?allocate(original.width,original.height):original;
         int[] copy=new int[original.width*original.height];for(int yy=0;yy<original.height;yy++)for(int xx=0;xx<original.width;xx++)copy[yy*original.width+xx]=base.pixel(original,xx,yy);
         operation=op;target=next;pixels=copy;GameUses.Entry e=uses.entries.get(selected);x=e.x();y=e.y();cursorX=cursorY=0;focus=0;
-        screen=(op==Operation.MOVE||op==Operation.DUPLICATE)?Screen.PLACE:Screen.DRAW;
+        screen=(op==Operation.MOVE||op==Operation.DUPLICATE)?Screen.PLACE:Screen.DRAW;frameSelection();
     }
     public void add(int size){
         if(play!=null&&uses.entries.size()>=16)throw new IllegalArgumentException("This behavior editor currently supports 16 sprites. Existing data was kept; All tools remains available.");
         int[] widths={8,16,32,32},heights={8,16,16,32};if(size<0||size>=4)throw new IllegalArgumentException("Choose a sprite size");
         SpriteRegion next=allocate(widths[size],heights[size]);target=next;pixels=new int[target.width*target.height];operation=Operation.ADD;
-        x=(128-target.width)/2;y=(128-target.height)/2;cursorX=cursorY=0;eraser=false;screen=Screen.DRAW;focus=0;
+        x=viewX+(128-target.width)/2;y=viewY+(128-target.height)/2;cursorX=cursorY=0;eraser=false;screen=Screen.DRAW;focus=0;
     }
     public void paint(int px,int py){if(screen!=Screen.DRAW)return;cursorX=clamp(px,0,target.width-1);cursorY=clamp(py,0,target.height-1);pixels[cursorY*target.width+cursorX]=eraser?0:color;}
-    public void point(int px,int py){if(screen==Screen.PLACE){x=clamp(px,-target.width+1,127);y=clamp(py,-target.height+1,127);}else if(screen==Screen.HOME&&blocked.isEmpty()){
+    public void point(int px,int py){if(screen==Screen.PLACE){x=clamp(px,-target.width+1,worldWidth()-1);y=clamp(py,-target.height+1,worldHeight()-1);ensureVisible(x,y,target.width,target.height);}else if(screen==Screen.HOME&&blocked.isEmpty()){
         for(int n=uses.entries.size()-1;n>=0;n--){GameUses.Entry e=uses.entries.get(n);SpriteRegion r=region(n);if(px>=e.x()&&py>=e.y()&&px<e.x()+r.width&&py<e.y()+r.height){selected=n;focus=n+1;return;}}
     }}
+    private int worldWidth(){return play!=null&&play.world!=null?play.world.width*8:128;}
+    private int worldHeight(){return play!=null&&play.world!=null?play.world.height*8:128;}
+    private void ensureVisible(int x,int y,int w,int h){
+        if(x<viewX)viewX=x;if(x+w>viewX+128)viewX=x+w-128;
+        if(y<viewY)viewY=y;if(y+h>viewY+128)viewY=y+h-128;
+        viewX=clamp(viewX,0,worldWidth()-128);viewY=clamp(viewY,0,worldHeight()-128);
+    }
+    public void frameSelection(){if(blocked.isEmpty()&&!uses.entries.isEmpty()){int index=screen==Screen.RELATION?relatedElement():selected;if(index>=0){GameUses.Entry e=uses.entries.get(index);SpriteRegion r=region(index);ensureVisible(e.x(),e.y(),r.width,r.height);}}}
     private static int clamp(int v,int lo,int hi){return Math.max(lo,Math.min(hi,v));}
     private void home(){nameDraft=null;choiceField=-1;relationshipFromChoice=false;relationshipField=-1;animation=null;settings=null;editingField=false;screen=Screen.HOME;operation=Operation.NONE;target=null;pixels=null;focus=uses.entries.isEmpty()?0:selected+1;if(overviewReturn!=null){GameRulesOverview.Kind kind=overviewReturn;int element=overviewElement;overviewReturn=null;overviewElement=-1;openOverview();focus=overview().find(kind,element);syncOverviewSelection();}}
     public Command act(WorkshopSession.Action a){
+        if(screen==Screen.WORLD){world.focus=focus;Command result=world.act(a);focus=world.focus;if(result==Command.CLOSE_WORLD){world=null;home();focus=uses.entries.size()+4;return Command.NONE;}return result;}
         if(screen==Screen.MUSIC){music.focus=focus;Command result=music.act(a);focus=music.focus;if(result==Command.CLOSE_MUSIC){music=null;operation=Operation.NONE;screen=Screen.HOME;focus=blocked.isEmpty()?uses.entries.size()+3:2;return Command.NONE;}return result;}
         if(screen==Screen.SOUND){sound.focus=focus;Command result=sound.act(a);focus=sound.focus;if(result==Command.CLOSE_SOUND){int parent=sound.returnElement;sound=null;operation=Operation.NONE;screen=parent>=0?Screen.ACTIONS:Screen.HOME;if(parent>=0)selected=parent;focus=parent>=0?7:(blocked.isEmpty()?uses.entries.size()+2:1);return Command.NONE;}return result;}
         if(a==WorkshopSession.Action.TEST)return Command.TEST;
@@ -258,7 +275,7 @@ public final class GameCanvas {
             if(a==WorkshopSession.Action.CANCEL){if(operation==Operation.ADD)screen=Screen.DRAW;else home();}return Command.NONE;
         }
         if(a==WorkshopSession.Action.UP)focus=Math.max(0,focus-1);if(a==WorkshopSession.Action.DOWN)focus=Math.min(rows().length-1,focus+1);
-        if(screen==Screen.HOME&&(focus>0&&focus<=uses.entries.size())&&blocked.isEmpty())selected=focus-1;
+        if(screen==Screen.HOME&&(focus>0&&focus<=uses.entries.size())&&blocked.isEmpty()){selected=focus-1;frameSelection();}
         if(a==WorkshopSession.Action.CANCEL){if(screen==Screen.HOME)return Command.PROJECTS;if(screen==Screen.DRAW_MENU)screen=Screen.DRAW;else home();return Command.NONE;}
         if(a==WorkshopSession.Action.UNDO&&screen==Screen.HOME)return Command.UNDO;
         if(a==WorkshopSession.Action.REDO&&screen==Screen.HOME)return Command.REDO;
@@ -271,7 +288,8 @@ public final class GameCanvas {
                 else if(blocked.isEmpty()&&focus==count+1)openOverview();
                 else if(focus==count+1+(blocked.isEmpty()?1:0))openSounds(false);
                 else if(focus==count+2+(blocked.isEmpty()?1:0))openMusic(false);
-                else return new Command[]{Command.TOOLS,Command.UNDO,Command.REDO,Command.PROJECTS}[focus-count-3-(blocked.isEmpty()?1:0)];break;}
+                else if(blocked.isEmpty()&&focus==count+4)openWorld();
+                else return new Command[]{Command.TOOLS,Command.UNDO,Command.REDO,Command.PROJECTS}[focus-(rows().length-4)];break;}
             case ACTIONS:
                 if(focus==0){if(sharedUses()>1||mapReference()||region(selected).sharesMap()){screen=Screen.SHARED;focus=0;}else start(Operation.APPEARANCE);}
                 else if(focus==1)start(Operation.MOVE);else if(focus==2)start(Operation.DUPLICATE);else if(focus==3){screen=Screen.DELETE;focus=0;}else if(focus==4)configure(true);else if(focus==5)animate();else if(focus==6)rename();else if(focus==7){PlayModel model=PlayModel.fromStatic(base);if(model.elements.get(selected).rule==0)throw new IllegalArgumentException("Choose an interaction in Behavior first. General sounds and game-start sounds are in Sound effects.");openSounds(false);sound.openEvent(selected+3);sound.returnElement=selected;focus=sound.focus;}else home();break;
@@ -286,6 +304,7 @@ public final class GameCanvas {
     }
     public WorkshopCartridge candidate(WorkshopCartridge current){
         if(!Arrays.equals(base.bytes(),current.bytes()))throw new IllegalArgumentException("The project changed. The saved source and this draft were kept; reopen the project before editing.");
+        if(world!=null)return world.candidate();
         if(music!=null)return music.candidate();
         if(sound!=null)return sound.candidate();
         supported();if(operation==Operation.RENAME){GameElementNames edited=names.copy();edited.values.set(selected,GameElementNames.normalize(nameDraft.text()));return edited.apply(base);}
@@ -341,15 +360,19 @@ public final class GameCanvas {
     }
     private GameRulesOverview overview(){if(overview==null)overview=new GameRulesOverview(PlayModel.fromStatic(base),labels);return overview;}
     public void openOverview(){supported();overview();screen=Screen.OVERVIEW;focus=0;operation=Operation.NONE;}
-    private void syncOverviewSelection(){int element=rowElement(focus);if(element>=0)selected=element;}
+    private void syncOverviewSelection(){int element=rowElement(focus);if(element>=0){selected=element;frameSelection();}}
     /** Preserve the semantic location even if an edited rule disappears or rows shift. */
     public void returnAfterSave(GameCanvas previous){
+        viewX=clamp(previous.viewX,0,worldWidth()-128);viewY=clamp(previous.viewY,0,worldHeight()-128);
+        if(previous.world!=null){openWorld();return;}
         if(previous.music!=null){openMusic(previous.music.fromTools);music.index=previous.music.index;focus=music.index;return;}
         if(previous.sound!=null){if(previous.sound.returnElement>=0){screen=Screen.ACTIONS;operation=Operation.NONE;selected=previous.sound.returnElement;focus=7;return;}openSounds(previous.sound.fromTools);sound.afterSave(previous.sound);focus=sound.focus;return;}
         if(previous.overviewReturn==null)return;
         openOverview();focus=overview().find(previous.overviewReturn,previous.overviewElement);syncOverviewSelection();
     }
     public void returnAfterHistory(GameCanvas previous){
+        viewX=clamp(previous.viewX,0,worldWidth()-128);viewY=clamp(previous.viewY,0,worldHeight()-128);
+        if(previous.world!=null&&blocked.isEmpty()){openWorld();return;}
         if(previous.music!=null){openMusic(previous.music.fromTools);music.index=previous.music.index;focus=music.index;return;}
         if(previous.sound!=null){if(previous.sound.returnElement>=0){screen=Screen.ACTIONS;operation=Operation.NONE;selected=previous.sound.returnElement;focus=7;return;}openSounds(previous.sound.fromTools);sound.afterSave(previous.sound);focus=sound.focus;return;}
         if(previous.screen!=Screen.OVERVIEW||!blocked.isEmpty())return;
@@ -441,7 +464,7 @@ public final class GameCanvas {
         if(screen==Screen.SETTINGS)return settings.readiness();
         PlayModel.Element e=settings.elements.get(selected);
         int active=focus<formFields().length?formFields()[focus]:-1;
-        if(active==0||active==1)return "Directions move this sprite. Higher speed is faster. It stops at the screen edge.";
+        if(active==0||active==1)return "Directions move this sprite. Higher speed is faster. It stops at the field edge.";
         if(active==3||e.rule>=1&&e.rule<=3)return "When the chosen sprite overlaps this sprite: "+(e.rule==1?"collect this sprite once.":e.rule==2?"win the game.":e.rule==3?"lose the game.":"choose a touch rule first.");
         if(active==5)return "Also toggle another switch with this one. Set that sprite to Toggle first.";
         return "Toggle: left/right select a switch, O changes it once per press. X restarts the game.";
@@ -449,40 +472,45 @@ public final class GameCanvas {
     public int[] image(){
         WorkshopCartridge cart=animation!=null?animation.model.layout(animation.resources):operation==Operation.CONFIG?settings.layout(base):draft()?candidate(base):base;PlayModel model=PlayModel.read(cart);if(model!=null)cart=model.layout(cart);GameUses list=new GameUses(cart,0);int[] image=new int[128*128];Arrays.fill(image,settings==null?background:settings.background);
         if(!blocked.isEmpty())return image;
+        PlayWorld field=play==null?null:play.world;
+        if(field!=null&&field.tiles){P8Map map=cart.map();for(int yy=0;yy<128;yy++)for(int xx=0;xx<128;xx++){int wx=xx+viewX,wy=yy+viewY;if(wx>=field.width*8||wy>=field.height*8)continue;int tile=map.tile(wx/8,wy/8);if(tile!=0){int p=cart.sheetPixel(tile%16*8+wx%8,tile/16*8+wy%8);if(p!=0)image[yy*128+xx]=p;}}}
         int placement=0;for(GameUses.Entry e:list.entries){SpriteRegion r=e.kind().equals("spr")?new SpriteRegion(e.values[0]%16*8,e.values[0]/16*8,8,8):new SpriteRegion(e.values[0],e.values[1],e.values[2],e.values[3]);
             if(animation!=null&&placement==selected)r=animation.current().region;placement++;
-            for(int yy=0;yy<r.height;yy++)for(int xx=0;xx<r.width;xx++){int dx=e.x()+xx,dy=e.y()+yy,p=cart.pixel(r,xx,yy);if(p!=0&&dx>=0&&dx<128&&dy>=0&&dy<128)image[dy*128+dx]=p;}
+            for(int yy=0;yy<r.height;yy++)for(int xx=0;xx<r.width;xx++){int dx=e.x()+xx-viewX,dy=e.y()+yy-viewY,p=cart.pixel(r,xx,yy);if(p!=0&&dx>=0&&dx<128&&dy>=0&&dy<128)image[dy*128+dx]=p;}
         }
         return image;
     }
     public byte[] encode(){try{
-        ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(bytes);o.writeInt(8);byte[] source=base.bytes();o.writeInt(source.length);o.write(source);
+        ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(bytes);o.writeInt(9);byte[] source=base.bytes();o.writeInt(source.length);o.write(source);
         o.writeUTF(screen.name());o.writeUTF(operation.name());for(int v:new int[]{selected,focus,color,cursorX,cursorY,x,y})o.writeInt(v);o.writeBoolean(eraser);
-        o.writeBoolean(target!=null);if(target!=null){for(int v:new int[]{target.x,target.y,target.width,target.height})o.writeInt(v);for(int p:pixels)o.writeByte(p);}o.writeBoolean(settings!=null);if(settings!=null){settings.encode(o);o.writeBoolean(editingField);o.writeInt(fieldBefore);settings.encodeAnimations(o);settings.encodeSounds(o);settings.encodeMusic(o);}o.writeBoolean(animation!=null);if(animation!=null){animation.focus=screen==Screen.ANIMATION?focus:3;animation.editing=editingField;animation.encode(o);}o.writeInt(relationshipField);o.writeInt(relationshipReturnFocus);o.writeBoolean(nameDraft!=null);if(nameDraft!=null){o.writeUTF(nameDraft.text());o.writeInt(nameDraft.key);o.writeBoolean(nameDraft.latin);o.writeBoolean(nameDraft.uppercase);o.writeBoolean(nameDraft.replaceAll);}o.writeInt(choiceField);o.writeInt(choiceBefore);o.writeBoolean(relationshipFromChoice);o.writeUTF(overviewReturn==null?"":overviewReturn.name());o.writeInt(overviewElement);o.writeBoolean(sound!=null);if(sound!=null){sound.focus=focus;sound.encode(o);}o.writeBoolean(music!=null);if(music!=null){music.focus=focus;music.encode(o);}return bytes.toByteArray();
+        o.writeBoolean(target!=null);if(target!=null){for(int v:new int[]{target.x,target.y,target.width,target.height})o.writeInt(v);for(int p:pixels)o.writeByte(p);}o.writeBoolean(settings!=null);if(settings!=null){settings.encode(o);o.writeBoolean(editingField);o.writeInt(fieldBefore);settings.encodeAnimations(o);settings.encodeSounds(o);settings.encodeMusic(o);}o.writeBoolean(animation!=null);if(animation!=null){animation.focus=screen==Screen.ANIMATION?focus:3;animation.editing=editingField;animation.encode(o);}o.writeInt(relationshipField);o.writeInt(relationshipReturnFocus);o.writeBoolean(nameDraft!=null);if(nameDraft!=null){o.writeUTF(nameDraft.text());o.writeInt(nameDraft.key);o.writeBoolean(nameDraft.latin);o.writeBoolean(nameDraft.uppercase);o.writeBoolean(nameDraft.replaceAll);}o.writeInt(choiceField);o.writeInt(choiceBefore);o.writeBoolean(relationshipFromChoice);o.writeUTF(overviewReturn==null?"":overviewReturn.name());o.writeInt(overviewElement);o.writeBoolean(sound!=null);if(sound!=null){sound.focus=focus;sound.encode(o);}o.writeBoolean(music!=null);if(music!=null){music.focus=focus;music.encode(o);}o.writeInt(viewX);o.writeInt(viewY);o.writeBoolean(world!=null);if(world!=null){world.focus=focus;world.encode(o);}return bytes.toByteArray();
     }catch(IOException e){throw new IllegalStateException(e);}}
     public static GameCanvas restore(byte[] bytes,WorkshopCartridge cart){try{
-        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version!=1&&version!=2&&version!=3&&version!=4&&version!=5&&version!=6&&version!=7&&version!=8)throw new IOException();int length=i.readInt();if(length<0||length>2*1024*1024||length>i.available())throw new IOException();byte[] source=new byte[length];i.readFully(source);
+        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version!=1&&version!=2&&version!=3&&version!=4&&version!=5&&version!=6&&version!=7&&version!=8&&version!=9)throw new IOException();int length=i.readInt();if(length<0||length>2*1024*1024||length>i.available())throw new IOException();byte[] source=new byte[length];i.readFully(source);
         if(!Arrays.equals(source,cart.bytes()))throw new IOException("The project changed; its source was preserved.");
         GameCanvas g=new GameCanvas(cart);g.screen=Screen.valueOf(i.readUTF());g.operation=Operation.valueOf(i.readUTF());g.selected=i.readInt();g.focus=i.readInt();g.color=i.readInt();g.cursorX=i.readInt();g.cursorY=i.readInt();g.x=i.readInt();g.y=i.readInt();g.eraser=i.readBoolean();
         if(i.readBoolean()){g.target=new SpriteRegion(i.readInt(),i.readInt(),i.readInt(),i.readInt());g.pixels=new int[g.target.width*g.target.height];for(int n=0;n<g.pixels.length;n++){g.pixels[n]=i.readUnsignedByte();if(g.pixels[n]>15)throw new IOException();}}
         if(version==1&&g.blocked.isEmpty()){if(g.screen==Screen.HOME&&g.focus>g.uses.entries.size())g.focus++;if(g.screen==Screen.ACTIONS&&g.focus==4)g.focus=5;}
-        if(version>=2&&i.readBoolean()){g.settings=PlayModel.decode(i);g.editingField=i.readBoolean();g.fieldBefore=i.readInt();if(version>=3)g.settings.decodeAnimations(i);if(version>=7)g.settings.decodeSounds(i);if(version>=8)g.settings.decodeMusic(i);}
+        if(version>=2&&i.readBoolean()){g.settings=PlayModel.decode(i);g.settings.world=PlayModel.fromStatic(cart).world;g.editingField=i.readBoolean();g.fieldBefore=i.readInt();if(version>=3)g.settings.decodeAnimations(i);if(version>=7)g.settings.decodeSounds(i);if(version>=8)g.settings.decodeMusic(i);}
         if(version>=3&&i.readBoolean()){g.animation=GameAnimation.decode(i,cart,version);g.editingField=g.animation.editing;if(g.animation.element!=g.selected)throw new IOException();}
         if(version>=4){g.relationshipField=i.readInt();g.relationshipReturnFocus=i.readInt();}
         if(version>=5){if(i.readBoolean()){g.nameDraft=new NameEditor(i.readUTF(),GameElementNames.LIMIT,true);g.nameDraft.key=i.readInt();g.nameDraft.latin=i.readBoolean();g.nameDraft.uppercase=i.readBoolean();g.nameDraft.replaceAll=i.readBoolean();GameElementNames.normalize(g.nameDraft.text());if(g.nameDraft.key<0||g.nameDraft.key>=g.nameDraft.count())throw new IOException();}g.choiceField=i.readInt();g.choiceBefore=i.readInt();g.relationshipFromChoice=i.readBoolean();}
         if(version>=6){String origin=i.readUTF();g.overviewReturn=origin.isEmpty()?null:GameRulesOverview.Kind.valueOf(origin);g.overviewElement=i.readInt();}
         if(version>=7&&i.readBoolean()){g.sound=SoundEditor.decode(i,cart);if(g.focus!=g.sound.focus)throw new IOException();}
         if(version>=8&&i.readBoolean()){g.music=MusicEditor.decode(i,cart);if(g.focus!=g.music.focus)throw new IOException();}
+        if(version>=9){g.viewX=i.readInt();g.viewY=i.readInt();if(i.readBoolean()){g.world=WorldEditor.decode(i,cart);if(g.world.focus!=g.focus)throw new IOException();}}
         if(version<7&&g.screen==Screen.HOME&&g.focus>=(g.blocked.isEmpty()?g.uses.entries.size()+2:1))g.focus++;
         if(version<8&&g.screen==Screen.HOME&&g.focus>=(g.blocked.isEmpty()?g.uses.entries.size()+3:2))g.focus++;
+        if(version<9&&g.blocked.isEmpty()&&g.screen==Screen.HOME&&g.focus>=g.uses.entries.size()+4)g.focus++;
         if(version<3&&g.screen==Screen.ACTIONS&&g.focus==5)g.focus=6;
         if(version<5&&g.screen==Screen.ACTIONS&&g.focus==6)g.focus=7;
         if(version<7&&g.screen==Screen.ACTIONS&&g.focus==7)g.focus=8;
         if(i.available()!=0||g.color<0||g.color>15||g.selected<0||g.selected>=Math.max(1,g.uses.entries.size())||g.focus<0||g.focus>Math.max(16,g.rows().length)||g.x<-32768||g.x>32767||g.y<-32768||g.y>32767)throw new IOException();
         boolean editing=g.screen==Screen.DRAW||g.screen==Screen.DRAW_MENU||g.screen==Screen.PALETTE||g.screen==Screen.PLACE;
-        if((g.operation!=Operation.NONE&&g.operation!=Operation.CONFIG&&g.operation!=Operation.ANIMATION&&g.operation!=Operation.RENAME&&g.operation!=Operation.SOUND&&g.operation!=Operation.MUSIC)!=editing&&g.operation!=Operation.ANIMATION||editing!=(g.target!=null))throw new IOException();
+        if((g.operation!=Operation.NONE&&g.operation!=Operation.CONFIG&&g.operation!=Operation.ANIMATION&&g.operation!=Operation.RENAME&&g.operation!=Operation.SOUND&&g.operation!=Operation.MUSIC&&g.operation!=Operation.WORLD)!=editing&&g.operation!=Operation.ANIMATION||editing!=(g.target!=null))throw new IOException();
         if((g.sound!=null)!=(g.screen==Screen.SOUND)||(g.operation==Operation.SOUND)!=(g.screen==Screen.SOUND))throw new IOException();
         if((g.music!=null)!=(g.screen==Screen.MUSIC)||(g.operation==Operation.MUSIC)!=(g.screen==Screen.MUSIC))throw new IOException();
+        if((g.world!=null)!=(g.screen==Screen.WORLD)||(g.operation==Operation.WORLD)!=(g.screen==Screen.WORLD)||g.viewX<0||g.viewX>g.worldWidth()-128||g.viewY<0||g.viewY>g.worldHeight()-128)throw new IOException();
         boolean form=g.screen==Screen.BEHAVIOR||g.screen==Screen.SETTINGS||g.screen==Screen.RELATION||g.screen==Screen.CHOICE||g.screen==Screen.GOAL;
         if(form!=(g.settings!=null)||form!=(g.operation==Operation.CONFIG)||g.editingField&&!form&&g.screen!=Screen.ANIMATION)throw new IOException();
         if((g.animation!=null)!=(g.operation==Operation.ANIMATION)||g.screen==Screen.ANIMATION&&g.animation==null||g.animation!=null&&!(g.screen==Screen.ANIMATION||editing))throw new IOException();
@@ -511,7 +539,7 @@ public final class GameCanvas {
         }else if(g.overviewElement!=-1)throw new IOException();
         if(g.screen==Screen.PALETTE&&g.focus>15||g.rows().length>0&&g.focus>=g.rows().length)throw new IOException();
         if(g.screen!=Screen.HOME&&g.screen!=Screen.SOUND&&g.screen!=Screen.MUSIC&&!g.blocked.isEmpty())throw new IOException();
-        if((g.screen==Screen.ACTIONS||g.screen==Screen.SHARED||g.screen==Screen.DELETE||g.draft()&&g.operation!=Operation.ADD&&g.screen!=Screen.SOUND&&g.screen!=Screen.MUSIC&&g.screen!=Screen.SETTINGS&&g.screen!=Screen.GOAL)&&g.uses.entries.isEmpty())throw new IOException();
+        if((g.screen==Screen.ACTIONS||g.screen==Screen.SHARED||g.screen==Screen.DELETE||g.draft()&&g.operation!=Operation.ADD&&g.screen!=Screen.SOUND&&g.screen!=Screen.MUSIC&&g.screen!=Screen.WORLD&&g.screen!=Screen.SETTINGS&&g.screen!=Screen.GOAL)&&g.uses.entries.isEmpty())throw new IOException();
         if(editing){
             g.supported();if(g.cursorX<0||g.cursorX>=g.target.width||g.cursorY<0||g.cursorY>=g.target.height)throw new IOException();
             SpriteRegion expected=g.animation!=null?g.animation.current().region:g.operation==Operation.ADD||g.operation==Operation.INDEPENDENT?g.allocate(g.target.width,g.target.height):g.region(g.selected);

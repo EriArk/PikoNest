@@ -6,6 +6,18 @@
 
 Связи: [план](ROADMAP.md), [задачи](BACKLOG.md), [текущее состояние](STATUS.md).
 
+## 2026-10-23 world/camera acceptance still open
+
+Lab 0.0.84 locally connects map painting and camera setup to Game view. When device
+access is authorized, paint/erase beyond the first screen, select tiles and move
+objects using physical controls on compact/wide layouts. Test fixed/follow/room
+cameras, world-edge movement, screen-space HUD and restart in official PICO-8.
+Verify target deletion protection, hide/shrink preservation, field/picker recovery,
+one Save/Undo, animation/audio retention, Test/return and independent exported-cart
+playback. Compare all shared-gfx/protected files. Include a hero-free map and novice
+review of tile discovery. Host previews/traces do not close these gates.
+[0.0.84 evidence](showcase/0.0.84-en/README.md).
+
 ## 2026-10-23 music acceptance still open
 
 Lab 0.0.83 adds local pattern/composition and nested phrase workflows. After device

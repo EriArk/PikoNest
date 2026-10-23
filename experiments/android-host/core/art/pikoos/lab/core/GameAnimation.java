@@ -75,7 +75,7 @@ public final class GameAnimation {
     }
     static GameAnimation decode(DataInputStream in,WorkshopCartridge base)throws IOException{return decode(in,base,8);}
     static GameAnimation decode(DataInputStream in,WorkshopCartridge base,int version)throws IOException{
-        int element=in.readInt();GameAnimation a=new GameAnimation(base,element);a.model=PlayModel.decode(in);a.model.decodeAnimations(in);if(version>=7)a.model.decodeSounds(in);if(version>=8)a.model.decodeMusic(in);
+        int element=in.readInt();GameAnimation a=new GameAnimation(base,element);a.model=PlayModel.decode(in);a.model.world=PlayModel.fromStatic(base).world;a.model.decodeAnimations(in);if(version>=7)a.model.decodeSounds(in);if(version>=8)a.model.decodeMusic(in);
         int length=in.readInt();if(length<0||length>2*1024*1024||length>in.available())throw new IOException();byte[] bytes=new byte[length];in.readFully(bytes);a.resources=new WorkshopCartridge(bytes);
         a.frame=in.readInt();a.focus=in.readInt();a.before=in.readInt();a.editing=in.readBoolean();
         int regions=in.readInt();if(regions<0||regions>1024)throw new IOException();for(int n=0;n<regions;n++){SpriteRegion r=new SpriteRegion(in.readInt(),in.readInt(),in.readInt(),in.readInt());if(r.sharesMap())throw new IOException();a.editedRegions.add(r);}

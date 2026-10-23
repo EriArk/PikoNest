@@ -1,5 +1,9 @@
 # PikoNest — English website gallery
 
+[0.0.84: Game view world, map and camera](0.0.84-en/README.md) — field size,
+tile painting, world placement and fixed/follow/room cameras in one recoverable
+transaction. Local validation only; no new native screenshots or device claim.
+
 [0.0.83: music composition and shared audio editing](0.0.83-en/README.md) —
 patterns, nested phrase editing/copies, one composition transaction and explicit
 music/effects channel choices. Local validation only; no new native screenshots.

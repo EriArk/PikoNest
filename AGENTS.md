@@ -569,20 +569,23 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
-Current source/package (2026-10-23): lab 0.0.83 adds basic music composition after
-0.0.82 SFX/event editing. Ordinary patterns, nested phrase editing/copies, explicit
-three/four-part channel policies and game-start binding share one composition
-Save/Undo. Source-checked journal v8 retains v1–7 recovery. Unknown Lua supports
-explicit resource edits, not automatic allocation/wiring. Keep unsupported audio
-data intact. See docs/MUSIC_EDITOR.md and docs/showcase/0.0.83-en/README.md.
+Current source/package (2026-10-23): lab 0.0.84 connects field size, upper-map
+painting/erasing and fixed/follow/room cameras to Game view. World placement and
+selection pan the editor viewport; movement uses field bounds and HUD resets the
+camera. Map/settings share one Save/Undo with source-checked recovery; journal v9
+retains v1–8 readers. Preserve animation/audio and shared map/gfx bytes. Unknown
+Lua uses the existing independent tools, never guessed world wiring. The connected
+brush uses existing tiles; direct tile art creation in context is unfinished.
+See docs/WORLD_EDITOR.md and docs/showcase/0.0.84-en/README.md.
 
 Console use remains paused: no device actions until the owner explicitly allows
 it. Native/runtime, physical-controller, novice and owner acceptance remain open
-for labs 0.0.78–83 and issue #17. Next independent block: connect map/camera tools
-to the simpler Game view workflow. Music range/library/advanced-audio work remains
-in S01–S05; local implementation does not close official playback or novice gates.
-Complete outstanding visual/animation/audio journeys when authorized. Keep the
-separate owner APK release gate and follow the current ROADMAP.
+for labs 0.0.78–84 and issue #17. Next independent block: create/edit a tile from
+the map context without requiring a placed object, retaining shared-data review,
+Test/save/Undo/recovery. Then connect two small editable starter journeys through
+the same general tools. Collision, door/parallax, broader map and audio/library
+work remain unfinished. Complete outstanding device journeys when authorized.
+Keep the separate owner APK release gate and follow the current ROADMAP.
 
 Historical source/package record (2026-10-23): lab 0.0.78 implements Game view animation
 sequences and movement/toggle-state bindings. Local suite/build and focused
