@@ -6,6 +6,17 @@
 
 Связи: [план](ROADMAP.md), [задачи](BACKLOG.md), [текущее состояние](STATUS.md).
 
+## 2026-10-23 contextual Game view acceptance still open
+
+Labs 0.0.79–81 add visual relationships, names, explicit choices and a connected
+rule overview. Local tests/host layouts are not native or physical-input evidence.
+On authorized device access, cover both collection and hero-free switch journeys:
+name/select/link, choose goals and identify their participants, edit/remove rules,
+resolve a named dependency, cancel back to the originating entry, recover a draft,
+Test/return, save/Undo/reopen and independent export. Include animation drafts from
+the overview, compact/wide screens, touch and physical controls, then novice/owner
+review. Retain protected-file comparisons. [0.0.81 evidence](showcase/0.0.81-en/README.md).
+
 ## 2026-10-23 animation evidence boundary
 
 Lab 0.0.78 has local data/workflow tests and a built APK. The final native frame

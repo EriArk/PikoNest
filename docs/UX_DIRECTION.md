@@ -1,5 +1,25 @@
 # PikoNest: единая мастерская на портативке
 
+## Goals and connected rule overview — lab 0.0.81
+
+Game rules opens **How the game works**: named movement, contact/toggle and animation
+entries, plus game goal/background. Selecting an entry opens its existing editor;
+Save/Discard returns to the same rule, or another row of the same element after
+removal. Empty elements remain reachable through Add behavior. The overview is
+read-only and inferred from the recognized cart, not an extra graph users maintain.
+
+Win when has explicit choices with participant highlights and missing-rule hints.
+The field stays a labelled starting layout. Start tests the highlighted goal without
+saving; A keeps a choice in the form, Save commits. Nested Cancel preserves the
+previous value; form Discard returns to the overview. Dependency errors identify
+linked elements or animations rather than silently changing other rules.
+
+The list, forms, draft recovery and Undo/Redo work through abstract controller
+actions; touch uses the same operations. Compact/tall/wide layouts received host
+review. Native rendering, physical input, complete journeys and novice/owner review
+remain pending under #17. Continue SFX work while device access is paused.
+[Implementation/validation record](showcase/0.0.81-en/README.md).
+
 ## Named elements and explicit choices — lab 0.0.80
 
 The next implemented slice of #17 keeps the existing workshop and ordinary Lua.
@@ -28,9 +48,9 @@ It is locally checked; native/controller/novice/owner acceptance is still open.
   first identify its touching element; the existing clear prerequisite message
   applies. Target selection then supports isolated draft Test as before.
 
-Remaining #17 work: clearer goal choices and a readable overview of configured
-rules, consistent entry/return/edit/remove flow, then the two complete native
-journeys, animation checks and novice/owner review when console use is allowed.
+Historical next steps for 0.0.80: goal choices and the connected overview are now
+implemented above in 0.0.81. Complete native journeys, animation checks and
+novice/owner review remain pending when console use is allowed.
 This slice does not add arbitrary event graphs or claim all novice friction is gone.
 
 ---

@@ -10,6 +10,32 @@ Earlier work is recorded in [the technical status](docs/STATUS.md) and
 [versioned evidence](docs/showcase/README.md). See
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for the current overall picture.
 
+## 2026-10-23 — See and edit how your game works (0.0.81)
+
+**Implemented and locally checked; device and owner acceptance remain open.**
+
+- Game rules now shows the goal, background, movement, interactions and animations
+  together. Named entries lead to their settings; saving or cancelling brings you
+  back to the same rule or element. Undo also keeps you in the overview.
+- Goals have clear choices and highlight the items or switches that count.
+  Missing-rule hints explain what to add. You can try a highlighted goal before
+  saving, or cancel without changing the game.
+- Removing a movement or interaction now names linked switches or animations that
+  depend on it. Those connections remain protected until explicitly changed.
+- Draft recovery includes the return location, even through nested target choices.
+  Compact/tall/wide layouts received host review, including long element names.
+
+**Checked:** 77 local core suite invocations and integrated APK packaging passed.
+The new connected overview/goal suite passed 100 checks alongside existing Game
+view, name, relationship and animation tests. No device actions, installation or
+new official-runtime execution occurred; host previews are not native screenshots.
+
+**Limits:** the overview covers recognized Game view rules, not arbitrary Lua.
+Complete device journeys and physical/novice/owner acceptance remain open under
+issue #17. General sound effects/music are still unfinished. No public APK release.
+[Tool guide](docs/GAME_BEHAVIORS.md#goals-and-rule-overview-0081) ·
+[exact evidence](docs/showcase/0.0.81-en/README.md).
+
 ## 2026-10-23 — Name elements and choose behavior clearly (0.0.80)
 
 **Implemented and locally checked; device and owner acceptance remain open.**

@@ -12,35 +12,34 @@ setup live in one development APK; there is no public APK release yet.
 | Item | Current position |
 | --- | --- |
 | Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.80** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | Element names and explicit behavior choices implemented; device acceptance pending |
-| Current focus | Clarify goals and configured-rule overview; complete device journeys when permitted |
+| Android baseline | **0.0.81** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | Goals and a connected rule overview implemented; device acceptance pending |
+| Current focus | General sound-effect creation and event binding; visual device journeys when permitted |
 | Platforms | Android first; Linux later |
 
-## Latest implementation: names and clear action choices (0.0.80)
+## Latest implementation: see how your game works (0.0.81)
 
-Give elements their own names, such as Heart, Star or Left switch, using the
-controller keyboard or touch. Those names appear in the visual list and target
-picker. Two elements can share one graphic but have different names. Names follow
-supported placement/frame edits and travel with the exported game; clearing a name
-restores its automatic visual label.
+Open Game rules to see the goal, background, movement, interactions and animations
+in one list. Entries use your element names and show the elements involved on the
+field. Select an entry to edit it; saving or cancelling brings you back to that
+rule. Removing a rule keeps you at the same element, and Undo restores it.
 
-Movement and interaction now open explicit choices. Choose Collect when touched,
-then select who touches it. Cancelling that selection restores the previous
-interaction. Save, Undo, draft Test and recovery keep the same protected workflow.
-[Scope and validation](docs/showcase/0.0.80-en/README.md).
+Game goals now have clear choices: keep playing, collect all items, or turn all
+switches on. The field highlights the items/switches that count. If the game lacks
+the necessary interactions, a hint explains what to add. Removing movement or a
+switch cannot silently break an animation or linked switch; messages name what
+needs changing first. [Scope and validation](docs/showcase/0.0.81-en/README.md).
 
-**Checked locally:** the full core suite, Android packaging, name/choice recovery
-and named animation editing. **Not yet checked on device:** these new journeys,
-official Test/return, physical controls or new screenshots. Console use remains
-paused by the owner. The previous animation implementation also still needs its
-native/runtime acceptance.
+**Checked locally:** core tests, Android packaging, draft Test generation,
+recovery, save failure and exact Undo/Redo. Compact/tall/wide layout previews were
+reviewed on the host. **Still pending:** real-device journeys, official runtime,
+physical controls, novice/owner review and new native screenshots for labs 0.0.78–81.
+Console use remains paused. These are development builds, not public releases.
 
-This advances [issue #17](https://github.com/EriArk/PikoNest/issues/17), which stays
-open. Goal choices, the overview of configured rules and entry/return ergonomics
-still need work and novice/owner review. Names are optional editor annotations;
-if an external layout edit makes their bindings ambiguous, the app preserves the
-cart and asks for review instead of guessing. Sound/music tools remain unfinished.
+[Issue #17](https://github.com/EriArk/PikoNest/issues/17) stays open for that acceptance.
+The overview covers recognized Game view behavior; unfamiliar Lua remains in All
+tools. It is not a general event graph. Name-binding limits after external placement
+edits still apply. Sound/music creation and broader world tools remain unfinished.
 
 ## Previously demonstrated in the development app
 
@@ -94,9 +93,9 @@ No public beta or release readiness is claimed.
 
 ## What comes next
 
-1. Clarify game goals, the configured-rule overview and return/edit/remove flow. When console
-   use is authorized, verify collection/switch journeys and animation on device;
-   then implement general SFX creation and binding to supported events.
+1. Implement general SFX creation and binding to supported events. When console
+   use is authorized, verify the named collection/switch journeys, goal/overview
+   editing and animation on device, then address the observed UX findings.
 2. Complete the required audio/music and map/camera creation workflows, then
    validate a small pair of editable starters through the same general tools.
 3. Finish independent setup, storage/backup/recovery and Android compatibility;
@@ -118,9 +117,9 @@ status. This summary does not replace either plan or waive acceptance gates.
 
 ## Short update to adapt for a post
 
-PikoNest elements can now have names of your choice, and the editor uses those
-names when you connect them. Names stay with supported edits and exported games.
-Movement and interactions now open clear lists: choose what should happen, then
-pick the other element on the field. You can cancel without leaving half a rule
-behind. Local tests and the Android build pass; handheld and beginner testing are
-still ahead. The complete simpler workshop and public release are not finished.
+PikoNest now shows how your game works in one place: its goal, movement,
+interactions and animations. Pick a rule to change it, then return to the same
+place. Goals have clear choices and highlight the items or switches involved.
+If removing a rule would break a connection, the editor explains what needs
+changing first. Local checks and the Android build pass; handheld and beginner
+review are still ahead. Sound tools are the next development block.

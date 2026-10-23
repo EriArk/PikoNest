@@ -4,15 +4,16 @@
 
 The owner approved prioritizing a visual, contextual Game view over the next
 sound block. This refines UX07/UX08 rather than creating a second roadmap.
-Lab 0.0.80 adds user-defined element names, explicit movement/interaction choices
-and a guided contact target step to the visual relationships from 0.0.79.
-[Evidence and limits](showcase/0.0.80-en/README.md). Lab 0.0.78 animation also
-remains pending native/runtime acceptance. Console use is paused by the owner.
-The last complete native creation journey is still 0.0.77.
+Lab 0.0.81 completes the planned local goal/overview slice on top of names and
+visual relationships: explicit goals, connected rule editing and contextual return.
+[Evidence and limits](showcase/0.0.81-en/README.md). Native/runtime acceptance for
+labs 0.0.78–81 remains open. Console use is paused by the owner; the last complete
+native creation journey is still 0.0.77. Move independent code work to SFX rather
+than adding more recipes while these device checks await permission.
 
 | Next complete block | Existing task ownership | Ready when |
 | --- | --- | --- |
-| Finish contextual Game view interactions | UX07/UX08, #17 | Names and explicit movement/contact choices are implemented; next clarify goal selection, the configured-rule overview and return/edit/remove paths; existing All tools stays reachable; no sheet IDs or Lua wiring required |
+| Resolve Game view findings from the complete journeys | UX07/UX08, #17 | Names, relationships, goal choices and rule overview/edit/return are locally implemented; complete native/novice review and repair observed friction; All tools stays reachable |
 | Prove both visual journeys and animation when console use is authorized | UX07/UX08, N01/G04, #17 | Blank collection and hero-free linked switches; preview/confirm/cancel, draft Test/return, recovery, Save/Undo/reopen/export; compact/wide physical controls, novice and owner review; native before/after evidence |
 | Create and connect sound effects | S01–S03/S05, UX08 | Standard SFX resource editor, controller note entry, safe allocation/reuse, event binding, Save/reopen/Test/export; respect system mute |
 | Finish world/audio tools, then small editable starters | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | Maps/camera, music and tools work from Blank and independently of genre; two starter journeys use those same tools |

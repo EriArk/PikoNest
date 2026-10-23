@@ -1,5 +1,9 @@
 # PikoNest — English website gallery
 
+[0.0.81: goal choices and a connected rules overview](0.0.81-en/README.md) —
+local implementation/validation only; no new native screenshots. Includes goal
+participants, rule editing/return and recoverable drafts. Device acceptance is open.
+
 [0.0.80: element names and explicit behavior choices](0.0.80-en/README.md) —
 local implementation/validation record; no new native images. Names, guided
 contact selection and recovery are implemented; device/novice/owner review is open.

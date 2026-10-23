@@ -10,7 +10,8 @@ model or promise to visually edit arbitrary Lua. All tools remains reachable.
 2. Select it, open **Behavior**, choose **D-pad** movement and a speed, then save.
 3. Add another sprite. Open **On contact / press**, choose **Collect this / When touched**,
    then choose the moving element in the visual picker (lab 0.0.80). The collectible disappears once when their rectangles overlap.
-4. Open **Game rules**, choose **All collected**, then save. Duplicate or draw more
+4. Open **Game rules → Game goal → Win when**, choose **Win by collecting / All items**,
+   then **Save rules** (lab 0.0.81). Duplicate or draw more
    collectibles as desired. Each placement has its own collected state.
 5. Optionally add a **Lose** contact rule to a hazard, or a **Win** rule to a goal.
 6. **Start / Test** runs the game in the imported official PICO-8. PICO-8 **X**
@@ -141,3 +142,33 @@ then complete onboarding/storage, recovery and device acceptance. Public APK
 publication still requires the owner's explicit release approval.
 
 API reference: [official PICO-8 manual](https://www.lexaloffle.com/dl/docs/pico-8_manual.html).
+
+## Goals and rule overview (0.0.81)
+
+**Game rules** now opens **How the game works**, a read-only list derived from the
+recognized saved cart. It shows the goal/background and each configured movement,
+interaction and animation. Elements without any of these offer Add behavior.
+Thumbnails, names and focused relationship/goal outlines connect the list to the
+starting layout. This remains a starting layout, not a running simulation.
+
+Open a row to edit its corresponding existing form. Save or Discard returns to
+that row; if removal changes the list, return to another row for the same element.
+Undo/Redo in the overview also retains context. To remove movement choose Stay in
+place; to remove an interaction choose No interaction. Linked switches and state-
+bound animations must have their dependencies explicitly changed first. Messages
+identify the affected named elements. There is no silent cascade or rewiring.
+Animation rows open the existing frame editor; removing all animation data is not
+added by this batch (the existing editor retains its final frame).
+
+The Win when field opens three choices: No automatic win, collect all items, or
+all switches on. Highlights/counts use only elements configured with Collect or
+Toggle interactions. Empty prerequisites show actionable hints; saving an unfinished
+goal is allowed. No automatic win still permits explicit contact win/lose actions.
+Highlighting and cancelling never save the cart. Start tests a highlighted goal in
+an isolated draft; A keeps it in the form and Save rules commits it once.
+
+This changes navigation, explanations and preflight messages, not the ordinary Lua
+generator or its supported rule types. The overview is not a second rule store.
+Game-view journal v6 adds semantic return context; v1–5 remain readable with their
+old focus/field behavior. Source equality and original layout checks still apply.
+[Local evidence and pending native acceptance](showcase/0.0.81-en/README.md).

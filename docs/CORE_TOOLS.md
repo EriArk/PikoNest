@@ -1,5 +1,10 @@
 # Базовые инструменты: завершённость и порядок работ
 
+Lab 0.0.81 connects goal choices and an overview of existing Game view rules to
+behavior/animation editing, source-checked recovery and save/Undo. This is UX07/UX08
+work over the same bounded tools, not a new rule engine or completion of G/N/S.
+[Current evidence](showcase/0.0.81-en/README.md); [current queue](ROADMAP.md).
+
 **2026-10-23 — Lab 0.0.78, Game view animation (partial N01/G04/UX08):**
 Selected sprites now have editable frame sequences, independent copies, painting,
 per-frame durations/order/removal and Loop / When moving / When on bindings.

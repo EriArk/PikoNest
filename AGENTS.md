@@ -570,14 +570,17 @@ When a major decision is made:
 ## 15. Near-term priority order
 
 Owner-approved priority (2026-10-23, issue #17): finish the visual, contextual
-Game view workflow before the next sound block. Lab 0.0.80 adds optional element names and explicit movement/interaction choices
-to the visual relationships from 0.0.79. Names follow supported layout/frame edits
-and export in optional ordinary comments; unfamiliar/stale name bindings are not
-guessed. Goal selection and broader overview/return ergonomics remain unfinished.
+Game view workflow before the next sound block. Lab 0.0.81 adds explicit goals,
+participant highlighting and an overview of configured movement/interactions/animations
+on top of the 0.0.79–80 visual relationships and names. Overview edits return to
+the originating rule/element after save/discard; source-checked recovery includes
+that context. This planned local UX slice is implemented, not owner-accepted.
 Console use is paused by the owner: no device actions until explicitly allowed.
 Native/runtime, physical-controller, novice and owner acceptance remain open for
-this slice and lab 0.0.78 animation. Follow the current ROADMAP, not historical
-next-step notes. See docs/showcase/0.0.80-en/README.md.
+labs 0.0.78–81. Continue independent code work with general SFX creation/event
+binding; revisit visual journeys when device access is authorized and fix observed
+findings. Follow the current ROADMAP, not historical next-step notes.
+See docs/showcase/0.0.81-en/README.md.
 
 Historical source/package record (2026-10-23): lab 0.0.78 implements Game view animation
 sequences and movement/toggle-state bindings. Local suite/build and focused

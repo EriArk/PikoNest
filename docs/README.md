@@ -1,5 +1,10 @@
 # PikoNest: current scope and development map
 
+Latest source/package: [0.0.81 goals and rule overview](showcase/0.0.81-en/README.md).
+Labs 0.0.78–81 are implemented with local validation; their complete native/runtime
+journeys remain pending while console use is paused. The last complete native
+creation journey is 0.0.77 below. Follow [ROADMAP](ROADMAP.md) for current order.
+
 **2026-10-18 — Lab 0.0.77, connected small-game loop (partial UX07/UX08):**
 Game view now connects selected-sprite movement, contact collection/win/loss,
 linked switches, goals and restart through ordinary Lua. Native Blank authoring

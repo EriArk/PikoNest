@@ -52,13 +52,15 @@ final class GameSurface {
         if(g.screen==GameCanvas.Screen.NAME){nameEditor(yes,back);return;}
         boolean draw=g.screen==GameCanvas.Screen.DRAW||g.screen==GameCanvas.Screen.DRAW_MENU||g.screen==GameCanvas.Screen.PALETTE;
         boolean wide=w>=540;float top=104,bottom=h-104,side;
-        boolean contextual=g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.RELATION||g.screen==GameCanvas.Screen.ACTIONS||g.screen==GameCanvas.Screen.SETTINGS||g.screen==GameCanvas.Screen.CHOICE;
+        boolean contextual=g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.RELATION||g.screen==GameCanvas.Screen.ACTIONS||g.screen==GameCanvas.Screen.SETTINGS||g.screen==GameCanvas.Screen.CHOICE||g.screen==GameCanvas.Screen.GOAL||g.screen==GameCanvas.Screen.OVERVIEW;
         if(!draw)text("Starting layout",16,87,14,6,w-32);
         String[] rows=g.rows();boolean menu=rows.length>0;
         float listX=16,listY=top,listW=w-32;
         if(wide){side=Math.min(bottom-top,w*.55f-24);listX=side+40;listW=w-listX-16;}
         else{side=Math.min(w-32,menu?Math.max(104,(bottom-top)*.49f):bottom-top-24);if(contextual)side=Math.min(side,(w-64)*.5f);listY=top+side+12;}
-        if(wide&&(g.screen==GameCanvas.Screen.ANIMATION||contextual))side=Math.max(100,Math.min(side,bottom-top-100));
+        if(!wide&&(g.screen==GameCanvas.Screen.OVERVIEW||g.screen==GameCanvas.Screen.GOAL)){side=Math.min(side,112);listY=top+156;}
+        if(wide&&(g.screen==GameCanvas.Screen.ANIMATION||contextual))side=Math.max(100,Math.min(side,bottom-top-(g.screen==GameCanvas.Screen.OVERVIEW||g.screen==GameCanvas.Screen.GOAL?156:100)));
+        if(wide&&(g.screen==GameCanvas.Screen.OVERVIEW||g.screen==GameCanvas.Screen.GOAL)){listX=Math.max(side+40,w*.42f);listW=w-listX-16;}
         if(g.screen==GameCanvas.Screen.HOME){if(!wide)listY+=20;text("Elements",listX,wide?87:listY-8,14,14,listW);}
         float left=wide||contextual?16:(w-side)/2;
         SpriteRegion r=g.region();
@@ -78,7 +80,7 @@ final class GameSurface {
                     wrap("A paints a pixel. B opens Done and drawing options.",listX,top+146,listW,5);
                 }else text(g.eraser?"Eraser":"Brush  /  color "+g.color,left,bottom+12,18,6,w-32);
             }
-        }else if(g.blocked.isEmpty()&&!g.uses.entries.isEmpty()||g.screen==GameCanvas.Screen.PLACE){
+        }else if(g.blocked.isEmpty()&&!g.uses.entries.isEmpty()&&!g.globalRuleSelection()||g.screen==GameCanvas.Screen.PLACE){
             int sx,sy,sw,sh;
             if(g.screen==GameCanvas.Screen.PLACE){sx=g.x;sy=g.y;sw=r.width;sh=r.height;}
             else{GameUses.Entry e=g.uses.entries.get(g.selected);SpriteRegion region=g.region(g.selected);sx=e.x();sy=e.y();sw=region.width;sh=region.height;}
@@ -91,6 +93,7 @@ final class GameSurface {
             }
             canvas.restore();
         }
+        if(!draw){canvas.save();canvas.clipRect(imageArea);for(int element:g.goalElements())elementOutline(element,side,12);canvas.restore();}
         if(wide&&g.screen==GameCanvas.Screen.ANIMATION){
             GameAnimation animation=g.animation;float y=top+side+12,cell=Math.min(34,(listX-40)/8);
             for(int n=0;n<animation.sequence().frames.size();n++){
@@ -102,12 +105,12 @@ final class GameSurface {
             wrap(g.guidance(),left,y+cell+20,listX-left-20,Math.max(0,(int)((bottom-y-cell-8)/26)));
         }
         if(wide&&contextual)wrap(g.summary(),left,top+side+24,listX-left-20,Math.max(0,(int)((bottom-top-side-8)/26)));
-        else if(contextual)wrap(g.summary(),left+side+16,top+18,w-left-side-32,Math.max(1,(int)(side/26)));
+        else if(contextual)wrap(g.summary(),left+side+16,top+18,w-left-side-32,g.screen==GameCanvas.Screen.OVERVIEW||g.screen==GameCanvas.Screen.GOAL?6:Math.max(1,(int)(side/26)));
         if(g.screen==GameCanvas.Screen.PALETTE){
             float px=wide?listX:16,py=wide?top+20:listY,cell=Math.min((wide?listW:w-32)/8,40);
             for(int n=0;n<16;n++){final int color=n;float cx=px+n%8*cell,cy=py+n/8*cell;rect(cx+2,cy+2,cell-4,cell-4,n);if(g.focus==n)outline(cx,cy,cell,cell,7);hits.add(new Hit(cx,cy,cell,cell,()->{g.focus=color;act(Action.CONFIRM);}));}
         }else if(menu){
-            int rowHeight=g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.SETTINGS||g.screen==GameCanvas.Screen.CHOICE?50:40;
+            int rowHeight=g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.SETTINGS||g.screen==GameCanvas.Screen.CHOICE||g.screen==GameCanvas.Screen.GOAL||g.screen==GameCanvas.Screen.OVERVIEW?50:40;
             int visible=Math.max(1,(int)((bottom-listY)/rowHeight)),first=Math.max(0,Math.min(Math.max(0,rows.length-visible),g.focus-visible/2));
             for(int n=first;n<Math.min(rows.length,first+visible);n++){
                 final int row=n;float yy=listY+(n-first)*rowHeight;int element=g.rowElement(row);
@@ -117,7 +120,9 @@ final class GameSurface {
                     if(g.screen==GameCanvas.Screen.RELATION){changed();return;}
                     act(Action.CONFIRM);
                 });
-                if(element>=0){drawThumbnail(element,listX+8,yy+3,32);text(rows[n],listX+48,yy+27,20,g.focus==n?10:7,listW-58);}
+                if(element>=0){drawThumbnail(element,listX+8,yy+3,32);int split=rows[n].indexOf('\n');
+                    if(split<0)text(rows[n],listX+48,yy+27,20,g.focus==n?10:7,listW-58);
+                    else{text(rows[n].substring(0,split),listX+48,yy+17,18,6,listW-58);text(rows[n].substring(split+1),listX+48,yy+39,20,g.focus==n?10:7,listW-58);}}
             }
             if(rows.length>visible){rect(w-7,listY,2,visible*rowHeight,13);rect(w-8,listY+(visible*rowHeight-10)*g.focus/(rows.length-1),4,10,14);}
             if(wide&&g.screen==GameCanvas.Screen.SHARED)wrap(g.sharedUses()+" placements use these pixels"+(g.mapReference()?"; map tiles also refer to them.":"."),listX,listY+rows.length*rowHeight+20,listW,4);
@@ -125,7 +130,7 @@ final class GameSurface {
         }else if(g.screen==GameCanvas.Screen.PLACE&&wide){
             text("Choose a position",listX,top+24,22,7,listW);wrap("Move with the D-pad or tap the game. Done saves the whole change.",listX,top+62,listW,5);
         }
-        if(g.screen==GameCanvas.Screen.CHOICE)footer(yes+"  Choose",Action.CONFIRM,back+"  Cancel",Action.CANCEL);
+        if(g.screen==GameCanvas.Screen.CHOICE||g.screen==GameCanvas.Screen.GOAL)footer(yes+"  Choose",Action.CONFIRM,back+"  Cancel",Action.CANCEL);
         else if(g.screen==GameCanvas.Screen.RELATION)footer(yes+"  Confirm",Action.CONFIRM,back+"  Cancel",Action.CANCEL);
         else if(g.editingField)footer(yes+"  Keep value",Action.CONFIRM,back+"  Revert",Action.CANCEL);
         else if(g.screen==GameCanvas.Screen.DRAW)footer(yes+"  Paint",Action.CONFIRM,back+"  Done / options",Action.CANCEL);

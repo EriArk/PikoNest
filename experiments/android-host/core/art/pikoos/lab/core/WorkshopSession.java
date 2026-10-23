@@ -63,11 +63,11 @@ public final class WorkshopSession {
         if(command==GameCanvas.Command.PROJECTS){port.library();return;}
         if(command==GameCanvas.Command.SAVE){
             int index=game.operation==GameCanvas.Operation.ADD||game.operation==GameCanvas.Operation.DUPLICATE?game.uses.entries.size():game.selected;
-            save(game.candidate(cart),true);game=new GameCanvas(cart);game.selected=Math.min(index,Math.max(0,game.uses.entries.size()-1));game.focus=game.uses.entries.isEmpty()?0:game.selected+1;notice="Saved";return;
+            GameCanvas previous=game;save(game.candidate(cart),true);game=new GameCanvas(cart);game.selected=Math.min(index,Math.max(0,game.uses.entries.size()-1));game.focus=game.uses.entries.isEmpty()?0:game.selected+1;game.returnAfterSave(previous);notice="Saved";return;
         }
         if(command==GameCanvas.Command.UNDO||command==GameCanvas.Command.REDO){
             boolean returning=command==GameCanvas.Command.REDO;ArrayDeque<WorkshopCartridge> from=returning?redo:undo,to=returning?undo:redo;
-            if(!from.isEmpty()){WorkshopCartridge previous=cart;save(from.peek(),false);from.pop();to.push(previous);game=new GameCanvas(cart);notice=returning?"Redone":"Undone";}
+            if(!from.isEmpty()){WorkshopCartridge previous=cart;GameCanvas context=game;save(from.peek(),false);from.pop();to.push(previous);game=new GameCanvas(cart);game.returnAfterHistory(context);notice=returning?"Redone":"Undone";}
         }
     }
     public SharedEdit sharedEdit;

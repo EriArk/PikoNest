@@ -45,7 +45,7 @@ public final class GameRelationshipsTest {
             PlayModelTest.behavior(s,0);picker(s,5);s.game.focus=0;s.act(Action.CONFIRM);check(s.game.settings.elements.get(0).neighbor==-1,"explicit no-link choice");s.act(Action.CANCEL);
             PlayModelTest.behavior(s,0);picker(s,5);s.game.focus=s.game.rows().length-1;s.act(Action.CONFIRM);check(s.game.settings.elements.get(0).neighbor==1,"cancel row preserves link");
             byte[] stale=s.game.encode();refused(()->GameCanvas.restore(stale,cart));
-            GameCanvas original=new GameCanvas(cart);byte[] v3=original.encode();v3=Arrays.copyOf(v3,v3.length-18);java.nio.ByteBuffer.wrap(v3).putInt(3);same(cart.bytes(),GameCanvas.restore(v3,cart).candidate(cart).bytes(),"v3 recovery remains byte-exact");
+            GameCanvas original=new GameCanvas(cart);byte[] v3=original.encode();v3=Arrays.copyOf(v3,v3.length-24);java.nio.ByteBuffer.wrap(v3).putInt(3);same(cart.bytes(),GameCanvas.restore(v3,cart).candidate(cart).bytes(),"v3 recovery remains byte-exact");
             GameCanvas bad=new GameCanvas(PlayModel.code(cart,cart.code()+"poke(0,1)\n"));check(!bad.blocked.isEmpty()&&!bad.pickElementAt(10,20),"unknown Lua cannot acquire visual-edit bindings");
         }
         WorkshopCartridge one=GameCanvasTest.cart("function _draw()\n cls(1)\n spr(1,10,10)\nend\n","\n");WorkshopSession s=PlayModelTest.session(one,new PlayModelTest.Port());PlayModelTest.behavior(s,0);PlayModelTest.field(s,2,1);

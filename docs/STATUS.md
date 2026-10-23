@@ -1,5 +1,17 @@
 # Состояние PikoNest
 
+**2026-10-23 — Lab 0.0.81, goal choices and a connected rules overview (partial UX07/UX08, #17):**
+Game rules opens a read-only overview of the recognized game's goal, background,
+movement, interactions and animations. Named entries open the relevant existing
+editor; save/discard returns to that rule or the same element if the rule was
+removed. Goals use explicit choices, participant outlines and missing-rule hints.
+Dependency errors name linked elements or animation requirements. Source-checked
+recovery and Undo/Redo retain the overview context. Ordinary Lua semantics are unchanged.
+[Scope and local validation](showcase/0.0.81-en/README.md). Native/runtime,
+physical-controller, novice and owner acceptance remain open; console use is paused.
+The next independent code block is general SFX creation/event binding, while the
+complete visual journeys await authorized device access. Issue #17 stays open.
+
 **2026-10-23 — Lab 0.0.80, named elements and explicit behavior choices (partial UX07/UX08, #17):**
 Elements can now be named with a controller/touch keyboard. Names appear in the
 list and relationship picker, survive supported layout/frame edits, and travel
