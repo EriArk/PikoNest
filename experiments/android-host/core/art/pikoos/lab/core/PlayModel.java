@@ -11,7 +11,8 @@ public final class PlayModel {
     public static final String[] GOALS={"Free play","Collect all","All switches on"};
     public static final class Element {
         public int sx,sy,w,h,x,y,movement,speed=1,rule,target,on,neighbor=-1;
-        public Element copy(){Element e=new Element();e.sx=sx;e.sy=sy;e.w=w;e.h=h;e.x=x;e.y=y;e.movement=movement;e.speed=speed;e.rule=rule;e.target=target;e.on=on;e.neighbor=neighbor;return e;}
+        public PlayAnimation animation;
+        public Element copy(){Element e=new Element();e.sx=sx;e.sy=sy;e.w=w;e.h=h;e.x=x;e.y=y;e.movement=movement;e.speed=speed;e.rule=rule;e.target=target;e.on=on;e.neighbor=neighbor;e.animation=animation==null?null:animation.copy();return e;}
         int[] values(){return new int[]{sx,sy,w,h,x,y,movement,speed,rule,target,on,neighbor};}
     }
     private static final String[] FIELDS={"sx","sy","w","h","x","y","movement","speed","rule","target","on","neighbor"};
@@ -43,6 +44,7 @@ public final class PlayModel {
         if(background<0||background>15||goal<0||goal>2)throw new IllegalArgumentException("Invalid game settings");
         for(int n=0;n<elements.size();n++){Element e=elements.get(n);new SpriteRegion(e.sx,e.sy,e.w,e.h);
             if(e.x<-32768||e.x>32767||e.y<-32768||e.y>32767||e.speed<1||e.speed>4||e.movement<0||e.movement>3||e.rule<0||e.rule>4||e.on<0||e.on>1)throw new IllegalArgumentException("Invalid behavior settings");
+            if(e.animation!=null){e.animation.validate();for(PlayAnimation.Frame f:e.animation.frames)if(f.region.width!=e.w||f.region.height!=e.h)throw new IllegalArgumentException("Game view frames must share a size; other sequences remain available in All tools.");SpriteRegion first=e.animation.frames.get(0).region;if(first.x!=e.sx||first.y!=e.sy)throw new IllegalArgumentException("The first frame must match the sprite appearance.");if(e.animation.mode==1&&e.movement==0)throw new IllegalArgumentException("Choose a movement in Behavior first, or use Loop.");if(e.animation.mode==2&&e.rule!=4)throw new IllegalArgumentException("Choose Toggle in Behavior first, or use Loop.");}
             if(e.movement!=0&&(e.w>128||e.h>128))throw new IllegalArgumentException("Movement requires an image fitting the game screen.");
             if(e.neighbor<-1||e.neighbor>=elements.size()||e.neighbor==n)throw new IllegalArgumentException("Choose a different switch, or None, for Also toggle.");
             if(e.rule==4&&e.neighbor>=0&&elements.get(e.neighbor).rule!=4)throw new IllegalArgumentException("Set the other sprite to Toggle first, then link it here.");
@@ -58,7 +60,7 @@ public final class PlayModel {
     public String source(){
         validate();StringBuilder b=new StringBuilder(prefix.replace("\r\n","\n"));
         b.append("function _init()\n game_bg=").append(background).append("\n game_goal=").append(goal).append("\n game_count=").append(elements.size()).append('\n');
-        for(int n=0;n<elements.size();n++){Element e=elements.get(n);int[] v=e.values();for(int f=0;f<FIELDS.length;f++)b.append(' ').append(id(n)).append('_').append(FIELDS[f]).append('=').append(v[f]).append('\n');b.append(' ').append(id(n)).append("_visible=1\n");}
+        for(int n=0;n<elements.size();n++){Element e=elements.get(n);int[] v=e.values();for(int f=0;f<FIELDS.length;f++)b.append(' ').append(id(n)).append('_').append(FIELDS[f]).append('=').append(v[f]).append('\n');b.append(' ').append(id(n)).append("_visible=1\n");if(e.animation!=null)e.animation.init(b,id(n));}
         b.append(" game_score=0\n game_result=0\n game_selected=0\n");
         for(int n=0;n<6;n++)b.append(" game_last").append(n).append("=btn(").append(n).append(")\n");
         b.append("end\n\nfunction _update()\n");
@@ -71,12 +73,14 @@ public final class PlayModel {
         }
         for(int n=0;n<elements.size();n++){
             Element e=elements.get(n);String a=id(n);
+            if(e.animation!=null)e.animation.beforeMovement(b,a);
             if(e.movement!=0){
                 if(e.movement!=3){move(b,a,0,"x","-",128-e.w);move(b,a,1,"x","+",128-e.w);}
                 if(e.movement!=2){move(b,a,2,"y","-",128-e.h);move(b,a,3,"y","+",128-e.h);}
             }
             if(e.rule==4){b.append(" if pressed4 and game_selected==").append(switches.indexOf(n)).append(" then ").append(a).append("_on=1-").append(a).append("_on");if(e.neighbor>=0)b.append(" ").append(id(e.neighbor)).append("_on=1-").append(id(e.neighbor)).append("_on");b.append(" end\n");}
         }
+        for(int n=0;n<elements.size();n++){Element e=elements.get(n);if(e.animation!=null)e.animation.update(b,id(n));}
         // Move every element before evaluating any contacts; outcomes are checked in visible list order.
         for(int n=0;n<elements.size();n++){
             Element e=elements.get(n);if(e.rule<1||e.rule>3)continue;String a=id(n),t=id(e.target);Element other=elements.get(e.target);
@@ -90,7 +94,7 @@ public final class PlayModel {
         if(goal==2&&!switches.isEmpty()){b.append(" if game_result==0");for(int n:switches)b.append(" and ").append(id(n)).append("_on==1");b.append(" then game_result=1 end\n");}
         b.append("end\n\nfunction _draw()\n cls(game_bg)\n");
         for(int n=0;n<elements.size();n++){
-            Element e=elements.get(n);String a=id(n);b.append(" if ").append(a).append("_visible==1 then\n  sspr(").append(e.sx).append(',').append(e.sy).append(',').append(e.w).append(',').append(e.h).append(',').append(a).append("_x,").append(a).append("_y)\n");
+            Element e=elements.get(n);String a=id(n);b.append(" if ").append(a).append("_visible==1 then\n");if(e.animation!=null)e.animation.draw(b,a);else b.append("  sspr(").append(e.sx).append(',').append(e.sy).append(',').append(e.w).append(',').append(e.h).append(',').append(a).append("_x,").append(a).append("_y)\n");
             if(e.rule==4){
                 b.append("  rect(").append(a).append("_x,").append(a).append("_y,").append(a).append("_x+").append(e.w-1).append(',').append(a).append("_y+").append(e.h-1).append(',').append(a).append("_on==1 and 11 or 5)\n");
                 b.append("  if game_selected==").append(switches.indexOf(n)).append(" then rect(").append(a).append("_x-2,").append(a).append("_y-2,").append(a).append("_x+").append(e.w+1).append(',').append(a).append("_y+").append(e.h+1).append(",10) end\n");
@@ -114,11 +118,13 @@ public final class PlayModel {
         }else if(op==GameCanvas.Operation.ADD)p.elements.add(new Element());
         else if(op==GameCanvas.Operation.DUPLICATE)p.elements.add(p.elements.get(selected).copy());
         if(layout.size()!=p.elements.size())throw new IllegalArgumentException("The layout changed outside this edit.");
-        for(int n=0;n<layout.size();n++){Element a=p.elements.get(n),l=layout.get(n);a.sx=l.sx;a.sy=l.sy;a.w=l.w;a.h=l.h;a.x=l.x;a.y=l.y;}
+        for(int n=0;n<layout.size();n++){Element a=p.elements.get(n),l=layout.get(n);a.sx=l.sx;a.sy=l.sy;a.w=l.w;a.h=l.h;a.x=l.x;a.y=l.y;if(a.animation!=null)a.animation.frames.get(0).region=new SpriteRegion(a.sx,a.sy,a.w,a.h);}
         p.validate();return p;
     }
     void encode(DataOutputStream o)throws IOException{o.writeUTF(prefix);o.writeUTF(newline);o.writeInt(background);o.writeInt(goal);o.writeInt(elements.size());for(Element e:elements)for(int v:e.values())o.writeInt(v);}
     static PlayModel decode(DataInputStream i)throws IOException{PlayModel p=new PlayModel();p.prefix=i.readUTF();p.newline=i.readUTF();if(!p.newline.equals("\n")&&!p.newline.equals("\r\n")||!new LuaContext(p.prefix).masked().trim().isEmpty())throw new IOException();p.background=i.readInt();p.goal=i.readInt();int count=i.readInt();if(count<0||count>16)throw new IOException();for(int n=0;n<count;n++){Element e=new Element();e.sx=i.readInt();e.sy=i.readInt();e.w=i.readInt();e.h=i.readInt();e.x=i.readInt();e.y=i.readInt();e.movement=i.readInt();e.speed=i.readInt();e.rule=i.readInt();e.target=i.readInt();e.on=i.readInt();e.neighbor=i.readInt();if(e.rule<0||e.rule>4||e.target<0||e.target>16)throw new IOException();p.elements.add(e);}return p;}
+    void encodeAnimations(DataOutputStream o)throws IOException{for(Element e:elements){o.writeBoolean(e.animation!=null);if(e.animation!=null)e.animation.encode(o);}}
+    void decodeAnimations(DataInputStream i)throws IOException{for(Element e:elements)if(i.readBoolean())e.animation=PlayAnimation.decode(i);}
     /** A marker cannot authorize a rewrite: rebuild and compare every byte of the Lua recipe. */
     public static PlayModel read(WorkshopCartridge cart){
         String source=cart.code(),s=source.replace("\r\n","\n");int start=new LuaContext(s).masked().indexOf("function _init()\n");if(start<0)return null;
@@ -127,7 +133,7 @@ public final class PlayModel {
             if(!new LuaContext(p.prefix).masked().trim().isEmpty())return null;
             String init=s.substring(start,s.indexOf("\nend",start));Map<String,Integer> v=new HashMap<>();Matcher m=Pattern.compile("(?m)^ ([a-z0-9_]+)=(-?[0-9]+)$").matcher(init);while(m.find()){if(v.put(m.group(1),Integer.parseInt(m.group(2)))!=null)return null;}
             p.background=v.get("game_bg");p.goal=v.get("game_goal");int count=v.get("game_count");if(count<0||count>16)return null;
-            for(int n=0;n<count;n++){Element e=new Element();int[] f=new int[FIELDS.length];for(int k=0;k<f.length;k++)f[k]=v.get(id(n)+"_"+FIELDS[k]);e.sx=f[0];e.sy=f[1];e.w=f[2];e.h=f[3];e.x=f[4];e.y=f[5];e.movement=f[6];e.speed=f[7];e.rule=f[8];e.target=f[9];e.on=f[10];e.neighbor=f[11];p.elements.add(e);}
+            for(int n=0;n<count;n++){Element e=new Element();int[] f=new int[FIELDS.length];for(int k=0;k<f.length;k++)f[k]=v.get(id(n)+"_"+FIELDS[k]);e.sx=f[0];e.sy=f[1];e.w=f[2];e.h=f[3];e.x=f[4];e.y=f[5];e.movement=f[6];e.speed=f[7];e.rule=f[8];e.target=f[9];e.on=f[10];e.neighbor=f[11];e.animation=PlayAnimation.read(v,id(n));p.elements.add(e);}
             p.validate();return source.equals(p.source())?p:null;
         }catch(Exception e){return null;}
     }

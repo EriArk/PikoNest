@@ -6,6 +6,14 @@
 
 Связи: [план](ROADMAP.md), [задачи](BACKLOG.md), [текущее состояние](STATUS.md).
 
+## 2026-10-23 animation evidence boundary
+
+Lab 0.0.78 has local data/workflow tests and a built APK. The final native frame
+journey and official-runtime animation checks were not completed: the owner
+requested no further console use. An initial install/project copy is not proof
+of playback, recovery, controller ergonomics or export. See the
+[validation record](showcase/0.0.78-en/README.md). All ACC scenarios remain open.
+
 ## Запись результата
 
 Для каждого прогона фиксировать commit/APK, модель/Android/экран/controller,

@@ -62,10 +62,12 @@ Unknown or manually changed code is preserved and routed to All tools. Convertin
 a recognized static layout retains its comments; subsequent edits preserve the
 generated source structure. No PikoNest metadata is required to run the cart.
 
+Lab 0.0.78 adds [editable frame sequences and movement/switch-state bindings](GAME_ANIMATION.md). Local code/tests exist; native animation acceptance is still pending.
+
 Current editor limits: 16 placements; speed 1–4 pixels per update; one contact
 or toggle rule per placement; one optional linked switch; fixed rectangular
 graphics; a solid background; fixed outcome text. These are PikoNest limitations,
-not limits of PICO-8. Maps, animated states, audio events, richer conditions,
+not limits of PICO-8. Maps, audio events, richer conditions,
 score/lives customization and library insertion still need connections to this
 creation path. Existing advanced tools remain available, but arbitrary code
 changes can take a project outside the recognized Game view subset.
@@ -76,7 +78,7 @@ Technical evidence for this batch belongs in
 [the 0.0.77 showcase](showcase/0.0.77-en/README.md).
 Native input injection and automated checks do not close physical-controller,
 novice or owner acceptance. The full product is not beta-ready merely because
-these two small games work. Next connect animation and audio to this same path,
+these two small games work. Next verify the new animation path on device and connect audio,
 then complete onboarding/storage, recovery and device acceptance. Public APK
 publication still requires the owner's explicit release approval.
 

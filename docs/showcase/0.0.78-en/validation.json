@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-23",
+  "build": "0.0.78",
+  "baseline_commit": "a5af32012b1791a444c5e6a0faa105cc2c58047c",
+  "final_local_apk_sha256": "e63a589500abeae02e4696b0c9cee257a1f68d31e99a71912e83454991236d6d",
+  "final_apk_installed": false,
+  "initial_installed_apk_sha256": "63703b17302ce7f1ba0c085014cc410479783b0cdeb401e794bff2b2c324d037",
+  "initial_native_scope": [
+    "installation",
+    "open Play/Workshop",
+    "create and open a separate copy of an existing project"
+  ],
+  "full_local_suite_invocations": 75,
+  "full_suite_passed": true,
+  "final_focused_checks": {
+    "GameCanvasTest": 16504,
+    "PlayModelTest": 96,
+    "GameAnimationTest": 80199
+  },
+  "package_check": "One launcher, integrated runtime adapter, 263 Godot assets, no official PICO-8 binaries bundled",
+  "official_animation_runtime_executed": false,
+  "native_animation_journey_completed": false,
+  "device_testing_pause": "Owner requested no further console use; finish code and docs",
+  "audio": "Last observation before the pause: media muted, effective volume zero. No volume changes made.",
+  "private_pre_install_backup": {
+    "created": true,
+    "project_library_save_files_in_inventory": 61,
+    "post_run_comparison_completed": false
+  },
+  "images": [],
+  "runtime_fixture": {
+    "path": "experiments/android-host/tests/fixtures/game-animation-0.2.7.p8",
+    "sha256": "2e13744cb57654735d5fd50a03134203f4c50d33145a49aa5dafa85346336cc6",
+    "status": "Prepared, not executed in official runtime; synthetic button provider, not physical-input proof"
+  },
+  "pending": [
+    "final APK installation",
+    "native frame creation/painting/order/recovery/Undo",
+    "official movement and linked-switch animation",
+    "draft Test and return",
+    "ordinary export and independent execution",
+    "screenshots and visual review",
+    "physical-controller, novice and owner acceptance"
+  ],
+  "public_apk_release": false
+}

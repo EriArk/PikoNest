@@ -1,5 +1,17 @@
 # Состояние PikoNest
 
+**2026-10-23 — Lab 0.0.78, Game view animation (partial N01/G04/UX08):**
+Selected sprites now have editable frame sequences, independent copies, painting,
+per-frame durations/order/removal and Loop / When moving / When on bindings.
+One Save/Undo covers pixels and ordinary Lua; source-checked drafts retain frame
+edits and field revert. Existing 0.0.77 carts round-trip exactly. The full local
+suite and Android build passed; final focused checks cover recovery fixes.
+An initial APK was installed and a safe project copy opened. The owner then
+requested no further console use. Animation playback, final-APK install/native
+journey, export, screenshots and physical/owner acceptance are **not yet checked**.
+[Tool contract](GAME_ANIMATION.md) · [validation record](showcase/0.0.78-en/README.md).
+Audio remains a separate unfinished block; no beta or APK release claim.
+
 **2026-10-18 — Lab 0.0.77, connected small-game loop (partial UX07/UX08):**
 Game view now connects selected-sprite movement, contact collection/win/loss,
 linked switches, goals and restart through ordinary Lua. Native Blank authoring

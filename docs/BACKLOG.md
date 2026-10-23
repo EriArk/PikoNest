@@ -1,5 +1,17 @@
 # PikoNest — задачи полного цикла
 
+**2026-10-23 — Lab 0.0.78, Game view animation (partial N01/G04/UX08):**
+Selected sprites now have editable frame sequences, independent copies, painting,
+per-frame durations/order/removal and Loop / When moving / When on bindings.
+One Save/Undo covers pixels and ordinary Lua; source-checked drafts retain frame
+edits and field revert. Existing 0.0.77 carts round-trip exactly. The full local
+suite and Android build passed; final focused checks cover recovery fixes.
+An initial APK was installed and a safe project copy opened. The owner then
+requested no further console use. Animation playback, final-APK install/native
+journey, export, screenshots and physical/owner acceptance are **not yet checked**.
+[Tool contract](GAME_ANIMATION.md) · [validation record](showcase/0.0.78-en/README.md).
+Audio remains a separate unfinished block; no beta or APK release claim.
+
 **2026-10-18 — Lab 0.0.77, connected small-game loop (partial UX07/UX08):**
 Game view now connects selected-sprite movement, contact collection/win/loss,
 linked switches, goals and restart through ordinary Lua. Native Blank authoring
@@ -241,7 +253,7 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 | G03.4 | Частично (0.0.63) / G03, G01 | Копия/перенос/очистка прямоугольной области 128×64; snapshot при перекрытии, preview последствий для gfx, подтверждение, одна отмена, восстановление | Технический путь: android-map-regions-63; физическая UX-приёмка открыта. Межпроектный буфер, shared-кисти и remapped RAM не входят в этот срез |
 | G04 | Частично (G04.1) / C02 | Явное использование ресурса в игре: выбрать sprite/map/область, положение/порядок/HUD, вставить обычный draw-код или связать известное использование | Нарисованный спрайт/фон действительно виден после Test из blank; несколько использований допустимы; не создаётся обязательная сцена/герой/ECS. Map-часть подключается по готовности G03 |
 | G04.2 | Частично (0.0.62, 0.0.64–65) / G04.1, C02, A02 | Из спрайтов/карты разместить ресурс в игре; список известных использований, создание, повторная форма, копия/удаление, безопасная точка draw-вставки, возврат и восстановление | Ограниченный blank-путь без открытия Lua: android-uses-62; анимации подключены в N01.3, камера в N02.3. Фоны, сложные контексты и физическая приёмка остаются. Полный контракт в CORE_TOOLS |
-| N01 | Частично (N01.1–3) / G01, M01 | Кадры/копия/порядок/длительность/loop, preview/step/stop, отражение и несколько последовательностей; известные переходы состояний | Анимация работает в игре и вне PikoNest; частота кадров не спутана с update rate; возврат сохраняет кадр; ручная правка Lua безопасно размыкает привязку |
+| N01 | Частично (N01.1–3; Game view code in 0.0.78, native acceptance pending) / G01, M01 | Кадры/копия/порядок/длительность/loop, preview/step/stop, отражение и несколько последовательностей; известные переходы состояний | Анимация работает в игре и вне PikoNest; частота кадров не спутана с update rate; возврат сохраняет кадр; ручная правка Lua безопасно размыкает привязку |
 | N01.3 | Частично (0.0.64) / N01.1–2, G04.2 | Управление анимациями из списка размещений, создание из области/выбранного спрайта, повторная форма, копия/удаление и Undo/восстановление без открытия Lua | Технические свидетельства: android-animation-uses-64. Известные блоки плоского draw; отсчёт от запуска. Привязка к состояниям/событиям, сложные контексты и физическая UX-приёмка остаются открытыми |
 | N02 | Частично (N02.1–3) / M01 | Камера: неподвижная, follow выбранного объекта, плавная прокрутка, границы и переключение экранов/комнат; координаты world/screen, UI отдельно | Карта больше экрана прокручивается; камера переключает комнату при пересечении края; HUD неподвижен; работа без героя; обычный Lua и восстановление camera state |
 | N02.3 | Частично (0.0.65) / N02.1–2, G04.2 | Камера в списке размещений, повторная форма, диапазон и возврат к прежней камере, переход к экрану, удаление/Undo/recovery без Lua | android-camera-uses-65: плоский draw, официальный world/screen и сохранность данных. Связь с объектом, плавность, сложные контексты и физическая UX-приёмка остаются |

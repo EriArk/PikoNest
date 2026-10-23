@@ -2,13 +2,41 @@
 
 Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
-There is no public APK release as of 18 October 2026.
+There is no public APK release as of 23 October 2026.
 
 This file was started on 11 October 2026 and backfilled from documented work
 from 5 October onward. It is a curated history, not a complete commit log.
 Earlier work is recorded in [the technical status](docs/STATUS.md) and
 [versioned evidence](docs/showcase/README.md). See
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for the current overall picture.
+
+## 2026-10-23 — Animation from the selected sprite (0.0.78)
+
+**Implemented and locally tested; native playback acceptance is pending.**
+
+- Added Game view Animation: copy/draw frames, select a pose, adjust individual
+  durations, reorder/remove frames and save the sequence without opening Lua.
+- Added Loop, When moving and When on bindings. Movement uses actual position
+  changes; state entry, stopping, switching off and restart return to frame one.
+- Shared/map-backed frames get independent copies before painting. Allocation
+  reserves all frame references, including transparent ones; removed frames keep
+  their sheet pixels. Existing games remain byte-exact without implicit migration.
+- A complete animation saves as one Undo transaction. Draft recovery retains
+  pixels, field revert and drawing cancellation; Test prepares an isolated cart.
+  New graphics sections recover too, and recovery rejects unrelated resource edits.
+- Added a controller form and touch frame strip using the existing pixel UI.
+
+**Checked:** the full local suite (75 invocations) and Android build passed;
+final focused suites passed 16,504 Game view, 96 behavior and 80,199 animation
+checks. An initial APK was installed and a copy of an existing project opened.
+The owner then requested no further console use. Final APK installation, native
+animation authoring/recovery/Test/export, official playback and screenshots are
+still open. No new runtime pass or post-run device-preservation result is claimed.
+
+**Limits:** up to eight same-size frames in this Game view sequence; one sequence
+per sprite, loop/moving/on bindings only. These are editor limits. Sound effects,
+music and broader event animation remain unfinished. No public APK release.
+[Tool guide](docs/GAME_ANIMATION.md) · [exact evidence](docs/showcase/0.0.78-en/README.md).
 
 ## 2026-10-18 — Playable games from Game view (0.0.77)
 

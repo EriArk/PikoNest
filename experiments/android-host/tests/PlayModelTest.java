@@ -23,8 +23,8 @@ public final class PlayModelTest {
             WorkshopCartridge blank=GameCanvasTest.cart("-- function is a comment\nfunction _draw()\n cls(1)\nend\n",nl);
             Port p=new Port();WorkshopSession s=session(blank,p);sprite(s,20,50);sprite(s,90,50);
             WorkshopCartridge staticCart=s.cart();
-            GameCanvas legacy=new GameCanvas(staticCart);legacy.focus=legacy.uses.entries.size()+1;byte[] v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-1);java.nio.ByteBuffer.wrap(v1).putInt(1);GameCanvas migrated=GameCanvas.restore(v1,staticCart);check(migrated.act(Action.CONFIRM)==GameCanvas.Command.TOOLS,"v1 All tools focus migrates");
-            legacy.screen=GameCanvas.Screen.ACTIONS;legacy.focus=4;v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-1);java.nio.ByteBuffer.wrap(v1).putInt(1);migrated=GameCanvas.restore(v1,staticCart);migrated.act(Action.CONFIRM);check(migrated.screen==GameCanvas.Screen.HOME,"v1 Back focus migrates");
+            GameCanvas legacy=new GameCanvas(staticCart);legacy.focus=legacy.uses.entries.size()+1;byte[] v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-2);java.nio.ByteBuffer.wrap(v1).putInt(1);GameCanvas migrated=GameCanvas.restore(v1,staticCart);check(migrated.act(Action.CONFIRM)==GameCanvas.Command.TOOLS,"v1 All tools focus migrates");
+            legacy.screen=GameCanvas.Screen.ACTIONS;legacy.focus=4;v1=legacy.encode();v1=Arrays.copyOf(v1,v1.length-2);java.nio.ByteBuffer.wrap(v1).putInt(1);migrated=GameCanvas.restore(v1,staticCart);migrated.act(Action.CONFIRM);check(migrated.screen==GameCanvas.Screen.HOME,"v1 Back focus migrates");
             behavior(s,0);field(s,0,1);field(s,1,1);
             row(s,1);s.act(Action.RIGHT);byte[] journal=s.game.encode();
             WorkshopSession recovered=session(staticCart,p);recovered.restoreGame(journal);check(recovered.game.editingField,"field editing recovers");recovered.act(Action.CANCEL);

@@ -569,6 +569,15 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
+Current source/package (2026-10-23): lab 0.0.78 implements Game view animation
+sequences and movement/toggle-state bindings. Local suite/build and focused
+recovery checks passed. Only an initial APK install/project-copy path was checked;
+the owner requested no further console use during this batch. Final installation,
+animation UI/runtime/export/screenshots and physical/novice/owner acceptance stay
+open. Do not use the device again until the owner reauthorizes it. Continue code
+and docs independently; next functional block is standard SFX creation/event
+binding. See `docs/GAME_ANIMATION.md` and `docs/showcase/0.0.78-en/README.md`.
+
 Current native baseline (2026-10-18): lab 0.0.77 adds partial UX08 to Game view:
 movement, contact collect/win/loss, linked switches, goals and restart. Two Blank
 UI-authored games reached official runtime and exact export; the collection

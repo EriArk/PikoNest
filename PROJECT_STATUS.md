@@ -1,6 +1,6 @@
 # PikoNest — project status
 
-Updated **18 October 2026 (UTC)**. A plain-language snapshot for posts and the
+Updated **23 October 2026**. A plain-language snapshot for posts and the
 website. Dated changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## At a glance
@@ -12,12 +12,26 @@ setup live in one development APK; there is no public APK release yet.
 | Item | Current position |
 | --- | --- |
 | Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.77**, installed and checked on Retroid Pocket Classic |
-| Latest work | Two games created from Blank without opening Lua |
-| Current focus | Complete the same creation path with animation and sound |
+| Android baseline | **0.0.78** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | Game view frame authoring and movement/switch-state animation implemented; device acceptance pending |
+| Current focus | Verify animation on device when permitted, then create/connect sound effects |
 | Platforms | Android first; Linux later |
 
-## What works in the development build
+## Latest implementation: animation (0.0.78)
+
+Select a sprite, copy/draw frames, change their order and durations, and choose
+continuous playback, movement playback or playback while a switch is on. The
+app prepares ordinary PICO-8 Lua and protects shared graphics with independent
+copies. Save/Undo, draft Test generation and source-checked recovery are covered
+by local tests. [Scope and validation](docs/showcase/0.0.78-en/README.md).
+
+**Not yet demonstrated on the device:** the complete animation journey, official
+playback, final package installation, export and new screenshots. The owner
+paused console use after an initial install/project-copy check. That boundary is
+intentional; these features must not yet be described as verified on Retroid.
+General sound/music editing is still unfinished.
+
+## Previously demonstrated in the development app
 
 - **Play and Workshop in one app.** Browse local games, launch using imported
   official PICO-8 and return. External-launch and storage work also has bounded
@@ -54,7 +68,8 @@ placements, simple movement/contact/toggle rules and fixed outcome text. Unknown
 Lua is preserved and uses All tools. These are editor limits, not PICO-8 limits.
 The preview shows initial positions, not simulated game execution.
 
-Still required: event-driven animation/audio, general SFX/music editing, maps and
+Still required: animation device acceptance and broader event clips, audio bindings,
+general SFX/music editing, maps and
 camera connected to the simpler path, broader rules, library insertion and
 multi-type reuse, remaining sprite/map operations, complete onboarding/storage
 and recovery, modern Android compatibility, English coverage and wider device
@@ -68,8 +83,8 @@ No public beta or release readiness is claimed.
 
 ## What comes next
 
-1. Connect animation and SFX to the selected sprite and supported game events,
-   including create/edit/save/reopen/Test rather than just parameter presets.
+1. Complete native/official-runtime animation checks when console use is authorized;
+   then implement general SFX creation and binding to supported game events.
 2. Complete the required audio/music and map/camera creation workflows, then
    validate a small pair of editable starters through the same general tools.
 3. Finish independent setup, storage/backup/recovery and Android compatibility;

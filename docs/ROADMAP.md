@@ -1,6 +1,24 @@
 # PikoNest — путь к полному Android-продукту
 
-## Current completion package — 18 October 2026
+## Current completion package — 23 October 2026
+
+Lab 0.0.78 implements Game view frame authoring and movement/switch-state
+animation in code. Local tests/build passed; final device/runtime acceptance is
+pending because the owner paused console use. [Exact evidence](showcase/0.0.78-en/README.md).
+The prior 0.0.77 two-game runtime/export proof remains the last completed native
+creation journey. Do not present the new animation journey as demonstrated yet.
+
+| Next complete block | Task ownership | Ready when |
+| --- | --- | --- |
+| Finish animation acceptance when the console is available | N01/G04, UX08 | Final APK; UI frame authoring/recovery/Undo; official movement and linked-switch playback; ordinary export; English captures |
+| Create and connect sound effects | S01–S03/S05, UX08 | General standard SFX resource model/editor, controller note entry, safe allocation/reuse, event binding, Save/reopen/Test/export; respect system mute |
+| Finish world/audio tools, then small editable starters | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | Maps/camera, music and necessary tools work from Blank and independently of genre; two starter journeys use those same tools |
+| Independent Android setup and reliable data ownership | P/R tasks, modern target, Q05 | Fresh runtime/folder setup, backup/recovery/update and external launches without developer intervention |
+| Device, novice and owner acceptance | Q01–Q07, ACC-01–09 | Complete journeys on supported screens/physical controls; English/errors reviewed; owner findings resolved |
+
+All required acceptance criteria and the separate owner APK release gate remain.
+
+## Previous completion package — 18 October 2026
 
 The owner requested a substantial connected batch toward a usable beta baseline.
 Lab 0.0.77 implements three related blocks: selected-element behavior; game

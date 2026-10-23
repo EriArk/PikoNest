@@ -1,5 +1,9 @@
 # PikoNest — English website gallery
 
+[0.0.78: animation implementation and validation record](0.0.78-en/README.md) —
+local checks only for the new animation workflow; no new animation screenshots
+or official-runtime playback claim. The last completed native image pack is below.
+
 [0.0.77: two playable games from Blank](0.0.77-en/README.md) — eleven native
 English captures: movement, contacts, goals, linked switches, official play and
 verified export. Includes both ordinary `.p8` files; no public APK release.

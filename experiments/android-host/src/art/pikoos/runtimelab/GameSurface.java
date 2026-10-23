@@ -52,6 +52,7 @@ final class GameSurface {
         float listX=16,listY=top,listW=w-32;
         if(wide){side=Math.min(bottom-top,w*.55f-24);listX=side+40;listW=w-listX-16;}
         else{side=Math.min(w-32,menu?Math.max(104,(bottom-top)*.49f):bottom-top-24);listY=top+side+12;}
+        if(wide&&g.screen==GameCanvas.Screen.ANIMATION)side=Math.max(120,side-92);
         float left=wide?16:(w-side)/2;
         SpriteRegion r=g.region();
         float imageW=draw?side*r.width/Math.max(r.width,r.height):side,imageH=draw?side*r.height/Math.max(r.width,r.height):side;
@@ -78,13 +79,23 @@ final class GameSurface {
             if(g.screen==GameCanvas.Screen.BEHAVIOR){PlayModel.Element e=g.settings.elements.get(g.selected);int other=e.rule>=1&&e.rule<=3?e.target:e.rule==4?e.neighbor:-1;if(other>=0&&other<g.settings.elements.size()&&other!=g.selected){PlayModel.Element t=g.settings.elements.get(other);outline(left+t.x*side/128,top+t.y*side/128,t.w*side/128,t.h*side/128,12);}}
             canvas.restore();
         }
+        if(wide&&g.screen==GameCanvas.Screen.ANIMATION){
+            GameAnimation animation=g.animation;float y=top+side+12,cell=Math.min(34,(listX-40)/8);
+            for(int n=0;n<animation.sequence().frames.size();n++){
+                final int frame=n;SpriteRegion source=animation.sequence().frames.get(n).region;float x=left+n*cell;
+                for(int py=0;py<source.height;py++)for(int px=0;px<source.width;px++)rect(x+px*(cell-4)/source.width,y+py*(cell-4)/source.height,(cell-4)/source.width,(cell-4)/source.height,animation.resources.pixel(source,px,py));
+                outline(x-1,y-1,cell-2,cell-2,n==animation.frame?10:13);
+                hits.add(new Hit(x,y,cell,cell,()->{if(g.editingField)return;animation.frame=frame;changed();}));
+            }
+            wrap(g.guidance(),left,y+cell+20,listX-left-20,Math.max(0,(int)((bottom-y-cell-8)/26)));
+        }
         if(g.screen==GameCanvas.Screen.PALETTE){
             float px=wide?listX:16,py=wide?top+20:listY,cell=Math.min((wide?listW:w-32)/8,40);
             for(int n=0;n<16;n++){final int color=n;float cx=px+n%8*cell,cy=py+n/8*cell;rect(cx+2,cy+2,cell-4,cell-4,n);if(g.focus==n)outline(cx,cy,cell,cell,7);hits.add(new Hit(cx,cy,cell,cell,()->{g.focus=color;act(Action.CONFIRM);}));}
         }else if(menu){
             int visible=Math.max(1,(int)((bottom-listY)/38)),first=Math.max(0,Math.min(Math.max(0,rows.length-visible),g.focus-visible/2));
             for(int n=first;n<Math.min(rows.length,first+visible);n++){final int row=n;button(rows[n],listX,listY+(n-first)*38,listW,36,g.focus==n,()->{if(g.editingField){if(row==g.focus)act(Action.RIGHT);return;}g.focus=row;act(Action.CONFIRM);});}
-            if(wide&&(g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.SETTINGS)){wrap(g.guidance(),listX,listY+Math.min(rows.length,visible)*38+18,listW,Math.max(0,(int)((bottom-listY-Math.min(rows.length,visible)*38)/26)));}
+            if(wide&&(g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.SETTINGS||g.screen==GameCanvas.Screen.ANIMATION)){wrap(g.guidance(),listX,listY+Math.min(rows.length,visible)*38+18,listW,Math.max(0,(int)((bottom-listY-Math.min(rows.length,visible)*38)/26)));}
             if(rows.length>visible){rect(w-7,listY,2,visible*38,13);rect(w-8,listY+(visible*38-10)*g.focus/(rows.length-1),4,10,14);}
             if(wide&&g.screen==GameCanvas.Screen.SHARED)wrap(g.sharedUses()+" placements use these pixels"+(g.mapReference()?"; map tiles also refer to them.":"."),listX,listY+rows.length*38+16,listW,4);
             if(wide&&g.screen==GameCanvas.Screen.HOME&&g.uses.entries.isEmpty())wrap(g.blocked.isEmpty()?"Start with your own sprite. Draw it, then place it in the game.":g.blocked,listX,listY+rows.length*38+16,listW,4);
