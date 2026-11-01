@@ -1,5 +1,22 @@
 # Состояние PikoNest
 
+**2026-11-01 — Lab 0.0.88, verified external copies (partial P02/P08, R08):**
+Folders → Projects or Asset library → Start opens an explicit copy workflow.
+New copy creates its own uniquely named folder; Resume rechecks the prior candidate.
+Projects include ordinary cart files and on-disk metadata; library includes sprites,
+parameter presets and the persistent sprite buffer. Original files are never
+written or deleted. SHA-256 readback and a final source/destination pass precede
+the completion receipt. Cancellation between files can resume; an incomplete or
+conflicting existing file requires a new copy and is retained for review.
+The durable destination record survives process loss; Android lifecycle/grant
+behavior still needs device validation. Working storage remains app-private;
+this is not activation or a complete app/save/draft backup.
+[Contract and limits](STORAGE_COPY.md) · [local evidence](showcase/0.0.88-en/README.md).
+86 local suites and integrated APK packaging passed; 36 new transfer checks and
+11 supplemental checks of the real local source adapter passed. Console use stays
+paused. Next replace direct filesystem persistence with a shared storage port,
+then activate external project/library storage using verified transfer/recovery.
+
 **2026-11-01 — Lab 0.0.87, optional setup guide (partial R08/P02):**
 First entry now connects Games, current data locations and the purchased Raspberry
 Pi ZIP in a skippable English guide. Progress is saved; Folders → Select reopens

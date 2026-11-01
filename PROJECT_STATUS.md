@@ -12,12 +12,31 @@ setup live in one development APK; there is no public APK release yet.
 | Item | Current position |
 | --- | --- |
 | Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.87** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | Optional first-run guide and preparation without automatic play; device acceptance pending |
+| Android baseline | **0.0.88** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | Verified project/library copies to selected folders; device acceptance pending |
 | Current focus | Verified external project/library storage; device journeys when permitted |
 | Platforms | Android first; Linux later |
 
-## Latest implementation: a gentler first start (0.0.87)
+## Latest implementation: checked copies of your creations (0.0.88)
+
+Projects and reusable assets can now be copied to their selected external folders.
+Each copy gets a new directory. PikoNest rereads every file and checks its contents
+before reporting success. Cancelled copies keep all files; Resume checks the last
+candidate and continues when existing files match. A damaged partial copy stays
+available and requires a fresh copy.
+
+**Checked locally:** 86 core suite invocations and single-APK packaging passed,
+including 36 new transfer checks. Eleven additional checks exercised the actual
+local source adapter with ordinary cart bytes, metadata and library files.
+Android providers, process death, physical controls and visual/device acceptance
+remain pending. Console use remains paused.
+
+Working storage still lives inside the app. This copies files, not settings,
+unfinished editor drafts or game saves. Activating external working storage is
+the next block. [User path and limits](docs/STORAGE_COPY.md) ·
+[Evidence](docs/showcase/0.0.88-en/README.md).
+
+## Previous implementation: a gentler first start (0.0.87)
 
 A short English guide connects a games folder, explains where creations live and
 opens setup for the user's purchased Raspberry Pi PICO-8 ZIP. It remembers the
@@ -56,7 +75,7 @@ Compact/tall/wide layouts received host review. These checks do not replace
 playing in official PICO-8 or using real handheld controls.
 
 **Still pending:** official-runtime execution, installation, physical controls,
-independent exports and novice/owner journeys for labs 0.0.78–87. Console use
+independent exports and novice/owner journeys for labs 0.0.78–88. Console use
 remains paused. No native screenshot pack or public APK release was produced.
 [Issue #17](https://github.com/EriArk/PikoNest/issues/17) remains open.
 

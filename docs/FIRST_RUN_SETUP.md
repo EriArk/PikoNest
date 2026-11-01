@@ -1,5 +1,14 @@
 # Первый запуск: папки и официальный PICO-8
 
+## Copy workflow added in 0.0.88
+
+Folders → Projects / Asset library → Start now opens verified copy and explicit
+Resume. [Storage copy contract](STORAGE_COPY.md). This preserves original app-private
+data and writes a separately verified candidate in the selected tree. It does not
+activate external working storage or copy preferences, unfinished drafts or saves.
+The first-run guide's current-storage explanation remains accurate. Full folder
+activation and native setup acceptance stay open.
+
 ## Current implementation — 0.0.87, 1 November 2026
 
 The optional English guide opens on the first eligible main-app entry, including

@@ -1,0 +1,13 @@
+{
+  "lab": "0.0.88",
+  "date": "2026-11-01",
+  "apk_sha256": "85619c370c454dccf0fc71ca4e8cac8c14b77251596bf9444cf6ae9ec9e10c65",
+  "core_suite_invocations": 86,
+  "VerifiedTransferTest": 36,
+  "local_source_adapter_checks": 11,
+  "device_used": false,
+  "installed": false,
+  "released": false,
+  "native_visual_review": false,
+  "external_working_storage_active": false
+}

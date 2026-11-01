@@ -26,7 +26,11 @@ final class FolderView extends View {
         setFocusable(true);setFocusableInTouchMode(true);
         setContentDescription("Folders. Up/down: role. Confirm: choose folder. X: check access. Select: setup guide. Back: return.");
     }
-    void action(Action a){if(a==Action.MENU&&!s.busy){((android.app.Activity)getContext()).startActivityForResult(new android.content.Intent(getContext(),FirstRunActivity.class),87);return;}if(a==Action.NEXT&&!s.busy){runtime.run();return;}s.act(a);changed.run();invalidate();}
+    void action(Action a){
+        if(a==Action.TEST&&!s.busy&&(s.selected==2||s.selected==3)){
+            ((android.app.Activity)getContext()).startActivity(new android.content.Intent(getContext(),StorageCopyActivity.class).putExtra("role",s.selected==2?"PROJECTS":"DATA"));return;
+        }
+        if(a==Action.MENU&&!s.busy){((android.app.Activity)getContext()).startActivityForResult(new android.content.Intent(getContext(),FirstRunActivity.class),87);return;}if(a==Action.NEXT&&!s.busy){runtime.run();return;}s.act(a);changed.run();invalidate();}
     private void rect(float x,float y,float width,float height,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+width,y+height,p);}
     private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(PixelText.size(size));c.drawText(value,x,y,p);}
     private void fit(String value,float x,float y,int size,int color,float max){p.setTextSize(PixelText.size(size));while(value.length()>1&&p.measureText(value)>max)value=value.substring(0,value.length()-2)+"…";text(value,x,y,size,color);}
@@ -48,7 +52,7 @@ final class FolderView extends View {
         FolderSetup.Entry e=s.entry(s.selected);
         fit(e.problem.isEmpty()?HINTS[s.selected]:e.problem,16,423,17,e.problem.isEmpty()?6:9,w-32);
         fit(s.notice.isEmpty()?(swap?"B":"A")+" choose / reconnect · X check":s.notice,16,451,18,10,w-32);
-        fit("Select: setup guide",16,478,16,13,w-32);
+        fit(s.selected>=2?"Start: verified copy / Select: setup": "Select: setup guide",16,478,16,13,w-32);
         rect(0,h-44,w,44,0);text((swap?"B":"A")+" Choose",12,h-16,18,10);
         text("X Check",w/3+8,h-16,18,14);text((swap?"A":"B")+" Back",w*2/3+8,h-16,18,6);
         c.restore();
@@ -59,7 +63,7 @@ final class FolderView extends View {
         if(e.getActionMasked()==MotionEvent.ACTION_UP){
             if(Math.abs(x-downX)>20||Math.abs(y-downY)>20)return true;
             if(y<42&&x>w-140)action(Action.NEXT);
-            else if(y>=460&&y<490)action(Action.MENU);
+            else if(y>=460&&y<490)action(s.selected>=2&&x<w/2?Action.TEST:Action.MENU);
             else if(y>=h-44)action(x<w/3?Action.CONFIRM:x<w*2/3?Action.CONTEXT:Action.CANCEL);
             else if(x>=16&&x<=w-16&&y>=124&&y<400){s.select((int)(y-124)/69);changed.run();invalidate();}
             performClick();return true;

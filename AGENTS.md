@@ -569,7 +569,19 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
-Current source/package (2026-11-01): lab 0.0.87 adds a skippable English
+Current source/package (2026-11-01): lab 0.0.88 adds explicit verified external
+copies for projects and library via Folders → select Projects/Data → Start. Unique
+candidate directories, SHA-256 readback/final recheck, durable destination and
+explicit Resume preserve originals. Partial conflicting files require a new copy;
+no automatic overwrite or cleanup. See docs/STORAGE_COPY.md and local evidence in
+docs/showcase/0.0.88-en/README.md. Working storage remains private; this is not
+external activation or full preference/draft/save backup. 86 local suites and APK
+packaging passed. Device/provider/visual/physical/owner acceptance remains open.
+Next introduce a shared persistence port and external project/library activation;
+reuse verified transfer, preserve originals and journal the switch. Console use
+remains paused; the separate owner public-APK release gate remains in force.
+
+Previous source/package (2026-11-01): lab 0.0.87 adds a skippable English
 first-entry guide with saved progress and Folders re-entry. Games connects to the
 existing Play index after a durable grant/check; cancelled/stale results cannot
 publish a replacement. Purchased Raspberry Pi ZIP import continues into preparation

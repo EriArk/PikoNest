@@ -4,6 +4,23 @@ Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
 There is no public APK release as of 1 November 2026.
 
+## 2026-11-01 — Verified copies to selected folders (lab 0.0.88)
+
+- Added Copy projects / Copy library from Folders. Copies use new directories,
+  preserve originals and check every file before displaying success.
+- Added Resume for interrupted candidates. Existing matching files are rechecked;
+  partial or conflicting files are retained and need a new copy.
+- Added a checked SHA-256 completion receipt, destination journal and cancellable
+  worker with English progress/error guidance and controller/touch actions.
+- Local validation: 86 core suites, 36 transfer assertions, 11 actual local-source
+  adapter checks and single-APK package verification passed.
+- Limits: working storage remains internal. Settings, unfinished editor drafts,
+  saves and runtime data are excluded. Actual Android provider, interruption,
+  visual and physical-input acceptance remain open; the console was not used.
+
+[Scope and evidence](docs/showcase/0.0.88-en/README.md) ·
+[Copy guide](docs/STORAGE_COPY.md).
+
 ## 2026-11-01 — First-start guide and optional runtime test (lab 0.0.87)
 
 - Added a skippable English setup guide with saved progress and re-entry from
