@@ -1,0 +1,15 @@
+{
+  "lab": "0.0.90",
+  "apk_sha256": "4be20a47b755e31becdf746f53b30db757c861b60f61cb8f9a677807dd36e04c",
+  "core_suite_invocations": 88,
+  "RecoverableReplaceTest": 61,
+  "FirstRunSetupTest": 40,
+  "ProjectRepositoryTest": 40,
+  "VerifiedTransferTest": 36,
+  "external_projects_implemented": true,
+  "external_library_implemented": false,
+  "device_used": false,
+  "installed": false,
+  "native_visual_review": false,
+  "released": false
+}

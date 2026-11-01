@@ -37,6 +37,7 @@ final class ProjectStore implements art.pikoos.lab.core.ProjectRepository.Storag
     }
     public void replace(String id,byte[] expected,byte[] next)throws Exception {
         synchronized(ProjectStore.class){
+            ProjectStorage.checkLocalWrite();
             AtomicFile target=cart(id);
             if(!java.util.Arrays.equals(target.readFully(),expected))throw new Exception("Project changed before save. Stored source kept.");
             FileOutputStream output=null;
@@ -45,7 +46,7 @@ final class ProjectStore implements art.pikoos.lab.core.ProjectRepository.Storag
         }
     }
     public void publish(String id,byte[] bytes,String title)throws Exception {
-        synchronized(ProjectStore.class){publishLocked(id,bytes,title);}
+        synchronized(ProjectStore.class){ProjectStorage.checkLocalWrite();publishLocked(id,bytes,title);}
     }
     private void publishLocked(String id,byte[] bytes,String title)throws Exception {
         File target=directory(id);

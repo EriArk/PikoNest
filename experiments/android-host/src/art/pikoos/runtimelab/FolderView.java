@@ -19,7 +19,7 @@ final class FolderView extends View {
     private Canvas c;
     private float scale,w,h,downX,downY;
     private static final String[] TITLES={"Games","Splore","Projects","Asset library"};
-    private static final String[] HINTS={"Read games; originals unchanged.","Splore still uses app storage.","Projects still use app storage.","Assets still use app storage."};
+    private static final String[] HINTS={"Read games; originals unchanged.","Splore still uses app storage.","Start opens project location / recovery.","Assets still use app storage."};
     FolderView(Context context,FolderSetup session,boolean swap,Runnable changed,Runnable runtime){
         super(context);s=session;this.swap=swap;this.changed=changed;this.runtime=runtime;
         PixelText.configure(context,p);p.setAntiAlias(false);
@@ -27,7 +27,8 @@ final class FolderView extends View {
         setContentDescription("Folders. Up/down: role. Confirm: choose folder. X: check access. Select: setup guide. Back: return.");
     }
     void action(Action a){
-        if(a==Action.TEST&&!s.busy&&(s.selected==2||s.selected==3)){
+        if(a==Action.TEST&&!s.busy&&s.selected==2){((android.app.Activity)getContext()).startActivity(new android.content.Intent(getContext(),ProjectStorageActivity.class));return;}
+        if(a==Action.TEST&&!s.busy&&s.selected==3){
             ((android.app.Activity)getContext()).startActivity(new android.content.Intent(getContext(),StorageCopyActivity.class).putExtra("role",s.selected==2?"PROJECTS":"DATA"));return;
         }
         if(a==Action.MENU&&!s.busy){((android.app.Activity)getContext()).startActivityForResult(new android.content.Intent(getContext(),FirstRunActivity.class),87);return;}if(a==Action.NEXT&&!s.busy){runtime.run();return;}s.act(a);changed.run();invalidate();}
@@ -45,14 +46,14 @@ final class FolderView extends View {
             FolderSetup.Entry e=s.entry(i);float y=124+i*69;boolean selected=s.selected==i;
             rect(16,y,w-32,62,selected?2:0);rect(16,y,4,62,selected?10:13);
             fit(TITLES[i],30,y+23,21,selected?10:7,w-190);
-            String state=e.state==FolderSetup.State.READY?(i==0?"Connected":"Reserved"):e.state==FolderSetup.State.CHECKING?"Checking":e.state==FolderSetup.State.UNAVAILABLE?"Reconnect":e.state==FolderSetup.State.UNKNOWN?"Check":"Choose";
+            String state=e.state==FolderSetup.State.READY?(i==0?"Connected":i==2&&ProjectStorage.selectedActive(getContext(),e.location)?"Active":"Reserved"):e.state==FolderSetup.State.CHECKING?"Checking":e.state==FolderSetup.State.UNAVAILABLE?"Reconnect":e.state==FolderSetup.State.UNKNOWN?"Check":"Choose";
             fit(state,w-145,y+23,16,e.state==FolderSetup.State.READY?11:e.state==FolderSetup.State.UNAVAILABLE?9:6,115);
             fit(e.location.isEmpty()?"No external folder selected":e.name,30,y+48,17,6,w-60);
         }
         FolderSetup.Entry e=s.entry(s.selected);
         fit(e.problem.isEmpty()?HINTS[s.selected]:e.problem,16,423,17,e.problem.isEmpty()?6:9,w-32);
         fit(s.notice.isEmpty()?(swap?"B":"A")+" choose / reconnect · X check":s.notice,16,451,18,10,w-32);
-        fit(s.selected>=2?"Start: verified copy / Select: setup": "Select: setup guide",16,478,16,13,w-32);
+        fit(s.selected==2?"Start: project storage / Select: setup":s.selected==3?"Start: library copy / Select: setup": "Select: setup guide",16,478,16,13,w-32);
         rect(0,h-44,w,44,0);text((swap?"B":"A")+" Choose",12,h-16,18,10);
         text("X Check",w/3+8,h-16,18,14);text((swap?"A":"B")+" Back",w*2/3+8,h-16,18,6);
         c.restore();

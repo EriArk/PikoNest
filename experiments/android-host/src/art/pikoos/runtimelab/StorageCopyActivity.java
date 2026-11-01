@@ -51,6 +51,7 @@ public final class StorageCopyActivity extends Activity {
         Job(Context c,String r,boolean resume){context=c;role=r;this.resume=resume;}
         public void run(){
             try{
+                if(role.equals("PROJECTS")&&!ProjectStorage.identity(context).isEmpty())throw new Exception("Projects use an external workspace. The internal-copy path cannot back up newer external edits. Export the current cart from Projects.");
                 SharedPreferences folders=context.getSharedPreferences("folder-setup",0),journal=context.getSharedPreferences("storage-copy-"+role,0);
                 String location=folders.getString(role+".uri","");if(location.isEmpty())throw new Exception("Choose the destination folder in Folders first.");
                 Uri tree=Uri.parse(location);FolderAccess.verify(context.getContentResolver(),tree,true);

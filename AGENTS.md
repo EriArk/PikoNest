@@ -569,7 +569,20 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
-Current source/package (2026-11-01): lab 0.0.89 routes all project workflow
+Current source/package (2026-11-01): lab 0.0.90 connects external working
+Projects through SAF, verified candidate activation and a checked atomic location record.
+Project reads recover pending retained-version save journals; unknown modifications
+or missing access block rather than silently using internal originals. Reconnect
+requires the same tree; explicit internal selection opens older originals without
+merging newer external changes. All versions are retained. Private journals remain
+required for interruption recovery; complete reinstall backup/restore is unfinished.
+See docs/EXTERNAL_PROJECTS.md and docs/showcase/0.0.90-en/README.md. 88 local core
+suites and APK packaging are recorded; Android/provider/visual/physical/novice/owner
+acceptance remains open. Console use stays paused and public APK release still
+requires separate owner approval. Next connect library persistence and activation,
+then complete full backup/restore and Splore ownership plus authorized device journeys.
+
+Previous source/package (2026-11-01): lab 0.0.89 routes all project workflow
 operations through portable ProjectRepository.Storage. MainActivity no longer
 receives project File/AtomicFile objects. ProjectStore is the local adapter with
 source recheck under a shared process lock, staged cart/title readback and existing

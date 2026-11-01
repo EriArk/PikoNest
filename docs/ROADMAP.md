@@ -9,14 +9,16 @@ starters to Game view. Shared optional help routes to the same tools in Blank.
 [Creation evidence](showcase/0.0.86-en/README.md). Lab 0.0.87 adds the optional
 first-entry guide, real Games-folder connection and purchased-runtime preparation
 without automatic play. [Setup evidence](showcase/0.0.87-en/README.md). Native/runtime
-acceptance for labs 0.0.78–89 remains open. Console use is paused; the last complete
+acceptance for labs 0.0.78–90 remains open. Console use is paused; the last complete
 native creation journey remains 0.0.77. Next implement verified external project
 and library migration/activation: existing saved destinations are still intentions.
 Lab 0.0.88 adds verified project/library copy and Resume, with working storage
 still private. Lab 0.0.89 connects project workflows to the portable persistence contract.
-Next implement the external project adapter and journaled activation/reopen/lost-access
-recovery, then the library port and activation;
-then complete Splore ownership/indexing, full backup/restore/update and independent setup.
+Lab 0.0.90 connects a SAF project adapter, checked activation, retained-version saves
+and reconnect/explicit fallback locally. [External Projects](EXTERNAL_PROJECTS.md).
+Next connect library persistence and external activation, then full backup/restore
+and remaining Splore ownership/indexing. Complete provider/native/physical journeys
+when console use is authorized; local implementation does not close acceptance.
 Broader core/library, map/audio and learning work remains unfinished.
 
 | Next complete block | Existing task ownership | Ready when |
@@ -25,7 +27,7 @@ Broader core/library, map/audio and learning work remains unfinished.
 | Prove both visual journeys and animation when console use is authorized | UX07/UX08, N01/G04, #17 | Blank collection and hero-free linked switches; preview/confirm/cancel, draft Test/return, recovery, Save/Undo/reopen/export; compact/wide physical controls, novice and owner review; native before/after evidence |
 | Complete audio creation and connection | S01–S05, UX08 | Basic SFX/event and music composition/shared-SFX/channel paths exist locally in 0.0.82–83; official Listen/Stop/Test/return/export and physical acceptance remain open, alongside range/library/advanced-audio work; respect system mute |
 | Validate the two editable starters and contextual help | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | Locally implemented in 0.0.86; finish unassisted Blank/start journeys and review content/help with a novice and owner, without template-locked tools |
-| Independent Android setup and reliable data ownership | P/R tasks, modern target, Q05 | 0.0.87 connects optional guide, Games and archive preparation locally; next verified external project/library migration and activation, Splore ownership/indexing, backup/update and complete native setup/external-launch journeys |
+| Independent Android setup and reliable data ownership | P/R tasks, modern target, Q05 | 0.0.90 connects project activation/recovery locally; next library activation, full backup/restore, Splore ownership/indexing and complete native setup/external-launch journeys |
 | Device, novice and owner acceptance | Q01–Q07, ACC-01–09 | Complete journeys on supported screens/physical controls; English/errors reviewed; owner findings resolved |
 
 All required acceptance criteria and the separate owner APK release gate remain.

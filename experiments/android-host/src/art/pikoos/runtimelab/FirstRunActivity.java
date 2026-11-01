@@ -73,7 +73,7 @@ public final class FirstRunActivity extends Activity {
         }catch(Exception error){state.problem="Access could not be saved. Choose the folder again.";view.invalidate();}
     }
     @Override protected void onSaveInstanceState(Bundle out){out.putInt("step",state.step);super.onSaveInstanceState(out);}
-    @Override protected void onResume(){super.onResume();state.runtimePrepared=RuntimeInstallation.matchesSaved(this);view.invalidate();immersive();}
+    @Override protected void onResume(){super.onResume();state.projectsExternal=!ProjectStorage.identity(this).isEmpty();state.runtimePrepared=RuntimeInstallation.matchesSaved(this);view.invalidate();immersive();}
     private void immersive(){
         if(Build.VERSION.SDK_INT>=30){getWindow().setDecorFitsSystemWindows(false);WindowInsetsController c=getWindow().getInsetsController();if(c!=null){c.hide(WindowInsets.Type.systemBars());c.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);}}
         else getWindow().getDecorView().setSystemUiVisibility(5894);

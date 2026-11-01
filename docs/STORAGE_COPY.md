@@ -1,5 +1,16 @@
 # Verified copies to user folders
 
+## External Projects added in 0.0.90
+
+Projects → Start now opens activation/reconnection controls, not the historical
+internal-copy screen. [External project contract](EXTERNAL_PROJECTS.md). Internal
+originals are copied, checked and retained before selecting the external workspace.
+Asset library → Start keeps the existing verified-copy workflow; its working store
+is still private. Once external projects are selected, the old internal-project
+copy path refuses to represent older originals as a backup of newer external edits.
+The sections below describe historical copy/persistence groundwork; they do not
+override the current external-project contract. Complete backup/restore remains open.
+
 ## Project persistence groundwork in 0.0.89
 
 The project workflow now depends on portable `ProjectRepository.Storage`: exists,

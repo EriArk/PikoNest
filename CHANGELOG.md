@@ -4,6 +4,21 @@ Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
 There is no public APK release as of 1 November 2026.
 
+## 2026-11-01 — External working projects (lab 0.0.90)
+
+- Added verified activation of a selected Android Projects folder. Original internal
+  projects are retained; project create/import/save/reopen use the external workspace.
+- Added retained-version saves and recovery of interrupted writes. Unknown changes
+  block overwrite and preserve files for review.
+- Added reconnect and explicit return to older internal originals, plus automatic
+  workshop reopening after a location change and accurate first-run storage wording.
+- Local validation: 88 core suites, 61 new recovery assertions and integrated APK
+  packaging. Android provider/device, visual/controller and owner acceptance pending.
+- Limits: assets, settings, drafts and saves keep their current locations. No merge,
+  complete reinstall recovery or automatic version cleanup. No console use or release.
+
+[Contract](docs/EXTERNAL_PROJECTS.md) · [Evidence](docs/showcase/0.0.90-en/README.md).
+
 ## 2026-11-01 — Shared project persistence (lab 0.0.89)
 
 - Moved project creation, import, opening and saving behind a portable storage

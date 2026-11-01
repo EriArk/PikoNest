@@ -1,5 +1,22 @@
 # PikoNest — задачи полного цикла
 
+**2026-11-01 — Lab 0.0.90, external working projects (partial P02/P03/R08):**
+Folders → Projects → Start opens project storage controls. Activation creates and
+verifies a fresh workspace, exercises retained-version saves and file/directory
+renames on the candidate, then commits its location in a checked AtomicFile. MainActivity reopens through
+the SAF project adapter. Internal originals stay untouched; writes to those
+originals are gated during activation. Create/import/save/reopen/export use ordinary
+external `projects/<id>/game.p8` files. Pending save journals recover complete old
+or new versions; unknown changes remain blocked with all evidence retained.
+Reconnect restores the original tree grant. Explicit return to older internal
+originals is a separate workspace choice, not a merge. Library and runtime data
+remain private. Local recovery tests pass; actual Android activation/provider,
+physical/visual and owner acceptance remain open. Console use stays paused.
+[Contract](EXTERNAL_PROJECTS.md) · [evidence](showcase/0.0.90-en/README.md).
+88 core suite invocations and integrated package checks are recorded there;
+RecoverableReplaceTest has 61 assertions. Next connect library persistence and
+activation; complete real external-storage journeys when device use is authorized.
+
 **2026-11-01 — Lab 0.0.89, shared project persistence (partial P02/P03/R08):**
 Project create/import/list/title/read/save now use the portable ProjectRepository
 storage contract. MainActivity no longer accesses project directories or AtomicFile
@@ -367,7 +384,7 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 | R05 | Частично / R03, P02 | Владение game saves/cartdata, cstore/save и рабочими копиями; запись обратно, конфликт, backup; безопасные runtime-зависимости | Сохранение переживает запуск из Play/external и обновление; источник не перезаписывается молча; неперенесённые записи остаются доступными; динамические пути имеют проверенный контракт |
 | R06 | Исследование / A01 | Матрица official runtime version/ABI/Android, определение версии и backend capabilities, смена runtime | «ZIP структурно читается», «архитектура подходит» и «эта версия проверена» различаются; инструкция архива соответствует backend, неподдержанная версия не маскируется |
 | R07 | Исследование / R02, P02, R05 | Splore: выбранные Downloads, реальные BBS-cache/зависимости, индекс Play, offline; восстановление переноса | Скачать новую игру, увидеть на полке, перезапустить без сети и сыграть; потеря папки не теряет загрузку; multicart проверен отдельно |
-| R08 | Частично, 0.0.87 / R01, R02, R06, R07, P02 | Полный первый запуск и тот же путь в Settings; четыре назначения, правильный ZIP, progress/retry, отложенная настройка и продолжение Test/external | Чистая установка проходит ACC-06; отмена сохраняет сделанное; редактор доступен без runtime; нет обязательного аккаунта, курса или имени проекта |
+| R08 | Частично, 0.0.90 / R01, R02, R06, R07, P02 | Полный первый запуск и тот же путь в Settings; четыре назначения, правильный ZIP, progress/retry, отложенная настройка и продолжение Test/external | Чистая установка проходит ACC-06; отмена сохраняет сделанное; редактор доступен без runtime; нет обязательного аккаунта, курса или имени проекта |
 | R09 | Частично, 0.0.71 / A01, A06, R01, R03; #9/#10 | Один APK и одна иконка PikoNest: встроить адаптер запуска, убрать обязательную установку helper/runtime APK; сохранить границу backend и импорт купленного runtime. Требование владельца 2026-10-07 | Чистая установка работает без внешних wrapper-пакетов; Play/Test/возврат и восстановление проверены. Проверенный перенос проектов/сохранений/библиотеки предшествует удалению старых lab-приложений; proprietary runtime не включён в APK |
 | R10 | Исследование / R09, R06 | Современный Android target: заменить зависимость от исполнения writable app-private файлов; сохранить импорт официального runtime и backend | Запуск/выход/восстановление проверены на современных Android при актуальном target; не простая смена manifest, не встраивание proprietary binaries. SDK 28 разрешён владельцем только для первой интеграции |
 

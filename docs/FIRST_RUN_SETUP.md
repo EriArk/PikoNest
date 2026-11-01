@@ -1,5 +1,14 @@
 # Первый запуск: папки и официальный PICO-8
 
+## External project selection in 0.0.90
+
+Folders → Projects → Start now offers checked activation and reconnection of an
+external project workspace. [Contract](EXTERNAL_PROJECTS.md). The first-run guide
+reports split storage when that workspace is selected: Projects external, assets
+and Splore still inside the app. Its previous blanket internal-storage explanation
+applies only before activation. External working projects are locally implemented;
+native/provider/novice acceptance and the other destinations remain unfinished.
+
 ## Copy workflow added in 0.0.88
 
 Folders → Projects / Asset library → Start now opens verified copy and explicit

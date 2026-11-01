@@ -12,12 +12,31 @@ setup live in one development APK; there is no public APK release yet.
 | Item | Current position |
 | --- | --- |
 | Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.89** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | Safer shared project persistence, preparing external storage; device acceptance pending |
-| Current focus | Verified external project/library storage; device journeys when permitted |
+| Android baseline | **0.0.90** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | External working projects and recovery paths; device acceptance pending |
+| Current focus | External library storage; device journeys when permitted |
 | Platforms | Android first; Linux later |
 
-## Latest implementation: preparing projects for external storage (0.0.89)
+## Latest implementation: projects in your own folder (0.0.90)
+
+Projects can now use a selected Android folder as their working location. Activation
+creates and checks a fresh workspace before switching; the internal originals stay
+available separately. Save keeps the previous version, and interrupted saves have
+a recovery path. Lost folder access offers reconnection instead of silently opening
+older copies. Library storage and game saves remain in their current locations.
+
+**Checked locally:** 88 core suites, including 61 new recovery assertions, and
+integrated APK packaging. Simulated provider failures were exercised before and
+after each save step, alongside real editor Save/Undo/reopen through the domain.
+Android folder/provider, visual/physical-input and owner acceptance remain open;
+the console was not used. [Scope and evidence](docs/showcase/0.0.90-en/README.md).
+
+This does not complete full backup/restore. Keep the app installed: settings,
+unfinished drafts and interrupted-save records remain private. Returning to internal
+originals does not merge newer external edits. [User guide](docs/EXTERNAL_PROJECTS.md).
+Next connect external library storage, then complete authorized device journeys.
+
+## Previous implementation: preparing projects for external storage (0.0.89)
 
 Project creation, import, opening and saving now share one storage interface.
 Saving checks that the source still matches the edit, and new projects are checked
@@ -93,7 +112,7 @@ Compact/tall/wide layouts received host review. These checks do not replace
 playing in official PICO-8 or using real handheld controls.
 
 **Still pending:** official-runtime execution, installation, physical controls,
-independent exports and novice/owner journeys for labs 0.0.78–89. Console use
+independent exports and novice/owner journeys for labs 0.0.78–90. Console use
 remains paused. No native screenshot pack or public APK release was produced.
 [Issue #17](https://github.com/EriArk/PikoNest/issues/17) remains open.
 

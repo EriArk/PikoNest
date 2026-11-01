@@ -299,6 +299,13 @@ Test/возврат. Это статическая сцена с плоским 
 
 ## ACC-06 — чистая установка, папки и Splore
 
+Lab 0.0.90 locally connects external working Projects. All acceptance boxes remain
+open: exercise actual activation/cancellation, lost tree grant/SD, interruption at
+each rename/journal boundary, reopen/Undo/export, imported metadata and unknown Lua,
+reconnect plus explicit older-internal workspace selection. Compare originals,
+external carts, retained versions and private drafts. Confirm no stale fallback or
+merge is implied. Library, saves and full reinstall/backup acceptance stay separate.
+
 Lab 0.0.87 locally implements optional first-entry guidance, Games-tree verification
 and prepare-without-launch. All checkboxes below remain open. When device use is
 authorized, exercise cold entry, later/re-entry, existing-data upgrade, Android

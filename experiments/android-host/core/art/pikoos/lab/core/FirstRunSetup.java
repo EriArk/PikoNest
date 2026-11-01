@@ -10,7 +10,7 @@ public final class FirstRunSetup {
     }
     public final Port port;
     public int step;
-    public boolean busy, gamesChecked, runtimePrepared;
+    public boolean busy, gamesChecked, runtimePrepared,projectsExternal;
     public String gamesName="", problem="";
     private long generation;
     public FirstRunSetup(Port port,int step){this.port=port;this.step=Math.max(0,Math.min(3,step));}
@@ -43,13 +43,14 @@ public final class FirstRunSetup {
     public String title(){return new String[]{"Your games","Your creations","Your PICO-8","Make yourself at home"}[step];}
     public String body(){
         if(step==0)return "Connect a folder of PICO-8 games for the Play shelf. Your original files stay unchanged. No games yet? Continue and try a starter.";
+        if(step==1&&projectsExternal)return "Projects use your selected external workspace. Assets and Splore still stay inside PikoNest. Keep the app installed: settings, drafts and save recovery records remain inside it.";
         if(step==1)return "Projects, reusable assets and Splore downloads currently stay inside PikoNest. Export important games before uninstalling. External project and library folders are not active yet.";
         if(step==2)return "Choose the Raspberry Pi ZIP from your PICO-8 purchase page. PikoNest checks and prepares it inside this app. You can create now and set up play later.";
         return "Browse games in Play, or open Workshop to make your own. Setup is always available from Folders. Runtime preparation does not confirm picture, sound or controls.";
     }
     public String status(){
         if(step==0)return busy?"Checking folder...":gamesChecked?"Connected: "+gamesName:gamesName.isEmpty()?"No games folder connected":"Saved folder: check access";
-        if(step==1)return "Current storage: inside the app";
+        if(step==1)return projectsExternal?"Projects: external / assets: inside app":"Current storage: inside the app";
         if(step==2)return runtimePrepared?"Prepared / optional test available":"Play needs your purchased runtime";
         return runtimePrepared?"Runtime prepared / try a game":"You can create / set up play later";
     }

@@ -48,6 +48,7 @@ public final class MainActivity extends Activity {
     private SharedPreferences libraryPrefs;
     private final art.pikoos.lab.core.ToolCatalogue toolCatalogue=new art.pikoos.lab.core.ToolCatalogue();
     private art.pikoos.lab.core.ProjectRepository store;
+    private String projectLocation="";
     private SpriteAssetStore assetStore;
     private SpriteBufferStore spriteBuffer;
     private ParameterPresetStore presetStore;
@@ -113,7 +114,7 @@ public final class MainActivity extends Activity {
         int shelfFocus=libraryPrefs.getInt("focus",0);
         backend=new ExternalPicoBackend(this);
         try {
-            store=new art.pikoos.lab.core.ProjectRepository(new ProjectStore(getFilesDir()));
+            projectLocation=ProjectStorage.identity(this);store=ProjectStorage.open(this);
             assetStore=new SpriteAssetStore(getFilesDir());
             spriteBuffer=new SpriteBufferStore(getFilesDir());
             presetStore=new ParameterPresetStore(getFilesDir());
@@ -182,9 +183,11 @@ public final class MainActivity extends Activity {
             if(saved==null&&art.pikoos.lab.core.FirstRunSetup.shouldOpen(getSharedPreferences("first-run",0).getBoolean("dismissed",false),setupPending,runtimeActive))
                 startActivityForResult(new Intent(this,FirstRunActivity.class),87);
         }catch(Exception e){
-            TextView error=new TextView(this);error.setText("Не удалось открыть проекты. Исходные файлы сохранены.\n"+e.getMessage());
+            TextView error=new TextView(this);error.setText("Cannot open Projects. Existing files were kept.\n"+e.getMessage());
             error.setTextColor(WorkshopView.COLORS[7]);error.setBackgroundColor(WorkshopView.COLORS[1]);error.setPadding(32,32,32,32);
-            setContentView(error);Log.e(TAG,"Project load failed; original retained",e);
+            android.widget.LinearLayout recovery=new android.widget.LinearLayout(this);recovery.setOrientation(1);recovery.setBackgroundColor(WorkshopView.COLORS[1]);recovery.addView(error);
+            android.widget.Button storage=new android.widget.Button(this);storage.setText("Project storage / reconnect");storage.setOnClickListener(v->startActivityForResult(new Intent(this,ProjectStorageActivity.class),91));recovery.addView(storage);
+            setContentView(recovery);Log.e(TAG,"Project load failed; original retained",e);
         }
     }
     private void openProject(final String id,WorkshopCartridge cart)throws Exception {
@@ -423,6 +426,7 @@ public final class MainActivity extends Activity {
             }catch(Exception e){Log.e(TAG,"Diagnostic result unavailable",e);if(session!=null){session.diagnosticPending=false;session.mode=Mode.CODE;session.notice="Результат проверки недоступен";surface.invalidate();}}
             return;
         }
+        if(request==91){recreate();return;}
         if(request==87){if(showingPlay)showPlay();else if(showingFolders)showFolders(folderReturnPlay);return;}
         if(request==PICK_FOLDER){folderResult(result,data);return;}
         if(request==SAVE_CART){exportResult(result,data);return;}
@@ -644,7 +648,7 @@ public final class MainActivity extends Activity {
     @Override protected void onPause(){if(input!=null)input.reset();persistUi();super.onPause();}
     @Override protected void onStop(){super.onStop();if(awaitingReturn)leftForRuntime=true;}
     @Override protected void onResume(){
-        super.onResume();immersive();
+        super.onResume();if(!projectLocation.equals(ProjectStorage.identity(this))){recreate();return;}immersive();
         onRuntimeResume();
     }
     private void onRuntimeResume(){

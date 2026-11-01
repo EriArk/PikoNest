@@ -1,5 +1,22 @@
 # Состояние PikoNest
 
+**2026-11-01 — Lab 0.0.90, external working projects (partial P02/P03/R08):**
+Folders → Projects → Start opens project storage controls. Activation creates and
+verifies a fresh workspace, exercises retained-version saves and file/directory
+renames on the candidate, then commits its location in a checked AtomicFile. MainActivity reopens through
+the SAF project adapter. Internal originals stay untouched; writes to those
+originals are gated during activation. Create/import/save/reopen/export use ordinary
+external `projects/<id>/game.p8` files. Pending save journals recover complete old
+or new versions; unknown changes remain blocked with all evidence retained.
+Reconnect restores the original tree grant. Explicit return to older internal
+originals is a separate workspace choice, not a merge. Library and runtime data
+remain private. Local recovery tests pass; actual Android activation/provider,
+physical/visual and owner acceptance remain open. Console use stays paused.
+[Contract](EXTERNAL_PROJECTS.md) · [evidence](showcase/0.0.90-en/README.md).
+88 core suite invocations and integrated package checks are recorded there;
+RecoverableReplaceTest has 61 assertions. Next connect library persistence and
+activation; complete real external-storage journeys when device use is authorized.
+
 **2026-11-01 — Lab 0.0.89, shared project persistence (partial P02/P03/R08):**
 Project create/import/list/title/read/save now use the portable ProjectRepository
 storage contract. MainActivity no longer accesses project directories or AtomicFile

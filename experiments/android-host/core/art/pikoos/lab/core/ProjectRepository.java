@@ -10,7 +10,8 @@ public final class ProjectRepository {
         byte[] read(String id)throws Exception;
         String importedTitle(String id)throws Exception;
         void publish(String id,byte[] bytes,String importedTitle)throws Exception;
-        /** Must compare expected source and publish atomically, preserving old data on failure. */
+        /** Compare expected source and publish a complete version. Retain prior bytes;
+         * interrupted providers may require journal recovery before subsequent reads. */
         void replace(String id,byte[] expected,byte[] next)throws Exception;
     }
     private final Storage storage;
