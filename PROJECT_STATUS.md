@@ -12,12 +12,30 @@ setup live in one development APK; there is no public APK release yet.
 | Item | Current position |
 | --- | --- |
 | Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.88** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | Verified project/library copies to selected folders; device acceptance pending |
+| Android baseline | **0.0.89** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | Safer shared project persistence, preparing external storage; device acceptance pending |
 | Current focus | Verified external project/library storage; device journeys when permitted |
 | Platforms | Android first; Linux later |
 
-## Latest implementation: checked copies of your creations (0.0.88)
+## Latest implementation: preparing projects for external storage (0.0.89)
+
+Project creation, import, opening and saving now share one storage interface.
+Saving checks that the source still matches the edit, and new projects are checked
+before appearing on the shelf. Existing project folders and cart bytes are preserved.
+This is internal groundwork for external storage, with no new screen or external
+working location enabled yet. The verified-copy workflow remains available.
+
+**Checked locally:** 87 core suites passed, including 40 new persistence assertions
+covering real editor Save/Undo/Redo, failed writes and source conflicts. Android
+compilation and integrated APK packaging are recorded in the evidence below.
+Device/provider acceptance remains pending; console use stays paused.
+[Evidence](docs/showcase/0.0.89-en/README.md).
+
+Next: external project adapter, safe activation and reopening after access loss;
+then the corresponding library path. Settings, saves and unfinished drafts still
+need their separate complete-backup workflow.
+
+## Previous implementation: checked copies of your creations (0.0.88)
 
 Projects and reusable assets can now be copied to their selected external folders.
 Each copy gets a new directory. PikoNest rereads every file and checks its contents
@@ -75,7 +93,7 @@ Compact/tall/wide layouts received host review. These checks do not replace
 playing in official PICO-8 or using real handheld controls.
 
 **Still pending:** official-runtime execution, installation, physical controls,
-independent exports and novice/owner journeys for labs 0.0.78–88. Console use
+independent exports and novice/owner journeys for labs 0.0.78–89. Console use
 remains paused. No native screenshot pack or public APK release was produced.
 [Issue #17](https://github.com/EriArk/PikoNest/issues/17) remains open.
 

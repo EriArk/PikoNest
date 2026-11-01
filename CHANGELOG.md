@@ -4,6 +4,19 @@ Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
 There is no public APK release as of 1 November 2026.
 
+## 2026-11-01 — Shared project persistence (lab 0.0.89)
+
+- Moved project creation, import, opening and saving behind a portable storage
+  contract in preparation for external working folders.
+- Added a source recheck at the local write boundary and verification of new cart
+  and imported-title bytes before publication. Existing project paths stay intact.
+- Validated editor Save/Undo/Redo through the new repository, failed Undo, import
+  retry, write failure and source conflicts: 40 new checks; 87 local core suites.
+- Working data still lives inside the app. External activation, the library port
+  and Android provider/device acceptance remain unfinished. No console use or release.
+
+[Evidence and limitations](docs/showcase/0.0.89-en/README.md).
+
 ## 2026-11-01 — Verified copies to selected folders (lab 0.0.88)
 
 - Added Copy projects / Copy library from Folders. Copies use new directories,

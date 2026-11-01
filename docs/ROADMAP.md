@@ -9,11 +9,13 @@ starters to Game view. Shared optional help routes to the same tools in Blank.
 [Creation evidence](showcase/0.0.86-en/README.md). Lab 0.0.87 adds the optional
 first-entry guide, real Games-folder connection and purchased-runtime preparation
 without automatic play. [Setup evidence](showcase/0.0.87-en/README.md). Native/runtime
-acceptance for labs 0.0.78–88 remains open. Console use is paused; the last complete
+acceptance for labs 0.0.78–89 remains open. Console use is paused; the last complete
 native creation journey remains 0.0.77. Next implement verified external project
 and library migration/activation: existing saved destinations are still intentions.
 Lab 0.0.88 adds verified project/library copy and Resume, with working storage
-still private. Next introduce a shared persistence port and external activation;
+still private. Lab 0.0.89 connects project workflows to the portable persistence contract.
+Next implement the external project adapter and journaled activation/reopen/lost-access
+recovery, then the library port and activation;
 then complete Splore ownership/indexing, full backup/restore/update and independent setup.
 Broader core/library, map/audio and learning work remains unfinished.
 

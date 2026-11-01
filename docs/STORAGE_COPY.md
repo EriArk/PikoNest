@@ -1,5 +1,27 @@
 # Verified copies to user folders
 
+## Project persistence groundwork in 0.0.89
+
+The project workflow now depends on portable `ProjectRepository.Storage`: exists,
+list, read cart, read imported title, exclusive publish and compare-and-replace.
+MainActivity handles no project File/AtomicFile objects. Its separate pending
+import/export journals keep their existing private AtomicFile implementation.
+
+The local adapter retains the existing project layout and atomic writes. It
+rechecks expected source immediately before save under a shared process lock;
+the same lock serializes reads and publication across adapter instances. New
+cart and import-title bytes are read back from staging before directory publication.
+Repository save verifies readback and refuses stale sources; failed verification
+is an error with uncertain stored state, never an automatic success or rollback.
+This is not an OS lock against unrelated processes. Ordinary `.p8` bytes and
+existing IDs remain unchanged; no schema or path migration occurs in this batch.
+
+Next implement the SAF-backed project adapter and durable activation transaction.
+It must satisfy the same source-conflict/publication contract despite provider
+limitations. A saved tree grant or successful copy is not an activated backend.
+Library persistence has not yet moved to this port. Current working locations,
+verified-copy exclusions and native acceptance limits below remain unchanged.
+
 Lab 0.0.88, 1 November 2026. Local implementation; native acceptance is pending.
 
 ## User path

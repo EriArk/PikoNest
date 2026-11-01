@@ -1,5 +1,22 @@
 # PikoNest — задачи полного цикла
 
+**2026-11-01 — Lab 0.0.89, shared project persistence (partial P02/P03/R08):**
+Project create/import/list/title/read/save now use the portable ProjectRepository
+storage contract. MainActivity no longer accesses project directories or AtomicFile
+objects. The local adapter retains existing IDs, paths, staged publication and
+AtomicFile writes, adds source recheck at the write boundary and verifies staged
+cart/title bytes before publication. Read/replace/publication share a process lock.
+Repository readback reports an unverified save; no-op edits avoid writing.
+40 new checks include real WorkshopSession Save/Undo/Redo through the repository,
+failed Undo, stale sources, a race after the initial read, import retry/metadata,
+input/output ownership and unsafe IDs. 87 core suite invocations passed; integrated
+compilation/packaging evidence is recorded in [0.0.89](showcase/0.0.89-en/README.md).
+This is persistence groundwork, with no new external working-storage activation.
+Projects and library stay app-private; verified copies remain available. Library
+stores still need the corresponding port. Next implement the external project
+adapter and journaled activation/access-loss recovery, followed by library storage.
+Console use stays paused; native/provider/physical/owner acceptance remains open.
+
 **2026-11-01 — Lab 0.0.88, verified external copies (partial P02/P08, R08):**
 Folders → Projects or Asset library → Start opens an explicit copy workflow.
 New copy creates its own uniquely named folder; Resume rechecks the prior candidate.

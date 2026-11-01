@@ -47,7 +47,7 @@ public final class MainActivity extends Activity {
     private SharedPreferences prefs;
     private SharedPreferences libraryPrefs;
     private final art.pikoos.lab.core.ToolCatalogue toolCatalogue=new art.pikoos.lab.core.ToolCatalogue();
-    private ProjectStore store;
+    private art.pikoos.lab.core.ProjectRepository store;
     private SpriteAssetStore assetStore;
     private SpriteBufferStore spriteBuffer;
     private ParameterPresetStore presetStore;
@@ -113,7 +113,7 @@ public final class MainActivity extends Activity {
         int shelfFocus=libraryPrefs.getInt("focus",0);
         backend=new ExternalPicoBackend(this);
         try {
-            store=new ProjectStore(getFilesDir());
+            store=new art.pikoos.lab.core.ProjectRepository(new ProjectStore(getFilesDir()));
             assetStore=new SpriteAssetStore(getFilesDir());
             spriteBuffer=new SpriteBufferStore(getFilesDir());
             presetStore=new ParameterPresetStore(getFilesDir());
@@ -121,7 +121,7 @@ public final class MainActivity extends Activity {
             exportDraft=new AtomicFile(new File(getFilesDir(),"pending-export.bin"));
             byte[] template;
             try(InputStream in=getAssets().open("moon-garden.p8")){template=readAll(in);}
-            if(!store.directory("moon-garden").exists())store.create("moon-garden",template);
+            if(!store.exists("moon-garden"))store.create("moon-garden",template);
             library=LibrarySession.curated(new LibrarySession.Port(){
                 public java.util.List<String> ids()throws Exception{return store.ids();}
                 public byte[] read(String id)throws Exception{return store.read(id);}
@@ -189,15 +189,15 @@ public final class MainActivity extends Activity {
     }
     private void openProject(final String id,WorkshopCartridge cart)throws Exception {
         persistUi();
-        store.cart(id); // Validate the target before switching editor state.
+        store.read(id); // Validate the selected project through the storage port.
         final String projectTitle=store.title(id);activeTitle=projectTitle;
         WorkshopSession next=sessions.get(id);
         if(next==null||!java.util.Arrays.equals(next.cart().bytes(),cart.bytes())) {
             next=new WorkshopSession(cart,new WorkshopSession.Port(){
-                public void save(byte[] bytes)throws Exception{saveCart(store.cart(id),bytes);Log.i(TAG,"project_saved id="+id+" bytes="+bytes.length);}
+                private byte[] savedSource=cart.bytes();
+                public void save(byte[] bytes)throws Exception{save(savedSource,bytes);}
                 public void save(byte[] expected,byte[] bytes)throws Exception{
-                    if(!java.util.Arrays.equals(expected,store.read(id)))throw new Exception("Файл проекта изменился вне редактора. Исходник не заменён; вернись к правке или открой проект заново.");
-                    save(bytes);
+                    store.save(id,expected,bytes);savedSource=bytes.clone();Log.i(TAG,"project_saved id="+id+" bytes="+bytes.length);
                 }
                 public void launch(byte[] bytes)throws Exception{launchCart(bytes);}
                 public void diagnose(byte[] bytes)throws Exception{

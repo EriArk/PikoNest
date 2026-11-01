@@ -1,0 +1,10 @@
+{
+  "lab": "0.0.89",
+  "apk_sha256": "035682b28620e8b016ad7a2816073285332d08149157e24392b57d538eab57cb",
+  "core_suite_invocations": 87,
+  "ProjectRepositoryTest": 40,
+  "device_used": false,
+  "installed": false,
+  "released": false,
+  "external_storage_active": false
+}

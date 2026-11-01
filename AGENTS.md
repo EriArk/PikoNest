@@ -569,7 +569,19 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
-Current source/package (2026-11-01): lab 0.0.88 adds explicit verified external
+Current source/package (2026-11-01): lab 0.0.89 routes all project workflow
+operations through portable ProjectRepository.Storage. MainActivity no longer
+receives project File/AtomicFile objects. ProjectStore is the local adapter with
+source recheck under a shared process lock, staged cart/title readback and existing
+atomic writes/paths. See docs/STORAGE_COPY.md and docs/showcase/0.0.89-en/README.md.
+40 new checks exercise real editor Save/Undo/Redo and failure/conflict paths; 87
+local core suites passed. External working storage is not active. Next implement
+the SAF project adapter and journaled activation/reopen/access-loss recovery, then
+the library port and activation. Preserve IDs, cart bytes, originals and drafts.
+Console use remains paused; native/provider/physical/owner acceptance and the
+separate owner APK release gate remain open.
+
+Previous source/package (2026-11-01): lab 0.0.88 adds explicit verified external
 copies for projects and library via Folders → select Projects/Data → Start. Unique
 candidate directories, SHA-256 readback/final recheck, durable destination and
 explicit Resume preserve originals. Partial conflicting files require a new copy;
