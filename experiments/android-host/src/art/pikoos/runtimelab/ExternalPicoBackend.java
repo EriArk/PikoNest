@@ -74,6 +74,7 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         activity.startActivityForResult(intent,DIAGNOSTIC_REQUEST);
     }
     void checkAvailableForLaunch() throws Exception {
+        if(RuntimeArchiveJob.current!=null&&!RuntimeArchiveJob.current.done)throw new Exception("Finish or cancel PICO-8 preparation before starting a game.");
         if(RuntimeMigrationJob.pending())throw new Exception("Finish or cancel the runtime data import first.");
         if(RuntimeInstallation.integrated(activity))RuntimeHomes.current(activity);
         if(!detect().launcherPresent)throw new Exception("PICO-8 is not set up. Open runtime setup from Play to import your purchased runtime.");

@@ -12,12 +12,31 @@ setup live in one development APK; there is no public APK release yet.
 | Item | Current position |
 | --- | --- |
 | Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.86** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | Two editable starting games and shared creation help; device acceptance pending |
-| Current focus | Independent first-run folder/runtime setup; device journeys when permitted |
+| Android baseline | **0.0.87** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | Optional first-run guide and preparation without automatic play; device acceptance pending |
+| Current focus | Verified external project/library storage; device journeys when permitted |
 | Platforms | Android first; Linux later |
 
-## Latest implementation: a helpful place to start (0.0.86)
+## Latest implementation: a gentler first start (0.0.87)
+
+A short English guide connects a games folder, explains where creations live and
+opens setup for the user's purchased Raspberry Pi PICO-8 ZIP. It remembers the
+current step, can be skipped, and can be reopened from Folders. PICO-8 preparation
+now follows archive import without automatically opening a game. The optional test
+is a separate action; a preparation failure can retry the saved archive.
+
+Games folders connect to Play. Projects, assets and Splore downloads still live
+inside the app: other saved folder choices are explicitly labelled reserved.
+Activating external project and library storage is the next implementation block.
+
+**Checked locally:** 85 core suite invocations and integrated APK packaging passed;
+the new guide's state checks cover skipping, progress, cancellation, late callbacks,
+failed saves and preparation-versus-testing. Compact, tall and wide host layouts
+were reviewed. Android folder grants, actual runtime preparation, interruptions,
+physical controls and a novice first-run journey remain untested for this batch.
+The console was not used. [Evidence and host previews](docs/showcase/0.0.87-en/README.md).
+
+## Previous implementation: a helpful place to start (0.0.86)
 
 New project now offers Blank, Little explorer and Light puzzle with a picture,
 a short explanation and play controls. Collect stars in the explorer game, or
@@ -37,7 +56,7 @@ Compact/tall/wide layouts received host review. These checks do not replace
 playing in official PICO-8 or using real handheld controls.
 
 **Still pending:** official-runtime execution, installation, physical controls,
-independent exports and novice/owner journeys for labs 0.0.78–86. Console use
+independent exports and novice/owner journeys for labs 0.0.78–87. Console use
 remains paused. No native screenshot pack or public APK release was produced.
 [Issue #17](https://github.com/EriArk/PikoNest/issues/17) remains open.
 

@@ -299,6 +299,14 @@ Test/возврат. Это статическая сцена с плоским 
 
 ## ACC-06 — чистая установка, папки и Splore
 
+Lab 0.0.87 locally implements optional first-entry guidance, Games-tree verification
+and prepare-without-launch. All checkboxes below remain open. When device use is
+authorized, exercise cold entry, later/re-entry, existing-data upgrade, Android
+picker cancel/revocation, process death during check/import/prepare, insufficient
+space, ZIP replacement and retry, then optional Test/return. Confirm old runtime,
+projects, saves and assets remain intact. The three reserved destinations are not
+active storage and cannot satisfy the four-folder criterion.
+
 Этап M5; R01–R08, P02/P03/P08, A06.
 
 Проводить в отдельном чистом тестовом профиле/окружении или с проверенной копией

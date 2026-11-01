@@ -1,0 +1,35 @@
+{
+  "lab": "0.0.87",
+  "date": "2026-11-01",
+  "apk_sha256": "d5f9e00330c80ac48035089c6d60a880d6901be45f271222ca6f28332cb72b24",
+  "device_used": false,
+  "installed": false,
+  "public_release": false,
+  "full_core_suite_invocations": 85,
+  "FirstRunSetupTest": 40,
+  "FolderSetupTest": 15,
+  "RuntimeArchiveTest": 37,
+  "RuntimeProbeTest": 16,
+  "images": [
+    {
+      "file": "01-games-host-preview.png",
+      "origin": "Production View drawing via temporary Java2D Android stubs; synthetic setup state; not a native capture",
+      "sha256": "a5d265806d199844b89fc542d92b255476da0f43a2edd8926cc38d3fdb0ba63a"
+    },
+    {
+      "file": "02-runtime-host-preview.png",
+      "origin": "Production View drawing via temporary Java2D Android stubs; synthetic setup state; not a native capture",
+      "sha256": "78fe7fad4f2d12f245433ea56c6145e31b1f2e0710465710126ddee14b1f9478"
+    },
+    {
+      "file": "03-optional-test-host-preview.png",
+      "origin": "Production View drawing via temporary Java2D Android stubs; synthetic setup state; not a native capture",
+      "sha256": "29888d994f546864dc987caa57cc55afc6e968a05852252402c3d6181f40679b"
+    },
+    {
+      "file": "04-folder-intentions-host-preview.png",
+      "origin": "Production View drawing via temporary Java2D Android stubs; synthetic setup state; not a native capture",
+      "sha256": "8c62f878983e0d371617cca271b18d002edca93c9f2e71abad2c5d0881ccc2fb"
+    }
+  ]
+}

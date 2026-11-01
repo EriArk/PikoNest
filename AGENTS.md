@@ -569,22 +569,25 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
-Current source/package (2026-11-01): lab 0.0.86 adds Little explorer and Light
-puzzle through the same general tools/model as Blank. The creation picker defaults
-to Blank, previews original starter content and preserves older examples/projects.
-X / Help provides optional explanations and routes to existing editors; unfamiliar
-Lua uses All tools. New project IDs preserve old namespaces. Journal v11 reads
-v1–10, including earlier world/tile drafts. See docs/STARTER_GAMES.md and
-docs/showcase/0.0.86-en/README.md.
+Current source/package (2026-11-01): lab 0.0.87 adds a skippable English
+first-entry guide with saved progress and Folders re-entry. Games connects to the
+existing Play index after a durable grant/check; cancelled/stale results cannot
+publish a replacement. Purchased Raspberry Pi ZIP import continues into preparation
+without automatic launch; Test is explicit and failed preparation can retry the
+saved verified candidate. Projects/library/Splore still use app-private storage;
+external folder intentions remain reserved, not active. See FIRST_RUN_SETUP and
+docs/showcase/0.0.87-en/README.md. Lab 0.0.86's two editable starters and contextual
+help remain available through the same general tools, alongside Blank.
 
 Console use remains paused: no device actions until the owner explicitly allows
 it. Native/runtime, physical-controller, novice and owner acceptance remain open
-for labs 0.0.78–86 and issue #17. Next independent block: complete the first-run
-folder/runtime path with recoverable setup errors, following FIRST_RUN_SETUP and
-SINGLE_APK. Preserve user projects, saves, library and runtime state. Remaining
-core/library, collision/door/parallax, broader audio and learning work stays open.
-Do not substitute more starter variants for these gaps. Complete outstanding
-device journeys when authorized; public APK publication needs separate owner approval.
+for labs 0.0.78–87 and issue #17. Next independent block: verified, journaled
+external project/library migration and activation with cancellation/recovery and
+original-data preservation. Then finish Splore ownership/indexing and backup/update.
+Do not claim ACC-06 or full onboarding from the local guide. Remaining core/library,
+collision/door/parallax, broader audio and learning work stays open. Do not substitute
+more starter variants for these gaps. Device journeys wait for authorization;
+public APK publication needs separate owner approval.
 
 Historical source/package record (2026-10-23): lab 0.0.78 implements Game view animation
 sequences and movement/toggle-state bindings. Local suite/build and focused

@@ -1,5 +1,21 @@
 # PikoNest — задачи полного цикла
 
+**2026-11-01 — Lab 0.0.87, optional setup guide (partial R08/P02):**
+First entry now connects Games, current data locations and the purchased Raspberry
+Pi ZIP in a skippable English guide. Progress is saved; Folders → Select reopens
+it. A verified Games tree feeds the existing Play index. Cancelled/stale checks
+cannot publish a replacement. Runtime import continues into preparation without
+launching; Test is a separate choice, and a failed preparation can retry the saved
+verified archive. Active games/data imports prevent preparation; a pending archive
+job prevents a concurrent game launch. Existing project/library destinations stay
+app-private; other selected folders are explicitly reserved, not active storage.
+[Setup contract](FIRST_RUN_SETUP.md) · [local evidence and host previews](showcase/0.0.87-en/README.md).
+85 local suite invocations and integrated APK packaging passed. Android provider,
+process-death, official runtime, physical-controller and novice/owner journeys for
+this batch remain unperformed. Console use stays paused; ACC-06/R08 are not closed.
+Next: verified project/library destination migration and activation, then remaining
+Splore ownership/indexing and backup/update work. Preserve originals throughout.
+
 **2026-11-01 — Lab 0.0.86, editable starters and contextual help (partial UX09/T01, H01/H02):**
 New project defaults to Blank, then offers Little explorer and Light puzzle with
 original art, starting-layout previews and controls. Both use the existing general
@@ -317,7 +333,7 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 | R05 | Частично / R03, P02 | Владение game saves/cartdata, cstore/save и рабочими копиями; запись обратно, конфликт, backup; безопасные runtime-зависимости | Сохранение переживает запуск из Play/external и обновление; источник не перезаписывается молча; неперенесённые записи остаются доступными; динамические пути имеют проверенный контракт |
 | R06 | Исследование / A01 | Матрица official runtime version/ABI/Android, определение версии и backend capabilities, смена runtime | «ZIP структурно читается», «архитектура подходит» и «эта версия проверена» различаются; инструкция архива соответствует backend, неподдержанная версия не маскируется |
 | R07 | Исследование / R02, P02, R05 | Splore: выбранные Downloads, реальные BBS-cache/зависимости, индекс Play, offline; восстановление переноса | Скачать новую игру, увидеть на полке, перезапустить без сети и сыграть; потеря папки не теряет загрузку; multicart проверен отдельно |
-| R08 | Частично / R01, R02, R06, R07, P02 | Полный первый запуск и тот же путь в Settings; четыре назначения, правильный ZIP, progress/retry, отложенная настройка и продолжение Test/external | Чистая установка проходит ACC-06; отмена сохраняет сделанное; редактор доступен без runtime; нет обязательного аккаунта, курса или имени проекта |
+| R08 | Частично, 0.0.87 / R01, R02, R06, R07, P02 | Полный первый запуск и тот же путь в Settings; четыре назначения, правильный ZIP, progress/retry, отложенная настройка и продолжение Test/external | Чистая установка проходит ACC-06; отмена сохраняет сделанное; редактор доступен без runtime; нет обязательного аккаунта, курса или имени проекта |
 | R09 | Частично, 0.0.71 / A01, A06, R01, R03; #9/#10 | Один APK и одна иконка PikoNest: встроить адаптер запуска, убрать обязательную установку helper/runtime APK; сохранить границу backend и импорт купленного runtime. Требование владельца 2026-10-07 | Чистая установка работает без внешних wrapper-пакетов; Play/Test/возврат и восстановление проверены. Проверенный перенос проектов/сохранений/библиотеки предшествует удалению старых lab-приложений; proprietary runtime не включён в APK |
 | R10 | Исследование / R09, R06 | Современный Android target: заменить зависимость от исполнения writable app-private файлов; сохранить импорт официального runtime и backend | Запуск/выход/восстановление проверены на современных Android при актуальном target; не простая смена manifest, не встраивание proprietary binaries. SDK 28 разрешён владельцем только для первой интеграции |
 

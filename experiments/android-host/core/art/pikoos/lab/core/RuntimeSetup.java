@@ -4,8 +4,9 @@ import art.pikoos.lab.core.WorkshopSession.Action;
 
 /** Archive readiness is separate from installed adapter and successful runtime execution. */
 public final class RuntimeSetup {
-    public interface Port {void pick();void recheck();void cancel();void leave();default void test(){}}
+    public interface Port {void pick();void recheck();void cancel();void leave();default void test(){} default void prepare(){recheck();}}
     public final Port port;
+    public boolean prepared;
     public boolean busy,hasArchive,verified,adapterPresent,arm64;
     public String filename="",phase="",problem="",notice="";
     public long archiveBytes;
@@ -15,7 +16,7 @@ public final class RuntimeSetup {
         if(testing){if(action==Action.CONFIRM||action==Action.TEST)port.test();else if(action==Action.CANCEL)port.leave();return;}
         if(action==Action.CANCEL){if(busy)port.cancel();else port.leave();return;}
         if(busy)return;
-        if(action==Action.CONFIRM||action==Action.TEST){if(verified&&arm64)port.test();else if(arm64)port.pick();else problem="This runtime backend requires Android ARM64.";}
+        if(action==Action.CONFIRM||action==Action.TEST){if(verified&&arm64){if(prepared)port.test();else port.prepare();}else if(arm64)port.pick();else problem="This runtime backend requires Android ARM64.";}
         if(action==Action.CONTEXT)port.pick();
         if(action==Action.UNDO&&hasArchive)port.recheck();
     }

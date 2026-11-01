@@ -6,11 +6,14 @@ The owner approved prioritizing a visual, contextual Game view over the next
 sound block. This refines UX07/UX08 rather than creating a second roadmap.
 Labs 0.0.81–86 connect rules, audio, world/map/camera, tile art and two small editable
 starters to Game view. Shared optional help routes to the same tools in Blank.
-[Latest evidence](showcase/0.0.86-en/README.md). Native/runtime acceptance for labs
-0.0.78–86 remains open. Console use is paused; the last complete native creation
-journey remains 0.0.77. Next independent work is the first-run folder/runtime path,
-including recovery from failed preparation or lost access. Broader core/library,
-map/audio and learning work remains unfinished; avoid repeated preset growth.
+[Creation evidence](showcase/0.0.86-en/README.md). Lab 0.0.87 adds the optional
+first-entry guide, real Games-folder connection and purchased-runtime preparation
+without automatic play. [Setup evidence](showcase/0.0.87-en/README.md). Native/runtime
+acceptance for labs 0.0.78–87 remains open. Console use is paused; the last complete
+native creation journey remains 0.0.77. Next implement verified external project
+and library migration/activation: existing saved destinations are still intentions.
+Then complete Splore ownership/indexing, backup/update and independent setup.
+Broader core/library, map/audio and learning work remains unfinished.
 
 | Next complete block | Existing task ownership | Ready when |
 | --- | --- | --- |
@@ -18,7 +21,7 @@ map/audio and learning work remains unfinished; avoid repeated preset growth.
 | Prove both visual journeys and animation when console use is authorized | UX07/UX08, N01/G04, #17 | Blank collection and hero-free linked switches; preview/confirm/cancel, draft Test/return, recovery, Save/Undo/reopen/export; compact/wide physical controls, novice and owner review; native before/after evidence |
 | Complete audio creation and connection | S01–S05, UX08 | Basic SFX/event and music composition/shared-SFX/channel paths exist locally in 0.0.82–83; official Listen/Stop/Test/return/export and physical acceptance remain open, alongside range/library/advanced-audio work; respect system mute |
 | Validate the two editable starters and contextual help | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | Locally implemented in 0.0.86; finish unassisted Blank/start journeys and review content/help with a novice and owner, without template-locked tools |
-| Independent Android setup and reliable data ownership | P/R tasks, modern target, Q05 | Next: one first-run path for folder destinations, correct purchased archive, preparation and recovery; then backup/update and external launches without developer intervention |
+| Independent Android setup and reliable data ownership | P/R tasks, modern target, Q05 | 0.0.87 connects optional guide, Games and archive preparation locally; next verified external project/library migration and activation, Splore ownership/indexing, backup/update and complete native setup/external-launch journeys |
 | Device, novice and owner acceptance | Q01–Q07, ACC-01–09 | Complete journeys on supported screens/physical controls; English/errors reviewed; owner findings resolved |
 
 All required acceptance criteria and the separate owner APK release gate remain.

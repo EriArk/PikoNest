@@ -18,6 +18,17 @@ final class RuntimeInstallation {
         catch(Exception absent){return false;}
     }
     static boolean ready(Context c){return new File(c.getFilesDir(),"package/pikonest-ready").isFile();}
+    static boolean matchesSaved(Context c){
+        try{
+            RuntimeArchiveJob.Saved saved=RuntimeArchiveJob.saved(c);
+            File marker=new File(c.getFilesDir(),"package/pikonest-ready");
+            return saved!=null&&marker.isFile()&&marker.length()<200
+                &&new File(c.getFilesDir(),"package/proot").isFile()
+                &&new File(c.getFilesDir(),"package/rootfs/home/pico/pico-8/pico8_64").isFile()
+                &&new File(c.getFilesDir(),"package/rootfs/home/pico/pico-8/pico8.dat").isFile()
+                &&new String(Files.readAllBytes(marker.toPath()),"US-ASCII").equals("pikonest-runtime-1\n"+saved.hash);
+        }catch(Exception unavailable){return false;}
+    }
     static File prepare(Context c,RuntimeArchiveJob.Saved saved,BooleanSupplier cancelled)throws Exception{
         if(!integrated(c))throw new IOException("Integrated runtime is unavailable");
         File zipFile=new File(RuntimeArchiveJob.directory(c),saved.file);
@@ -25,7 +36,7 @@ final class RuntimeInstallation {
         if(!saved.hash.equals(checked.sha256))throw new IOException("Saved archive changed. Select the original ZIP again.");
         File marker=new File(c.getFilesDir(),"package/pikonest-ready");
         String identity="pikonest-runtime-1\n"+saved.hash;
-        if(marker.isFile()&&new String(Files.readAllBytes(marker.toPath()),"US-ASCII").equals(identity))return null;
+        if(matchesSaved(c))return null;
         // PulseAudio uses a pathname Unix socket (108-byte sockaddr_un limit).
         // Keep the canonical candidate path short; a long symlink target still fails.
         File installations=new File(c.getFilesDir(),"rt");

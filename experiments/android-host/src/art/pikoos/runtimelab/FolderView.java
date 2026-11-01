@@ -18,15 +18,15 @@ final class FolderView extends View {
     private final Paint p=new Paint();
     private Canvas c;
     private float scale,w,h,downX,downY;
-    private static final String[] TITLES={"Готовые игры","Загрузки Splore","Свои проекты","Библиотека и данные"};
-    private static final String[] HINTS={"Чтение игр. Исходные файлы не меняются.","Место загрузок. Связь со Splore — позже.","Перенос нынешних проектов — отдельный шаг.","Спрайты, музыка и другие ресурсы для повторного использования."};
+    private static final String[] TITLES={"Games","Splore","Projects","Asset library"};
+    private static final String[] HINTS={"Read games; originals unchanged.","Splore still uses app storage.","Projects still use app storage.","Assets still use app storage."};
     FolderView(Context context,FolderSetup session,boolean swap,Runnable changed,Runnable runtime){
         super(context);s=session;this.swap=swap;this.changed=changed;this.runtime=runtime;
         PixelText.configure(context,p);p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
-        setContentDescription("Папки. Вверх и вниз: назначение. A: выбрать папку. X: проверить доступ. B: на полку.");
+        setContentDescription("Folders. Up/down: role. Confirm: choose folder. X: check access. Select: setup guide. Back: return.");
     }
-    void action(Action a){if(a==Action.NEXT&&!s.busy){runtime.run();return;}s.act(a);changed.run();invalidate();}
+    void action(Action a){if(a==Action.MENU&&!s.busy){((android.app.Activity)getContext()).startActivityForResult(new android.content.Intent(getContext(),FirstRunActivity.class),87);return;}if(a==Action.NEXT&&!s.busy){runtime.run();return;}s.act(a);changed.run();invalidate();}
     private void rect(float x,float y,float width,float height,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+width,y+height,p);}
     private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(PixelText.size(size));c.drawText(value,x,y,p);}
     private void fit(String value,float x,float y,int size,int color,float max){p.setTextSize(PixelText.size(size));while(value.length()>1&&p.measureText(value)>max)value=value.substring(0,value.length()-2)+"…";text(value,x,y,size,color);}
@@ -34,23 +34,23 @@ final class FolderView extends View {
         c=canvas;scale=Math.max(1,Math.round(getResources().getDisplayMetrics().density));
         scale=Math.min(scale,Math.min(getWidth()/360f,getHeight()/540f));w=getWidth()/scale;h=getHeight()/scale;
         c.save();c.scale(scale,scale);rect(0,0,w,h,1);rect(0,0,w,42,2);
-        text("PIKOOS",16,30,28,7);text("R PICO-8",w-114,28,20,14);
-        text("Папки мастерской",16,82,28,7);
-        fit(w<500?"Проекты пока внутри PIKOOS.":"Выбери места. Проекты пока хранятся в приложении.",16,108,17,6,w-32);
+        text("PikoNest",16,30,24,7);text("R PICO8",w-130,28,18,14);
+        text("Folders",16,82,28,7);
+        fit("Projects and assets stay in app.",16,108,17,6,w-32);
         for(int i=0;i<4;i++){
             FolderSetup.Entry e=s.entry(i);float y=124+i*69;boolean selected=s.selected==i;
             rect(16,y,w-32,62,selected?2:0);rect(16,y,4,62,selected?10:13);
-            fit(w<500&&i==3?"Библиотека":TITLES[i],30,y+23,21,selected?10:7,w-190);
-            String state=e.state==FolderSetup.State.READY?"Готово":e.state==FolderSetup.State.CHECKING?"Читаю…":e.state==FolderSetup.State.UNAVAILABLE?"Ошибка":e.state==FolderSetup.State.UNKNOWN?"Проверить":"Выбрать";
+            fit(TITLES[i],30,y+23,21,selected?10:7,w-190);
+            String state=e.state==FolderSetup.State.READY?(i==0?"Connected":"Reserved"):e.state==FolderSetup.State.CHECKING?"Checking":e.state==FolderSetup.State.UNAVAILABLE?"Reconnect":e.state==FolderSetup.State.UNKNOWN?"Check":"Choose";
             fit(state,w-145,y+23,16,e.state==FolderSetup.State.READY?11:e.state==FolderSetup.State.UNAVAILABLE?9:6,115);
-            fit(e.location.isEmpty()?"Папка ещё не выбрана":e.name,30,y+48,17,6,w-60);
+            fit(e.location.isEmpty()?"No external folder selected":e.name,30,y+48,17,6,w-60);
         }
         FolderSetup.Entry e=s.entry(s.selected);
         fit(e.problem.isEmpty()?HINTS[s.selected]:e.problem,16,423,17,e.problem.isEmpty()?6:9,w-32);
-        fit(s.notice.isEmpty()?(swap?"B":"A")+" выбрать / подключить снова · X проверить":s.notice,16,451,18,10,w-32);
-        fit("В выборе папки откроется окно Android.",16,478,16,13,w-32);
-        rect(0,h-44,w,44,0);text((swap?"B":"A")+" папка",12,h-16,18,10);
-        text("X проверка",w/3+8,h-16,18,14);text((swap?"A":"B")+" назад",w*2/3+8,h-16,18,6);
+        fit(s.notice.isEmpty()?(swap?"B":"A")+" choose / reconnect · X check":s.notice,16,451,18,10,w-32);
+        fit("Select: setup guide",16,478,16,13,w-32);
+        rect(0,h-44,w,44,0);text((swap?"B":"A")+" Choose",12,h-16,18,10);
+        text("X Check",w/3+8,h-16,18,14);text((swap?"A":"B")+" Back",w*2/3+8,h-16,18,6);
         c.restore();
     }
     @Override public boolean onTouchEvent(MotionEvent e){
@@ -59,6 +59,7 @@ final class FolderView extends View {
         if(e.getActionMasked()==MotionEvent.ACTION_UP){
             if(Math.abs(x-downX)>20||Math.abs(y-downY)>20)return true;
             if(y<42&&x>w-140)action(Action.NEXT);
+            else if(y>=460&&y<490)action(Action.MENU);
             else if(y>=h-44)action(x<w/3?Action.CONFIRM:x<w*2/3?Action.CONTEXT:Action.CANCEL);
             else if(x>=16&&x<=w-16&&y>=124&&y<400){s.select((int)(y-124)/69);changed.run();invalidate();}
             performClick();return true;

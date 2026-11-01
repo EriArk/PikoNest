@@ -27,7 +27,7 @@ public class RuntimeProbeTest {
             try{RuntimeProbe.prepare(archive,"00",cart,new ByteArrayOutputStream(),()->false);throw new AssertionError("changed archive");}catch(IOException expected){checks++;}
             try{RuntimeProbe.unpack(new ByteArrayInputStream(transport),Files.createDirectory(root.resolve("cancel")).toFile(),()->true);throw new AssertionError("cancel");}catch(java.util.concurrent.CancellationException expected){checks++;}
             int[] calls={0,0};RuntimeSetup s=new RuntimeSetup(new RuntimeSetup.Port(){public void pick(){calls[0]++;}public void test(){calls[1]++;}public void cancel(){}public void leave(){}public void recheck(){}});
-            s.arm64=true;s.verified=true;s.act(art.pikoos.lab.core.WorkshopSession.Action.CONFIRM);check(calls[1]==1,"verified archive primary action starts probe");
+            s.arm64=true;s.verified=true;s.prepared=true;s.act(art.pikoos.lab.core.WorkshopSession.Action.CONFIRM);check(calls[1]==1,"prepared runtime primary action starts probe");
             s.testing=true;s.act(art.pikoos.lab.core.WorkshopSession.Action.CONTEXT);check(calls[0]==0,"cannot replace archive during probe");
         }finally{try(java.util.stream.Stream<Path> all=Files.walk(root)){for(Path p:(Iterable<Path>)all.sorted(Comparator.reverseOrder())::iterator)Files.delete(p);}}
         System.out.println("RuntimeProbeTest: "+checks+" checks passed");

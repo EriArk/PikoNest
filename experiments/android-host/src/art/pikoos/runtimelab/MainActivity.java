@@ -176,6 +176,11 @@ public final class MainActivity extends Activity {
             if(exportJob!=null)exportJob.attach(exportListener);
             if((!awaitingReturn||playPrefs.getBoolean("runtime",false))&&(library.mode==LibrarySession.Mode.SHELF||library.mode==LibrarySession.Mode.ERROR))showPlay();
             if(!awaitingReturn&&folderPrefs.getBoolean("visible",false))showFolders(folderPrefs.getBoolean("fromPlay",true));
+            boolean setupPending=importDraft.getBaseFile().exists()||exportDraft.getBaseFile().exists()||exportJob!=null||RuntimeMigrationJob.pending()
+                ||RuntimeArchiveJob.current!=null&&!RuntimeArchiveJob.current.done;
+            boolean runtimeActive=awaitingReturn||backend.hasSession()&&!art.pikoos.lab.core.RuntimeSession.ended(backend.sessionPhase());
+            if(saved==null&&art.pikoos.lab.core.FirstRunSetup.shouldOpen(getSharedPreferences("first-run",0).getBoolean("dismissed",false),setupPending,runtimeActive))
+                startActivityForResult(new Intent(this,FirstRunActivity.class),87);
         }catch(Exception e){
             TextView error=new TextView(this);error.setText("Не удалось открыть проекты. Исходные файлы сохранены.\n"+e.getMessage());
             error.setTextColor(WorkshopView.COLORS[7]);error.setBackgroundColor(WorkshopView.COLORS[1]);error.setPadding(32,32,32,32);
@@ -342,7 +347,7 @@ public final class MainActivity extends Activity {
                     String current=folders.entry(role.ordinal()).location;
                     if(!current.isEmpty())intent.putExtra(android.provider.DocumentsContract.EXTRA_INITIAL_URI,Uri.parse(current));
                     startActivityForResult(intent,PICK_FOLDER);
-                }catch(Exception e){folders.notice="Не удалось открыть выбор папки";folderView.invalidate();}
+                }catch(Exception e){folders.notice="Cannot open the folder picker. Try again.";folderView.invalidate();}
             }
             public void check(FolderSetup.Role role,String location){checkFolder(role,location);}
             public void save(FolderSetup.Role role,String location,String name)throws Exception{
@@ -384,7 +389,7 @@ public final class MainActivity extends Activity {
     private void folderResult(int result,Intent data){
         String pending=folderPrefs.getString("pending","");folderPrefs.edit().remove("pending").apply();
         if(!showingFolders)showFolders();
-        if(result!=RESULT_OK||data==null||data.getData()==null){folders.notice="Выбор отменён · прежняя папка сохранена";folderView.invalidate();return;}
+        if(result!=RESULT_OK||data==null||data.getData()==null){folders.notice="Selection cancelled / previous folder kept";folderView.invalidate();return;}
         try{
             FolderSetup.Role role=FolderSetup.Role.valueOf(pending);Uri tree=data.getData();
             int flags=data.getFlags()&(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -418,6 +423,7 @@ public final class MainActivity extends Activity {
             }catch(Exception e){Log.e(TAG,"Diagnostic result unavailable",e);if(session!=null){session.diagnosticPending=false;session.mode=Mode.CODE;session.notice="Результат проверки недоступен";surface.invalidate();}}
             return;
         }
+        if(request==87){if(showingPlay)showPlay();else if(showingFolders)showFolders(folderReturnPlay);return;}
         if(request==PICK_FOLDER){folderResult(result,data);return;}
         if(request==SAVE_CART){exportResult(result,data);return;}
         if(request!=PICK_CART||library==null)return;

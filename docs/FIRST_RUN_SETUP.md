@@ -1,15 +1,62 @@
 # Первый запуск: папки и официальный PICO-8
 
-Current status, **0.0.71**: one APK prepares the user's purchased Raspberry Pi ZIP
+## Current implementation — 0.0.87, 1 November 2026
+
+The optional English guide opens on the first eligible main-app entry, including
+an existing install that has not dismissed it. Pending import/export, runtime-data
+import, archive preparation and active/unknown runtime sessions defer entry. It
+does not intercept external-launch activities. Left/right or shoulder actions move
+between Games, creations, PICO-8 and finish; Back chooses setup later. Reopen it
+through Folders → Select (or tap the setup-guide hint). These are semantic input
+routes; actual physical-controller acceptance remains pending.
+
+- **Games:** the Android folder picker obtains a durable read grant, then an
+  off-thread check verifies listing. Only a successful check and preference commit
+  replace the Games location used by Play. Cancellation, failed persistence,
+  replacement failure and stale callbacks preserve the earlier choice. Saved
+  locations are checked again when the guide is recreated; names alone are not
+  access proof. A process killed during a new-folder check requires selecting
+  that candidate again; it cannot activate an unverified location.
+- **Creations:** projects, assets and Splore still use the current private storage.
+  The guide explains this and export-before-uninstall. Existing external intentions
+  remain preserved in Folders, whose `Reserved` label does not claim migration.
+- **PICO-8:** choose the purchased **Raspberry Pi ZIP**, for example
+  `pico-8_0.2.7_raspi.zip`. Linux amd64/i386 are rejected by content validation.
+  The saved archive is checked and prepared automatically; there is no automatic
+  game launch. On reopening runtime setup, the saved candidate is rechecked and
+  preparation retried if necessary. Preparation failure after successful validation
+  offers retry without requiring another download. Cancellation keeps the previous
+  activated runtime. Test remains an explicit action after preparation.
+- **Readiness:** the prepared marker must match the selected archive hash and the
+  runtime files must exist. Archive validation, preparation, trial return and actual
+  picture/input acceptance remain distinct. A new archive can be saved while the
+  previous installation is retained; the guide does not label that old installation
+  as preparation of the new archive. Process loss after archive save is recoverable
+  by reopening runtime setup. No user source archive is modified.
+- **Finish/later:** stores guide dismissal, not a gameplay or owner-acceptance flag.
+  All workshop tools remain accessible without runtime setup. Existing project
+  drafts, `.p8` data, saves and library are not migrated by this guide.
+
+Source checks and host renders are recorded in
+[0.0.87 evidence](showcase/0.0.87-en/README.md). Console use remains paused; native
+first entry, provider grants, interruptions, actual preparation and optional Test
+still require a device journey. This slice does **not** complete ACC-06.
+
+Next implement a journaled, verified copy-and-activation transaction for projects
+and the library. Treat SAF handles as opaque locations; do not convert them to
+Linux paths or claim a saved destination is active. Keep originals until verified
+activation, allow cancellation/retry, and preserve canonical `.p8` and metadata.
+
+Historical native evidence, **0.0.71**: one APK prepares the user's purchased Raspberry Pi ZIP
 and runs official ARM64 PICO-8 in its own private backend. Folders → R PICO-8 →
 Select Data opens read-only old-data import with conflict review and verified
 activation; source and prior home stay intact. Isolated clean private installation,
 Play, Workshop Test/return and interrupted setup were exercised on Retroid.
 [Evidence](showcase/0.0.71-en/README.md) · [Ownership and limits](SINGLE_APK.md).
 
-The complete first-run wizard is still unfinished: automatic introduction,
-activation of all four user destinations, Splore indexing, loss-of-access recovery
-and full old frontend settings migration remain required. A clean test namespace
+The full four-destination setup remains unfinished: external project/library
+activation, Splore indexing, broader loss-of-access recovery and full old frontend
+settings migration remain required. A clean test namespace
 on a device with an independent wrapper installed is not factory-clean acceptance.
 The following 0.0.30 / Runtime Test 4 notes describe the historical two-app probe,
 not the current integrated delivery path.

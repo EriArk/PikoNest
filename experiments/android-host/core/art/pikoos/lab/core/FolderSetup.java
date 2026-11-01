@@ -43,14 +43,14 @@ public final class FolderSetup {
         if(a==Action.CONFIRM)port.pick(Role.values()[selected]);
         if(a==Action.CONTEXT){
             Entry e=entry(selected);
-            if(e.location.isEmpty()){notice="Сначала выбери папку";return;}
+            if(e.location.isEmpty()){notice="Choose a folder first";return;}
             begin(Role.values()[selected],e.location);
         }
     }
     public void begin(Role role,String location){
         if(busy)return;
         pending=role;candidate=location;selected=role.ordinal();busy=true;
-        Entry e=entry(selected);previous=e.state;e.state=State.CHECKING;notice="Проверяем доступ…";
+        Entry e=entry(selected);previous=e.state;e.state=State.CHECKING;notice="Checking access...";
         port.check(role,location);
     }
     public void complete(String name,String problem){
@@ -60,12 +60,12 @@ public final class FolderSetup {
             try{
                 port.save(pending,candidate,name);
                 e.location=candidate;e.name=name;e.state=State.READY;e.problem="";
-                notice="Папка сохранена · доступ проверен";
-            }catch(Exception failure){problem="Не удалось сохранить выбор. Попробуй ещё раз.";}
+                notice="Folder saved / access checked";
+            }catch(Exception failure){problem="Cannot save this choice. Try again.";}
         }
         if(problem!=null){
             e.state=same?State.UNAVAILABLE:previous;e.problem=problem;
-            notice=same?"Выбери папку снова для подключения":"Новый выбор не сохранён";
+            notice=same?"Reconnect this folder":"New choice was not saved";
         }
         busy=false;candidate=null;pending=null;
     }

@@ -1,5 +1,21 @@
 # Состояние PikoNest
 
+**2026-11-01 — Lab 0.0.87, optional setup guide (partial R08/P02):**
+First entry now connects Games, current data locations and the purchased Raspberry
+Pi ZIP in a skippable English guide. Progress is saved; Folders → Select reopens
+it. A verified Games tree feeds the existing Play index. Cancelled/stale checks
+cannot publish a replacement. Runtime import continues into preparation without
+launching; Test is a separate choice, and a failed preparation can retry the saved
+verified archive. Active games/data imports prevent preparation; a pending archive
+job prevents a concurrent game launch. Existing project/library destinations stay
+app-private; other selected folders are explicitly reserved, not active storage.
+[Setup contract](FIRST_RUN_SETUP.md) · [local evidence and host previews](showcase/0.0.87-en/README.md).
+85 local suite invocations and integrated APK packaging passed. Android provider,
+process-death, official runtime, physical-controller and novice/owner journeys for
+this batch remain unperformed. Console use stays paused; ACC-06/R08 are not closed.
+Next: verified project/library destination migration and activation, then remaining
+Splore ownership/indexing and backup/update work. Preserve originals throughout.
+
 **2026-11-01 — Lab 0.0.86, editable starters and contextual help (partial UX09/T01, H01/H02):**
 New project defaults to Blank, then offers Little explorer and Light puzzle with
 original art, starting-layout previews and controls. Both use the existing general

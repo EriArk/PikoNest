@@ -21,9 +21,9 @@ final class RuntimeArchiveJob {
         final String file,name,hash;final long bytes;
         Saved(String file,String name,String hash,long bytes){this.file=file;this.name=name;this.hash=hash;this.bytes=bytes;}
     }
-    private final Context context;private final Uri uri;private final String displayName;final boolean recheck;boolean probe,dispatched;
+    private final Context context;private final Uri uri;private final String displayName;final boolean recheck;boolean probe,prepare,dispatched,followup;
     private final Handler ui=new Handler(Looper.getMainLooper());private Listener listener;
-    volatile boolean done,cancelled;volatile String phase="Читаем архив…",error="";volatile Saved result;
+    volatile boolean done,cancelled,archiveVerified;volatile String phase="Reading archive...",error="";volatile Saved result;
     private RuntimeArchiveJob(Context c,Uri uri,String name){context=c.getApplicationContext();this.uri=uri;displayName=name;recheck=uri==null;}
     static File directory(Context c){return new File(c.getFilesDir(),"runtime-archives");}
     static AtomicFile journal(Context c){return new AtomicFile(new File(c.getFilesDir(),"runtime-archive.json"));}
@@ -31,7 +31,7 @@ final class RuntimeArchiveJob {
         AtomicFile journal=journal(c);if(!journal.getBaseFile().exists()&&!new File(journal.getBaseFile()+".bak").exists())return null;
         JSONObject value=new JSONObject(new String(journal.readFully(),"UTF-8"));
         String file=value.getString("file"),hash=value.getString("sha256");long bytes=value.getLong("bytes");
-        if(!file.matches("[0-9a-f-]{36}\\.zip")||!hash.matches("[0-9a-f]{64}")||bytes<1||bytes>RuntimeArchive.MAX_ZIP)throw new IOException("Запись об архиве недоступна. Выбери архив снова.");
+        if(!file.matches("[0-9a-f-]{36}\\.zip")||!hash.matches("[0-9a-f]{64}")||bytes<1||bytes>RuntimeArchive.MAX_ZIP)throw new IOException("Archive record unavailable. Choose your ZIP again.");
         return new Saved(file,value.getString("name"),hash,bytes);
     }
     static RuntimeArchiveJob start(Context c,Uri uri,String name){
@@ -41,19 +41,24 @@ final class RuntimeArchiveJob {
     }
     static RuntimeArchiveJob prepareProbe(Context c){
         if(current!=null&&!current.done)return current;
-        RuntimeArchiveJob job=new RuntimeArchiveJob(c,null,"");job.probe=true;current=job;
+        RuntimeArchiveJob job=new RuntimeArchiveJob(c,null,"");job.probe=true;job.prepare=true;current=job;
         new Thread(job::run,"pikoos-runtime-prepare").start();return job;
+    }
+    static RuntimeArchiveJob prepareOnly(Context c){
+        if(current!=null&&!current.done)return current;
+        RuntimeArchiveJob job=new RuntimeArchiveJob(c,null,"");job.prepare=true;current=job;
+        new Thread(job::run,"pikonest-runtime-prepare").start();return job;
     }
     void attach(Listener next){listener=next;next.changed(this);}
     void detach(Listener old){if(listener==old)listener=null;}
-    synchronized void cancel(){if(!done){cancelled=true;phase="Отменяем проверку…";notifyUi();}}
+    synchronized void cancel(){if(!done){cancelled=true;phase="Cancelling...";notifyUi();}}
     private void notifyUi(){ui.post(()->{if(listener!=null)listener.changed(this);});}
     private void phase(String text){phase=text;notifyUi();}
     private void run(){
         File temporary=null,preparedRuntime=null;Saved previous=null;boolean readableJournal=true;
         try{
             try{previous=saved(context);}catch(Exception ignored){readableJournal=false;/* Preserve candidate files if their journal cannot be read. */}
-            File root=directory(context);if(!root.isDirectory()&&!root.mkdir())throw new IOException("Не удалось создать место для архива");
+            File root=directory(context);if(!root.isDirectory()&&!root.mkdir())throw new IOException("Cannot create archive storage");
             // Only app-created orphan snapshots, never arbitrary paths or directories. No active competing job.
             File[] orphans=root.listFiles();if(readableJournal&&orphans!=null)for(File f:orphans){
                 if(f.isFile()&&f.getName().matches("[0-9a-f-]{36}\\.zip")&&(previous==null||!f.getName().equals(previous.file)))f.delete();
@@ -61,9 +66,9 @@ final class RuntimeArchiveJob {
             RuntimeArchive.check(()->cancelled);
             File file;String name=displayName;
             if(recheck){
-                if(previous==null)throw new IOException("Выбери архив PICO-8 для проверки");
+                if(previous==null)throw new IOException("Choose your PICO-8 archive first");
                 file=new File(root,previous.file);
-                if(!file.isFile()||file.length()!=previous.bytes)throw new IOException("Сохранённая копия архива недоступна. Выбери ZIP снова.");
+                if(!file.isFile()||file.length()!=previous.bytes)throw new IOException("Saved archive unavailable. Choose your ZIP again.");
             }else{
                 // Providers can be remote: metadata queries also belong off the UI thread.
                 try(Cursor cursor=context.getContentResolver().query(uri,new String[]{OpenableColumns.DISPLAY_NAME},null,null,null)){
@@ -72,20 +77,23 @@ final class RuntimeArchiveJob {
                 name=name.replaceAll("[\\p{Cntrl}]"," ");if(name.length()>160)name=name.substring(0,160);
                 RuntimeArchive.check(()->cancelled);
                 file=temporary=new File(root,UUID.randomUUID().toString()+".zip");
-                if(!file.createNewFile())throw new IOException("Не удалось подготовить копию архива");
+                if(!file.createNewFile())throw new IOException("Cannot create an archive copy");
                 try(InputStream input=context.getContentResolver().openInputStream(uri);FileOutputStream output=new FileOutputStream(file)){
                     RuntimeArchive.copy(input,output,()->cancelled);output.getFD().sync();
                 }
             }
-            phase("Проверяем ZIP и ARM64…");
+            phase("Checking ZIP and ARM64...");
             RuntimeArchive.Result inspected=RuntimeArchive.inspect(file,()->cancelled);
-            if(recheck&&!inspected.sha256.equals(previous.hash))throw new IOException("Сохранённый архив изменился. Выбери исходный ZIP снова.");
-            if(probe){
+            if(recheck&&!inspected.sha256.equals(previous.hash))throw new IOException("Saved archive changed. Choose the original ZIP again.");
+            archiveVerified=true;
+            if(prepare){
                 if(RuntimeInstallation.integrated(context)){
                     phase("Preparing PICO-8 inside PikoNest...");
                     preparedRuntime=RuntimeInstallation.prepare(context,previous,()->cancelled);
-                }
-                phase("Готовим пробный запуск…");byte[] cart;
+                }else if(!probe)throw new IOException("This build does not contain the integrated runtime adapter.");
+            }
+            if(probe){
+                phase("Preparing a test cartridge...");byte[] cart;
                 try(InputStream input=context.getAssets().open("runtime-probe.p8");ByteArrayOutputStream buffer=new ByteArrayOutputStream()){
                     byte[] bytes=new byte[4096];for(int n;(n=input.read(bytes))!=-1;)buffer.write(bytes,0,n);cart=buffer.toByteArray();
                 }
@@ -104,12 +112,12 @@ final class RuntimeArchiveJob {
                     catch(Exception failure){journal.failWrite(output);throw failure;}
                     temporary=null;
                 }
-                if(probe&&RuntimeInstallation.integrated(context))RuntimeInstallation.activate(context,preparedRuntime);
+                if(prepare&&RuntimeInstallation.integrated(context))RuntimeInstallation.activate(context,preparedRuntime);
                 result=candidate;done=true;
             }
             if(!recheck&&previous!=null&&!previous.file.equals(candidate.file))new File(root,previous.file).delete();
         }catch(java.util.concurrent.CancellationException ignored){cancelled=true;}
-        catch(Exception failure){error=failure.getMessage()==null?"Не удалось проверить архив. Попробуй выбрать его снова.":failure.getMessage();}
+        catch(Exception failure){error=failure.getMessage()==null?"Cannot verify the archive. Choose it again.":failure.getMessage();}
         finally{if(temporary!=null)temporary.delete();done=true;notifyUi();}
     }
 }

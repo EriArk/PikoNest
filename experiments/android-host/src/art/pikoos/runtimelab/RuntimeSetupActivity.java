@@ -18,8 +18,16 @@ public final class RuntimeSetupActivity extends Activity {
         if(isDestroyed()||isFinishing()||next!=job)return;
         if(!next.done){state.begin(next.phase);}
         else if(next.cancelled)state.cancelled();
-        else if(next.result!=null){state.complete(next.result.name,next.result.bytes,null);if(next.probe&&!next.dispatched&&resumed)launchPrepared();}
-        else{if(next.recheck)state.verified=false;state.complete("",0,next.error);}
+        else if(next.result!=null){
+            state.complete(next.result.name,next.result.bytes,null);state.prepared=RuntimeInstallation.matchesSaved(this);
+            if(!next.recheck&&!next.followup&&resumed&&state.arm64){next.followup=true;prepareArchive();return;}
+            if(next.prepare&&state.prepared)state.notice="Prepared inside PikoNest / test when you are ready";
+            if(next.probe&&!next.dispatched&&resumed)launchPrepared();
+        }
+        else{
+            if(next.recheck)state.verified=next.archiveVerified;state.prepared=RuntimeInstallation.matchesSaved(this);state.complete("",0,next.error);
+            if(next.prepare&&next.archiveVerified)state.notice="Archive saved / preparation can be retried";
+        }
         if(!probeFailure.isEmpty())state.problem=probeFailure;
         view.invalidate();
     };
@@ -31,9 +39,10 @@ public final class RuntimeSetupActivity extends Activity {
                     Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     startActivityForResult(intent,PICK);
-                }catch(Exception error){state.problem="Не удалось открыть выбор файла";view.invalidate();}
+                }catch(Exception error){state.problem="Cannot open the file picker. Try again.";view.invalidate();}
             }
             public void recheck(){attach(RuntimeArchiveJob.start(RuntimeSetupActivity.this,null,""));}
+            public void prepare(){prepareArchive();}
             public void cancel(){if(job!=null)job.cancel();}
             public void leave(){finish();}
             public void test(){
@@ -54,10 +63,17 @@ public final class RuntimeSetupActivity extends Activity {
             RuntimeArchiveJob.Saved archive=RuntimeArchiveJob.saved(this);
             if(archive!=null){state.hasArchive=true;state.filename=archive.name;state.archiveBytes=archive.bytes;}
             if(RuntimeArchiveJob.current!=null&&!RuntimeArchiveJob.current.done)attach(RuntimeArchiveJob.current);
-            else if(archive!=null)attach(RuntimeArchiveJob.start(this,null,""));
-        }catch(Exception e){state.problem="Не удалось прочитать запись об архиве. Выбери ZIP снова.";}
+            else if(archive!=null&&state.arm64)prepareArchive();
+        }catch(Exception e){state.problem="Cannot read the saved archive record. Choose your ZIP again.";}
     }
     private void attach(RuntimeArchiveJob next){if(job!=null)job.detach(listener);job=next;job.attach(listener);}
+    private void prepareArchive(){
+        ExternalPicoBackend backend=new ExternalPicoBackend(this);
+        if(RuntimeMigrationJob.pending()||backend.hasSession()&&!art.pikoos.lab.core.RuntimeSession.ended(backend.sessionPhase())){
+            state.problem="Finish the current game or data import before preparing PICO-8.";view.invalidate();return;
+        }
+        attach(RuntimeArchiveJob.prepareOnly(this));
+    }
     void action(Action action){
         if(action==Action.MENU&&!state.busy&&!state.testing){startActivity(new Intent(this,RuntimeDataActivity.class));return;}
         view.action(action);
@@ -65,7 +81,7 @@ public final class RuntimeSetupActivity extends Activity {
     private void launchPrepared(){
         try{
             ExternalPicoBackend backend=new ExternalPicoBackend(this);backend.checkProbeAvailable();
-            if(!getSharedPreferences("runtime-setup",0).edit().putBoolean("dispatched",true).commit())throw new Exception("Не удалось сохранить состояние проверки");
+            if(!getSharedPreferences("runtime-setup",0).edit().putBoolean("dispatched",true).commit())throw new Exception("Cannot save the test state. Try again.");
             job.dispatched=true;state.testing=true;handler.removeCallbacks(monitor);backend.launchProbe();
         }catch(Exception error){getSharedPreferences("runtime-setup",0).edit().putBoolean("dispatched",false).commit();state.testing=false;state.problem=error.getMessage();}
     }

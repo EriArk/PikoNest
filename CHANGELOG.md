@@ -4,6 +4,24 @@ Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
 There is no public APK release as of 1 November 2026.
 
+## 2026-11-01 — First-start guide and optional runtime test (lab 0.0.87)
+
+- Added a skippable English setup guide with saved progress and re-entry from
+  Folders. It connects the games folder to Play and explains current data storage.
+- Choosing a valid purchased Raspberry Pi ZIP now continues into PICO-8 preparation.
+  Trying a game is a separate action. Failed preparation can retry the saved archive;
+  a cancelled or rejected folder replacement retains the earlier choice.
+- Updated the folder and archive screens in English. Reserved external destinations
+  are distinguished from active storage; long setup messages can be scrolled.
+- Local validation: 85 core suite invocations passed, including 40 new guide/runtime
+  state checks; the single APK compiled, signed and passed package verification.
+  Compact/tall/wide production-view host renders were reviewed.
+- Limits: projects, assets and Splore still use app-private storage. No new device,
+  official-runtime, physical-input or owner acceptance was performed. No APK release.
+
+[Scope and host previews](docs/showcase/0.0.87-en/README.md) ·
+[First-run setup and remaining work](docs/FIRST_RUN_SETUP.md).
+
 This file was started on 11 October 2026 and backfilled from documented work
 from 5 October onward. It is a curated history, not a complete commit log.
 Earlier work is recorded in [the technical status](docs/STATUS.md) and

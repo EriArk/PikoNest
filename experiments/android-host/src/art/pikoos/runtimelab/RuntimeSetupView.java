@@ -9,14 +9,14 @@ import art.pikoos.lab.core.WorkshopSession.Action;
 /** Controller-first archive step in the workshop's existing pixel language. */
 final class RuntimeSetupView extends View {
     private final RuntimeSetup state;private final boolean swap;private final Paint p=new Paint();
-    private Canvas c;private float scale,w,h,downX,downY,buttonY;
+    private Canvas c;private float scale,w,h,downX,downY,buttonY,scroll,maxScroll;
     RuntimeSetupView(Context context,RuntimeSetup state,boolean swap){
         super(context);this.state=state;this.swap=swap;
         PixelText.configure(context,p);p.setAntiAlias(false);
         setFocusable(true);setFocusableInTouchMode(true);
-        setContentDescription("Подключение PICO-8. A: выбрать архив или проверить запуск. X: другой ZIP. Y: перепроверить архив. B: Back или Cancel подготовку.");
+        setContentDescription("PICO-8 setup. Confirm: choose archive, prepare or test. X: another ZIP. Y: verify archive. Back: return or cancel preparation.");
     }
-    void action(Action a){state.act(a);invalidate();}
+    void action(Action a){if(a==Action.UP||a==Action.DOWN)scroll=Math.max(0,Math.min(maxScroll,scroll+(a==Action.UP?-48:48)));else{state.act(a);scroll=0;}invalidate();}
     private void rect(float x,float y,float width,float height,int color){p.setColor(WorkshopView.COLORS[color]);c.drawRect(x,y,x+width,y+height,p);}
     private void text(String value,float x,float y,int size,int color){p.setColor(WorkshopView.COLORS[color]);p.setTextSize(PixelText.size(size));c.drawText(value,x,y,p);}
     private void fit(String value,float x,float y,int size,int color,float width){p.setTextSize(PixelText.size(size));while(value.length()>1&&p.measureText(value)>width)value=value.substring(0,value.length()-2)+"…";text(value,x,y,size,color);}
@@ -33,8 +33,9 @@ final class RuntimeSetupView extends View {
         float left=Math.max(16,(w-590)/2),width=Math.min(w-32,590);
         text("Your PICO-8",left,85,32,7);
         float step=width/3;
-        int stage=state.testing||state.returned?2:state.busy&&state.verified?1:0;
+        int stage=state.testing||state.returned?2:state.prepared||state.busy&&state.verified?1:0;
         for(int i=0;i<3;i++){rect(left+i*step,104,step-6,4,i==stage?10:13);fit(new String[]{"1 Archive","2 Prepare","3 Test"}[i],left+i*step,130,16,i==stage?10:13,step-12);}
+        buttonY=h-147;c.save();c.clipRect(left,144,left+width,buttonY-8);c.translate(0,-scroll);
         float y=wrap("Download the Raspberry Pi ZIP from your PICO-8 purchase page.",left,164,20,7,width);
         y=wrap("For example: pico-8_0.2.7_raspi.zip",left,y+3,17,14,width);
         y=wrap("PikoNest prepares everything inside this app.",left,y+2,17,6,width);
@@ -42,17 +43,17 @@ final class RuntimeSetupView extends View {
         // A small archive cartridge, using exactly the PICO-8 palette.
         rect(left+14,panel+18,47,69,2);rect(left+20,panel+25,35,30,14);
         rect(left+29,panel+31,6,17,7);rect(left+41,panel+31,6,17,7);rect(left+24,panel+67,27,6,5);
-        String caption=state.busy?state.phase:state.hasArchive?(state.verified?"Archive verified":"Archive saved"):"Choose your archive";
+        String caption=state.busy?state.phase:state.hasArchive?(state.prepared?"Runtime prepared":state.verified?"Archive verified":"Archive saved"):"Choose your archive";
         fit(caption,left+78,panel+31,22,state.busy?10:state.verified?11:7,width-93);
         fit(state.hasArchive?state.filename:"PICO-8 / Raspberry Pi ZIP",left+78,panel+59,17,6,width-93);
         fit(state.hasArchive?String.format(java.util.Locale.ROOT,"%.1f MiB · %s",state.archiveBytes/1048576.0,state.verified?"ARM64":"check needed"):"Your purchased archive",left+78,panel+84,16,13,width-93);
         y=panel+137;
-        String message=state.problem.isEmpty()?(state.busy?"Cancel preparation with "+(swap?"A":"B")+".":state.testing?"The test is open. Use its game menu to finish and return here.":state.returned?"The test has closed. Picture and controls still need your review.":state.verified?"Prepare this archive and open a test. A failed preparation keeps the previous runtime.":"We check the ZIP and its ARM64 runtime before preparation."):state.problem;
+        String message=state.problem.isEmpty()?(state.busy?"Cancel preparation with "+(swap?"A":"B")+".":state.testing?"The test is open. Use its game menu to finish and return here.":state.returned?"The test has closed. Picture and controls still need your review.":state.prepared?"PICO-8 is prepared. You can test it now or return to setup.":state.verified?"Prepare this archive inside PikoNest. A failed preparation keeps the previous runtime.":"We check the ZIP and its ARM64 runtime before preparation."):state.problem;
         y=wrap(message,left,y,19,state.problem.isEmpty()?6:9,width);
-        buttonY=Math.max(y+10,h-147);
+        maxScroll=Math.max(0,y-(buttonY-8));c.restore();if(scroll>maxScroll){scroll=maxScroll;invalidate();}
         rect(left,buttonY,width,49,state.busy?5:2);rect(left,buttonY,4,49,state.busy?13:10);
-        fit(state.busy?"Preparing...":(swap?"B":"A")+(state.testing?"  Return to test":state.verified?"  Prepare & test":"  Choose ZIP"),left+16,buttonY+32,23,state.busy?6:10,width-30);
-        fit(state.notice.isEmpty()?(state.adapterPresent?"Runtime adapter available":"Runtime preparation is required"):state.notice,left,buttonY+75,16,13,width);
+        fit(state.busy?"Preparing...":(swap?"B":"A")+(state.testing?"  Return to test":state.prepared?"  Test PICO-8":state.verified?"  Prepare PICO-8":"  Choose ZIP"),left+16,buttonY+32,23,state.busy?6:10,width-30);
+        fit(maxScroll>0?"Up / down: read more":state.notice.isEmpty()?(state.adapterPresent?"Runtime adapter available":"Runtime preparation is required"):state.notice,left,buttonY+75,16,13,width);
         rect(0,h-45,w,45,0);text((swap?"A":"B")+(state.busy?" Cancel":" Back"),left,h-16,18,6);
         if(!state.busy&&!state.testing){text("Select Data",left+110,h-16,17,14);text("X Other ZIP",left+width-145,h-16,18,14);}
         c.restore();
@@ -61,6 +62,7 @@ final class RuntimeSetupView extends View {
         float x=event.getX()/scale,y=event.getY()/scale;
         if(event.getActionMasked()==MotionEvent.ACTION_DOWN){downX=x;downY=y;return true;}
         if(event.getActionMasked()==MotionEvent.ACTION_UP){
+            if(downY>=144&&downY<buttonY&&Math.abs(y-downY)>20){scroll=Math.max(0,Math.min(maxScroll,scroll+downY-y));invalidate();return true;}
             if(Math.abs(x-downX)<20&&Math.abs(y-downY)<20){
                 if(y>=h-45){if(x>w/3&&x<2*w/3&&getContext() instanceof RuntimeSetupActivity)((RuntimeSetupActivity)getContext()).action(Action.MENU);else action(x<w/2?Action.CANCEL:Action.CONTEXT);}
                 else if(y>=buttonY&&y<=buttonY+49)action(Action.CONFIRM);
