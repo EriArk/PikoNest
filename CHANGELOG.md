@@ -2,13 +2,41 @@
 
 Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
-There is no public APK release as of 23 October 2026.
+There is no public APK release as of 1 November 2026.
 
 This file was started on 11 October 2026 and backfilled from documented work
 from 5 October onward. It is a curated history, not a complete commit log.
 Earlier work is recorded in [the technical status](docs/STATUS.md) and
 [versioned evidence](docs/showcase/README.md). See
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for the current overall picture.
+
+## 2026-11-01 — Start from a small game and make it yours (0.0.86)
+
+**Implemented and locally checked; official runtime and device acceptance remain open.**
+
+- Added Little explorer and Light puzzle beside Blank, with original art, a field
+  preview, plain descriptions and controls. Previous examples remain available.
+- Both starts use the existing tools: movement/collecting or linked switches,
+  goals, animation, event sounds and scenery. There is no template-locked editor.
+- X / Help explains common tasks and opens the relevant tool. It works in Blank
+  too and offers sprite setup when needed. Unknown Lua keeps the All tools path.
+- New projects and copies keep separate saved files. Editing, Undo, recovery and
+  ordinary export preserve the game's other resources and behavior. Older project
+  IDs and drafts remain readable; opening help never modifies the game.
+
+**Checked:** 84 local core suite invocations and integrated APK packaging passed.
+The final starter workflow suite passed 135 assertions; 15 host Lua checks covered
+winning/restarting both games, linked switches, animation and event calls. Four
+actual older-journal checks passed. Compact/tall/wide host layout review led to
+larger starter sprites and shorter labels. A final help-return correction passed
+focused checks and refreshed Android packaging.
+
+**Limits:** this is a starter pair and optional help, not completed novice acceptance,
+learning progress or a full genre catalogue. Console use remains paused: no
+installation, new official execution, native screenshots or public APK release.
+Two ordinary example carts and three labeled host previews are in the repository.
+Next: independent first-run folder/runtime setup and recoverable errors.
+[Guide](docs/STARTER_GAMES.md) · [evidence and previews](docs/showcase/0.0.86-en/README.md).
 
 ## 2026-10-23 — Draw new tiles without leaving the map (0.0.85)
 

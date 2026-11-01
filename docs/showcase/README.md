@@ -1,5 +1,9 @@
 # PikoNest — English website gallery
 
+[0.0.86: editable starting games and contextual help](0.0.86-en/README.md) —
+original collection/switch games, shared tool guidance and safe project creation.
+Includes ordinary host-generated carts and labeled host previews, not device captures.
+
 [0.0.85: draw and reuse tile art inside the map](0.0.85-en/README.md) —
 new tiles, shared edits, independent copies and one recoverable world transaction.
 Includes two clearly labeled host layout previews, not native screenshots.

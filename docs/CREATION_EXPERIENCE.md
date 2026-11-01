@@ -1,6 +1,20 @@
 # Creation experience: from an idea to a playable game
 
-## Latest implementation — 23 October 2026, lab 0.0.80
+**2026-11-01 — Lab 0.0.86, editable starters and contextual help (partial UX09/T01, H01/H02):**
+New project defaults to Blank, then offers Little explorer and Light puzzle with
+original art, starting-layout previews and controls. Both use the existing general
+model/tools for movement or hero-free switches, goals, animation, sounds and map.
+New IDs preserve old projects; creation/copy/export use the existing storage paths.
+X / Help explains actions and opens their tools, including missing-element setup
+in Blank and All tools for unfamiliar Lua. Journal v11 retains v1–10 readers.
+[Guide](STARTER_GAMES.md) · [local checks, carts and host previews](showcase/0.0.86-en/README.md).
+84 local suite invocations and integrated packaging passed; actual official/device,
+physical-input and novice/owner acceptance remain open. Console use stays paused.
+The starter pair and help do not complete learning progress, a genre catalogue or
+ACC-09. Next complete independent first-run folder/runtime setup and recoverable
+failures; continue remaining core/library operations and device journeys when allowed.
+
+## Previous implementation — 23 October 2026, lab 0.0.80
 
 Elements can now have user-defined names, including independent names for two
 uses of one sprite. Movement and interaction open explicit options; contact
@@ -11,7 +25,7 @@ still pending; console use remains paused. Next improve goals and the configured
 rule overview/return flow. [Contract](UX_DIRECTION.md#named-elements-and-explicit-choices--lab-0080)
 and [validation](showcase/0.0.80-en/README.md).
 
-## Current implementation boundary — 23 October 2026
+## Previous implementation boundary — 23 October 2026
 
 [Issue #17](https://github.com/EriArk/PikoNest/issues/17) refines this approved
 direction: finish the contextual Game view journey before the next sound block.

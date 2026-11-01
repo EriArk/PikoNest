@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import art.pikoos.lab.core.LibrarySession;
 import art.pikoos.lab.core.WorkshopCartridge;
 import art.pikoos.lab.core.HeroBinding;
+import art.pikoos.lab.core.GameCanvas;
 import art.pikoos.lab.core.SpriteRegion;
 import art.pikoos.lab.core.WorkshopSession.Action;
 
@@ -65,10 +66,10 @@ final class LibraryView extends ShelfSurface {
     private void dialog(){
         hits.clear();p.setColor(0xdd000000);c.drawRect(0,0,w,h,p);
         if(s.exporting!=null&&s.mode!=LibrarySession.Mode.ERROR){exportDialog();return;}
+        if(s.mode==LibrarySession.Mode.CREATE){createDialog();return;}
         if(s.mode==LibrarySession.Mode.IMPORT||s.mode==LibrarySession.Mode.READING){importDialog();return;}
         float dw=Math.min(w-32,460),x=(w-dw)/2,y=(h-300)/2;
         rect(x,y,dw,300,1);rect(x,y,dw,3,14);
-        boolean create=s.mode==LibrarySession.Mode.CREATE;
         if(s.mode==LibrarySession.Mode.COPY){
             text("Copy project",x+18,y+40,24,14);
             wrap(s.current().title,x+18,y+84,dw-36,7,2);
@@ -76,17 +77,8 @@ final class LibraryView extends ShelfSurface {
             button(ok()+" Copy",x+16,y+238,(dw-44)/2,true,()->action(Action.CONFIRM));
             button(back()+" Cancel",x+28+(dw-44)/2,y+238,(dw-44)/2,false,()->action(Action.CANCEL));return;
         }
-        fit(create?"New project":"Could not complete",x+18,y+40,26,create?14:9,dw-36);
-        if(create){
-            String[] titles={"Moon Garden","Blank","Lights"};
-            String[] descriptions={"A character, jumping and platforms.","An empty game for your ideas.","Light up the board. Edit its tiles."};
-            button("<",x+16,y+58,44,false,()->action(Action.LEFT));
-            button(">",x+dw-60,y+58,44,false,()->action(Action.RIGHT));
-            fit(titles[s.templateChoice],x+74,y+88,24,7,dw-148);
-            wrap(descriptions[s.templateChoice],x+18,y+132,dw-36,7,2);
-            text((s.templateChoice+1)+" / "+s.templateCount()+"  ·  ← → choose",x+18,y+182,18,6);
-            fit(s.templateChoice==1?"Build your own game.":"A separate project.",x+18,y+208,18,6,dw-36);
-        }else{
+        fit("Could not complete",x+18,y+40,26,9,dw-36);
+        {
             text("Your original projects are safe.",x+18,y+82,18,7);
             String message=s.error;
             for(int row=0;row<4&&!message.isEmpty();row++){
@@ -94,8 +86,21 @@ final class LibraryView extends ShelfSurface {
                 text(message.substring(0,count),x+18,y+119+row*25,18,6);message=message.substring(count);
             }
         }
-        button(ok()+(create?" Create":" Back"),x+16,y+238,create?(dw-44)/2:dw-32,true,()->action(Action.CONFIRM));
-        if(create)button(back()+" Cancel",x+28+(dw-44)/2,y+238,(dw-44)/2,false,()->action(Action.CANCEL));
+        button(ok()+" Back",x+16,y+238,dw-32,true,()->action(Action.CONFIRM));
+    }
+    private void createDialog(){
+        LibrarySession.Template t=s.template();float dw=Math.min(w-24,620),dh=Math.min(h-24,440),x=(w-dw)/2,y=(h-dh)/2;
+        rect(x,y,dw,dh,1);rect(x,y,dw,3,14);fit("Start something new",x+16,y+34,24,14,dw-32);
+        button("<",x+12,y+48,40,false,()->action(Action.LEFT));button(">",x+dw-52,y+48,40,false,()->action(Action.RIGHT));
+        fit(t.title,x+60,y+78,dw<500?18:22,7,dw-120);
+        float side=dw>=500?176:112,px=dw>=500?x+16:x+(dw-side)/2,py=y+104;
+        GameCanvas game=new GameCanvas(t.cart());int[] pixels=game.blocked.isEmpty()?game.image():null;
+        if(pixels!=null){for(int n=0;n<pixels.length;n++)rect(px+n%128*side/128,py+n/128*side/128,side/128,side/128,pixels[n]);outline(px-1,py-1,side+2,side+2,13);}
+        else artwork(t.cart(),px,py,side);
+        float tx=dw>=500?px+side+24:x+16,ty=dw>=500?py+20:py+side+28,tw=dw>=500?dw-side-56:dw-32;
+        float next=wrap(t.description,tx,ty,tw,7,2);wrap(t.controls,tx,next+10,tw,6,2);
+        fit((s.templateChoice+1)+" / "+s.templateCount()+"  |  Editable copy",x+16,y+dh-70,18,6,dw-32);
+        button(ok()+" Create",x+12,y+dh-54,(dw-36)/2,true,()->action(Action.CONFIRM));button(back()+" Cancel",x+24+(dw-36)/2,y+dh-54,(dw-36)/2,false,()->action(Action.CANCEL));
     }
     private void exportDialog(){
         float dw=Math.min(w-32,480),x=(w-dw)/2,y=(h-400)/2;

@@ -38,26 +38,42 @@ public final class LibrarySession {
     public CartridgeExport exporting;
     private Mode errorReturn=Mode.SHELF;
     private final Port port;
-    private final byte[][] templates;
+    public static final class Template {
+        public final String title,description,controls,prefix;
+        private final byte[] bytes;
+        public Template(String title,String description,String controls,String prefix,byte[] bytes){this.title=title;this.description=description;this.controls=controls;this.prefix=prefix;this.bytes=new WorkshopCartridge(bytes).bytes();}
+        public WorkshopCartridge cart(){return new WorkshopCartridge(bytes);}
+    }
+    private final Template[] templates;
+    private final int defaultTemplate;
+    public Template template(){return templates[templateChoice];}
     public int templateChoice;
     public int templateCount(){return templates.length;}
     private final ArrayList<Entry> entries=new ArrayList<>();
     public int selected, focus; // focus: 0 cards, 1 new, 2 copy, 3 import, 4 export
     public Mode mode=Mode.SHELF;
     public String error="";
-    public LibrarySession(Port port, byte[]... templates) {
-        if(templates.length<1||templates.length>3)throw new IllegalArgumentException("Invalid template count");
-        this.port=port;this.templates=new byte[templates.length][];
-        for(int i=0;i<templates.length;i++)this.templates[i]=new WorkshopCartridge(templates[i]).bytes();
+    public LibrarySession(Port port, byte[]... templates) {this(port,legacy(templates),Math.min(1,templates.length-1));}
+    private LibrarySession(Port port,Template[] templates,int initial){this.port=port;this.templates=templates.clone();defaultTemplate=initial;}
+    private static Template[] legacy(byte[][] bytes){
+        if(bytes.length<1||bytes.length>3)throw new IllegalArgumentException("Invalid template count");
+        String[] titles={"Moon Garden","Blank","Lights"},prefix={"garden-","blank-","puzzle-"};
+        Template[] result=new Template[bytes.length];for(int n=0;n<bytes.length;n++)result[n]=new Template(titles[n],n==1?"An empty game for your ideas.":"Earlier example. Some edits use All tools.",n==1?"Draw your first sprite.":"Keep as a separate project.",prefix[n],bytes[n]);return result;
+    }
+    public static LibrarySession curated(Port port,byte[] garden,byte[] blank,byte[] lights){
+        Template[] old=legacy(new byte[][]{garden,blank,lights});
+        return new LibrarySession(port,new Template[]{old[1],
+            new Template("Little explorer","Move around and collect all three stars.","D-pad: move. X: restart.","explorer-",StarterGames.create(false).bytes()),
+            new Template("Light puzzle","Turn on every lamp. Some lamps are linked.","Left/right: select. O: toggle.","switches-",StarterGames.create(true).bytes()),old[0],old[2]},0);
     }
     public static boolean validId(String id) {
-        return id!=null&&(id.equals("moon-garden")||CartridgeImport.validId(id)||id.matches("(?:garden|remix|blank|puzzle)-[0-9]{4,8}"));
+        return id!=null&&(id.equals("moon-garden")||CartridgeImport.validId(id)||id.matches("(?:garden|remix|blank|puzzle|explorer|switches)-[0-9]{4,8}"));
     }
     public static String title(String id) {
         if(!validId(id))throw new IllegalArgumentException("Invalid project ID");
         if(id.equals("moon-garden"))return "Moon Garden";
         if(CartridgeImport.validId(id))return "Imported game";
-        return (id.startsWith("garden-")?"New game ":id.startsWith("blank-")?"Blank project ":id.startsWith("puzzle-")?"Lights ":"Copy ")+Integer.parseInt(id.substring(id.indexOf('-')+1));
+        return (id.startsWith("garden-")?"New game ":id.startsWith("blank-")?"Blank project ":id.startsWith("puzzle-")?"Lights ":id.startsWith("explorer-")?"Little explorer ":id.startsWith("switches-")?"Light puzzle ":"Copy ")+Integer.parseInt(id.substring(id.indexOf('-')+1));
     }
     public List<Entry> entries(){return Collections.unmodifiableList(entries);}
     public Entry current(){return entries.isEmpty()?null:entries.get(selected);}
@@ -94,8 +110,8 @@ public final class LibrarySession {
         Entry from=current();
         if(copy&&from==null)return;
         // Read again: copy authoritative saved bytes, never a stale thumbnail or editor draft.
-        byte[] bytes=copy?new WorkshopCartridge(port.read(from.id)).bytes():templates[templateChoice].clone();
-        List<String> ids=port.ids();String prefix=copy?"remix-":new String[]{"garden-","blank-","puzzle-"}[templateChoice],id;
+        byte[] bytes=copy?new WorkshopCartridge(port.read(from.id)).bytes():template().cart().bytes();
+        List<String> ids=port.ids();String prefix=copy?"remix-":template().prefix,id;
         int number=1;
         do{id=prefix+String.format(java.util.Locale.ROOT,"%04d",number++);}while(ids.contains(id));
         port.create(id,bytes);
@@ -153,7 +169,7 @@ public final class LibrarySession {
             if(a==Action.UP||a==Action.LEFT||a==Action.PREVIOUS){selected=Math.max(0,selected-1);focus=entries.isEmpty()?1:0;}
             if(a==Action.DOWN||a==Action.RIGHT||a==Action.NEXT){selected=Math.min(Math.max(0,entries.size()-1),selected+1);focus=entries.isEmpty()?1:0;}
             if(a==Action.CONFIRM){
-                if(focus==1){templateChoice=Math.min(1,templates.length-1);mode=Mode.CREATE;}
+                if(focus==1){templateChoice=defaultTemplate;mode=Mode.CREATE;}
                 else if(focus==2&&current()!=null)mode=Mode.COPY;
                 else if(focus==3)port.pickImport();
                 else if(focus==4)prepareExport();

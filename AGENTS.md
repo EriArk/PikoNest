@@ -569,22 +569,22 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
-Current source/package (2026-10-23): lab 0.0.85 connects new tile art, edit-all
-and independent copies directly to the Game view map workflow. Controller/touch
-painting, local stroke history, shared-reference review, flags and safe upper
-allocation join the existing world/map/camera draft. Save/Undo is atomic; journal
-v10 restores v1–9, including nested strokes and old world history. Lower/shared
-tiles can be copied into upper storage; in-place shared-memory edits remain in
-All tools. Unknown Lua is preserved without guessed allocation/wiring. See
-docs/WORLD_EDITOR.md and docs/showcase/0.0.85-en/README.md.
+Current source/package (2026-11-01): lab 0.0.86 adds Little explorer and Light
+puzzle through the same general tools/model as Blank. The creation picker defaults
+to Blank, previews original starter content and preserves older examples/projects.
+X / Help provides optional explanations and routes to existing editors; unfamiliar
+Lua uses All tools. New project IDs preserve old namespaces. Journal v11 reads
+v1–10, including earlier world/tile drafts. See docs/STARTER_GAMES.md and
+docs/showcase/0.0.86-en/README.md.
 
 Console use remains paused: no device actions until the owner explicitly allows
 it. Native/runtime, physical-controller, novice and owner acceptance remain open
-for labs 0.0.78–85 and issue #17. Next independent block: connect two small editable
-starter journeys through the same general tools, with contextual guidance and no
-template-locked capability. Collision, door/parallax, broader map and audio/library
-work remain unfinished. Complete outstanding device journeys when authorized.
-Keep the separate owner APK release gate and follow the current ROADMAP.
+for labs 0.0.78–86 and issue #17. Next independent block: complete the first-run
+folder/runtime path with recoverable setup errors, following FIRST_RUN_SETUP and
+SINGLE_APK. Preserve user projects, saves, library and runtime state. Remaining
+core/library, collision/door/parallax, broader audio and learning work stays open.
+Do not substitute more starter variants for these gaps. Complete outstanding
+device journeys when authorized; public APK publication needs separate owner approval.
 
 Historical source/package record (2026-10-23): lab 0.0.78 implements Game view animation
 sequences and movement/toggle-state bindings. Local suite/build and focused

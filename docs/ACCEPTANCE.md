@@ -6,6 +6,17 @@
 
 Связи: [план](ROADMAP.md), [задачи](BACKLOG.md), [текущее состояние](STATUS.md).
 
+## 2026-11-01 starter and help acceptance still open
+
+Lab 0.0.86 adds Little explorer, Light puzzle and shared optional help. When
+console use is authorized, create each via the native selector, win/restart in
+official PICO-8, change appearance, a rule, a tile and an event sound through the
+general tools, then Test/return/Undo/recover/reopen/export. Run exports independently.
+Repeat the equivalent steps from Blank; include hero-free editing and All tools
+access. Check compact/wide physical input, touch, previous-project preservation,
+failed creation and unassisted novice use. Host traces/previews do not close ACC-09.
+[Evidence](showcase/0.0.86-en/README.md).
+
 ## 2026-10-23 tile-art acceptance still open
 
 Lab 0.0.85 adds map-context tile painting and shared/independent copies. When

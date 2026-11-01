@@ -1,24 +1,24 @@
 # PikoNest — путь к полному Android-продукту
 
-## Current completion package — 23 October 2026, issue #17
+## Current completion package — 1 November 2026, issue #17
 
 The owner approved prioritizing a visual, contextual Game view over the next
 sound block. This refines UX07/UX08 rather than creating a second roadmap.
-Labs 0.0.81–85 connect goal/overview editing, SFX/events, music composition,
-world/map/camera editing and in-context tile art to Game view.
-[Latest evidence](showcase/0.0.85-en/README.md). Native/runtime acceptance for labs
-0.0.78–85 remains open. Console use is paused; the last complete native creation
-journey is still 0.0.77. Next independent work connects two small editable starter
-journeys using the same general tools. Range/library/advanced audio and broader
-map/camera operations remain unfinished; avoid repeated preset growth.
+Labs 0.0.81–86 connect rules, audio, world/map/camera, tile art and two small editable
+starters to Game view. Shared optional help routes to the same tools in Blank.
+[Latest evidence](showcase/0.0.86-en/README.md). Native/runtime acceptance for labs
+0.0.78–86 remains open. Console use is paused; the last complete native creation
+journey remains 0.0.77. Next independent work is the first-run folder/runtime path,
+including recovery from failed preparation or lost access. Broader core/library,
+map/audio and learning work remains unfinished; avoid repeated preset growth.
 
 | Next complete block | Existing task ownership | Ready when |
 | --- | --- | --- |
 | Resolve Game view findings from the complete journeys | UX07/UX08, #17 | Names, relationships, goal choices and rule overview/edit/return are locally implemented; complete native/novice review and repair observed friction; All tools stays reachable |
 | Prove both visual journeys and animation when console use is authorized | UX07/UX08, N01/G04, #17 | Blank collection and hero-free linked switches; preview/confirm/cancel, draft Test/return, recovery, Save/Undo/reopen/export; compact/wide physical controls, novice and owner review; native before/after evidence |
 | Complete audio creation and connection | S01–S05, UX08 | Basic SFX/event and music composition/shared-SFX/channel paths exist locally in 0.0.82–83; official Listen/Stop/Test/return/export and physical acceptance remain open, alongside range/library/advanced-audio work; respect system mute |
-| Connect two small editable starters | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | In-context tile creation/copy/edit is locally implemented in 0.0.85; two small starters use the same genre-neutral world/audio/behavior tools and remain editable through them |
-| Independent Android setup and reliable data ownership | P/R tasks, modern target, Q05 | Fresh runtime/folder setup, backup/recovery/update and external launches without developer intervention |
+| Validate the two editable starters and contextual help | G01–G04, N02/N03, S04/S05, UX09/T01, H01/H02 | Locally implemented in 0.0.86; finish unassisted Blank/start journeys and review content/help with a novice and owner, without template-locked tools |
+| Independent Android setup and reliable data ownership | P/R tasks, modern target, Q05 | Next: one first-run path for folder destinations, correct purchased archive, preparation and recovery; then backup/update and external launches without developer intervention |
 | Device, novice and owner acceptance | Q01–Q07, ACC-01–09 | Complete journeys on supported screens/physical controls; English/errors reviewed; owner findings resolved |
 
 All required acceptance criteria and the separate owner APK release gate remain.

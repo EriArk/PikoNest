@@ -35,8 +35,8 @@ final class GameSurface {
         float y=height-88;rect(0,y,width,88,1);rect(16,y,width-32,1,13);
         button(primary,8,y+4,width/2-12,40,true,()->act(action));button(secondary,width/2+4,y+4,width/2-12,40,false,()->act(back));
         button(game().editingField?"Left  -":"Start  Test",8,y+44,width/2-12,40,false,()->act(game().editingField?Action.LEFT:Action.TEST));
-        String extra=game().editingField?"Right  +":game().screen==GameCanvas.Screen.NAME?"X  Erase":game().screen==GameCanvas.Screen.DRAW?"X  Color":game().screen==GameCanvas.Screen.PLACE?"D-pad  Move":"D-pad  List";
-        button(extra,width/2+4,y+44,width/2-12,40,false,()->{if(game().editingField)act(Action.RIGHT);else if(game().screen==GameCanvas.Screen.DRAW||game().screen==GameCanvas.Screen.NAME)act(Action.CONTEXT);});
+        String extra=game().editingField?"Right  +":game().screen==GameCanvas.Screen.NAME?"X  Erase":game().screen==GameCanvas.Screen.DRAW?"X  Color":game().screen==GameCanvas.Screen.PLACE?"D-pad  Move":game().screen==GameCanvas.Screen.HOME?"X  Help":"D-pad  List";
+        button(extra,width/2+4,y+44,width/2-12,40,false,()->{if(game().editingField)act(Action.RIGHT);else if(game().screen==GameCanvas.Screen.DRAW||game().screen==GameCanvas.Screen.NAME||game().screen==GameCanvas.Screen.HOME)act(Action.CONTEXT);});
     }
     void draw(Canvas c,float s,float w,float h){
         canvas=c;scale=s;width=w;height=h;hits.clear();imageArea=null;GameCanvas g=game();
@@ -53,6 +53,7 @@ final class GameSurface {
         if(g.screen==GameCanvas.Screen.SOUND){soundEditor(yes,back,g.sound);return;}
         if(g.screen==GameCanvas.Screen.MUSIC){if(g.music.sound!=null)soundEditor(yes,back,g.music.sound);else musicEditor(yes,back);return;}
         if(g.screen==GameCanvas.Screen.NAME){nameEditor(yes,back);return;}
+        if(g.screen==GameCanvas.Screen.GUIDE){text("Choose an idea; A opens it.",16,87,18,6,w-32);guide(yes,back);return;}
         boolean draw=g.screen==GameCanvas.Screen.DRAW||g.screen==GameCanvas.Screen.DRAW_MENU||g.screen==GameCanvas.Screen.PALETTE;
         boolean wide=w>=540;float top=104,bottom=h-104,side;
         boolean contextual=g.screen==GameCanvas.Screen.BEHAVIOR||g.screen==GameCanvas.Screen.RELATION||g.screen==GameCanvas.Screen.ACTIONS||g.screen==GameCanvas.Screen.SETTINGS||g.screen==GameCanvas.Screen.CHOICE||g.screen==GameCanvas.Screen.GOAL||g.screen==GameCanvas.Screen.OVERVIEW;
@@ -139,6 +140,16 @@ final class GameSurface {
         else if(g.screen==GameCanvas.Screen.DRAW)footer(yes+"  Paint",Action.CONFIRM,back+"  Done / options",Action.CANCEL);
         else if(g.screen==GameCanvas.Screen.PLACE)footer(yes+"  Done",Action.CONFIRM,back+(g.operation==GameCanvas.Operation.ADD?"  Draw again":"  Cancel"),Action.CANCEL);
         else footer(yes+"  Select",Action.CONFIRM,back+(g.screen==GameCanvas.Screen.HOME?"  Projects":"  Back"),Action.CANCEL);
+    }
+    private void guide(String yes,String back){
+        GameCanvas g=game();boolean wide=width>=540;float top=112,bottom=height-100,listW=wide?width*.46f:width-64;
+        int visible=wide?Math.max(1,(int)((bottom-top)/44)):Math.min(2,Math.max(1,(int)((bottom-top-180)/44)));
+        String[] rows=g.rows();int first=Math.max(0,Math.min(rows.length-visible,g.focus-visible/2));
+        for(int n=first;n<Math.min(rows.length,first+visible);n++){final int row=n;button(rows[n],16,top+(n-first)*44,listW,42,g.focus==n,()->{if(g.focus!=row){g.focus=row;changed();}else act(Action.CONFIRM);});}
+        float arrows=wide?listW+22:width-42;button("^",arrows,top,28,38,false,()->act(Action.UP));button("v",arrows,top+(visible-1)*44,28,38,false,()->act(Action.DOWN));
+        float tx=wide?listW+62:16,ty=wide?top+20:top+visible*44+28,tw=width-tx-16;
+        wrap(g.guideText(),tx,ty,tw,Math.max(1,(int)((bottom-ty)/26)+1));
+        footer(yes+"  Open",Action.CONFIRM,back+"  Game",Action.CANCEL);
     }
     private void worldEditor(String yes,String back){
         GameCanvas g=game();WorldEditor e=g.world;if(e.art!=null){tileArtEditor(yes,back);return;}boolean grid=e.page==WorldEditor.Page.PAINT||e.page==WorldEditor.Page.TILES;

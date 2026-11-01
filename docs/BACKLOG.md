@@ -1,5 +1,19 @@
 # PikoNest — задачи полного цикла
 
+**2026-11-01 — Lab 0.0.86, editable starters and contextual help (partial UX09/T01, H01/H02):**
+New project defaults to Blank, then offers Little explorer and Light puzzle with
+original art, starting-layout previews and controls. Both use the existing general
+model/tools for movement or hero-free switches, goals, animation, sounds and map.
+New IDs preserve old projects; creation/copy/export use the existing storage paths.
+X / Help explains actions and opens their tools, including missing-element setup
+in Blank and All tools for unfamiliar Lua. Journal v11 retains v1–10 readers.
+[Guide](STARTER_GAMES.md) · [local checks, carts and host previews](showcase/0.0.86-en/README.md).
+84 local suite invocations and integrated packaging passed; actual official/device,
+physical-input and novice/owner acceptance remain open. Console use stays paused.
+The starter pair and help do not complete learning progress, a genre catalogue or
+ACC-09. Next complete independent first-run folder/runtime setup and recoverable
+failures; continue remaining core/library operations and device journeys when allowed.
+
 **2026-10-23 — Lab 0.0.85, tile art inside the map (partial G01–G04, UX08):**
 Create an 8×8 tile directly from the map, paint with controller/touch, review it
 and keep it as the brush and selected cell without creating a game object. Existing
@@ -245,7 +259,7 @@ Q08 (дополнительные языки) следует после англ
 | UX06 | Дизайн подготовлен 2026-10-08; обсуждение экранов открыто / UX01; #2/#6 | [Путь создания](CREATION_EXPERIENCE.md): blank и два старта, game view, контекстная правка, автоматизация, контроллер; [макет](design/creation-flow-2026-10-08/README.md) | Направление согласовано. Конкретные экраны и спорные переходы рассмотрены владельцем; макет не закрывает Android/runtime/физическую приёмку |
 | UX07 | Дополнение 0.0.80: имена элементов, controller keyboard; native-приёмка открыта. Дополнение 0.0.79: миниатюры/выбор на поле, без native-приёмки (#17). Частично lab 0.0.76–77: поведение сохраняется при правке размещений; static Blank, draw/place, shared/independent edit, Undo/recovery/Test; широкий контекст и приёмка открыты / UX06; G01–G04, A02/A03, P03 | Game view и единый путь Add → Draw → Place → Edit → Test; безопасное размещение ресурса без ручного слота в поддержанном новом проекте | С контроллера создать своё изображение, поставить несколько экземпляров, изменить один/общую графику, Undo, save/reopen и Test/точный возврат; Cancel/сбой/внешняя правка не портят источник. Из blank без скрытого героя и без ручных x/y-переменных |
 | UX08 | Дополнение 0.0.80: явный выбор движения/взаимодействия, связанный выбор контакта с отменой. Дополнение 0.0.78–79: анимация и визуальные связи реализованы, native-приёмка открыта (#17). Частично lab 0.0.77: движение, контакты, связанные переключатели, цель/reset, UI Blank/Test/export; расширенные правила и приёмка открыты / UX07; C02.4, M01/M02, G04, H02 | Поведение и понятные правила у выбранного элемента; автоматическая связка обычного Lua, именованные цели, once/held/state-entry, цель и перезапуск | Общими средствами создать оба сценария CREATION_EXPERIENCE; изменить правило и цель, удалить поведение, Undo/reopen/Test/экспорт; запускается вне PikoNest. Связь N/S закрывается соответствующими задачами, не имитируется |
-| UX09 | План / UX08; необходимые N01/S01–S03/S05, T01, H01/H02, Q01 | Два небольших изменяемых старта, добровольная помощь, приёмка новичком | ACC-09 из blank и старта, включая игру без героя; нет ручных адресов/callback/координатных связей. Удаление стартового содержимого не лишает инструментов. Полные редакторы и ACC-01–03 остаются отдельными воротами |
+| UX09 | Частично 0.0.86: два изменяемых старта и общая помощь реализованы локально; device/novice/owner и ACC-09 открыты / UX08; необходимые N01/S01–S03/S05, T01, H01/H02, Q01 | Два небольших изменяемых старта, добровольная помощь, приёмка новичком | ACC-09 из blank и старта, включая игру без героя; нет ручных адресов/callback/координатных связей. Удаление стартового содержимого не лишает инструментов. Полные редакторы и ACC-01–03 остаются отдельными воротами |
 
 ## A. Производственные границы и общие контракты — M0, поперёк этапов
 
@@ -392,7 +406,7 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 | B03 | План / B01, B02, N01, G03, S04, M06 | Расширить сохранение/вставку с пикселей на animations/tiles/maps/backgrounds/SFX/music/VFX/mechanics | Каждый тип имеет законченный путь project → library → другой project → Test; игра работает без библиотечного файла; происхождение/зависимости не теряются |
 | B04 | Частично / P05, P07, B03 | Play → Peek Inside (read-only) → выбор/просмотр/прослушивание → извлечь или Remix копией; связь с оригиналом | Ничего не извлекается/переписывается автоматически; неизвестное поведение не выдаётся за восстановленную механику; пользователь явно выбирает ресурс |
 | B05 | Частично / P05, P06, M01, R05 | Проект из обычных multicart: главы/регионы, видимые реальные файлы, переходы/параметры, зависимости и согласованное обновление общих ресурсов | Собрать две главы через UI, перейти туда/обратно, сохранить прогресс, перенести весь проект; копия ресурса не вызывает скрытого автообновления других carts |
-| T01 | Частично / M02, M03, M04, M05, M06, S05, B03 | Жанровые стартовые наборы: puzzle, platformer, top-down, shooter; минимальная объяснимая сцена/правила, общие механики | Из шаблона убрать/добавить любую механику и открыть любой инструмент. Та же возможность есть в blank/imported cart; шаблон не заменяет недостающий редактор |
+| T01 | Частично 0.0.86: Little explorer и Light puzzle используют общие инструменты; остальные жанры и приёмка открыты / M02, M03, M04, M05, M06, S05, B03 | Жанровые стартовые наборы: puzzle, platformer, top-down, shooter; минимальная объяснимая сцена/правила, общие механики | Из шаблона убрать/добавить любую механику и открыть любой инструмент. Та же возможность есть в blank/imported cart; шаблон не заменяет недостающий редактор |
 
 ## H. Справка и обучение через работу — вместе с M1–M4
 

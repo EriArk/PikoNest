@@ -122,7 +122,7 @@ public final class MainActivity extends Activity {
             byte[] template;
             try(InputStream in=getAssets().open("moon-garden.p8")){template=readAll(in);}
             if(!store.directory("moon-garden").exists())store.create("moon-garden",template);
-            library=new LibrarySession(new LibrarySession.Port(){
+            library=LibrarySession.curated(new LibrarySession.Port(){
                 public java.util.List<String> ids()throws Exception{return store.ids();}
                 public byte[] read(String id)throws Exception{return store.read(id);}
                 public void create(String id,byte[] bytes)throws Exception{store.create(id,bytes);}

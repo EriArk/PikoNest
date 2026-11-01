@@ -1,0 +1,78 @@
+{
+  "lab": "0.0.86",
+  "date": "2026-11-01",
+  "scope": "Editable starter pair and contextual help; local validation only",
+  "build": {
+    "full_suite_invocations": 84,
+    "full_build": "passed",
+    "starter_checks_full_run": 133,
+    "starter_checks_final_focused_run": 135,
+    "final_packaging": "passed after focused help-return fix; core suites not repeated",
+    "apk_sha256": "77aa5d5cb54d72057d4251f9f43a0b136579e02970ccd87f9f863cc71e5daf62",
+    "one_launcher": true,
+    "godot_assets_verified": 263,
+    "bundled_official_runtime": false,
+    "installed": false
+  },
+  "legacy_journals": {
+    "producer": "previous lab 0.0.85 compiled classes",
+    "input_version": 10,
+    "output_version": 11,
+    "checks": 4,
+    "scope": [
+      "Home Projects focus",
+      "interrupted tile stroke and exact candidate",
+      "stroke Undo",
+      "v11 reserialization"
+    ]
+  },
+  "host_lua": {
+    "checks": 15,
+    "result": "passed",
+    "engine": "Lupa with += normalization and stubbed PICO-8 graphics/audio; not official-runtime validation",
+    "journeys": [
+      "Movement-only collection of all stars, win, event SFX, restart",
+      "Hero-free linked switches, bright frame, win, restart and held-input edge"
+    ]
+  },
+  "layouts": {
+    "renderer": "Production LibraryView, ShelfSurface and GameSurface via temporary Java2D adapters and Monocraft",
+    "logical_sizes": [
+      [
+        360,
+        480
+      ],
+      [
+        360,
+        800
+      ],
+      [
+        620,
+        540
+      ],
+      [
+        960,
+        540
+      ]
+    ],
+    "native_screenshots": false,
+    "images": [
+      "host-explorer.png",
+      "host-puzzle.png",
+      "host-help.png"
+    ],
+    "art": "Original StarterGames art authored for this batch"
+  },
+  "carts": {
+    "little-explorer.p8": "b06607a54f3f6c3e023e74c3de79380cd528ca03878e98fe4a74575093f917e9",
+    "light-puzzle.p8": "92517f02fa0084be00bdbe8d27d73f74ec54d3499df39b60c9d80ef576bbda43"
+  },
+  "pending": [
+    "Official PICO-8 execution and independent export playback",
+    "Native installation, Test/return and process recovery",
+    "Physical controller and touch acceptance",
+    "Novice and owner acceptance",
+    "Full first-run setup and remaining core/library work",
+    "Separate owner APK release gate"
+  ]
+}

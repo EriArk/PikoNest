@@ -1,5 +1,19 @@
 # Состояние PikoNest
 
+**2026-11-01 — Lab 0.0.86, editable starters and contextual help (partial UX09/T01, H01/H02):**
+New project defaults to Blank, then offers Little explorer and Light puzzle with
+original art, starting-layout previews and controls. Both use the existing general
+model/tools for movement or hero-free switches, goals, animation, sounds and map.
+New IDs preserve old projects; creation/copy/export use the existing storage paths.
+X / Help explains actions and opens their tools, including missing-element setup
+in Blank and All tools for unfamiliar Lua. Journal v11 retains v1–10 readers.
+[Guide](STARTER_GAMES.md) · [local checks, carts and host previews](showcase/0.0.86-en/README.md).
+84 local suite invocations and integrated packaging passed; actual official/device,
+physical-input and novice/owner acceptance remain open. Console use stays paused.
+The starter pair and help do not complete learning progress, a genre catalogue or
+ACC-09. Next complete independent first-run folder/runtime setup and recoverable
+failures; continue remaining core/library operations and device journeys when allowed.
+
 **2026-10-23 — Lab 0.0.85, tile art inside the map (partial G01–G04, UX08):**
 Create an 8×8 tile directly from the map, paint with controller/touch, review it
 and keep it as the brush and selected cell without creating a game object. Existing
