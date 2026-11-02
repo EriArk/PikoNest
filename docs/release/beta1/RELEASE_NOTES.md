@@ -1,6 +1,6 @@
 # PikoNest 0.1.0-beta.1 — little worlds, made here
 
-**Prepared publication text. Final candidate acceptance is pending; no release exists yet.**
+**The first public early beta, approved with the limitations below.**
 
 The first early beta brings a PICO-8 player and game-making workshop to Android
 handhelds. One APK, one icon: Play when you want a game, Workshop when you want
@@ -48,8 +48,8 @@ folder sync and complete localization remain future work. The backend uses targe
 
 Physical/novice controls, audible sound (tests were muted), wider device/runtime
 coverage and remaining provider/interruption/multicart journeys are not claimed
-passed. Record the owner's accepted/deferred matrix before publishing this text.
-Keep those limits visible in the public release.
+passed. The owner accepted this bounded first-beta scope; those checks remain
+follow-up work, not completed tests.
 
 ## Downloads
 
@@ -63,3 +63,5 @@ APK SHA-256: `e496a14cc5751232850fa76b393f99ce9b5fb88668c9dbb6a8317ffc2cda224f`.
 
 Original PikoNest code is MIT; dependencies and third-party games retain their own
 terms. PICO-8 is by Lexaloffle Games. PikoNest is independent.
+
+[Setup and known limits](https://github.com/EriArk/PikoNest/blob/v0.1.0-beta.1/docs/release/beta1/README.md) · [Actual screenshots](https://github.com/EriArk/PikoNest/tree/v0.1.0-beta.1/docs/showcase/beta1-en) · [Device evidence](https://github.com/EriArk/PikoNest/blob/v0.1.0-beta.1/docs/release/beta1/DEVICE_ACCEPTANCE.md).

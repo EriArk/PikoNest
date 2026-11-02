@@ -1,5 +1,10 @@
 # PikoNest — задачи полного цикла
 
+**2026-11-02 — Early-beta publication approved:** the owner accepted the installed
+candidate and documented limits. First release: `v0.1.0-beta.1`. This closes only
+the publication decision, not Q/UX/storage/core-tool tasks with unfinished scope.
+Next: beta feedback and deferred physical/audio/provider/device acceptance.
+
 **2026-11-02 — Q05 distribution package complete; acceptance still partial:**
 Authenticated support refresh replaces unknown Termux files. All 82 native records
 are reviewed (80 official matches); 185 materials, notices/configuration and rebuild

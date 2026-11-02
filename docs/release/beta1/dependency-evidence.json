@@ -24,11 +24,13 @@
   "new_notices_packaged": true,
   "device_access": true,
   "device_record": "DEVICE_ACCEPTANCE.md",
-  "apk_published": false,
+  "apk_published": true,
   "limitations": [
     "Original resolved Gradle graph unavailable; notice review uses observed DEX class families.",
     "Original SDL compiler options unavailable.",
     "Full offline rebuild not performed.",
     "Ubuntu provenance uses official dated HTTPS; its OpenPGP chain was not independently verified."
-  ]
+  ],
+  "owner_publication_approved": true,
+  "release_tag": "v0.1.0-beta.1"
 }

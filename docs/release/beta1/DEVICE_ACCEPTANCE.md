@@ -1,7 +1,9 @@
 # Early beta 1: device evidence
 
 Recorded 2 November 2026 after the owner made the handheld available. This is a
-bounded technical check, not physical-controller, novice or owner acceptance.
+bounded technical check, not physical-controller or novice acceptance. The owner
+subsequently confirmed satisfaction and explicitly approved publication of this
+exact candidate with the listed limitations. Release: `v0.1.0-beta.1`.
 
 ## Candidate identity
 
@@ -61,7 +63,8 @@ final product hash above. This does not claim every journey was repeated on ever
 
 ## Still needs explicit acceptance or further testing
 
-- Owner review of the exact installed candidate and publication approval.
+- Owner publication approval is complete for this exact early beta; the checks
+  below remain deferred/unverified, not implicitly passed.
 - Physical buttons/sticks, novice usability and audible playback.
 - Fresh actual third-party launcher UI journey and content-URI variants.
 - Other displays/orientations, Android versions and runtime versions.

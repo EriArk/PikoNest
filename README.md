@@ -7,9 +7,9 @@ PikoNest brings **Play, Workshop and runtime setup into one APK**, built around
 handheld controls and the PICO-8 palette. You supply your purchased official
 PICO-8 runtime; it is never bundled with the app.
 
-**First early beta: device-tested candidate, awaiting final owner acceptance.**
-Version `0.1.0-beta.1`. No public APK is published yet. More ambitious gameplay
-can still require Lua. [Tested scope and limits](docs/release/beta1/DEVICE_ACCEPTANCE.md).
+**[Download the first early beta — 0.1.0-beta.1](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.1).**
+One APK, checked on Retroid Pocket Classic. More ambitious gameplay can still
+require Lua. [Tested scope and limits](docs/release/beta1/DEVICE_ACCEPTANCE.md).
 
 [Project status](PROJECT_STATUS.md) · [Changelog](CHANGELOG.md) ·
 [Roadmap](docs/ROADMAP.md) · [Build and contribute](CONTRIBUTING.md) ·
@@ -80,7 +80,7 @@ journeys remain open. [Backup guide](docs/BACKUP_RESTORE.md).
 
 ## Getting started
 
-1. Install the owner-approved APK when published. Update an existing installation
+1. Download the APK from the [GitHub release](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.1). Update an existing installation
    **in place**; do not uninstall it to update. There is one PikoNest icon and no
    separate helper app.
 2. Import your purchased **PICO-8 Raspberry Pi ZIP containing `pico8_64` (ARM64)**.
@@ -111,6 +111,6 @@ muted during the latest automated device checks. [Evidence](docs/release/beta1/D
 
 Original PikoNest code uses the [MIT License](LICENSE). Dependencies retain their
 [separate terms](THIRD_PARTY_NOTICES.md); matching support sources and rebuild
-instructions accompany the prepared distribution. [Dependency record](docs/release/beta1/DEPENDENCIES.md).
+instructions accompany the release download. [Dependency record](docs/release/beta1/DEPENDENCIES.md).
 PICO-8 belongs to Lexaloffle Games and is purchased separately. PikoNest is an
 independent project. Third-party games and extracted assets retain their authors' terms.

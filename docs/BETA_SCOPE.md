@@ -1,5 +1,10 @@
 # First early Android beta
 
+**Publication decision, 2 November 2026:** the owner explicitly approved the exact
+installed `0.1.0-beta.1` with the declared limitations. The prior publication list
+below is retained as preparation history; remaining checks are deliberately deferred
+for this first early beta, not marked passed. See the device record.
+
 Owner decision, 2 November 2026: call the first public milestone an **early beta**,
 with candidate version `0.1.0-beta.1`. This supersedes the alpha name chosen earlier
 that day. It does not claim a complete no-Lua creator or waive existing acceptance

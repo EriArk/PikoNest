@@ -1,5 +1,17 @@
 # PikoNest — changelog
 
+## 2026-11-02 — PikoNest 0.1.0-beta.1
+
+- First owner-approved early beta: one Android APK for Play, Workshop and imported
+  official runtime setup. [Download](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.1).
+- Ships the exact Retroid-tested APK with checksums and corresponding support
+  sources/notices. PICO-8 itself remains user-purchased and is not distributed.
+- The owner explicitly accepted the recorded early-beta limits. Physical/audible,
+  broader-device, provider/interruption and multicart checks remain unverified,
+  rather than being marked passed by release approval.
+- Current English README and seven actual handheld screenshots accompany the release.
+  [Evidence](docs/release/beta1/DEVICE_ACCEPTANCE.md).
+
 ## 2026-11-02 — First early beta on the handheld
 
 - Refreshed unidentified runtime-support files from authenticated packages; included
@@ -25,8 +37,8 @@
   [Screenshots](docs/showcase/beta1-en/README.md).
 
 Plain-language development updates for posts and the website, newest first.
-Version numbers below identify **development builds**, not public APK releases.
-There is no public APK release as of 2 November 2026.
+The first public early beta is **0.1.0-beta.1**. Earlier lab-version entries remain
+development evidence, not retrospective public releases.
 
 ## 2026-11-02 — PRoot source recovery and clearer evidence checks
 

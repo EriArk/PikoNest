@@ -12,11 +12,10 @@ Local backup/restore, Splore → Play and candidate packaging are implemented in
 2. **Device work now authorized and partially demonstrated:** independent setup,
    preserved update, Splore/offline, clean restore, two starter wins, blank movement,
    SFX/music previews and external intent/resume. [Passes and limits](release/beta1/DEVICE_ACCEPTANCE.md).
-3. Review the installed candidate and native English gallery with the owner. Complete
-   or explicitly accept remaining physical/audio/provider/launcher and device-matrix
-   checks for the bounded early beta; do not label untested journeys passed.
-4. Publish only the owner-approved exact APK with hashes, corresponding support sources,
-   matching repository source and release notes. No release has been created yet.
+3. **Owner-approved first beta:** `v0.1.0-beta.1` publishes the exact tested APK,
+   checksums and corresponding support sources. The owner accepted the recorded limits.
+4. Collect early-beta feedback and finish deferred physical/audio/provider/launcher
+   and device-matrix checks; they remain untested, not automatically passed.
 5. Continue broader no-Lua creation, world/audio/library, external download sync,
    modern-target execution and localization after the accepted first beta.
 

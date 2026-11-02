@@ -1,5 +1,11 @@
 # Состояние PikoNest
 
+**2026-11-02 — First public early beta:** the owner explicitly approved the exact
+installed APK and its disclosed limitations. [Release 0.1.0-beta.1](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.1).
+Physical/audio, wider-device, provider/interruption and multicart checks remain
+open; approval did not convert them into passed tests. Follow-up is feedback and
+that deferred matrix, then broader creation workflows.
+
 **2026-11-02 — Refreshed early-beta candidate and authorized device checks:**
 Dependency review/materials are complete for the recorded payload: 82 native files,
 80 official matches, 185 retained inputs and strict completion pass. Final APK

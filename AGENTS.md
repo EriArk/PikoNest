@@ -6,10 +6,11 @@ beta `0.1.0-beta.1` (lab 0.0.93) now has a refreshed, reviewed support payload a
 bounded device acceptance. Follow `docs/release/beta1/DEVICE_ACCEPTANCE.md` for
 exact candidate hashes, demonstrated journeys and remaining physical/provider/owner
 limits. Do not turn automated input or muted previews into physical/audio acceptance.
-No public release yet; the final candidate/limits and explicit owner publication
-gate remain separate. Keep private rollback backups and purchased archives out of Git.
-Next: candidate review and declared-scope acceptance, then approved publication;
-broader no-Lua genre creation, modern target and other product work follow.
+The owner explicitly approved publishing this exact early beta with the stated
+untested physical/audio/provider/device limits. Release tag: `v0.1.0-beta.1`. This
+is not blanket approval of future APK releases. Keep private backups and purchased
+archives out of Git. Next: early-beta feedback and deferred acceptance, then broader
+no-Lua genre creation, modern target and other product work.
 
 Owner milestone decision (2026-11-02): target an alpha first. Ordinary Lua may
 be required beyond supported visual workflows; complete no-Lua genre creation is

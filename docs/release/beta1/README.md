@@ -1,6 +1,6 @@
 # PikoNest early beta 1 candidate
 
-Updated 2 November 2026. **Installed and technically checked; not yet published.**
+Updated 2 November 2026. **[First owner-approved early beta](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.1).**
 Version `0.1.0-beta.1`, source lab `0.0.93`, Android version code `93`.
 [Exact APK and source-bundle hashes](SHA256SUMS).
 
@@ -11,7 +11,7 @@ gameplay may require Lua; this is not a complete no-code creator.
 
 ## Install and start
 
-1. Install the owner-approved APK when published. There is no public download yet.
+1. Install the APK from the [GitHub release](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.1).
    Update existing PikoNest **in place**, without uninstalling. One icon, no helper app.
 2. Choose Games in the guide, or skip it. Android's system picker may need touch.
 3. Import your purchased **PICO-8 Raspberry Pi ZIP containing `pico8_64` (ARM64)**
@@ -54,9 +54,10 @@ gameplay may require Lua; this is not a complete no-code creator.
 | Splore | Single-cart download/shelf/offline title passed; multicart continuation and external-folder sync remain unfinished/unverified. |
 | Language | Main shelves/setup/Game view are English; some legacy tools/help are incompletely translated. |
 
-## Remaining acceptance before publication
+## Deferred acceptance in the first early beta
 
-The owner has freed the handheld. These items are not marked passed:
+The owner explicitly approved this exact APK with the stated limits. These
+remaining checks are deliberately deferred; they are not marked passed:
 
 - [ ] Physical controls, audible playback, novice/owner review.
 - [ ] Fresh third-party launcher UI and content-URI variants; VIEW/resume already passed.
@@ -64,11 +65,11 @@ The owner has freed the handheld. These items are not marked passed:
 - [ ] Real grant/provider loss, full storage, unfinished-draft restore and interrupted
   rollback; host fault tests remain a separate evidence layer.
 - [ ] Wider devices/displays/orientations/runtime versions; multicart offline parts.
-- [ ] Owner reviews the exact candidate and explicitly accepts its early-beta limits,
-  including deliberately deferred checks, then approves publication.
+- [x] Owner confirmed satisfaction with the installed candidate, accepted the
+  early-beta limits above and explicitly approved publication.
 
-A passing build does not waive the checklist. The owner may explicitly define a
-bounded first-beta matrix; deferred work remains tracked and must not be called tested.
+The owner accepted this bounded first-beta matrix. Deferred work remains tracked
+and must not be called tested; release approval does not close broader product tasks.
 
 ## Publication materials
 
@@ -79,5 +80,5 @@ bounded first-beta matrix; deferred work remains tracked and must not be called 
 - [Prepared release text](RELEASE_NOTES.md), [rebuild map](REBUILDING.md) and
   [build/signing guide](../../../experiments/android-integrated/README.md).
 
-Create the GitHub prerelease only after final owner approval. If code changes,
-rebuild and repeat affected checks; never substitute an untested APK under these hashes.
+This approval applies only to these exact artifacts. Future code changes require
+new builds and affected checks; never substitute another APK under these hashes.
