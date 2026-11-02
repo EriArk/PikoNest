@@ -9,6 +9,7 @@ from unittest.mock import patch
 import zipfile
 
 import audit
+from signed_catalog import verify_index
 
 
 class AuditTests(unittest.TestCase):
@@ -79,6 +80,38 @@ class AuditTests(unittest.TestCase):
         path = self.root / 'lock.json'; path.write_text(json.dumps(lock))
         with self.assertRaisesRegex(ValueError, 'Duplicate materials'):
             audit.load_lock(path)
+
+    def test_unknown_native_source_blocks_even_if_gate_list_was_cleared(self):
+        lock = self.lock(); lock['open_gates'] = []
+        self.assertTrue(audit.incomplete(lock))
+
+    def test_binary_matching_is_not_a_universal_license_requirement(self):
+        lock = self.lock(); lock['open_gates'] = []
+        lock['native_files'][0]['status'] = 'permissive-notices-reviewed'
+        self.assertFalse(audit.incomplete(lock))
+
+    def test_unrecognized_review_status_does_not_clear_completion(self):
+        lock = self.lock(); lock['open_gates'] = []
+        lock['native_files'][0]['status'] = 'unrecognized-status'
+        self.assertTrue(audit.incomplete(lock))
+
+    def test_signature_does_not_replace_index_and_package_hash_checks(self):
+        index = b'Package: demo\nVersion: 1\nFilename: pool/demo.deb\nSize: 2\nSHA256: abc\n'
+        release = 'Date: historical\nSHA256:\n %s %d main/Packages\n' % (audit.sha(index), len(index))
+        evidence = dict(id='demo', package='demo', version='1', catalog_filename='pool/demo.deb', bytes=2, sha256='abc')
+        self.assertEqual(verify_index(release, index, 'main/Packages', [evidence]), 'historical')
+        with self.assertRaisesRegex(ValueError, 'index hash/size'):
+            verify_index(release, index + b'changed', 'main/Packages', [evidence])
+        with self.assertRaisesRegex(ValueError, 'disagrees'):
+            verify_index(release, index, 'main/Packages', [dict(evidence, version='2')])
+
+    def test_signed_index_cannot_omit_or_duplicate_package_record(self):
+        index = b'Package: demo\nVersion: 1\nFilename: pool/demo.deb\nSize: 2\nSHA256: abc\n'
+        evidence = dict(id='demo', package='demo', version='1', catalog_filename='pool/demo.deb', bytes=2, sha256='abc')
+        for data in [b'Package: unrelated\n', index + b'\n' + index]:
+            release = 'SHA256:\n %s %d main/Packages\n' % (audit.sha(data), len(data))
+            with self.assertRaisesRegex(ValueError, 'Missing/duplicate package'):
+                verify_index(release, data, 'main/Packages', [evidence])
 
     def test_bundle_excludes_adjacent_private_files_and_is_deterministic(self):
         lock = audit.load_lock()

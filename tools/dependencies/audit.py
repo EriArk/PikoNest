@@ -178,6 +178,31 @@ def verify_evidence(lock, directory, offline=False):
     return sum(r['status'] == 'official-binary-match' for r in lock['native_files'])
 
 
+def verify_catalogs(lock, directory, executable, offline=False):
+    from signed_catalog import verify_signature, verify_index
+    evidence = {r['id']: r for r in lock['evidence']}
+    results = []
+    for catalog in lock.get('catalogs', []):
+        def read(record):
+            return download(record, local_path(directory, record['sha256']), offline).read_bytes()
+        anchor = read(evidence[catalog['key']['evidence_id']])
+        with zipfile.ZipFile(io.BytesIO(anchor)) as z:
+            key = checked(z.read(catalog['key']['member']), catalog['key'])
+        release = verify_signature(read(catalog['release']), key, catalog['key']['fingerprint'], executable)
+        packages = [r for r in evidence.values() if r.get('catalog_id') == catalog['id']]
+        date = verify_index(release, read(catalog['index']), catalog['index_path'], packages)
+        results.append({'id': catalog['id'], 'signed_date': date, 'packages': len(packages),
+                        'fingerprint': catalog['key']['fingerprint']})
+    return results
+
+
+def incomplete(lock):
+    # A matching original package is one proof route, not a license requirement
+    # to reproduce all MIT/zlib binaries. Unknown source builds still fail closed.
+    reviewed = {'official-binary-match', 'permissive-notices-reviewed', 'source-built-reviewed'}
+    return bool(lock['open_gates']) or any(r['status'] not in reviewed for r in lock['native_files'])
+
+
 def source_materials(lock, directory, offline=False):
     def one(row):
         return download(row, local_path(directory, row['path']), offline)
@@ -221,6 +246,7 @@ def main():
     parser.add_argument('--apk', type=Path)
     parser.add_argument('--materials', type=Path, help='Fetch/verify locked source materials here')
     parser.add_argument('--evidence', type=Path, help='Fetch/verify official binary packages here')
+    parser.add_argument('--gpg', type=Path, help='Also verify recorded signed catalogs; requires --evidence')
     parser.add_argument('--offline', action='store_true')
     parser.add_argument('--bundle', type=Path)
     parser.add_argument('--require-complete', action='store_true', help='Fail while any distribution gates remain')
@@ -231,17 +257,20 @@ def main():
         print('APK native inventory:', dict(verify_native(args.apk, lock)))
     if args.evidence:
         print('Official binary matches verified:', verify_evidence(lock, args.evidence, args.offline))
+    if args.gpg:
+        if not args.evidence:
+            parser.error('--gpg requires --evidence')
+        print('Signed catalogs verified:', verify_catalogs(lock, args.evidence, args.gpg, args.offline))
     if args.materials:
         print('Source material files verified:', len(source_materials(lock, args.materials, args.offline)))
     if args.bundle:
         if not args.materials:
             parser.error('--bundle requires --materials')
         print('Partial source-material bundle SHA256:', bundle(lock, args.materials, args.bundle))
-    print('Distribution review: INCOMPLETE' if lock['open_gates'] else 'Distribution review: no recorded open gates')
+    print('Distribution review: INCOMPLETE' if incomplete(lock) else 'Distribution review: no recorded open gates')
     for gate in lock['open_gates']:
         print('- ' + gate)
-    if args.require_complete and (lock['open_gates'] or any(
-            r['status'] != 'official-binary-match' for r in lock['native_files'])):
+    if args.require_complete and incomplete(lock):
         raise SystemExit(2)
 
 

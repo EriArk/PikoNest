@@ -21,15 +21,19 @@ redistribution. This table is an identified-materials inventory, not a completed
 audit of every transitive dependency.
 
 The 2 November dependency follow-up covers 79 ELF files (77 bootstrap and two APK
-libraries). Forty-four match exact official Ubuntu/Termux/Godot artifacts; 153
-source archives and patches are collected with pinned URLs/hashes. See
+libraries). Sixty match exact official Ubuntu/Termux/Godot artifacts; 155
+source inputs and two catalog files are collected with pinned URLs/hashes. See
 [the distribution evidence](docs/release/beta1/DEPENDENCIES.md) and preserved
 [native component notices](experiments/android-host/assets/NATIVE-NOTICES.txt).
 These include Ubuntu package copyright texts, full referenced common licenses,
 the identified Termux source notices, SDL/wrapper notices and LLVM C++ runtime
 licenses. The latter are separate from the Godot engine copyright list.
 
-This remains incomplete: 33 Termux files need exact source/build provenance or
+The additional 16 PulseAudio files match the historical Termux 17.0-1 package
+through a verified repository signature, signed index and package checksum chain.
+Its upstream source, exact recipe snapshot and notices are now retained.
+
+This remains incomplete: 17 Termux files need exact source/build provenance or
 replacement, and non-native dependencies and final distribution requirements still
 need review. New notices enter the next APK packaging pass. The candidate stays
 local until the corresponding-source/notice package is complete. Original PikoNest

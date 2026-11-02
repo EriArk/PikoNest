@@ -13,29 +13,35 @@ setup live in one development APK; there is no public APK release yet.
 | --- | --- |
 | Stage | First early beta preparation; Lua remains necessary outside supported visual paths |
 | Android baseline | **0.0.93 / 0.1.0-beta.1** candidate (see evidence); **0.0.77** remains the last complete native creation journey |
-| Latest work | Recovered official origins for 44 native files; assembled pinned source materials and notices |
-| Current focus | Resolve 33 remaining Termux native files, finish distribution materials, then authorized device journeys |
+| Latest work | Confirmed PulseAudio through a signed catalog; 60 native files now have official matches |
+| Current focus | Resolve 17 remaining Termux files and Android notices, finish distribution materials, then authorized device journeys |
 | Platforms | Android first; Linux later |
 
 ## Dependency preparation — 2 November 2026
 
-We traced 44 of the application's 79 native files to exact official packages,
+We traced 60 of the application's 79 native files to exact official packages,
 including the Godot engine, most Linux support libraries and part of the Android
 support layer. Their source materials now have fixed versions and checksums;
-153 source archives and patches are collected locally, with component licenses.
+155 source inputs and two repository catalogs are collected locally, with licenses.
 A repeatable check catches changed or unexpected native files and verifies the
 source-only archive without including the purchased PICO-8 runtime or private data.
 
-This work is **not complete**: 33 Android-side files still need exact source/build
-provenance or a controlled replacement. SDL/wrapper build details, remaining
-notices and final distribution review also stay open. Ten focused audit tests
-passed; all current native hashes, 44 official package matches and the collected
+The latest research recovered all 16 PulseAudio files from a historical Termux
+package and verified the repository signature, index and package hashes. This
+avoids replacing those binaries just to establish their origin. License review
+also now distinguishes required notices/sources from optional identical rebuilds.
+
+This work is **not complete**: 17 Android-side files still need source/notice
+provenance or a controlled replacement. Remaining Android notices and final
+distribution review also stay open; six APK version markers were invalid, so we
+do not treat them as proof of resolved versions. Fifteen focused audit tests
+passed; all current native hashes, 60 official package matches and the collected
 sources were checked. The existing APK was not replaced or installed, and new
 notices enter its next packaging pass. [Details](docs/release/beta1/DEPENDENCIES.md).
 
-Next: finish the remaining Android support components from a pinned source/build
-tree where old package provenance cannot be recovered; test the resulting candidate
-on the handheld only when the owner frees it.
+Next: prioritize the remaining PRoot/BusyBox/support-library sources and Android
+notices, replacing only components whose provenance cannot be recovered. Test the
+resulting candidate on the handheld only when the owner frees it.
 
 ## First early beta preparation (0.0.93)
 

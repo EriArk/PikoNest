@@ -3,14 +3,34 @@
   "candidate_apk_sha256": "a8a85b1804c8a7a67bee68010c19d4591a05901709df5b84a82eab01cf732e54",
   "candidate_unchanged": true,
   "native_files_verified": 79,
-  "official_binary_matches": 44,
-  "official_artifacts_verified": 33,
-  "unresolved_termux_native_files": 33,
-  "source_material_files_verified": 153,
-  "source_material_bytes": 138873971,
-  "audit_tests_passed": 10,
+  "official_binary_matches": 60,
+  "official_artifacts_verified": 34,
+  "unresolved_termux_native_files": 17,
+  "source_input_files": 155,
+  "catalog_files": 2,
+  "material_files_verified": 157,
+  "material_bytes": 150485821,
+  "audit_tests_passed": 15,
   "strict_completion_exit_code": 2,
+  "signature": {
+    "catalog": "termux-main:2026-01-23",
+    "fingerprint": "CC72CF8BA7DBFA0182877D045A897D96E57CF20C",
+    "verification": "GnuPG valid signature; signed index and package hashes verified",
+    "tampered_catalog_rejected": true
+  },
+  "android_metadata": {
+    "version_markers": 22,
+    "invalid_version_markers": 6,
+    "complete_inventory": false
+  },
   "bundle": {
+    "name": "PikoNest-beta1-partial-source-materials-r2.zip",
+    "sha256": "9016c2e9ce5868de315ae79481ac0b41afb5643798ba61a93f4c5cdcfaeb245c",
+    "bytes": 151588563,
+    "entries": 160,
+    "scope": "partial source materials and catalog evidence; not cleared for publication"
+  },
+  "previous_bundle": {
     "name": "PikoNest-beta1-partial-source-materials.zip",
     "sha256": "5647cef4713cf20f8b09da186767fc1fc9320ae0a86f55e261f29e1d770b8153",
     "bytes": 139914520,

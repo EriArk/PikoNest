@@ -1,0 +1,117 @@
+{
+  "recorded": "2026-11-02",
+  "upstream_apk_sha256": "916330f7f4a8349c3630d207be73b402f3161a2717a8d1884228ca2c0f94da2b",
+  "scope": "Metadata hints only; not a complete DEX inventory or verified resolved dependency graph.",
+  "entries": [
+    {
+      "path": "META-INF/androidx.activity_activity.version",
+      "value": "1.8.1",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.annotation_annotation-experimental.version",
+      "value": "1.4.0",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.arch.core_core-runtime.version",
+      "value": "task ':arch:core:core-runtime:writeVersionFile' property 'version'",
+      "status": "invalid-version-marker"
+    },
+    {
+      "path": "META-INF/androidx.core_core-ktx.version",
+      "value": "1.2.0",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.core_core-splashscreen.version",
+      "value": "1.0.1",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.core_core.version",
+      "value": "1.8.0",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.customview_customview.version",
+      "value": "1.0.0",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.fragment_fragment.version",
+      "value": "1.8.6",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.lifecycle_lifecycle-livedata-core.version",
+      "value": "task ':lifecycle:lifecycle-livedata-core:writeVersionFile' property 'version'",
+      "status": "invalid-version-marker"
+    },
+    {
+      "path": "META-INF/androidx.lifecycle_lifecycle-livedata.version",
+      "value": "task ':lifecycle:lifecycle-livedata:writeVersionFile' property 'version'",
+      "status": "invalid-version-marker"
+    },
+    {
+      "path": "META-INF/androidx.lifecycle_lifecycle-runtime.version",
+      "value": "task ':lifecycle:lifecycle-runtime:writeVersionFile' property 'version'",
+      "status": "invalid-version-marker"
+    },
+    {
+      "path": "META-INF/androidx.lifecycle_lifecycle-viewmodel-savedstate.version",
+      "value": "task ':lifecycle:lifecycle-viewmodel-savedstate:writeVersionFile' property 'version'",
+      "status": "invalid-version-marker"
+    },
+    {
+      "path": "META-INF/androidx.lifecycle_lifecycle-viewmodel.version",
+      "value": "task ':lifecycle:lifecycle-viewmodel:writeVersionFile' property 'version'",
+      "status": "invalid-version-marker"
+    },
+    {
+      "path": "META-INF/androidx.loader_loader.version",
+      "value": "1.0.0",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.profileinstaller_profileinstaller.version",
+      "value": "1.3.1",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.savedstate_savedstate.version",
+      "value": "1.2.1",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.startup_startup-runtime.version",
+      "value": "1.1.1",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.tracing_tracing.version",
+      "value": "1.0.0",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.versionedparcelable_versionedparcelable.version",
+      "value": "1.1.1",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/androidx.viewpager_viewpager.version",
+      "value": "1.0.0",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/kotlinx_coroutines_android.version",
+      "value": "1.6.4",
+      "status": "version-marker-only"
+    },
+    {
+      "path": "META-INF/kotlinx_coroutines_core.version",
+      "value": "1.6.4",
+      "status": "version-marker-only"
+    }
+  ]
+}

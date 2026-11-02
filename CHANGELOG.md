@@ -4,6 +4,25 @@ Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
 There is no public APK release as of 2 November 2026.
 
+## 2026-11-02 — Signed PulseAudio provenance and license review
+
+- Recovered all 16 shipped PulseAudio files from a historical Termux package.
+  Its repository signature, signed index and package checksum were verified using
+  the public key from the official bootstrap. Official native matches increased
+  from 44 to 60 of 79; 17 files remain unresolved. No runtime replacement was needed.
+- Collected the exact PulseAudio source and recipe snapshot, additional notices
+  and catalog evidence. The second partial material bundle has 155 source inputs
+  and two catalog files; the previous bundle is retained.
+- Corrected the completion rule: an explicitly reviewed permissive component or
+  source build need not match an official binary byte for byte. Unknown/unreviewed
+  records and open distribution requirements still fail completion.
+- Recorded incomplete Android dependency metadata: six of 22 version markers
+  contain Gradle task text instead of versions. Remaining Android notices are not
+  claimed complete from those markers or from the native inventory.
+- Validation: 15 focused audit tests, all 79 native hashes, 60 official binary
+  matches, the signed catalog chain and 157 material-file hashes. No app rebuild,
+  device access, installed changes or release. [Research and evidence](docs/release/beta1/LICENSING_REVIEW.md).
+
 ## 2026-11-02 — Native dependency sources and distribution checks
 
 - Matched 44 native files to official Ubuntu, Termux and Godot artifacts. Collected

@@ -6,9 +6,9 @@ The local build passed all 91 core suites and package verification.
 [Exact candidate hash and open gates](../../showcase/0.0.93-en/candidate.json).
 The APK remains outside Git. No release tag, download or publication is implied.
 
-Dependency follow-up: 44 of 79 native files now match official artifacts, and 153
-source archives/patches are collected. The existing candidate is unchanged;
-additional notices and native drift checks enter its next packaging pass. Thirty-three
+Dependency follow-up: 60 of 79 native files now match official artifacts, with 155
+source inputs and two signed-catalog files collected. The existing candidate is unchanged;
+additional notices and native drift checks enter its next packaging pass. Seventeen
 Termux files and the remaining distribution review still block completion. See
 [dependency evidence](DEPENDENCIES.md); the local source-material ZIP is partial.
 

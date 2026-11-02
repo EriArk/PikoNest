@@ -99,8 +99,11 @@
       "path": "bootstrap:package/pulseaudio",
       "bytes": 72680,
       "sha256": "d7c7812b5d0d6fa0ccd72e345fa0eb82c23f26df47e02dbdec1088d339712b59",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/bin/pulseaudio",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/rootfs/usr/bin/busybox",
@@ -491,15 +494,21 @@
       "path": "bootstrap:package/pulselibs/libprotocol-native.so",
       "bytes": 115720,
       "sha256": "a5f31886ae237ea8f9c114cdcb63d13c264486e5ba03aa95183f899150a7a557",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/libprotocol-native.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/module-simple-protocol-tcp.so",
       "bytes": 9192,
       "sha256": "79a1e60785cfae6b1d739dd1467f504397344b2a855244c3b6d7a59237229d26",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/module-simple-protocol-tcp.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/libvorbis.so",
@@ -512,15 +521,21 @@
       "path": "bootstrap:package/pulselibs/module-suspend-on-idle.so",
       "bytes": 19320,
       "sha256": "f04c49c9d9e0de31d068d155ab55409ab7598e3f102348453ac56a9382070915",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/module-suspend-on-idle.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/module-always-sink.so",
       "bytes": 8792,
       "sha256": "6b6faa2f193648ab110aec38251534ef4434a31ca856e5eda75c02ba6a68d4d5",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/module-always-sink.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/libsoxr.so",
@@ -533,8 +548,11 @@
       "path": "bootstrap:package/pulselibs/module-null-sink.so",
       "bytes": 17296,
       "sha256": "6fdc913226b27aabfef1efab99e456af8e7c5a55c3dfffb5b14b3b4915542e8e",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/module-null-sink.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/libFLAC.so",
@@ -547,29 +565,41 @@
       "path": "bootstrap:package/pulselibs/module-native-protocol-unix.so",
       "bytes": 9408,
       "sha256": "e878a6e9d87b64a7301ea017294e1ddec22679d696ad7aaad65356694c3c4533",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/module-native-protocol-unix.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/module-aaudio-sink.so",
       "bytes": 18416,
       "sha256": "70959e2d4aed507f04381edb49b853dbebb79d1728b6440b21cef8e2535c48ac",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/module-aaudio-sink.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/module-native-protocol-tcp.so",
       "bytes": 9712,
       "sha256": "5bc995ce019f04058291552410a446869cf28add5f18ab8e8af8fe85ef01c824",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/module-native-protocol-tcp.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/module-default-device-restore.so",
       "bytes": 9480,
       "sha256": "15613ee11c10bd002af198984344ce2a2b6b375aad1136538308d049eed3b322",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/module-default-device-restore.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/libogg.so",
@@ -582,8 +612,11 @@
       "path": "bootstrap:package/pulselibs/libprotocol-simple.so",
       "bytes": 27032,
       "sha256": "70bca38032c048a2979233164f8dc7246779efcb6bcdcd44019598cff71682cd",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/libprotocol-simple.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/libvorbisenc.so",
@@ -596,15 +629,21 @@
       "path": "bootstrap:package/pulselibs/libpulsecore-17.0.so",
       "bytes": 610664,
       "sha256": "5e4f756cdfd7e6928e3b2dc413207a5999bd8e7db8b90b3584c1dd541e2374d4",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/libpulsecore-17.0.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/libpulsecommon-17.0.so",
       "bytes": 493312,
       "sha256": "5e1e47a0ba66c993b42b8664e9da8bdf4413403766a6f55afe1c90cf70979da5",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/libpulsecommon-17.0.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/libspeexdsp.so",
@@ -631,8 +670,11 @@
       "path": "bootstrap:package/pulselibs/module-switch-on-connect.so",
       "bytes": 10072,
       "sha256": "caad10266fa7080be10e14fb58b5bc488ce1de8350577e25079f4f4ba51c1b5d",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/module-switch-on-connect.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/libiconv.so",
@@ -648,15 +690,21 @@
       "path": "bootstrap:package/pulselibs/module-sles-sink.so",
       "bytes": 19872,
       "sha256": "91ca45b4f6b19c22c52a3ecb32ada4531de674117ac2eecf36f71548e7b2c2a8",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/pulseaudio/modules/module-sles-sink.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/libpulse.so",
       "bytes": 309008,
       "sha256": "00d1eca8a4f45fd483fb72fef29d0ad318c3721a7b7236338828d36114664e6a",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:pulseaudio",
+      "status": "official-binary-match",
+      "evidence_id": "termux:pulseaudio:17.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libpulse.so",
+      "source_key": "pulseaudio=17.0-1"
     },
     {
       "path": "bootstrap:package/pulselibs/libandroid-execinfo.so",
@@ -1050,6 +1098,20 @@
       "format": "zip",
       "official_sha512": "cae82566ac5d3f504ab5f27b62284ac6078b0918cdcf2dc7ce36a96478134991db4bb9b826ba73ba7a3b006c00b8d58e59bc27b685c71a80c6974a7e16d585d7",
       "checksum_url": "https://github.com/godotengine/godot-builds/releases/download/4.6-stable/SHA512-SUMS.txt"
+    },
+    {
+      "id": "termux:pulseaudio:17.0-1",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/p/pulseaudio/pulseaudio_17.0-1_aarch64.deb",
+      "sha256": "5a52eb2d58300e7b399157cf41b0d4d69043ee6fe4a2f3ce6a6686c58130a5fc",
+      "bytes": 844184,
+      "format": "deb",
+      "package": "pulseaudio",
+      "version": "17.0-1",
+      "source_key": "pulseaudio=17.0-1",
+      "source_revision": "1f020889c9aa44ea0f63d7222e8c2b62c3f45f68",
+      "recipe_commit": "0ab554db227f55a6ce8144f6f1e071d650c8ddae",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/p/pulseaudio/pulseaudio_17.0-1_aarch64.deb"
     }
   ],
   "materials": [
@@ -2123,12 +2185,40 @@
       "sha256": "ec4002e85d93c047b20110ea288e8145ec2856231049b7580b394942a6f91bc0",
       "bytes": 12017551,
       "kind": "source"
+    },
+    {
+      "path": "termux/pulseaudio/pulseaudio-1f020889c9aa44ea0f63d7222e8c2b62c3f45f68.tar.gz",
+      "url": "https://codeload.github.com/pulseaudio/pulseaudio/tar.gz/1f020889c9aa44ea0f63d7222e8c2b62c3f45f68",
+      "sha256": "0ccee8a0c9653badc668cf11f0eaad97a1febb85afa82c24c2d1935926446e3b",
+      "bytes": 2835842,
+      "kind": "source"
+    },
+    {
+      "path": "termux/pulseaudio-recipes/termux-packages-0ab554db227f55a6ce8144f6f1e071d650c8ddae.tar.gz",
+      "url": "https://codeload.github.com/termux/termux-packages/tar.gz/0ab554db227f55a6ce8144f6f1e071d650c8ddae",
+      "sha256": "79caba882315afca1649bbf0455cb8d35929fdc23d61efc7b94e7c83cd17ccc2",
+      "bytes": 7039325,
+      "kind": "source"
+    },
+    {
+      "path": "catalogs/termux-20260123/InRelease",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/dists/stable/InRelease",
+      "sha256": "8a71a45784ad7dcb0e0b6dce18361503d6bcd9eeb4e24507d11e372bc31d0c67",
+      "bytes": 14016,
+      "kind": "signed-catalog"
+    },
+    {
+      "path": "catalogs/termux-20260123/Packages",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/dists/stable/main/binary-aarch64/Packages",
+      "sha256": "64dcec68c0825523afde9767bb43c63345473d85ffc67d06246bae8e9f51b0a3",
+      "bytes": 1722667,
+      "kind": "signed-catalog"
     }
   ],
   "notice_asset": {
     "path": "experiments/android-host/assets/NATIVE-NOTICES.txt",
-    "sha256": "db202035890ae5e6ce8cd499cd0c33540461353cd39a6fdee66b984059227b07",
-    "bytes": 811468
+    "sha256": "cfeb524c7334b13fcc673a08daf4603efc17c3f3980c7d5d28c58ae3b0581101",
+    "bytes": 863167
   },
   "notice_sections": [
     {
@@ -2478,6 +2568,42 @@
       "url": "https://android.googlesource.com/toolchain/llvm-project/+/97a699bf4812a18fb657c2779f5296a4ab2694d2/libunwind/LICENSE.TXT?format=TEXT",
       "sha256": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d",
       "bytes": 16706
+    },
+    {
+      "title": "PulseAudio 17.0 / pulseaudio-1f020889c9aa44ea0f63d7222e8c2b62c3f45f68/GPL",
+      "url": "https://codeload.github.com/pulseaudio/pulseaudio/tar.gz/1f020889c9aa44ea0f63d7222e8c2b62c3f45f68",
+      "sha256": "c38aee9e3c8c4d5d594ff548a1be05453023016d6286931f6512db215ec1fd42",
+      "bytes": 17989
+    },
+    {
+      "title": "PulseAudio 17.0 / pulseaudio-1f020889c9aa44ea0f63d7222e8c2b62c3f45f68/LGPL",
+      "url": "https://codeload.github.com/pulseaudio/pulseaudio/tar.gz/1f020889c9aa44ea0f63d7222e8c2b62c3f45f68",
+      "sha256": "a9bdde5616ecdd1e980b44f360600ee8783b1f99b8cc83a2beb163a0a390e861",
+      "bytes": 26527
+    },
+    {
+      "title": "PulseAudio 17.0 / pulseaudio-1f020889c9aa44ea0f63d7222e8c2b62c3f45f68/LICENSE",
+      "url": "https://codeload.github.com/pulseaudio/pulseaudio/tar.gz/1f020889c9aa44ea0f63d7222e8c2b62c3f45f68",
+      "sha256": "a1064b9838b6b4feee61eaeb0925da4b4834c984b77716558860c4294ed6c015",
+      "bytes": 2192
+    },
+    {
+      "title": "PulseAudio 17.0 / pulseaudio-1f020889c9aa44ea0f63d7222e8c2b62c3f45f68/src/pulsecore/filter/LICENSE.WEBKIT",
+      "url": "https://codeload.github.com/pulseaudio/pulseaudio/tar.gz/1f020889c9aa44ea0f63d7222e8c2b62c3f45f68",
+      "sha256": "70f0b37e54712965e64de494fc26003ee6bd978718cdbdfe1c32b0f754a1f0b2",
+      "bytes": 1568
+    },
+    {
+      "title": "Termux PulseAudio / module-aaudio-sink.c license header",
+      "url": "https://codeload.github.com/termux/termux-packages/tar.gz/0ab554db227f55a6ce8144f6f1e071d650c8ddae",
+      "sha256": "90bdd6a6d096952bc929aafac379c4feea0459c3a6b8c832a6b4784c969d80c6",
+      "bytes": 727
+    },
+    {
+      "title": "Termux PulseAudio / module-sles-sink.c license header",
+      "url": "https://codeload.github.com/termux/termux-packages/tar.gz/0ab554db227f55a6ce8144f6f1e071d650c8ddae",
+      "sha256": "90bdd6a6d096952bc929aafac379c4feea0459c3a6b8c832a6b4784c969d80c6",
+      "bytes": 727
     }
   ],
   "bootstrap_non_elf": [
@@ -5420,12 +5546,45 @@
     }
   ],
   "open_gates": [
-    "Exact source/build provenance for 33 Android-side Termux ELF files remains unresolved.",
-    "SDL and shim have source/notices but no local rebuild or configuration comparison.",
-    "Bootstrap scripts/configuration/certificate stores and DEX/Android library notices still need complete provenance review.",
-    "Termux ncurses auxiliary terminfo build inputs and fully offline build recipe verification remain open.",
-    "LGPL replacement/relink instructions and exact combined distribution review remain open.",
-    "New notice asset is not present in the previously built beta candidate; repackage after dependency closure.",
-    "Handheld/runtime/owner acceptance and explicit APK publication approval remain pending."
+    "Exact source/build provenance remains unresolved for 17 Android-side Termux ELF files.",
+    "Bootstrap scripts/configuration/certificate stores and DEX/Android dependency notices still need complete distribution review.",
+    "Complete corresponding-source and applicable replacement/relink instructions remain pending for the combined support layer.",
+    "Updated notices must enter and be checked in the final candidate APK after dependency review."
+  ],
+  "catalogs": [
+    {
+      "id": "termux-main:2026-01-23",
+      "release": {
+        "path": "catalogs/termux-20260123/InRelease",
+        "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/dists/stable/InRelease",
+        "sha256": "8a71a45784ad7dcb0e0b6dce18361503d6bcd9eeb4e24507d11e372bc31d0c67",
+        "bytes": 14016,
+        "kind": "signed-catalog"
+      },
+      "index": {
+        "path": "catalogs/termux-20260123/Packages",
+        "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/dists/stable/main/binary-aarch64/Packages",
+        "sha256": "64dcec68c0825523afde9767bb43c63345473d85ffc67d06246bae8e9f51b0a3",
+        "bytes": 1722667,
+        "kind": "signed-catalog"
+      },
+      "index_path": "main/binary-aarch64/Packages",
+      "key": {
+        "evidence_id": "termux-bootstrap:2025.01.26",
+        "member": "share/termux-keyring/termux-autobuilds.gpg",
+        "sha256": "21c385d5a30107453bd60582d64e2f6e5f5ce11e340ac05e57f943f9c0235420",
+        "bytes": 2458,
+        "fingerprint": "CC72CF8BA7DBFA0182877D045A897D96E57CF20C"
+      }
+    }
+  ],
+  "provenance_followups": [
+    "SDL source revision and shim source are retained under permissive terms. A byte-identical rebuild is not a license precondition; local build options remain unverified.",
+    "An entirely offline rebuild and auxiliary ncurses terminfo inputs have not been demonstrated. This is separate from the MIT notice requirement for that library.",
+    "PulseAudio recipe folder (8 files) matches the 17.0-1 package commit and the retained January 2025 snapshot. Actual runtime compatibility is unchanged, not re-tested."
+  ],
+  "release_gates": [
+    "Authorized handheld/runtime/provider acceptance of the exact candidate.",
+    "Explicit owner approval of the reviewed APK publication."
   ]
 }

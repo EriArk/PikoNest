@@ -7,10 +7,11 @@ outside supported visual paths; this does not close the complete no-code product
 Local backup/restore, Splore → Play and candidate packaging are implemented in
 0.0.93. [Scope](BETA_SCOPE.md) · [Candidate preparation](release/beta1/README.md).
 
-1. Finish the native source/notice package: 44 of 79 files now match official
-   artifacts, with 153 source-material files collected. Resolve the remaining 33
+1. Finish the native source/notice package: 60 of 79 files now match official
+   artifacts, with 155 source inputs and two catalogs collected. Resolve the remaining 17
    Termux files from a pinned source/build tree where old provenance cannot be
-   recovered; complete SDL/shim, non-native notice and distribution review.
+   recovered; complete component-specific notice and distribution review. Do not
+   require a byte-identical rebuild for permissive components merely to clear licensing.
    Keep the current candidate as rollback baseline. [Evidence](release/beta1/DEPENDENCIES.md).
 2. When the owner frees the handheld, test independent setup, in-place update,
    storage/reconnect, backup/restore, physical controls, Play/external launcher and

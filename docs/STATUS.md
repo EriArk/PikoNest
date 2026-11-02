@@ -1,5 +1,17 @@
 # Состояние PikoNest
 
+**2026-11-02 — Signed PulseAudio recovery and license review (Q05 partial):**
+Official artifact matches increased to 60/79: all 16 shipped PulseAudio files
+match the Termux 17.0-1 package. Its historical InRelease signature, index and
+package checksum chain passed with the official bootstrap key. Exact upstream
+source/recipe snapshots and notices are retained; 17 native files remain unresolved.
+Material bundle r2 has 155 source inputs and two catalogs. Fifteen focused tests
+passed. [Research](release/beta1/LICENSING_REVIEW.md) · [Evidence](release/beta1/dependency-evidence.json).
+Source-only/permissive review is no longer incorrectly required to produce an
+official binary hash match. Android dependency inventory remains incomplete: six
+version markers contain invalid Gradle task text. No binary replacement, rebuild,
+device use or release. Next: remaining source/notice review, then authorized acceptance.
+
 **2026-11-02 — Native source recovery and audit tooling (Q05 partial):**
 All 79 candidate native files now have a checked inventory. Forty-four match
 official binary artifacts (36 Ubuntu, six Termux, two Godot), and 153 source

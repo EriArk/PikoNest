@@ -1,5 +1,13 @@
 # PikoNest — задачи полного цикла
 
+**2026-11-02 — Q05 signed-catalog follow-up, still partial:**
+60/79 native files now match official artifacts after signed PulseAudio recovery.
+Seventeen files remain unresolved; 155 source inputs and two catalogs collected.
+Fifteen focused checks passed, including the boundary between provenance evidence
+and actual license requirements. Android notices cannot be cleared from incomplete
+version markers. [Research and next work](release/beta1/LICENSING_REVIEW.md).
+No runtime replacement, device action or release occurred.
+
 **2026-11-02 — Q05 dependency follow-up, still partial:**
 44/79 native files match official artifacts; 153 source-material files and partial
 notices are collected. Ten audit tests and offline candidate/source/evidence checks
@@ -557,7 +565,7 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 | Q02 | Частично / A05 | Полный remapping/A-B convention, stick/D-pad, отсутствие плечевых/touch, reconnect, optional keyboard/mouse, системные picker-границы | Каждый основной путь пройден физическим контроллером; ограничения системы явно описаны и есть предусмотренный путь настройки; горячие клавиши не единственный вход |
 | Q03 | Частично / A06, R03 | Старт/сканирование/редактор/preview: отзывчивость, память, большие проекты, background/sleep; отмена/ограничение provider I/O и диагностика зависаний | По согласованному профилю измерены задержки/ресурсы; задачи не блокируют UI; зависший provider/длинная загрузка не теряют данные и имеют восстановление |
 | Q04 | План / функциональные задачи A/P/R/L/C/G/N/M/S/B/T/H | Выполнить ACC-01–07 и техническую часть ACC-08, corpus на границах ресурсов, разные жанры, внешний PICO-8 round-trip, восстановление/обновление | Доказательства привязаны к сборке/устройству/версии, ограничения перечислены; ни один обязательный путь не требует правки файлов разработчиком. Приёмка владельцем и разрешение выпуска закрываются отдельно в Q06 |
-| Q05 | Частично, local beta 0.0.93; 44/79 native origins matched, 153 source inputs; remaining sources/device pending / A06, R02, P08 | Производственный package/signing/update, backup migration, notices/зависимости/permissions; инструкция установки/архива и known limits | Проверено обновление с сохранением проектов/сейвов, нет debug-only зависимости или proprietary runtime в APK; ключи/секреты вне репозитория; без автоматического release |
+| Q05 | Частично, local beta 0.0.93; 60/79 native origins matched, signed PulseAudio catalog; 17 native files/Android notices/device pending / A06, R02, P08 | Производственный package/signing/update, backup migration, notices/зависимости/permissions; инструкция установки/архива и known limits | Проверено обновление с сохранением проектов/сейвов, нет debug-only зависимости или proprietary runtime в APK; ключи/секреты вне репозитория; без автоматического release |
 | Q06 | План / Q01, Q02, Q03, Q04, Q05 | Демонстрация владельцу полного продукта, исправления замечаний; лишь затем отдельно разрешённый GitHub APK release | Записано явное подтверждение полной удовлетворённости и разрешение конкретного выпуска. Нет prerelease как обхода запрета; молчание/«продолжаем» не являются одобрением |
 
 Перед международным расширением запланированы:
