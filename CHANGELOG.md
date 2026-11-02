@@ -6,6 +6,7 @@
   matching sources, original notices, BusyBox configuration and rebuild/replacement
   instructions. The strict distribution check now passes: 82 native files, 80
   official matches and 185 retained material files. Purchased PICO-8 is never bundled.
+  Pinned bundle inputs preserve their exact line endings across Git checkouts.
 - Expanded Splore indexing beyond 128 games and read current cached titles safely.
   Fixed repeated sprite thumbnails and immediately visible archive-import errors.
 - Updated Retroid in place. All 56 existing project files and four library files

@@ -2,3 +2,9 @@
 *.p8 -text
 # Native license bytes are pinned in the source-material manifest.
 experiments/android-host/assets/NATIVE-NOTICES.txt -text
+# Corresponding-source bundle inputs have byte-level hashes across Windows/Linux.
+docs/release/beta1/busybox.config -text
+docs/release/beta1/REBUILDING.md -text
+tools/dependencies/runtime-support.json -text
+experiments/android-host/assets/GODOT-COPYRIGHT.txt -text
+experiments/android-host/assets/GODOT-LICENSE.txt -text
