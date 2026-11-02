@@ -1,5 +1,12 @@
 # PikoNest — задачи полного цикла
 
+**2026-11-02 — Q05 PRoot recovery, still partial:**
+Three PRoot files now have a secondary package match and recipe-checked source.
+Official matches remain 60/79; 14 other Termux files remain unidentified. PRoot
+authentication/source review, Android notices and combined distribution review
+stay open. Seventeen focused tests and offline evidence/material checks passed;
+no binary replacement, device action or release. [Details](release/beta1/LICENSING_REVIEW.md).
+
 **2026-11-02 — Q05 signed-catalog follow-up, still partial:**
 60/79 native files now match official artifacts after signed PulseAudio recovery.
 Seventeen files remain unresolved; 155 source inputs and two catalogs collected.
@@ -565,7 +572,7 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 | Q02 | Частично / A05 | Полный remapping/A-B convention, stick/D-pad, отсутствие плечевых/touch, reconnect, optional keyboard/mouse, системные picker-границы | Каждый основной путь пройден физическим контроллером; ограничения системы явно описаны и есть предусмотренный путь настройки; горячие клавиши не единственный вход |
 | Q03 | Частично / A06, R03 | Старт/сканирование/редактор/preview: отзывчивость, память, большие проекты, background/sleep; отмена/ограничение provider I/O и диагностика зависаний | По согласованному профилю измерены задержки/ресурсы; задачи не блокируют UI; зависший provider/длинная загрузка не теряют данные и имеют восстановление |
 | Q04 | План / функциональные задачи A/P/R/L/C/G/N/M/S/B/T/H | Выполнить ACC-01–07 и техническую часть ACC-08, corpus на границах ресурсов, разные жанры, внешний PICO-8 round-trip, восстановление/обновление | Доказательства привязаны к сборке/устройству/версии, ограничения перечислены; ни один обязательный путь не требует правки файлов разработчиком. Приёмка владельцем и разрешение выпуска закрываются отдельно в Q06 |
-| Q05 | Частично, local beta 0.0.93; 60/79 native origins matched, signed PulseAudio catalog; 17 native files/Android notices/device pending / A06, R02, P08 | Производственный package/signing/update, backup migration, notices/зависимости/permissions; инструкция установки/архива и known limits | Проверено обновление с сохранением проектов/сейвов, нет debug-only зависимости или proprietary runtime в APK; ключи/секреты вне репозитория; без автоматического release |
+| Q05 | Частично, local beta 0.0.93; 60/79 official + 3 secondary native matches; 14 unidentified files, PRoot/Android review and device pending / A06, R02, P08 | Производственный package/signing/update, backup migration, notices/зависимости/permissions; инструкция установки/архива и known limits | Проверено обновление с сохранением проектов/сейвов, нет debug-only зависимости или proprietary runtime в APK; ключи/секреты вне репозитория; без автоматического release |
 | Q06 | План / Q01, Q02, Q03, Q04, Q05 | Демонстрация владельцу полного продукта, исправления замечаний; лишь затем отдельно разрешённый GitHub APK release | Записано явное подтверждение полной удовлетворённости и разрешение конкретного выпуска. Нет prerelease как обхода запрета; молчание/«продолжаем» не являются одобрением |
 
 Перед международным расширением запланированы:

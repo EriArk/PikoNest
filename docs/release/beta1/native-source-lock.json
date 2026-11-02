@@ -7,22 +7,34 @@
       "path": "bootstrap:package/proot",
       "bytes": 215664,
       "sha256": "3dc28935e5701e23089c3ef21b27e23756f32afd8ff1b83ddc448e028f29665e",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:proot",
+      "status": "archived-package-match",
+      "evidence_id": "secondary:termux-proot:5.1.107-65",
+      "evidence_member": "./data/data/com.termux/files/usr/bin/proot",
+      "source_revision": "60485d2646c1e09105099772da4a20deda8d020d",
+      "recipe_revision": "66a7206e299d7836687dfee2130e1e2967734915"
     },
     {
       "path": "bootstrap:package/prootlb/loader32",
       "bytes": 6124,
       "sha256": "4982242e6614fa6f5d2cac6f4aa2e16e355a055f6a1d73c942eb98dd74b35aa8",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:proot",
+      "status": "archived-package-match",
+      "evidence_id": "secondary:termux-proot:5.1.107-65",
+      "evidence_member": "./data/data/com.termux/files/usr/libexec/proot/loader32",
+      "source_revision": "60485d2646c1e09105099772da4a20deda8d020d",
+      "recipe_revision": "66a7206e299d7836687dfee2130e1e2967734915"
     },
     {
       "path": "bootstrap:package/prootlb/loader",
       "bytes": 5736,
       "sha256": "dc27edf52bbb3b33e635ef636b37d473835bdddba793883330a6d20f458a9918",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "component": "termux:proot",
+      "status": "archived-package-match",
+      "evidence_id": "secondary:termux-proot:5.1.107-65",
+      "evidence_member": "./data/data/com.termux/files/usr/libexec/proot/loader",
+      "source_revision": "60485d2646c1e09105099772da4a20deda8d020d",
+      "recipe_revision": "66a7206e299d7836687dfee2130e1e2967734915"
     },
     {
       "path": "bootstrap:package/busybox",
@@ -1112,6 +1124,22 @@
       "recipe_commit": "0ab554db227f55a6ce8144f6f1e071d650c8ddae",
       "catalog_id": "termux-main:2026-01-23",
       "catalog_filename": "pool/main/p/pulseaudio/pulseaudio_17.0-1_aarch64.deb"
+    },
+    {
+      "id": "secondary:termux-proot:5.1.107-65",
+      "url": "https://raw.githubusercontent.com/TokiZeng/proot-distro-for-Termux-Android-5.0-7.0/e0a6f33314b231bd3e4aa7b37d468d7250e297cf/proot-distro_4.16.0_all.zip",
+      "format": "zip-deb",
+      "origin": "secondary-archive",
+      "package_record": {
+        "member": "proot_5.1.107-65_aarch64.deb",
+        "sha256": "a383e92ff55e692b13eb7bebaf251ff8550f10c054d101c25dbd02c413fd8ea0",
+        "bytes": 84884
+      },
+      "package": "proot",
+      "version": "5.1.107-65",
+      "authentication": "No official signed catalog or original checksum recovered; not an official binary match",
+      "sha256": "67ecf4ada17396f5457482e05d86c959f6c43999cd3bfb2ff9c13ebd9035bd55",
+      "bytes": 117000
     }
   ],
   "materials": [
@@ -2213,12 +2241,19 @@
       "sha256": "64dcec68c0825523afde9767bb43c63345473d85ffc67d06246bae8e9f51b0a3",
       "bytes": 1722667,
       "kind": "signed-catalog"
+    },
+    {
+      "path": "termux/proot/proot-60485d2646c1e09105099772da4a20deda8d020d.zip",
+      "url": "https://github.com/termux/proot/archive/60485d2646c1e09105099772da4a20deda8d020d.zip",
+      "kind": "source",
+      "sha256": "e6942f8b94fb3840faa3a500295dd4d79147266f60404df7c026703436850737",
+      "bytes": 446952
     }
   ],
   "notice_asset": {
     "path": "experiments/android-host/assets/NATIVE-NOTICES.txt",
-    "sha256": "cfeb524c7334b13fcc673a08daf4603efc17c3f3980c7d5d28c58ae3b0581101",
-    "bytes": 863167
+    "sha256": "09b901103a7d2e909e1e43c7f9683293da16d3e9169fba75ad5711507783ee2e",
+    "bytes": 882580
   },
   "notice_sections": [
     {
@@ -2604,6 +2639,12 @@
       "url": "https://codeload.github.com/termux/termux-packages/tar.gz/0ab554db227f55a6ce8144f6f1e071d650c8ddae",
       "sha256": "90bdd6a6d096952bc929aafac379c4feea0459c3a6b8c832a6b4784c969d80c6",
       "bytes": 727
+    },
+    {
+      "title": "Termux PRoot / COPYING (60485d2646c1e09105099772da4a20deda8d020d)",
+      "url": "https://github.com/termux/proot/archive/60485d2646c1e09105099772da4a20deda8d020d.zip",
+      "sha256": "0ffa6454acbe7e410ac6f0007df83b9b3161fe55484c1f4b87487c0f2d228a6d",
+      "bytes": 19106
     }
   ],
   "bootstrap_non_elf": [
@@ -5546,7 +5587,7 @@
     }
   ],
   "open_gates": [
-    "Exact source/build provenance remains unresolved for 17 Android-side Termux ELF files.",
+    "Exact source/build provenance remains unresolved for 14 Android-side Termux ELF files; three PRoot files match a secondary archive with source collected but authenticity/source review remains open.",
     "Bootstrap scripts/configuration/certificate stores and DEX/Android dependency notices still need complete distribution review.",
     "Complete corresponding-source and applicable replacement/relink instructions remain pending for the combined support layer.",
     "Updated notices must enter and be checked in the final candidate APK after dependency review."
@@ -5581,7 +5622,8 @@
   "provenance_followups": [
     "SDL source revision and shim source are retained under permissive terms. A byte-identical rebuild is not a license precondition; local build options remain unverified.",
     "An entirely offline rebuild and auxiliary ncurses terminfo inputs have not been demonstrated. This is separate from the MIT notice requirement for that library.",
-    "PulseAudio recipe folder (8 files) matches the 17.0-1 package commit and the retained January 2025 snapshot. Actual runtime compatibility is unchanged, not re-tested."
+    "PulseAudio recipe folder (8 files) matches the 17.0-1 package commit and the retained January 2025 snapshot. Actual runtime compatibility is unchanged, not re-tested.",
+    "PRoot 5.1.107-65: secondary package match only. Source ZIP matches the official recipe checksum; no signed original package catalog recovered and no rebuild performed. Review source/build correspondence and libtalloc before clearance."
   ],
   "release_gates": [
     "Authorized handheld/runtime/provider acceptance of the exact candidate.",

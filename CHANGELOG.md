@@ -4,6 +4,20 @@ Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
 There is no public APK release as of 2 November 2026.
 
+## 2026-11-02 — PRoot source recovery and clearer evidence checks
+
+- Found an archived package matching all three shipped PRoot files. Collected its
+  exact source and original notices; the source checksum matches the official
+  Termux build recipe. No working runtime component needed replacement.
+- Kept the secondary archive separate from official package evidence. The audit
+  checks both the outer archive and inner package and does not treat their match
+  as completed source/authentication review. Fourteen other Termux files remain
+  unidentified; Android notices and combined distribution review remain open.
+- Validation: 17 focused audit tests; 79 unchanged native hashes; 60 official and
+  three secondary binary matches; signed PulseAudio chain; 158 retained materials.
+  Created a third partial source bundle. No rebuild, device access or release.
+  [Evidence and remaining work](docs/release/beta1/LICENSING_REVIEW.md).
+
 ## 2026-11-02 — Signed PulseAudio provenance and license review
 
 - Recovered all 16 shipped PulseAudio files from a historical Termux package.

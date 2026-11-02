@@ -1,7 +1,7 @@
 member_path,bytes,sha256,matching_source_status
-package/proot,215664,3dc28935e5701e23089c3ef21b27e23756f32afd8ff1b83ddc448e028f29665e,unresolved-package-build: termux-unresolved
-package/prootlb/loader32,6124,4982242e6614fa6f5d2cac6f4aa2e16e355a055f6a1d73c942eb98dd74b35aa8,unresolved-package-build: termux-unresolved
-package/prootlb/loader,5736,dc27edf52bbb3b33e635ef636b37d473835bdddba793883330a6d20f458a9918,unresolved-package-build: termux-unresolved
+package/proot,215664,3dc28935e5701e23089c3ef21b27e23756f32afd8ff1b83ddc448e028f29665e,archived-package-match: termux:proot 5.1.107-65 (secondary archive; source review open)
+package/prootlb/loader32,6124,4982242e6614fa6f5d2cac6f4aa2e16e355a055f6a1d73c942eb98dd74b35aa8,archived-package-match: termux:proot 5.1.107-65 (secondary archive; source review open)
+package/prootlb/loader,5736,dc27edf52bbb3b33e635ef636b37d473835bdddba793883330a6d20f458a9918,archived-package-match: termux:proot 5.1.107-65 (secondary archive; source review open)
 package/busybox,4240,0d1decf834771c3f73f40aeae589c35c4b5dbc057d3691765b0e55393d30b703,unresolved-package-build: termux-unresolved
 package/libtalloc.so.2,31400,368262b345120a4e09ae961f4bda92e0cdfc18004145317f923abe403df6facf,unresolved-package-build: termux-unresolved
 package/bash,837728,d6a7e3969d2096d851d73cc2eee666e04ced60d5e6f5d6a4d88c0c09240d2c0d,official-binary-match: termux:bash

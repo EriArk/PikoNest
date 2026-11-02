@@ -13,8 +13,8 @@ setup live in one development APK; there is no public APK release yet.
 | --- | --- |
 | Stage | First early beta preparation; Lua remains necessary outside supported visual paths |
 | Android baseline | **0.0.93 / 0.1.0-beta.1** candidate (see evidence); **0.0.77** remains the last complete native creation journey |
-| Latest work | Confirmed PulseAudio through a signed catalog; 60 native files now have official matches |
-| Current focus | Resolve 17 remaining Termux files and Android notices, finish distribution materials, then authorized device journeys |
+| Latest work | Recovered the PRoot package and recipe-checked source; secondary evidence kept separate from 60 official native matches |
+| Current focus | Resolve 14 unidentified Termux files, finish PRoot/Android review and distribution materials, then authorized device journeys |
 | Platforms | Android first; Linux later |
 
 ## Dependency preparation — 2 November 2026
@@ -22,7 +22,7 @@ setup live in one development APK; there is no public APK release yet.
 We traced 60 of the application's 79 native files to exact official packages,
 including the Godot engine, most Linux support libraries and part of the Android
 support layer. Their source materials now have fixed versions and checksums;
-155 source inputs and two repository catalogs are collected locally, with licenses.
+156 source inputs and two repository catalogs are collected locally, with licenses.
 A repeatable check catches changed or unexpected native files and verifies the
 source-only archive without including the purchased PICO-8 runtime or private data.
 
@@ -31,15 +31,19 @@ package and verified the repository signature, index and package hashes. This
 avoids replacing those binaries just to establish their origin. License review
 also now distinguishes required notices/sources from optional identical rebuilds.
 
-This work is **not complete**: 17 Android-side files still need source/notice
-provenance or a controlled replacement. Remaining Android notices and final
+We also recovered the exact package containing the three PRoot files and retained
+its source, checked against the official build recipe. That package comes from a
+secondary archive, so we keep its evidence separate from authenticated packages.
+
+This work is **not complete**: 14 Android-side files still need package/source
+identification, and PRoot authentication/source review remains open. Remaining Android notices and final
 distribution review also stay open; six APK version markers were invalid, so we
-do not treat them as proof of resolved versions. Fifteen focused audit tests
-passed; all current native hashes, 60 official package matches and the collected
+do not treat them as proof of resolved versions. Seventeen focused audit tests
+passed; all current native hashes, 60 official and three secondary matches and the collected
 sources were checked. The existing APK was not replaced or installed, and new
 notices enter its next packaging pass. [Details](docs/release/beta1/DEPENDENCIES.md).
 
-Next: prioritize the remaining PRoot/BusyBox/support-library sources and Android
+Next: prioritize BusyBox's build configuration, linked-library sources and Android
 notices, replacing only components whose provenance cannot be recovered. Test the
 resulting candidate on the handheld only when the owner frees it.
 

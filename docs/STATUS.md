@@ -1,5 +1,16 @@
 # Состояние PikoNest
 
+**2026-11-02 — PRoot source recovery (Q05 partial):**
+Three shipped PRoot files match an archived 5.1.107-65 package. Source commit and
+checksum match the official Termux recipe; notices are retained. The secondary
+archive is explicitly weaker evidence, not added to the 60 official matches.
+Fourteen files remain unidentified; PRoot authenticity/source and Android review
+remain open. Seventeen audit tests passed; all 79 native hashes, 63 classified
+matches, signed PulseAudio chain and 158 materials verified offline. Partial bundle
+r3 retained; no runtime replacement, rebuild, device access or release.
+[Evidence](release/beta1/DEPENDENCIES.md). Next: BusyBox configuration and remaining
+linked-library/Android source and notice review, avoiding repeated broad mirror scans.
+
 **2026-11-02 — Signed PulseAudio recovery and license review (Q05 partial):**
 Official artifact matches increased to 60/79: all 16 shipped PulseAudio files
 match the Termux 17.0-1 package. Its historical InRelease signature, index and

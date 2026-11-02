@@ -9,6 +9,8 @@ The original candidate remains unchanged. New notice assets enter the next packa
 The audit covers **79 ELF files**: 77 inside the bootstrap and two directly in the
 APK. **60 match official binary artifacts byte for byte**. This is evidence of
 origin, not a requirement that every source rebuild reproduce the same hash.
+Three more PRoot files match a secondary archived package; they are counted
+separately and are not cleared for distribution by that match alone.
 
 | Group | Evidence and collected materials | Remaining work |
 | --- | --- | --- |
@@ -18,7 +20,8 @@ origin, not a requirement that every source rebuild reproduce the same hash.
 | Godot / C++ runtime | **Both APK libraries** match official `godot-lib.4.6.stable.template_release.aar`. Official release SHA-512 checked. Engine/font notices already present; LLVM libc++, libc++abi and libunwind notices collected from compiler revision embedded in the C++ runtime | Complete DEX/Android dependency review; engine build-source obligations differ from copyleft components |
 | SDL | Embedded revision `SDL-2.33.0-gcd0cf8b` resolves to `cd0cf8b855d1edd0cd30fe1edaabced23ea39e9a`; source and zlib notice collected | Build options/local modifications not established; no byte-match or rebuild claim |
 | Shim / wrapper | Source commit `562662e35727ae7706fe97fed3390db249a35263`, source archive, original MIT notice and existing local patch scripts retained | Rebuild/configuration comparison remains a provenance follow-up |
-| Remaining Termux components | **17 files**: PRoot/loaders, Android BusyBox, talloc and associated audio/support libraries | Exact package revisions/build sources unresolved; do not substitute latest sources and call them corresponding source |
+| PRoot and loaders | **Three files** match archived package 5.1.107-65; exact upstream source matches the official recipe checksum; original notice collected | Secondary archive only: official package authentication and source review remain open |
+| Remaining Termux components | **14 files**: Android BusyBox, talloc and associated audio/support libraries | Exact package revisions/build sources unresolved; do not substitute latest sources and call them corresponding source |
 | Other bootstrap content | Hash inventory now also records **20 non-ELF files and 567 links** | Scripts/configuration, certificate stores and non-native APK dependencies still need full provenance/notice review |
 | Official PICO-8 | Absent from support payload and source bundle; each user imports their purchased runtime | Keep proprietary binaries out of every distribution |
 
@@ -35,8 +38,10 @@ projects; PulseAudio contributes multiple modules and libiconv is present twice.
 
 - verifies every native filename, size and SHA-256 against an actual APK;
 - independently repeats the 60 matches against official `.deb`/ZIP/AAR files;
+- checks three secondary PRoot matches through separately hashed outer ZIP and
+  inner DEB, while retaining their weaker evidence status;
 - optionally repeats the Termux catalog signature and full index/package hash chain;
-- downloads and verifies **157 material files** (155 source inputs and two catalogs), using
+- downloads and verifies **158 material files** (156 source inputs and two catalogs), using
   pinned HTTPS URLs, sizes and hashes;
 - makes an allowlisted source-only ZIP with readback verification; adjacent private
   files, purchased runtime, evidence binaries and signing keys are excluded;
@@ -53,7 +58,7 @@ Godot/font notices remain separate. The next beta package verification also chec
 the native inventory and the new notice asset; this does not permit publication.
 
 The local source bundle is deliberately named
-`PikoNest-beta1-partial-source-materials-r2.zip`; it is not committed as a large binary
+`PikoNest-beta1-partial-source-materials-r3.zip`; it is not committed as a large binary
 or uploaded as a release. Its lock can recreate the collected materials. Source
 recipes have been retained, but a complete offline native rebuild has not run.
 Official HTTPS index/checksum evidence is recorded. Termux PulseAudio's catalog
@@ -62,7 +67,8 @@ OpenPGP verification was not performed. The earlier partial ZIP is retained loca
 
 ## Next work and publication criteria
 
-1. Resolve the remaining 17 Android native files. The main Termux endpoint no
+1. Resolve the remaining 14 unidentified Android native files and finish the
+   separate three-file PRoot source/authentication review. The main Termux endpoint no
    longer served the probed historical revisions, but one listed mirror recovered
    PulseAudio without replacement. Use targeted source recovery or a controlled
    pinned build for the remaining components. Keep the existing candidate as the
@@ -81,9 +87,9 @@ OpenPGP verification was not performed. The earlier partial ZIP is retained loca
 5. Publish only after the separate explicit owner approval. No release/tag/upload
    is authorized by a passing audit, build or device test alone.
 
-Local validation: **15 audit boundary tests passed**, all **79 candidate native
-hashes** checked, **60 official binary matches** repeated, the Termux signature
-chain verified, and all **157 material files** verified offline. Strict completion fails while gaps
+Local validation: **17 audit boundary tests passed**, all **79 candidate native
+hashes** checked, **60 official and three secondary binary matches** repeated, the Termux signature
+chain verified, and all **158 material files** verified offline. Strict completion fails while gaps
 remain. The previous 91 core suites belong to the unchanged 0.0.93 candidate;
 they were not rerun for this source/material-only batch.
 [Recorded candidate/bundle hashes and results](dependency-evidence.json).

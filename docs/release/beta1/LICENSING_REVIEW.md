@@ -62,11 +62,39 @@ upstream terms and relevant module headers are retained. Do not infer the final
 license of every linked component from the short package label. The wider library
 review, including the remaining audio dependencies, stays open.
 
-## Remaining 17 native files
+## PRoot: recovered package identity, secondary evidence only
+
+The three shipped PRoot/loader files exactly match `proot_5.1.107-65_aarch64.deb`
+inside a [secondary archive pinned to its repository commit](https://github.com/TokiZeng/proot-distro-for-Termux-Android-5.0-7.0/blob/e0a6f33314b231bd3e4aa7b37d468d7250e297cf/proot-distro_4.16.0_all.zip).
+The ZIP, inner DEB and each shipped file have separate locked hashes. The audit
+reads the nested package without installing or executing it. This is recorded as
+`archived-package-match`, **not** an official authenticated binary match, and it
+does not clear the completion gate. An official signed package hash was not found.
+
+The official [Termux recipe](https://github.com/termux/termux-packages/blob/66a7206e299d7836687dfee2130e1e2967734915/packages/proot/build.sh)
+identifies version 5.1.107-65, source commit
+`60485d2646c1e09105099772da4a20deda8d020d`, and source ZIP SHA-256
+`e6942f8b94fb3840faa3a500295dd4d79147266f60404df7c026703436850737`.
+The downloaded source matches that hash. The retained recipe tree contains both
+`build.sh` and `termux-chroot`; the original `COPYING` is appended unchanged to
+the notice asset. The source includes GPLv2 terms and author notices. No claim of
+a completed rebuild or fully reviewed corresponding-source distribution is made.
+The talloc dependency remains unresolved separately.
+
+Bounded recovery findings: the checked Internet Archive package collections only
+retain newer PRoot/BusyBox revisions, and newer mirror packages do not match.
+Do not repeat broad mirror scans or accept a nearby version by name. The next
+step is targeted source/configuration review for BusyBox and linked libraries,
+with a controlled build only where existing provenance cannot be established.
+
+## Remaining native review
+
+Fourteen files still lack an exact package identity. Three additional PRoot files
+have the secondary match above and still need authentication/source review.
 
 | Group | Files | Next proof needed |
 | --- | ---: | --- |
-| PRoot and loaders | 3 | Exact package/source patches, or a pinned source build |
+| PRoot and loaders | 3 | Secondary package match and recipe-checked source collected; finish authentication/source review or a pinned build |
 | Android BusyBox executable/library | 2 | Package revision and build configuration |
 | talloc | 1 | Exact package/source provenance |
 | Opus, Vorbis, FLAC, Ogg, SoXR, SpeexDSP | 7 | Package/source provenance; inspect statically included code as well |

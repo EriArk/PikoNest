@@ -5,12 +5,12 @@
   "native_files_verified": 79,
   "official_binary_matches": 60,
   "official_artifacts_verified": 34,
-  "unresolved_termux_native_files": 17,
-  "source_input_files": 155,
+  "unresolved_termux_native_files": 14,
+  "source_input_files": 156,
   "catalog_files": 2,
-  "material_files_verified": 157,
-  "material_bytes": 150485821,
-  "audit_tests_passed": 15,
+  "material_files_verified": 158,
+  "material_bytes": 150932773,
+  "audit_tests_passed": 17,
   "strict_completion_exit_code": 2,
   "signature": {
     "catalog": "termux-main:2026-01-23",
@@ -24,20 +24,39 @@
     "complete_inventory": false
   },
   "bundle": {
-    "name": "PikoNest-beta1-partial-source-materials-r2.zip",
-    "sha256": "9016c2e9ce5868de315ae79481ac0b41afb5643798ba61a93f4c5cdcfaeb245c",
-    "bytes": 151588563,
-    "entries": 160,
-    "scope": "partial source materials and catalog evidence; not cleared for publication"
-  },
-  "previous_bundle": {
-    "name": "PikoNest-beta1-partial-source-materials.zip",
-    "sha256": "5647cef4713cf20f8b09da186767fc1fc9320ae0a86f55e261f29e1d770b8153",
-    "bytes": 139914520,
-    "entries": 156,
-    "scope": "partial source materials; not cleared for publication"
+    "name": "PikoNest-beta1-partial-source-materials-r3.zip",
+    "sha256": "743f03231cd08b3efb121138375cec2ffead60ad2f0f82fddacc3a061e31e95c",
+    "bytes": 152058391,
+    "entries": 161,
+    "scope": "partial source materials and catalog evidence; PRoot secondary evidence; not cleared for publication"
   },
   "new_notices_packaged": false,
   "device_access": false,
-  "apk_published": false
+  "apk_published": false,
+  "secondary_binary_matches": 3,
+  "secondary_artifacts_verified": 1,
+  "secondary_source_review_pending_files": 3,
+  "previous_bundles": [
+    {
+      "name": "PikoNest-beta1-partial-source-materials.zip",
+      "sha256": "5647cef4713cf20f8b09da186767fc1fc9320ae0a86f55e261f29e1d770b8153",
+      "bytes": 139914520,
+      "entries": 156,
+      "scope": "partial source materials; not cleared for publication"
+    },
+    {
+      "name": "PikoNest-beta1-partial-source-materials-r2.zip",
+      "sha256": "9016c2e9ce5868de315ae79481ac0b41afb5643798ba61a93f4c5cdcfaeb245c",
+      "bytes": 151588563,
+      "entries": 160,
+      "scope": "partial source materials and catalog evidence; not cleared for publication"
+    }
+  ],
+  "proot": {
+    "package": "5.1.107-65",
+    "source_revision": "60485d2646c1e09105099772da4a20deda8d020d",
+    "source_matches_recipe_checksum": true,
+    "original_signed_package_hash_verified": false,
+    "source_review_complete": false
+  }
 }

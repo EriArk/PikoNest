@@ -61,7 +61,7 @@ def load_lock(path=LOCK):
                 raise ValueError('Invalid checksum record')
     ids = {r['id'] for r in lock['evidence']}
     for r in lock['native_files']:
-        if r['status'] == 'official-binary-match' and r.get('evidence_id') not in ids:
+        if r['status'] in {'official-binary-match', 'archived-package-match'} and r.get('evidence_id') not in ids:
             raise ValueError('Missing evidence for ' + r['path'])
     return lock
 
@@ -151,7 +151,15 @@ def ar_members(data):
         pos += size + size % 2
 
 
-def evidence_members(data, kind, wanted):
+def evidence_members(data, kind, wanted, package=None):
+    if kind == 'zip-deb':
+        if not package:
+            raise ValueError('Missing nested package record')
+        with zipfile.ZipFile(io.BytesIO(data)) as z:
+            if z.namelist().count(package['member']) != 1:
+                raise ValueError('Missing/duplicate nested package')
+            data = checked(z.read(package['member']), package)
+        return evidence_members(data, 'deb', wanted)
     if kind == 'zip':
         with zipfile.ZipFile(io.BytesIO(data)) as z:
             return {n: z.read(n) for n in wanted}
@@ -172,10 +180,11 @@ def verify_evidence(lock, directory, offline=False):
         rows = [r for r in lock['native_files'] if r.get('evidence_id') == evidence['id']]
         path = local_path(directory, evidence['sha256'])
         data = download(evidence, path, offline).read_bytes()
-        found = evidence_members(data, evidence['format'], {r['evidence_member'] for r in rows})
+        found = evidence_members(data, evidence['format'], {r['evidence_member'] for r in rows},
+                                 evidence.get('package_record'))
         for row in rows:
             checked(found[row['evidence_member']], row)
-    return sum(r['status'] == 'official-binary-match' for r in lock['native_files'])
+    return dict(Counter(r['status'] for r in lock['native_files'] if r.get('evidence_id')))
 
 
 def verify_catalogs(lock, directory, executable, offline=False):
@@ -245,7 +254,7 @@ def main():
     parser.add_argument('--lock', type=Path, default=LOCK)
     parser.add_argument('--apk', type=Path)
     parser.add_argument('--materials', type=Path, help='Fetch/verify locked source materials here')
-    parser.add_argument('--evidence', type=Path, help='Fetch/verify official binary packages here')
+    parser.add_argument('--evidence', type=Path, help='Fetch/verify pinned binary evidence here')
     parser.add_argument('--gpg', type=Path, help='Also verify recorded signed catalogs; requires --evidence')
     parser.add_argument('--offline', action='store_true')
     parser.add_argument('--bundle', type=Path)
@@ -256,7 +265,7 @@ def main():
     if args.apk:
         print('APK native inventory:', dict(verify_native(args.apk, lock)))
     if args.evidence:
-        print('Official binary matches verified:', verify_evidence(lock, args.evidence, args.offline))
+        print('Binary matches verified by evidence class:', verify_evidence(lock, args.evidence, args.offline))
     if args.gpg:
         if not args.evidence:
             parser.error('--gpg requires --evidence')

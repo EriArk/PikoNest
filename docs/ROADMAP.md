@@ -8,8 +8,10 @@ Local backup/restore, Splore → Play and candidate packaging are implemented in
 0.0.93. [Scope](BETA_SCOPE.md) · [Candidate preparation](release/beta1/README.md).
 
 1. Finish the native source/notice package: 60 of 79 files now match official
-   artifacts, with 155 source inputs and two catalogs collected. Resolve the remaining 17
-   Termux files from a pinned source/build tree where old provenance cannot be
+   artifacts; three PRoot files have secondary archive matches and recipe-checked
+   source. There are 156 source inputs and two catalogs collected. Resolve the remaining 14
+   unidentified Termux files and finish PRoot authentication/source review. Use a
+   pinned source/build tree where old provenance cannot be
    recovered; complete component-specific notice and distribution review. Do not
    require a byte-identical rebuild for permissive components merely to clear licensing.
    Keep the current candidate as rollback baseline. [Evidence](release/beta1/DEPENDENCIES.md).

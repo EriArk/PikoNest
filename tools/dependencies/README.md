@@ -8,8 +8,10 @@ The original MIT license does not replace the individual component licenses.
 The lock records 79 native files: 77 bootstrap files and two APK libraries. Of
 these, 60 match official binary artifacts byte for byte (36 Ubuntu, 22 Termux,
 two Godot). SDL reports a source revision, and the wrapper has a pinned source
-tree; these are weaker evidence than a binary match. Another 17 Termux files
-still need exact source/build provenance or replacement from known sources.
+tree; these are weaker evidence than a binary match. Three PRoot files match a
+secondary archived package, with recipe-checked sources collected; authentication
+and source review remain open. Another 14 Termux files still need exact
+source/build provenance or replacement from known sources.
 
 ## Verify locally
 
@@ -18,7 +20,7 @@ From the repository root, using Python 3.12 or later:
 ```powershell
 py tools/dependencies/audit.py --apk .local/artifacts/PikoNest-0.1.0-beta.1.apk
 py tools/dependencies/audit.py --materials .local/dependency-audit/source-materials
-py tools/dependencies/audit.py --materials .local/dependency-audit/source-materials --offline --bundle .local/artifacts/PikoNest-beta1-partial-source-materials-r2.zip
+py tools/dependencies/audit.py --materials .local/dependency-audit/source-materials --offline --bundle .local/artifacts/PikoNest-beta1-partial-source-materials-r3.zip
 ```
 
 The first command checks all native filenames, lengths and hashes. Missing,
@@ -54,6 +56,11 @@ The mirror catalog is a historical snapshot, not an assertion that its packages
 are current or suitable for system installation. Official Godot/Termux release
 checksum lists were also checked. See the recorded catalog dates and fingerprints.
 
+The PRoot archive is separate, weaker evidence: both ZIP and nested DEB hashes
+are checked before native comparison. Missing/duplicate nested entries and changed
+package bytes fail. `archived-package-match` does not clear source review, even if
+the open-gate list is accidentally emptied. No downloaded program is executed.
+
 ## What the materials contain
 
 - Ubuntu: 28 exact source packages for 31 binary packages, including upstream
@@ -67,7 +74,11 @@ checksum lists were also checked. See the recorded catalog dates and fingerprint
   `1f020889c9aa44ea0f63d7222e8c2b62c3f45f68` and the complete recipe tree at package
   commit `0ab554db227f55a6ce8144f6f1e071d650c8ddae`. All eight PulseAudio recipe
   files match the retained January 2025 tree. Signed repository/index metadata is
-  included: **155 source inputs plus two catalog files**, 157 material files total.
+  included in the materials.
+- Termux PRoot 5.1.107-65: source commit
+  `60485d2646c1e09105099772da4a20deda8d020d`, checked against the official recipe's
+  source checksum. Its two recipe files are already in the retained January 2025
+  tree. This brings the total to **156 source inputs plus two catalog files**.
 - SDL revision `cd0cf8b855d1edd0cd30fe1edaabced23ea39e9a`, identified by its
   embedded version, plus the pinned wrapper source and their notices.
 - Original component copyright texts, full common license texts and LLVM C++

@@ -95,6 +95,40 @@ class AuditTests(unittest.TestCase):
         lock['native_files'][0]['status'] = 'unrecognized-status'
         self.assertTrue(audit.incomplete(lock))
 
+    def test_secondary_archive_does_not_clear_source_review(self):
+        lock = self.lock(); lock['open_gates'] = []
+        lock['native_files'][0]['status'] = 'archived-package-match'
+        self.assertTrue(audit.incomplete(lock))
+
+    def test_nested_package_requires_its_own_hash_and_unique_entry(self):
+        payload = io.BytesIO()
+        with tarfile.open(fileobj=payload, mode='w') as t:
+            m = tarfile.TarInfo('./binary'); m.size = 7
+            t.addfile(m, io.BytesIO(b'fixture'))
+        data = payload.getvalue()
+        header = ('%-16s%-12s%-6s%-6s%-8s%-10s`\n' %
+                  ('data.tar/', '0', '0', '0', '100644', str(len(data)))).encode()
+        deb = b'!<arch>\n' + header + data
+        record = dict(member='package.deb', sha256=audit.sha(deb), bytes=len(deb))
+        outer = io.BytesIO()
+        with zipfile.ZipFile(outer, 'w') as z:
+            z.writestr('package.deb', deb)
+        self.assertEqual(audit.evidence_members(outer.getvalue(), 'zip-deb', {'./binary'}, record),
+                         {'./binary': b'fixture'})
+        with self.assertRaisesRegex(ValueError, 'hash mismatch'):
+            audit.evidence_members(outer.getvalue(), 'zip-deb', {'./binary'},
+                                   dict(record, sha256='0' * 64))
+        with self.assertRaisesRegex(ValueError, 'Missing/duplicate'):
+            audit.evidence_members(outer.getvalue(), 'zip-deb', {'./binary'},
+                                   dict(record, member='missing.deb'))
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', UserWarning)
+            with zipfile.ZipFile(outer, 'a') as z:
+                z.writestr('package.deb', deb)
+        with self.assertRaisesRegex(ValueError, 'Missing/duplicate'):
+            audit.evidence_members(outer.getvalue(), 'zip-deb', {'./binary'}, record)
+
     def test_signature_does_not_replace_index_and_package_hash_checks(self):
         index = b'Package: demo\nVersion: 1\nFilename: pool/demo.deb\nSize: 2\nSHA256: abc\n'
         release = 'Date: historical\nSHA256:\n %s %d main/Packages\n' % (audit.sha(index), len(index))
