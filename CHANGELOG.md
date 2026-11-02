@@ -4,6 +4,21 @@ Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
 There is no public APK release as of 2 November 2026.
 
+## 2026-11-02 — Native dependency sources and distribution checks
+
+- Matched 44 native files to official Ubuntu, Termux and Godot artifacts. Collected
+  153 pinned source archives/patches and additional original component notices.
+- Added a repeatable APK/source audit and an allowlisted source-material ZIP builder.
+  Unexpected libraries, corrupted sources and unsafe output paths are rejected;
+  incomplete source coverage is reported explicitly and fails the completion check.
+- The next beta package must include the new notices and pass native drift checks.
+  No native binaries, application behavior or installed app changed in this batch.
+- Validation: 10 focused boundary tests passed; all 79 current native files,
+  44 official binary matches and all 153 source files checked. The local bundle is
+  explicitly partial: 33 Termux files and the remaining distribution review are
+  unresolved. No full app rebuild, handheld access or publication.
+  [Evidence and next work](docs/release/beta1/DEPENDENCIES.md).
+
 ## 2026-11-02 — Early beta preparation, backup and Splore (lab 0.0.93)
 
 - Named the first milestone an early beta (`0.1.0-beta.1`), with Lua still needed

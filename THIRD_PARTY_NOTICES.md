@@ -20,13 +20,20 @@ A full component/notice audit of that payload remains required before production
 redistribution. This table is an identified-materials inventory, not a completed
 audit of every transitive dependency.
 
-The 2 November early beta preparation enumerates 77 ELF files in the pinned bootstrap,
-with SHA-256 values and a source-provenance status in
-[the distribution inventory](docs/release/beta1/DEPENDENCIES.md). Some are Termux
-builds and others Ubuntu builds; the upstream generic Docker recipe is not proof
-of the precise sources/configuration for all those binaries. The candidate stays
-local until the corresponding-source/notice package is complete. The original
-MIT decision is unchanged and does not cover those separate component terms.
+The 2 November dependency follow-up covers 79 ELF files (77 bootstrap and two APK
+libraries). Forty-four match exact official Ubuntu/Termux/Godot artifacts; 153
+source archives and patches are collected with pinned URLs/hashes. See
+[the distribution evidence](docs/release/beta1/DEPENDENCIES.md) and preserved
+[native component notices](experiments/android-host/assets/NATIVE-NOTICES.txt).
+These include Ubuntu package copyright texts, full referenced common licenses,
+the identified Termux source notices, SDL/wrapper notices and LLVM C++ runtime
+licenses. The latter are separate from the Godot engine copyright list.
+
+This remains incomplete: 33 Termux files need exact source/build provenance or
+replacement, and non-native dependencies and final distribution requirements still
+need review. New notices enter the next APK packaging pass. The candidate stays
+local until the corresponding-source/notice package is complete. Original PikoNest
+MIT licensing is unchanged and does not cover those separate component terms.
 
 Third-party cartridges and extracted assets retain their authors' terms. Import
 or extraction does not grant redistribution permission. Screenshot captions

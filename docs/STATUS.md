@@ -1,5 +1,17 @@
 # Состояние PikoNest
 
+**2026-11-02 — Native source recovery and audit tooling (Q05 partial):**
+All 79 candidate native files now have a checked inventory. Forty-four match
+official binary artifacts (36 Ubuntu, six Termux, two Godot), and 153 source
+archives/patches are collected with pinned hashes. SDL's embedded revision and
+the pinned shim source are recorded separately; 33 other Termux files remain
+unresolved. Source-only bundle creation, native drift checks and ten negative/boundary
+tests are implemented. [Distribution evidence](release/beta1/DEPENDENCIES.md).
+Original license notices enter the next APK packaging pass; no runtime binary or
+candidate APK changed, no full application rebuild, device access or publication.
+Next: resolve/replace the remaining Android native layer from pinned sources,
+finish non-native notice/replacement review, then perform authorized device tests.
+
 **2026-11-02 — Lab 0.0.93, first early beta preparation (P08/R07/Q05 partial):**
 Owner selected `0.1.0-beta.1`, superseding the earlier alpha name without claiming
 complete no-Lua creation. [Current scope](BETA_SCOPE.md). Checked ZIP backup and

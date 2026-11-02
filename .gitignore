@@ -18,6 +18,7 @@ local.properties
 .idea/
 .vscode/
 .gradle/
+__pycache__/
 /.codex/
 .DS_Store
 Thumbs.db

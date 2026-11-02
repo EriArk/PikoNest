@@ -1,78 +1,78 @@
 member_path,bytes,sha256,matching_source_status
-package/proot,215664,3dc28935e5701e23089c3ef21b27e23756f32afd8ff1b83ddc448e028f29665e,pending exact package/build provenance
-package/prootlb/loader32,6124,4982242e6614fa6f5d2cac6f4aa2e16e355a055f6a1d73c942eb98dd74b35aa8,pending exact package/build provenance
-package/prootlb/loader,5736,dc27edf52bbb3b33e635ef636b37d473835bdddba793883330a6d20f458a9918,pending exact package/build provenance
-package/busybox,4240,0d1decf834771c3f73f40aeae589c35c4b5dbc057d3691765b0e55393d30b703,pending exact package/build provenance
-package/libtalloc.so.2,31400,368262b345120a4e09ae961f4bda92e0cdfc18004145317f923abe403df6facf,pending exact package/build provenance
-package/bash,837728,d6a7e3969d2096d851d73cc2eee666e04ced60d5e6f5d6a4d88c0c09240d2c0d,pending exact package/build provenance
-package/libreadline.so.8,309728,0de1d33e1d25c0f92cb3d256bab8204a90fe449a8f3cec31b0d2b9c333b28eeb,pending exact package/build provenance
-package/libbusybox.so.1.37.0,862472,167d87a41b9dc2375790288ea93511a6d008d5c245cd2d5183bf978b03601e36,pending exact package/build provenance
-package/libncursesw.so.6,384432,d8fc637f9d9aaf1887e1b267ac23dff9a1b7137e233c78b623a431cc6002ab3f,pending exact package/build provenance
-package/libandroid-support.so,20704,b49953488d09fbc5e535a86a53cb428e2af64c039dd11bf5ecaa410be22ac0da,pending exact package/build provenance
-package/libiconv.so,1067696,2c74ccbbf134f6e24aaad0ff877fa20f1207785539eb1e0d2818dd59caf2517b,pending exact package/build provenance
-package/pulseaudio,72680,d7c7812b5d0d6fa0ccd72e345fa0eb82c23f26df47e02dbdec1088d339712b59,pending exact package/build provenance
-package/rootfs/usr/bin/busybox,985736,341dc7626553e8330cf8b5423bdd84055ef35ced73b4d3f63eb926d5e49d5805,pending exact package/build provenance
-package/rootfs/usr/bin/openssl,1017208,f63dd776acb90ef67955b6b827e014f3630095c6b100fdf29d47c57370ba11d2,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libsystemd.so.0,989464,d2b97576458741026f22a429c742c18422deb07c74eae65c5a9057f7783b6db3,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libvorbisenc.so.2,722856,602d16f3b6e7ff62d4fbfcdf5cfc9a2fc7eae187add4f4313eac4b5380f91ffb,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libasyncns.so.0,67352,fdc62a2e1fa5b3ebd6d6bc801b5d9627dec695c8c83c49e02cfa81396b610326,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libopus.so.0,395360,a346225ddd7a5964d718b51cd148639f80f6e3e2b17b3c73cc87ac82222314a5,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libcrypto.so.3,4597928,7c10d7356a78bcc2e397adc8af2df4f1e0f40fd1d7480784615b53701c38aaec,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libmpg123.so.0,331400,a7e2858dbb474686f75d4082e84f26eca06d942a3982c9f0da5b7dad95c61147,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/liblzma.so.5,198584,e2634ac2871900fa2b2d4937c9052b25bed0f2997bb3fa2911546efee42b32fa,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libXau.so.6,67640,6fff1a9d4b5bc4d91df752b12600f8aedcd8ac33ea01a48295326675243d68c0,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libcap.so.2,67704,edd12e59f18be423a6628fabd78072ff8ab9241d5fa965cf9d873c184a661d68,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libXdmcp.so.6,67528,84b6623297efd8eb43f98af678acbb68ca31de7617dab042a1dcc7c6feb8a2ea,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libgcrypt.so.20,1000536,763eeb8f170de52b8bc7268eaf433f72f03c980c04511130229a338a0ee2bb06,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libSDL2-2.0.so.0,3741592,c22825223fe287864a263dc01adccd68626fdda67a5798451ee0c08f7133bdef,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libpulse.so.0.24.2,330728,cca7dd98ddd32c558885362b9b5fa1065ac4c5fe0c6393960ec9c85671e6f6c8,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libX11-xcb.so.1,67216,29c7234b66338d3069707aa4108175287e21e68677ed3de078ab92cf0386cdd4,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libapparmor.so.1,133768,15d4c07596782b6b8d11c393c811e115862b37a02c364ca5a14887c092820887,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libxcb.so.1,199048,cc570b1aff9e2ffe32c1add5aa23cb65b041a3615810566bb32efcc0c3f83f28,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libsndfile.so.1,594792,f15aa57c7325e01a085665faa257988f88bd5bd35c3ade08ca871bc48136bdaf,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libssl.so.3,737192,e618a905d4426db4463606976f4959c3637950edca3950004157ebcc6b45ee5e,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libdbus-1.so.3,395336,9b8d0d8b10bdffc68f6699b03e7be99d4dc40552aca189be43b55c5f84753241,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libzstd.so.1,657432,fe726238b170b83aa83bf1f8a79109b8b61b9eb45234304511d093bbe5f5fb20,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libresolv.so.2,67720,852f938f297f87d56e493100d31612ff6b22dff8432919b26a2c353c7545fe95,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libmp3lame.so.0,329576,2bd9422e3f287a648eb150bc5ee7eeea228a522dfb7d1491a5548fa7842b677e,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libmd.so.0,67584,d0d295bf8c75814a0a45a39690e2505c170824af00aa065fee8c3eb935c1dc86,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libFLAC.so.12,329600,a547ee7c9ac918e0432950790bf8beab0f86c6c143a3d6a8e9e5fc35553f6d56,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libm.so.6,591800,a9c3487e01ae9f87dede4741ca08458c0cd507c2778381ded987fa1c2154c9be,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libtinfo.so.6,265416,7bbaee1535d845b4baf8323e75f25cb58d3bcab18bd1bc5b231932a17bc029e8,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/pulseaudio/libpulsecommon-16.1.so,526448,b972e84100fc6043a30bf626808e712d7647f841d2c59a0ade2f5cba76061bdb,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libvorbis.so.0,198504,10601a705b62bfd00ea6741b7a167129b918eb9f5ed9f5bd835ce3d94b0bc156,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/liblz4.so.1,133136,d1482a2f74152881d8b83708fedae7bca039f5608024f1178dc21a17df9887a7,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libc.so.6,1722920,af9f0346cd155b0cc2d2c549e54f22100ed5e03771f2f666dc4ba737987654a8,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libX11.so.6,1390984,8e4b164809fe69ddfa317340c23cddc7b66963413ba2b224bec5da79496c0c12,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libogg.so.0,67352,888224cbf3e81f365449d66c444efcf02b46271c598de929a2e51c77486663f4,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libgpg-error.so.0,198648,c0f6e1be12b720b950950e2f40ae4985fa629def1815a2ddceab50f5917a37be,pending exact package/build provenance
-package/rootfs/usr/lib/aarch64-linux-gnu/libbsd.so.0,133944,3d37bad538e9149f8fd60d6b215d94f10b208cc3a7958ec766aec5fba9266200,pending exact package/build provenance
-package/rootfs/usr/lib/ld-linux-aarch64.so.1,203968,4bde85854b2354752a55cdf131bbec6574c0babaa9da65e9b860f64544fe7b95,pending exact package/build provenance
-package/rootfs/home/pico/picoshim.so,117920,63adcaf088d8d3deca3f4d4174095f689f31bbbe0cfd63c6c12fa2c33abb5246,pending exact package/build provenance
-package/pulselibs/libopus.so,312120,876a73008cc7ec21aede35c658a6e2cddc78e2b6ea132412464472e2bce7a375,pending exact package/build provenance
-package/pulselibs/libprotocol-native.so,115720,a5f31886ae237ea8f9c114cdcb63d13c264486e5ba03aa95183f899150a7a557,pending exact package/build provenance
-package/pulselibs/module-simple-protocol-tcp.so,9192,79a1e60785cfae6b1d739dd1467f504397344b2a855244c3b6d7a59237229d26,pending exact package/build provenance
-package/pulselibs/libvorbis.so,151328,aa76e77de21b8b9ed6f25b1dfbd0f647c3f0405cefc247b1def54e170e1b0690,pending exact package/build provenance
-package/pulselibs/module-suspend-on-idle.so,19320,f04c49c9d9e0de31d068d155ab55409ab7598e3f102348453ac56a9382070915,pending exact package/build provenance
-package/pulselibs/module-always-sink.so,8792,6b6faa2f193648ab110aec38251534ef4434a31ca856e5eda75c02ba6a68d4d5,pending exact package/build provenance
-package/pulselibs/libsoxr.so,961544,66d8b0b74c4bfe3c01d06b27bd74ce5ddb455d7384b58406b2fd9c457b1db712,pending exact package/build provenance
-package/pulselibs/module-null-sink.so,17296,6fdc913226b27aabfef1efab99e456af8e7c5a55c3dfffb5b14b3b4915542e8e,pending exact package/build provenance
-package/pulselibs/libFLAC.so,191000,c59e1e2f2f6074b5e0a9eb72ee7a601de3f57de71a5774c7276210ada44150a9,pending exact package/build provenance
-package/pulselibs/module-native-protocol-unix.so,9408,e878a6e9d87b64a7301ea017294e1ddec22679d696ad7aaad65356694c3c4533,pending exact package/build provenance
-package/pulselibs/module-aaudio-sink.so,18416,70959e2d4aed507f04381edb49b853dbebb79d1728b6440b21cef8e2535c48ac,pending exact package/build provenance
-package/pulselibs/module-native-protocol-tcp.so,9712,5bc995ce019f04058291552410a446869cf28add5f18ab8e8af8fe85ef01c824,pending exact package/build provenance
-package/pulselibs/module-default-device-restore.so,9480,15613ee11c10bd002af198984344ce2a2b6b375aad1136538308d049eed3b322,pending exact package/build provenance
-package/pulselibs/libogg.so,26416,5bad294de1956fd77b158cf30d0fe80ab70be6344d9ac0658abdb204672ebf61,pending exact package/build provenance
-package/pulselibs/libprotocol-simple.so,27032,70bca38032c048a2979233164f8dc7246779efcb6bcdcd44019598cff71682cd,pending exact package/build provenance
-package/pulselibs/libvorbisenc.so,647312,89b743e745b7e70fa1c794a8035ea2f1c46ad2c7bba374d1bbffc5f9d61ef55d,pending exact package/build provenance
-package/pulselibs/libpulsecore-17.0.so,610664,5e4f756cdfd7e6928e3b2dc413207a5999bd8e7db8b90b3584c1dd541e2374d4,pending exact package/build provenance
-package/pulselibs/libpulsecommon-17.0.so,493312,5e1e47a0ba66c993b42b8664e9da8bdf4413403766a6f55afe1c90cf70979da5,pending exact package/build provenance
-package/pulselibs/libspeexdsp.so,56528,f36dcaaa30fd98697f8f720a708b06c9792ea66910aeb41c1311842510805258,pending exact package/build provenance
-package/pulselibs/libdbus-1.so,309984,6b0dd575b54bca36368cc54c12fa1308887fad979fd4cedbfee79851ef5dbb88,pending exact package/build provenance
-package/pulselibs/libltdl.so,36320,b5f04b38396fca7f67acd7a275167daa726fcb0d8d816cfe9918ffda255d5451,pending exact package/build provenance
-package/pulselibs/module-switch-on-connect.so,10072,caad10266fa7080be10e14fb58b5bc488ce1de8350577e25079f4f4ba51c1b5d,pending exact package/build provenance
-package/pulselibs/libiconv.so,1067696,2c74ccbbf134f6e24aaad0ff877fa20f1207785539eb1e0d2818dd59caf2517b,pending exact package/build provenance
-package/pulselibs/module-sles-sink.so,19872,91ca45b4f6b19c22c52a3ecb32ada4531de674117ac2eecf36f71548e7b2c2a8,pending exact package/build provenance
-package/pulselibs/libpulse.so,309008,00d1eca8a4f45fd483fb72fef29d0ad318c3721a7b7236338828d36114664e6a,pending exact package/build provenance
-package/pulselibs/libandroid-execinfo.so,33528,db557738b5904b755b0c2326a47d8b14a489e884a66ed7da31ca17d14cd0ae1b,pending exact package/build provenance
-package/pulselibs/libsndfile.so,403232,84686c989a48b8ce91323ecf2926202bd893fa5c1c93518322427b050a106231,pending exact package/build provenance
+package/proot,215664,3dc28935e5701e23089c3ef21b27e23756f32afd8ff1b83ddc448e028f29665e,unresolved-package-build: termux-unresolved
+package/prootlb/loader32,6124,4982242e6614fa6f5d2cac6f4aa2e16e355a055f6a1d73c942eb98dd74b35aa8,unresolved-package-build: termux-unresolved
+package/prootlb/loader,5736,dc27edf52bbb3b33e635ef636b37d473835bdddba793883330a6d20f458a9918,unresolved-package-build: termux-unresolved
+package/busybox,4240,0d1decf834771c3f73f40aeae589c35c4b5dbc057d3691765b0e55393d30b703,unresolved-package-build: termux-unresolved
+package/libtalloc.so.2,31400,368262b345120a4e09ae961f4bda92e0cdfc18004145317f923abe403df6facf,unresolved-package-build: termux-unresolved
+package/bash,837728,d6a7e3969d2096d851d73cc2eee666e04ced60d5e6f5d6a4d88c0c09240d2c0d,official-binary-match: termux:bash
+package/libreadline.so.8,309728,0de1d33e1d25c0f92cb3d256bab8204a90fe449a8f3cec31b0d2b9c333b28eeb,official-binary-match: termux:readline
+package/libbusybox.so.1.37.0,862472,167d87a41b9dc2375790288ea93511a6d008d5c245cd2d5183bf978b03601e36,unresolved-package-build: termux-unresolved
+package/libncursesw.so.6,384432,d8fc637f9d9aaf1887e1b267ac23dff9a1b7137e233c78b623a431cc6002ab3f,official-binary-match: termux:ncurses
+package/libandroid-support.so,20704,b49953488d09fbc5e535a86a53cb428e2af64c039dd11bf5ecaa410be22ac0da,official-binary-match: termux:libandroid-support
+package/libiconv.so,1067696,2c74ccbbf134f6e24aaad0ff877fa20f1207785539eb1e0d2818dd59caf2517b,official-binary-match: termux:libiconv
+package/pulseaudio,72680,d7c7812b5d0d6fa0ccd72e345fa0eb82c23f26df47e02dbdec1088d339712b59,unresolved-package-build: termux-unresolved
+package/rootfs/usr/bin/busybox,985736,341dc7626553e8330cf8b5423bdd84055ef35ced73b4d3f63eb926d5e49d5805,official-binary-match: ubuntu:busybox
+package/rootfs/usr/bin/openssl,1017208,f63dd776acb90ef67955b6b827e014f3630095c6b100fdf29d47c57370ba11d2,official-binary-match: ubuntu:openssl
+package/rootfs/usr/lib/aarch64-linux-gnu/libsystemd.so.0,989464,d2b97576458741026f22a429c742c18422deb07c74eae65c5a9057f7783b6db3,official-binary-match: ubuntu:libsystemd0
+package/rootfs/usr/lib/aarch64-linux-gnu/libvorbisenc.so.2,722856,602d16f3b6e7ff62d4fbfcdf5cfc9a2fc7eae187add4f4313eac4b5380f91ffb,official-binary-match: ubuntu:libvorbisenc2
+package/rootfs/usr/lib/aarch64-linux-gnu/libasyncns.so.0,67352,fdc62a2e1fa5b3ebd6d6bc801b5d9627dec695c8c83c49e02cfa81396b610326,official-binary-match: ubuntu:libasyncns0
+package/rootfs/usr/lib/aarch64-linux-gnu/libopus.so.0,395360,a346225ddd7a5964d718b51cd148639f80f6e3e2b17b3c73cc87ac82222314a5,official-binary-match: ubuntu:libopus0
+package/rootfs/usr/lib/aarch64-linux-gnu/libcrypto.so.3,4597928,7c10d7356a78bcc2e397adc8af2df4f1e0f40fd1d7480784615b53701c38aaec,official-binary-match: ubuntu:libssl3t64
+package/rootfs/usr/lib/aarch64-linux-gnu/libmpg123.so.0,331400,a7e2858dbb474686f75d4082e84f26eca06d942a3982c9f0da5b7dad95c61147,official-binary-match: ubuntu:libmpg123-0t64
+package/rootfs/usr/lib/aarch64-linux-gnu/liblzma.so.5,198584,e2634ac2871900fa2b2d4937c9052b25bed0f2997bb3fa2911546efee42b32fa,official-binary-match: ubuntu:liblzma5
+package/rootfs/usr/lib/aarch64-linux-gnu/libXau.so.6,67640,6fff1a9d4b5bc4d91df752b12600f8aedcd8ac33ea01a48295326675243d68c0,official-binary-match: ubuntu:libxau6
+package/rootfs/usr/lib/aarch64-linux-gnu/libcap.so.2,67704,edd12e59f18be423a6628fabd78072ff8ab9241d5fa965cf9d873c184a661d68,official-binary-match: ubuntu:libcap2
+package/rootfs/usr/lib/aarch64-linux-gnu/libXdmcp.so.6,67528,84b6623297efd8eb43f98af678acbb68ca31de7617dab042a1dcc7c6feb8a2ea,official-binary-match: ubuntu:libxdmcp6
+package/rootfs/usr/lib/aarch64-linux-gnu/libgcrypt.so.20,1000536,763eeb8f170de52b8bc7268eaf433f72f03c980c04511130229a338a0ee2bb06,official-binary-match: ubuntu:libgcrypt20
+package/rootfs/usr/lib/aarch64-linux-gnu/libSDL2-2.0.so.0,3741592,c22825223fe287864a263dc01adccd68626fdda67a5798451ee0c08f7133bdef,embedded-revision-source-collected: sdl2
+package/rootfs/usr/lib/aarch64-linux-gnu/libpulse.so.0.24.2,330728,cca7dd98ddd32c558885362b9b5fa1065ac4c5fe0c6393960ec9c85671e6f6c8,official-binary-match: ubuntu:libpulse0
+package/rootfs/usr/lib/aarch64-linux-gnu/libX11-xcb.so.1,67216,29c7234b66338d3069707aa4108175287e21e68677ed3de078ab92cf0386cdd4,official-binary-match: ubuntu:libx11-xcb1
+package/rootfs/usr/lib/aarch64-linux-gnu/libapparmor.so.1,133768,15d4c07596782b6b8d11c393c811e115862b37a02c364ca5a14887c092820887,official-binary-match: ubuntu:libapparmor1
+package/rootfs/usr/lib/aarch64-linux-gnu/libxcb.so.1,199048,cc570b1aff9e2ffe32c1add5aa23cb65b041a3615810566bb32efcc0c3f83f28,official-binary-match: ubuntu:libxcb1
+package/rootfs/usr/lib/aarch64-linux-gnu/libsndfile.so.1,594792,f15aa57c7325e01a085665faa257988f88bd5bd35c3ade08ca871bc48136bdaf,official-binary-match: ubuntu:libsndfile1
+package/rootfs/usr/lib/aarch64-linux-gnu/libssl.so.3,737192,e618a905d4426db4463606976f4959c3637950edca3950004157ebcc6b45ee5e,official-binary-match: ubuntu:libssl3t64
+package/rootfs/usr/lib/aarch64-linux-gnu/libdbus-1.so.3,395336,9b8d0d8b10bdffc68f6699b03e7be99d4dc40552aca189be43b55c5f84753241,official-binary-match: ubuntu:libdbus-1-3
+package/rootfs/usr/lib/aarch64-linux-gnu/libzstd.so.1,657432,fe726238b170b83aa83bf1f8a79109b8b61b9eb45234304511d093bbe5f5fb20,official-binary-match: ubuntu:libzstd1
+package/rootfs/usr/lib/aarch64-linux-gnu/libresolv.so.2,67720,852f938f297f87d56e493100d31612ff6b22dff8432919b26a2c353c7545fe95,official-binary-match: ubuntu:libc6
+package/rootfs/usr/lib/aarch64-linux-gnu/libmp3lame.so.0,329576,2bd9422e3f287a648eb150bc5ee7eeea228a522dfb7d1491a5548fa7842b677e,official-binary-match: ubuntu:libmp3lame0
+package/rootfs/usr/lib/aarch64-linux-gnu/libmd.so.0,67584,d0d295bf8c75814a0a45a39690e2505c170824af00aa065fee8c3eb935c1dc86,official-binary-match: ubuntu:libmd0
+package/rootfs/usr/lib/aarch64-linux-gnu/libFLAC.so.12,329600,a547ee7c9ac918e0432950790bf8beab0f86c6c143a3d6a8e9e5fc35553f6d56,official-binary-match: ubuntu:libflac12t64
+package/rootfs/usr/lib/aarch64-linux-gnu/libm.so.6,591800,a9c3487e01ae9f87dede4741ca08458c0cd507c2778381ded987fa1c2154c9be,official-binary-match: ubuntu:libc6
+package/rootfs/usr/lib/aarch64-linux-gnu/libtinfo.so.6,265416,7bbaee1535d845b4baf8323e75f25cb58d3bcab18bd1bc5b231932a17bc029e8,official-binary-match: ubuntu:libtinfo6
+package/rootfs/usr/lib/aarch64-linux-gnu/pulseaudio/libpulsecommon-16.1.so,526448,b972e84100fc6043a30bf626808e712d7647f841d2c59a0ade2f5cba76061bdb,official-binary-match: ubuntu:libpulse0
+package/rootfs/usr/lib/aarch64-linux-gnu/libvorbis.so.0,198504,10601a705b62bfd00ea6741b7a167129b918eb9f5ed9f5bd835ce3d94b0bc156,official-binary-match: ubuntu:libvorbis0a
+package/rootfs/usr/lib/aarch64-linux-gnu/liblz4.so.1,133136,d1482a2f74152881d8b83708fedae7bca039f5608024f1178dc21a17df9887a7,official-binary-match: ubuntu:liblz4-1
+package/rootfs/usr/lib/aarch64-linux-gnu/libc.so.6,1722920,af9f0346cd155b0cc2d2c549e54f22100ed5e03771f2f666dc4ba737987654a8,official-binary-match: ubuntu:libc6
+package/rootfs/usr/lib/aarch64-linux-gnu/libX11.so.6,1390984,8e4b164809fe69ddfa317340c23cddc7b66963413ba2b224bec5da79496c0c12,official-binary-match: ubuntu:libx11-6
+package/rootfs/usr/lib/aarch64-linux-gnu/libogg.so.0,67352,888224cbf3e81f365449d66c444efcf02b46271c598de929a2e51c77486663f4,official-binary-match: ubuntu:libogg0
+package/rootfs/usr/lib/aarch64-linux-gnu/libgpg-error.so.0,198648,c0f6e1be12b720b950950e2f40ae4985fa629def1815a2ddceab50f5917a37be,official-binary-match: ubuntu:libgpg-error0
+package/rootfs/usr/lib/aarch64-linux-gnu/libbsd.so.0,133944,3d37bad538e9149f8fd60d6b215d94f10b208cc3a7958ec766aec5fba9266200,official-binary-match: ubuntu:libbsd0
+package/rootfs/usr/lib/ld-linux-aarch64.so.1,203968,4bde85854b2354752a55cdf131bbec6574c0babaa9da65e9b860f64544fe7b95,official-binary-match: ubuntu:libc6
+package/rootfs/home/pico/picoshim.so,117920,63adcaf088d8d3deca3f4d4174095f689f31bbbe0cfd63c6c12fa2c33abb5246,pinned-wrapper-source-collected: wrapper-shim
+package/pulselibs/libopus.so,312120,876a73008cc7ec21aede35c658a6e2cddc78e2b6ea132412464472e2bce7a375,unresolved-package-build: termux-unresolved
+package/pulselibs/libprotocol-native.so,115720,a5f31886ae237ea8f9c114cdcb63d13c264486e5ba03aa95183f899150a7a557,unresolved-package-build: termux-unresolved
+package/pulselibs/module-simple-protocol-tcp.so,9192,79a1e60785cfae6b1d739dd1467f504397344b2a855244c3b6d7a59237229d26,unresolved-package-build: termux-unresolved
+package/pulselibs/libvorbis.so,151328,aa76e77de21b8b9ed6f25b1dfbd0f647c3f0405cefc247b1def54e170e1b0690,unresolved-package-build: termux-unresolved
+package/pulselibs/module-suspend-on-idle.so,19320,f04c49c9d9e0de31d068d155ab55409ab7598e3f102348453ac56a9382070915,unresolved-package-build: termux-unresolved
+package/pulselibs/module-always-sink.so,8792,6b6faa2f193648ab110aec38251534ef4434a31ca856e5eda75c02ba6a68d4d5,unresolved-package-build: termux-unresolved
+package/pulselibs/libsoxr.so,961544,66d8b0b74c4bfe3c01d06b27bd74ce5ddb455d7384b58406b2fd9c457b1db712,unresolved-package-build: termux-unresolved
+package/pulselibs/module-null-sink.so,17296,6fdc913226b27aabfef1efab99e456af8e7c5a55c3dfffb5b14b3b4915542e8e,unresolved-package-build: termux-unresolved
+package/pulselibs/libFLAC.so,191000,c59e1e2f2f6074b5e0a9eb72ee7a601de3f57de71a5774c7276210ada44150a9,unresolved-package-build: termux-unresolved
+package/pulselibs/module-native-protocol-unix.so,9408,e878a6e9d87b64a7301ea017294e1ddec22679d696ad7aaad65356694c3c4533,unresolved-package-build: termux-unresolved
+package/pulselibs/module-aaudio-sink.so,18416,70959e2d4aed507f04381edb49b853dbebb79d1728b6440b21cef8e2535c48ac,unresolved-package-build: termux-unresolved
+package/pulselibs/module-native-protocol-tcp.so,9712,5bc995ce019f04058291552410a446869cf28add5f18ab8e8af8fe85ef01c824,unresolved-package-build: termux-unresolved
+package/pulselibs/module-default-device-restore.so,9480,15613ee11c10bd002af198984344ce2a2b6b375aad1136538308d049eed3b322,unresolved-package-build: termux-unresolved
+package/pulselibs/libogg.so,26416,5bad294de1956fd77b158cf30d0fe80ab70be6344d9ac0658abdb204672ebf61,unresolved-package-build: termux-unresolved
+package/pulselibs/libprotocol-simple.so,27032,70bca38032c048a2979233164f8dc7246779efcb6bcdcd44019598cff71682cd,unresolved-package-build: termux-unresolved
+package/pulselibs/libvorbisenc.so,647312,89b743e745b7e70fa1c794a8035ea2f1c46ad2c7bba374d1bbffc5f9d61ef55d,unresolved-package-build: termux-unresolved
+package/pulselibs/libpulsecore-17.0.so,610664,5e4f756cdfd7e6928e3b2dc413207a5999bd8e7db8b90b3584c1dd541e2374d4,unresolved-package-build: termux-unresolved
+package/pulselibs/libpulsecommon-17.0.so,493312,5e1e47a0ba66c993b42b8664e9da8bdf4413403766a6f55afe1c90cf70979da5,unresolved-package-build: termux-unresolved
+package/pulselibs/libspeexdsp.so,56528,f36dcaaa30fd98697f8f720a708b06c9792ea66910aeb41c1311842510805258,unresolved-package-build: termux-unresolved
+package/pulselibs/libdbus-1.so,309984,6b0dd575b54bca36368cc54c12fa1308887fad979fd4cedbfee79851ef5dbb88,unresolved-package-build: termux-unresolved
+package/pulselibs/libltdl.so,36320,b5f04b38396fca7f67acd7a275167daa726fcb0d8d816cfe9918ffda255d5451,unresolved-package-build: termux-unresolved
+package/pulselibs/module-switch-on-connect.so,10072,caad10266fa7080be10e14fb58b5bc488ce1de8350577e25079f4f4ba51c1b5d,unresolved-package-build: termux-unresolved
+package/pulselibs/libiconv.so,1067696,2c74ccbbf134f6e24aaad0ff877fa20f1207785539eb1e0d2818dd59caf2517b,official-binary-match: termux:libiconv
+package/pulselibs/module-sles-sink.so,19872,91ca45b4f6b19c22c52a3ecb32ada4531de674117ac2eecf36f71548e7b2c2a8,unresolved-package-build: termux-unresolved
+package/pulselibs/libpulse.so,309008,00d1eca8a4f45fd483fb72fef29d0ad318c3721a7b7236338828d36114664e6a,unresolved-package-build: termux-unresolved
+package/pulselibs/libandroid-execinfo.so,33528,db557738b5904b755b0c2326a47d8b14a489e884a66ed7da31ca17d14cd0ae1b,unresolved-package-build: termux-unresolved
+package/pulselibs/libsndfile.so,403232,84686c989a48b8ce91323ecf2926202bd893fa5c1c93518322427b050a106231,unresolved-package-build: termux-unresolved

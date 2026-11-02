@@ -13,9 +13,29 @@ setup live in one development APK; there is no public APK release yet.
 | --- | --- |
 | Stage | First early beta preparation; Lua remains necessary outside supported visual paths |
 | Android baseline | **0.0.93 / 0.1.0-beta.1** candidate (see evidence); **0.0.77** remains the last complete native creation journey |
-| Latest work | Backup/restore, Splore → Play, non-debug candidate and updated website materials |
-| Current focus | Dependency/source distribution package, then authorized candidate device journeys |
+| Latest work | Recovered official origins for 44 native files; assembled pinned source materials and notices |
+| Current focus | Resolve 33 remaining Termux native files, finish distribution materials, then authorized device journeys |
 | Platforms | Android first; Linux later |
+
+## Dependency preparation — 2 November 2026
+
+We traced 44 of the application's 79 native files to exact official packages,
+including the Godot engine, most Linux support libraries and part of the Android
+support layer. Their source materials now have fixed versions and checksums;
+153 source archives and patches are collected locally, with component licenses.
+A repeatable check catches changed or unexpected native files and verifies the
+source-only archive without including the purchased PICO-8 runtime or private data.
+
+This work is **not complete**: 33 Android-side files still need exact source/build
+provenance or a controlled replacement. SDL/wrapper build details, remaining
+notices and final distribution review also stay open. Ten focused audit tests
+passed; all current native hashes, 44 official package matches and the collected
+sources were checked. The existing APK was not replaced or installed, and new
+notices enter its next packaging pass. [Details](docs/release/beta1/DEPENDENCIES.md).
+
+Next: finish the remaining Android support components from a pinned source/build
+tree where old package provenance cannot be recovered; test the resulting candidate
+on the handheld only when the owner frees it.
 
 ## First early beta preparation (0.0.93)
 
@@ -43,7 +63,7 @@ Android screenshots. [Images and build evidence](docs/showcase/0.0.93-en/README.
 
 **Still blocking publication:** native dependency matching-source/notice materials,
 authorized device/setup/update/restore/controller journeys, and the owner's actual
-candidate review/publication approval. The 77-file native inventory makes the
+candidate review/publication approval. The updated 79-file native audit makes the
 remaining source work explicit. [Checklist](docs/release/beta1/README.md).
 
 Next: resolve the native distribution sources while the console remains occupied;

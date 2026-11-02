@@ -7,8 +7,11 @@ outside supported visual paths; this does not close the complete no-code product
 Local backup/restore, Splore → Play and candidate packaging are implemented in
 0.0.93. [Scope](BETA_SCOPE.md) · [Candidate preparation](release/beta1/README.md).
 
-1. Complete the exact native dependency/source/notice distribution package. This
-   newly inventoried but pre-existing gap blocks APK publication.
+1. Finish the native source/notice package: 44 of 79 files now match official
+   artifacts, with 153 source-material files collected. Resolve the remaining 33
+   Termux files from a pinned source/build tree where old provenance cannot be
+   recovered; complete SDL/shim, non-native notice and distribution review.
+   Keep the current candidate as rollback baseline. [Evidence](release/beta1/DEPENDENCIES.md).
 2. When the owner frees the handheld, test independent setup, in-place update,
    storage/reconnect, backup/restore, physical controls, Play/external launcher and
    the declared creation/export journeys. Keep the console untouched until then.
