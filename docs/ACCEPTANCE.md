@@ -299,6 +299,13 @@ Test/возврат. Это статическая сцена с плоским 
 
 ## ACC-06 — чистая установка, папки и Splore
 
+Lab 0.0.91 locally connects the external library. Native gates remain open: test
+empty/existing library activation, mixed project/library locations, metadata and
+buffer reuse, interrupted canonical-name gaps, lost grants/SD, reconnect and explicit
+older originals. Verify no hidden resource loss, stale fallback or merge. Preserve
+historical codec records and unknown data. Full reinstall backup is a separate gate.
+The owner reaffirmed no handheld use on 2 November; do not run these checks yet.
+
 Lab 0.0.90 locally connects external working Projects. All acceptance boxes remain
 open: exercise actual activation/cancellation, lost tree grant/SD, interruption at
 each rename/journal boundary, reopen/Undo/export, imported metadata and unknown Lua,

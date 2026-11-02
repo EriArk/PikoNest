@@ -569,7 +569,23 @@ When a major decision is made:
 
 ## 15. Near-term priority order
 
-Current source/package (2026-11-01): lab 0.0.90 connects external working
+Current source/package (2026-11-02): lab 0.0.91 connects a portable typed
+library repository and local/SAF adapters for sprites, parameter presets and the
+shared sprite buffer. Asset library → Start offers verified activation/reconnect
+and explicit internal originals. Project/library locations are independent;
+onboarding and startup recovery report both. Raw migration bytes are preserved;
+historical preset labels permit explicit metadata edits. Recover pending saves
+before enumeration to avoid hiding a resource during an interrupted rename gap.
+See docs/EXTERNAL_LIBRARY.md and docs/showcase/0.0.91-en/README.md. 89 local suites
+and integrated packaging are recorded; native/provider/visual/physical/novice/owner
+acceptance remains open. Owner reaffirmed on 2026-11-02: do not touch the handheld.
+Keep all device actions paused until explicit reauthorization. Next complete a
+bounded full backup/restore workflow, then Splore ownership/indexing. Keep private
+recovery/state and proprietary runtime exclusions explicit; public APK release
+still requires separate owner approval. New audio/animation library types are not
+implemented by this storage work.
+
+Previous source/package (2026-11-01): lab 0.0.90 connects external working
 Projects through SAF, verified candidate activation and a checked atomic location record.
 Project reads recover pending retained-version save journals; unknown modifications
 or missing access block rather than silently using internal originals. Reconnect

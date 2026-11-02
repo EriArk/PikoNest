@@ -48,7 +48,7 @@ public final class MainActivity extends Activity {
     private SharedPreferences libraryPrefs;
     private final art.pikoos.lab.core.ToolCatalogue toolCatalogue=new art.pikoos.lab.core.ToolCatalogue();
     private art.pikoos.lab.core.ProjectRepository store;
-    private String projectLocation="";
+    private String projectLocation="",libraryLocation="";
     private SpriteAssetStore assetStore;
     private SpriteBufferStore spriteBuffer;
     private ParameterPresetStore presetStore;
@@ -114,10 +114,11 @@ public final class MainActivity extends Activity {
         int shelfFocus=libraryPrefs.getInt("focus",0);
         backend=new ExternalPicoBackend(this);
         try {
-            projectLocation=ProjectStorage.identity(this);store=ProjectStorage.open(this);
-            assetStore=new SpriteAssetStore(getFilesDir());
-            spriteBuffer=new SpriteBufferStore(getFilesDir());
-            presetStore=new ParameterPresetStore(getFilesDir());
+            projectLocation=ProjectStorage.identity(this);libraryLocation=LibraryStorage.identity(this);store=ProjectStorage.open(this);
+            libraryLocation=LibraryStorage.identity(this);art.pikoos.lab.core.LibraryRepository resources=LibraryStorage.open(this);
+            assetStore=new SpriteAssetStore(resources);
+            spriteBuffer=new SpriteBufferStore(resources);
+            presetStore=new ParameterPresetStore(resources);
             importDraft=new AtomicFile(new File(getFilesDir(),"pending-import.bin"));
             exportDraft=new AtomicFile(new File(getFilesDir(),"pending-export.bin"));
             byte[] template;
@@ -187,6 +188,7 @@ public final class MainActivity extends Activity {
             error.setTextColor(WorkshopView.COLORS[7]);error.setBackgroundColor(WorkshopView.COLORS[1]);error.setPadding(32,32,32,32);
             android.widget.LinearLayout recovery=new android.widget.LinearLayout(this);recovery.setOrientation(1);recovery.setBackgroundColor(WorkshopView.COLORS[1]);recovery.addView(error);
             android.widget.Button storage=new android.widget.Button(this);storage.setText("Project storage / reconnect");storage.setOnClickListener(v->startActivityForResult(new Intent(this,ProjectStorageActivity.class),91));recovery.addView(storage);
+            android.widget.Button libraryStorage=new android.widget.Button(this);libraryStorage.setText("Library storage / reconnect");libraryStorage.setOnClickListener(v->startActivityForResult(new Intent(this,ProjectStorageActivity.class).putExtra("library",true),91));recovery.addView(libraryStorage);
             setContentView(recovery);Log.e(TAG,"Project load failed; original retained",e);
         }
     }
@@ -648,7 +650,7 @@ public final class MainActivity extends Activity {
     @Override protected void onPause(){if(input!=null)input.reset();persistUi();super.onPause();}
     @Override protected void onStop(){super.onStop();if(awaitingReturn)leftForRuntime=true;}
     @Override protected void onResume(){
-        super.onResume();if(!projectLocation.equals(ProjectStorage.identity(this))){recreate();return;}immersive();
+        super.onResume();if(!projectLocation.equals(ProjectStorage.identity(this))||!libraryLocation.equals(LibraryStorage.identity(this))){recreate();return;}immersive();
         onRuntimeResume();
     }
     private void onRuntimeResume(){

@@ -1,0 +1,13 @@
+{
+  "lab": "0.0.91",
+  "date": "2026-11-02",
+  "apk_sha256": "ee64ff07e313b3b2aaae4834af1100ba0ac63f339d75e825fd7f27d8691b57e6",
+  "core_suite_invocations": 89,
+  "LibraryRepositoryTest": 288,
+  "pixel_comparisons_included": 256,
+  "RecoverableReplaceTest": 61,
+  "device_used": false,
+  "installed": false,
+  "released": false,
+  "native_visual_review": false
+}

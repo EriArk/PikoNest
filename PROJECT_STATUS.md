@@ -1,6 +1,6 @@
 # PikoNest — project status
 
-Updated **1 November 2026**. A plain-language snapshot for posts and the
+Updated **2 November 2026**. A plain-language snapshot for posts and the
 website. Dated changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## At a glance
@@ -12,12 +12,32 @@ setup live in one development APK; there is no public APK release yet.
 | Item | Current position |
 | --- | --- |
 | Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.90** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | External working projects and recovery paths; device acceptance pending |
-| Current focus | External library storage; device journeys when permitted |
+| Android baseline | **0.0.91** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | External working library alongside external Projects; device acceptance pending |
+| Current focus | Complete backup/restore; device journeys when permitted |
 | Platforms | Android first; Linux later |
 
-## Latest implementation: projects in your own folder (0.0.90)
+## Latest implementation: your reusable library in its own folder (0.0.91)
+
+The library can now use a selected Android folder for sprites, tool settings and
+the shared sprite buffer. Naming, categories, favorites and reuse follow that
+location. Activation checks a fresh copy before switching and retains the internal
+originals. Lost access has a reconnect path. Projects keep their independent location.
+
+Old preset field labels remain usable during explicit metadata edits. Transfer
+preserves resource files byte for byte. This adds no new music or SFX library type.
+
+**Checked locally:** 89 core suite invocations, including new library checks, and
+integrated single-APK packaging passed. Provider/device, visual/controller and
+novice/owner acceptance remain open. The owner reaffirmed no handheld use on
+2 November; it was not accessed. [Evidence](docs/showcase/0.0.91-en/README.md).
+
+Full reinstall backup/restore is still unfinished. Keep the app installed: settings,
+unfinished edits and recovery records include private state. Returning to internal
+originals does not merge newer external edits. [Guide](docs/EXTERNAL_LIBRARY.md).
+Next complete a bounded backup/restore workflow; native journeys wait for permission.
+
+## Previous implementation: projects in your own folder (0.0.90)
 
 Projects can now use a selected Android folder as their working location. Activation
 creates and checks a fresh workspace before switching; the internal originals stay
@@ -112,7 +132,7 @@ Compact/tall/wide layouts received host review. These checks do not replace
 playing in official PICO-8 or using real handheld controls.
 
 **Still pending:** official-runtime execution, installation, physical controls,
-independent exports and novice/owner journeys for labs 0.0.78–90. Console use
+independent exports and novice/owner journeys for labs 0.0.78–91. Console use
 remains paused. No native screenshot pack or public APK release was produced.
 [Issue #17](https://github.com/EriArk/PikoNest/issues/17) remains open.
 

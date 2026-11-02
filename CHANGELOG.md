@@ -2,7 +2,23 @@
 
 Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
-There is no public APK release as of 1 November 2026.
+There is no public APK release as of 2 November 2026.
+
+## 2026-11-02 — External working library (lab 0.0.91)
+
+- Connected sprites, parameter presets and the shared sprite buffer to an independent
+  external library location with checked activation, reconnect and internal originals.
+- Routed naming, categories, favorites, resource creation and reuse through shared
+  typed persistence. Interrupted saves recover before resource enumeration.
+- Preserved original resource bytes during migration; historical preset labels
+  now allow explicit metadata edits without false source conflicts.
+- Local validation: 89 core suites, new library repository checks (288 assertions,
+  including 256 pixel comparisons), and integrated single-APK packaging passed.
+- No handheld use, installation, screenshots or release. Actual Android provider,
+  lifecycle, visual/controller and owner acceptance remain open. Full reinstall
+  backup/restore, merge and additional reusable asset types are unfinished.
+
+[Contract](docs/EXTERNAL_LIBRARY.md) · [Evidence](docs/showcase/0.0.91-en/README.md).
 
 ## 2026-11-01 — External working projects (lab 0.0.90)
 

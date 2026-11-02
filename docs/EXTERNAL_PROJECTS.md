@@ -1,5 +1,12 @@
 # External working projects
 
+## Related update — 0.0.91
+
+Library storage now has its own external activation/reconnection path using the same
+controls. [External library](EXTERNAL_LIBRARY.md). Project location remains independent.
+The earlier private-only library statements below describe 0.0.90, not current scope.
+Full backup/restore and native acceptance remain unfinished; handheld use stays paused.
+
 Lab 0.0.90, 1 November 2026. Implemented locally; native acceptance is pending.
 
 ## Start and switch

@@ -1,5 +1,14 @@
 # Verified copies to user folders
 
+## External library added in 0.0.91
+
+Asset library → Start now opens activation/reconnect controls, like Projects.
+[External library contract](EXTERNAL_LIBRARY.md). The independent library location
+covers sprites, parameter presets and the shared sprite buffer; current internal
+originals are retained. Copy-only paths cannot claim those originals include later
+external edits. Historical copy paths below are superseded for the two working stores.
+Full application backup/restore remains unfinished.
+
 ## External Projects added in 0.0.90
 
 Projects → Start now opens activation/reconnection controls, not the historical

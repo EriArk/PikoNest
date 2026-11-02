@@ -1,5 +1,15 @@
 # Библиотека ресурсов PikoNest
 
+## Current storage — lab 0.0.91, 2 November 2026
+
+Sprites, parameter presets and the shared sprite buffer now share portable typed
+persistence with local and external SAF backends. Folders → Asset library → Start
+offers verified activation, reconnect and explicit internal originals. Names,
+categories, favorites and resource content follow the selected library location.
+[Contract](EXTERNAL_LIBRARY.md) · [local evidence](showcase/0.0.91-en/README.md).
+This is not new music/SFX or animation reuse, full backup/restore or native acceptance.
+Handheld use remains paused. Historical private-only notes below describe earlier labs.
+
 Статус: Android 0.0.11 реализует первый сквозной сценарий библиотеки спрайтов.
 В 0.0.12 добавлены названия при сохранении и переименование с контроллера.
 В 0.0.13 добавлен импорт одного внешнего текстового `.p8` в отдельный проект.

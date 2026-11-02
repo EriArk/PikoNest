@@ -1,5 +1,13 @@
 # Первый запуск: папки и официальный PICO-8
 
+## Library location added in 0.0.91
+
+Folders → Asset library → Start now offers verified external library activation and
+reconnect. Projects and library may each be internal or external; the guide reports
+their selected locations independently. Splore, preferences, drafts and recovery
+records still include private state. [Contract](EXTERNAL_LIBRARY.md). Full setup,
+backup/reinstall and native/provider acceptance remain open; no handheld use.
+
 ## External project selection in 0.0.90
 
 Folders → Projects → Start now offers checked activation and reconnection of an

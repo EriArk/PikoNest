@@ -1,5 +1,23 @@
 # Состояние PikoNest
 
+**2026-11-02 — Lab 0.0.91, external working library (partial P02/P08/R08):**
+Sprite assets, parameter presets and the shared sprite buffer now use a portable
+LibraryRepository with local/SAF adapters. Folders → Asset library → Start opens
+checked activation, reconnect and explicit older-internal selection. Activation
+preserves raw resource bytes, compares typed snapshots and exercises retained-version
+saves on the candidate before committing an independent atomic library location.
+Names/categories/favorites, preset settings and buffer content follow that location;
+source cartridges stay unchanged. Historical preset labels permit explicit metadata
+edits without falsely reporting a source conflict. Pending journals are recovered
+before enumeration so an interrupted rename cannot silently hide a resource.
+89 core suite invocations and integrated packaging are recorded in
+[0.0.91 evidence](showcase/0.0.91-en/README.md); LibraryRepositoryTest adds 288
+assertions (256 pixel comparisons). Actual native/provider/visual/physical/novice
+acceptance remains open. Owner reaffirmed no handheld use on 2 November.
+Full reinstall backup/restore, automatic merge/cleanup, additional reusable asset
+types and Splore ownership remain unfinished. [Library contract](EXTERNAL_LIBRARY.md).
+Next complete a bounded full-backup/restore workflow while device use is paused.
+
 **2026-11-01 — Lab 0.0.90, external working projects (partial P02/P03/R08):**
 Folders → Projects → Start opens project storage controls. Activation creates and
 verifies a fresh workspace, exercises retained-version saves and file/directory
