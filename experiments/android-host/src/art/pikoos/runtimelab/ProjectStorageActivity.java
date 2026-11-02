@@ -18,7 +18,7 @@ public final class ProjectStorageActivity extends Activity {
     private static Job current;private TextView status;private Button[] buttons;private ControllerInput input;private int selected;private boolean library;
     private final Handler handler=new Handler();private final Runnable refresh=new Runnable(){public void run(){render();handler.postDelayed(this,500);}};
     @Override public void onCreate(Bundle saved){
-        super.onCreate(saved);library=getIntent().getBooleanExtra("library",false);if(current!=null&&current.done&&current.library!=library)current=null;LinearLayout body=new LinearLayout(this);body.setOrientation(1);body.setPadding(24,20,24,20);body.setBackgroundColor(WorkshopView.COLORS[1]);
+        super.onCreate(saved);if(BackupRecovery.guard(this))return;library=getIntent().getBooleanExtra("library",false);if(current!=null&&current.done&&current.library!=library)current=null;LinearLayout body=new LinearLayout(this);body.setOrientation(1);body.setPadding(24,20,24,20);body.setBackgroundColor(WorkshopView.COLORS[1]);
         Typeface font=Typeface.createFromAsset(getAssets(),"Monocraft.ttf");
         TextView title=text(library?"PikoNest / Library storage":"PikoNest / Project storage",font,23,7);body.addView(title);
         body.addView(text(library?"Use selected folder copies sprites, presets and the shared sprite buffer to a checked external library. Internal originals stay separate. Projects, settings, drafts and saves keep their current locations.\n\nKeep this app installed: recovery records are private. Reconnect chooses the SAME folder. Returning to internal originals does not merge newer external changes.":"Use selected folder copies your current internal projects to a new workspace, checks them, then switches Projects there. Originals stay inside the app.\n\nLibrary, settings, unfinished drafts and saves keep their current locations. Keep this app installed: save-recovery records are private.\n\nReconnect restores access to the SAME external folder. Internal originals are older copies; switching back does not merge later external edits.",font,17,6));
@@ -32,6 +32,7 @@ public final class ProjectStorageActivity extends Activity {
     private void select(String value)throws Exception{if(library)LibraryStorage.select(this,value);else ProjectStorage.select(this,value);}
     private TextView text(String text,Typeface font,int size,int color){TextView t=new TextView(this);t.setText(text);t.setTypeface(font);t.setTextSize(size);t.setTextColor(WorkshopView.COLORS[color]);return t;}
     private void choose(int index){
+        if(BackupActivity.inProgress()){status.setText("Finish backup or restore before changing storage.");return;}
         if(current!=null&&!current.done){if(index==3)synchronized(current){if(!current.done)current.cancelled=true;}return;}
         if(index==3){finish();return;}
         try{

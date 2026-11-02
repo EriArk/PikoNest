@@ -1,0 +1,80 @@
+[
+  {
+    "file": "01-game-view.png",
+    "sha256": "140de58b98644d898394676700d26fbde3d60efd08b59fbdf3af79814d1e3f8d",
+    "source_fixture": "explorer-game-620x540",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "02-hero-free-puzzle.png",
+    "sha256": "b3c45c945aaaa8f66c02bf38ecd9f863f8a06fdd570182c4803d38bcb54a7a27",
+    "source_fixture": "puzzle-game-620x540",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "03-tile-painting.png",
+    "sha256": "c1ef68db427ebfdffb19764fe674ed844ddae3b3029c7c9f923911387c0d528a",
+    "source_fixture": "tile-draw-620x540",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "04-sound-editor.png",
+    "sha256": "3bf53810ff94a4e7d5c672a94ea213d1f080e36c0963709182aa68ce0ae6f04e",
+    "source_fixture": "music-note-620x540",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "05-music-pattern.png",
+    "sha256": "caee0d6e74f8b3d2f568d43f0a01586950f1755953095d7a0ff9539d4133a049",
+    "source_fixture": "music-pattern-620x540",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "06-context-help.png",
+    "sha256": "e2242a04c7ecaa98ce8c8c18592d9965157ed2f14c9b2d7fb1c1dc6652cc0e25",
+    "source_fixture": "guide-620x540",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "07-runtime-setup.png",
+    "sha256": "b74a0febc0258cbc8b18f5cf88f42e8d501f8bf7e6dea53dded84ff8a9a4380b",
+    "source_fixture": "runtime-620x540",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "08-backup.png",
+    "sha256": "7abc61463130a87beba93044dff022c78b40b11cbdcccf081d186b8ce785bf76",
+    "source_fixture": "backup-620x540",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "09-restore-compact.png",
+    "sha256": "4b0784d92490d1de259d383a8eb24cb34ba5f58564cde170e36ef882773dbedc",
+    "source_fixture": "restore-review-360x480",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "10-splore-menu.png",
+    "sha256": "d5f0ff314068fd7c29ec38e523428132e96e0319ab4d76c809d5a87a1d64d53d",
+    "source_fixture": "play-splore-620x540",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "11-splore-compact.png",
+    "sha256": "f3deb1049a8a629022b6244f49b28b41e5ecccb6bc5dab2c19908d97f4fcd4f3",
+    "source_fixture": "play-splore-360x480",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "12-backup-wide.png",
+    "sha256": "0b7e04ddf4940d6cd7b14f20579e1249a5e23b28d64f85f86b76dce2cd2efa3e",
+    "source_fixture": "backup-960x540",
+    "kind": "host preview; current production renderer with configured sample data; not an Android screenshot"
+  },
+  {
+    "file": "13-downloaded-game.png",
+    "sha256": "a2330fff6842700891ada91628f2cf245edaa049297a4d82de572b6f234470f3",
+    "source_fixture": "play-downloads-620x540",
+    "kind": "host preview; original Lights PNG arranged as a cached entry; not a BBS download or Android screenshot"
+  }
+]

@@ -1,0 +1,1 @@
+package art.pikoos.runtimelab;import art.pikoos.lab.core.*;class WorkshopView {public static final int[] COLORS=PicoPalette.COLORS;public Object getContext(){return null;}public void action(WorkshopSession.Action a){}public void gameChanged(){}public void performClick(){}}

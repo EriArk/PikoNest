@@ -10,7 +10,7 @@ import java.util.Arrays;
 /** One durable location switch. Missing access never silently selects the internal copies. */
 final class ProjectStorage {
     static volatile boolean activating;
-    static void checkLocalWrite()throws Exception{if(activating)throw new Exception("Project folder activation is in progress. Finish or cancel it before editing.");}
+    static void checkLocalWrite()throws Exception{if(BackupActivity.inProgress())throw new Exception("Finish backup or restore before editing.");if(activating)throw new Exception("Project folder activation is in progress. Finish or cancel it before editing.");}
     private static AtomicFile location(Context c){return new AtomicFile(new File(c.getFilesDir(),"project-location.json"));}
     static synchronized String identity(Context c){
         try{return new String(location(c).readFully(),"UTF-8");}

@@ -27,6 +27,7 @@ final class FolderView extends View {
         setContentDescription("Folders. Up/down: role. Confirm: choose folder. X: check access. Select: setup guide. Back: return.");
     }
     void action(Action a){
+        if(a==Action.UNDO&&!s.busy){((android.app.Activity)getContext()).startActivity(new android.content.Intent(getContext(),BackupActivity.class));return;}
         if(a==Action.TEST&&!s.busy&&s.selected==2){((android.app.Activity)getContext()).startActivity(new android.content.Intent(getContext(),ProjectStorageActivity.class));return;}
         if(a==Action.TEST&&!s.busy&&s.selected==3){((android.app.Activity)getContext()).startActivity(new android.content.Intent(getContext(),ProjectStorageActivity.class).putExtra("library",true));return;}
         if(a==Action.MENU&&!s.busy){((android.app.Activity)getContext()).startActivityForResult(new android.content.Intent(getContext(),FirstRunActivity.class),87);return;}if(a==Action.NEXT&&!s.busy){runtime.run();return;}s.act(a);changed.run();invalidate();}
@@ -39,7 +40,7 @@ final class FolderView extends View {
         c.save();c.scale(scale,scale);rect(0,0,w,h,1);rect(0,0,w,42,2);
         text("PikoNest",16,30,24,7);text("R PICO8",w-130,28,18,14);
         text("Folders",16,82,28,7);
-        fit("Projects and assets stay in app.",16,108,17,6,w-32);
+        fit("Choose storage or press Y for backups.",16,108,17,6,w-32);
         for(int i=0;i<4;i++){
             FolderSetup.Entry e=s.entry(i);float y=124+i*69;boolean selected=s.selected==i;
             rect(16,y,w-32,62,selected?2:0);rect(16,y,4,62,selected?10:13);
@@ -61,7 +62,8 @@ final class FolderView extends View {
         if(e.getActionMasked()==MotionEvent.ACTION_DOWN){downX=x;downY=y;return true;}
         if(e.getActionMasked()==MotionEvent.ACTION_UP){
             if(Math.abs(x-downX)>20||Math.abs(y-downY)>20)return true;
-            if(y<42&&x>w-140)action(Action.NEXT);
+            if(y>=90&&y<116)action(Action.UNDO);
+            else if(y<42&&x>w-140)action(Action.NEXT);
             else if(y>=460&&y<490)action(s.selected>=2&&x<w/2?Action.TEST:Action.MENU);
             else if(y>=h-44)action(x<w/3?Action.CONFIRM:x<w*2/3?Action.CONTEXT:Action.CANCEL);
             else if(x>=16&&x<=w-16&&y>=124&&y<400){s.select((int)(y-124)/69);changed.run();invalidate();}

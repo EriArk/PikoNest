@@ -19,7 +19,7 @@ public final class StorageCopyActivity extends Activity {
     private String role;private int selected;private final Handler handler=new Handler();
     private final Runnable refresh=new Runnable(){public void run(){render();handler.postDelayed(this,400);}};
     @Override public void onCreate(Bundle saved){
-        super.onCreate(saved);role=getIntent().getStringExtra("role");
+        super.onCreate(saved);if(BackupRecovery.guard(this))return;role=getIntent().getStringExtra("role");
         if(!"PROJECTS".equals(role)&&!"DATA".equals(role)){finish();return;}
         LinearLayout layout=new LinearLayout(this);layout.setOrientation(LinearLayout.VERTICAL);layout.setPadding(24,20,24,20);layout.setBackgroundColor(WorkshopView.COLORS[1]);
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setBackgroundColor(WorkshopView.COLORS[1]);scroll.addView(layout);Typeface font=Typeface.createFromAsset(getAssets(),"Monocraft.ttf");

@@ -17,6 +17,7 @@ final class PlayView extends ShelfSurface {
     @Override protected void onDraw(Canvas canvas){
         begin(canvas);s.columns=1;
         header(false,()->{},()->workshop());
+        if(w>=540)button("Splore",270,48,120,false,()->{s.splore();changed.run();invalidate();});
         String[] filters={"All games","Recent","Favorites"};
         text(filters[s.filter],16,132,24,7);
         fit(s.games().size()+(s.games().size()==1?" game":" games"),w-135,132,18,6,119);
@@ -29,7 +30,7 @@ final class PlayView extends ShelfSurface {
         PlaySession.Game game=s.current();
         if(w>=540&&game!=null){float x=40+width,size=w-x-16;cover(game.cover,x,150,size);}
         if(game==null){text(s.busy?"Finding your games…":"A little room for play",16,189,20,14);
-            wrap(s.filter==0?"Choose your games folder from the menu.":"No games here yet. Change the filter with Y.",16,225,w-32,6,3);}
+            wrap(s.filter==0?"Menu: choose a games folder or open Splore to discover games.":"No games here yet. Change the filter with Y.",16,225,w-32,6,3);}
         String message=!s.error.isEmpty()?s.error:s.busy?"Reading games…":game!=null&&!game.problem.isEmpty()?game.problem:s.notice;
         if(game!=null)fit(game.title,16,h-109,20,7,w-32);
         fit(message,16,h-79,18,!s.error.isEmpty()?9:6,w-32);

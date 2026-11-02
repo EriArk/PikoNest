@@ -7,7 +7,8 @@ import java.nio.charset.StandardCharsets;
 public class PlayWorkflowTest {
     static int checks;static void check(boolean b,String why){checks++;if(!b)throw new AssertionError(why);}
     static class Port implements PlaySession.Port {
-        int launches,workshops,folders,refreshes,favorites;boolean fail;
+        int launches,workshops,folders,refreshes,favorites,browsers;boolean fail;
+        public void splore()throws Exception{if(fail)throw new Exception("Runtime missing");browsers++;}
         public void launch(PlaySession.Game g){launches++;}public void refresh(){refreshes++;}
         public void workshop(){workshops++;}public void folders(){folders++;}
         public void favorite(PlaySession.Game g,boolean value)throws Exception{if(fail)throw new Exception("disk full");favorites++;}
@@ -41,6 +42,11 @@ public class PlayWorkflowTest {
         s.act(Action.UNDO);check(s.filter==2&&s.games().size()==2,"favorite filter");s.act(Action.CONTEXT);check(!a.favorite&&s.games().size()==1&&s.current()==b,"unfavorite filtered item");
         s.replace(Collections.emptyList(),"one");for(Action action:new Action[]{Action.LEFT,Action.RIGHT,Action.UP,Action.DOWN,Action.CONFIRM,Action.TEST,Action.CONTEXT})s.act(action);
         check(s.current()==null&&port.launches==1,"empty/missing selection safe");
+        s.act(Action.MENU);for(int i=0;i<4;i++)s.act(Action.DOWN);s.act(Action.CONFIRM);
+        check(port.browsers==1&&s.busy&&port.launches==1,"Splore works from an empty shelf without a project/cart");
+        s.splore();check(port.browsers==1,"no double Splore launch");s.fail("returned");port.fail=true;s.splore();
+        check(!s.busy&&s.error.equals("Runtime missing"),"Splore setup error is retryable");
+        port.fail=false;s.splore();check(port.browsers==2&&s.error.isEmpty(),"Splore retry uses backend entry");
         System.out.println("PlayWorkflowTest: "+checks+" checks passed");
     }
 }

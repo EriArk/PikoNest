@@ -11,13 +11,45 @@ setup live in one development APK; there is no public APK release yet.
 
 | Item | Current position |
 | --- | --- |
-| Stage | Alpha target; Lua remains necessary outside supported visual paths |
-| Android baseline | **0.0.92** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | Flexible runtime archive import and clearer first-run entry; device acceptance pending |
-| Current focus | Alpha setup/data preservation; device journeys when permitted |
+| Stage | First early beta preparation; Lua remains necessary outside supported visual paths |
+| Android baseline | **0.0.93 / 0.1.0-beta.1** candidate (see evidence); **0.0.77** remains the last complete native creation journey |
+| Latest work | Backup/restore, Splore → Play, non-debug candidate and updated website materials |
+| Current focus | Dependency/source distribution package, then authorized candidate device journeys |
 | Platforms | Android first; Linux later |
 
-## Alpha direction and setup changes (0.0.92)
+## First early beta preparation (0.0.93)
+
+The owner chose **early beta** as the first public milestone. This replaces the
+alpha name from earlier today, while keeping honest limits: some creation still
+needs Lua, and the full no-code product is later work. [Scope](docs/BETA_SCOPE.md).
+
+The new backup flow checks an external ZIP containing current projects, assets,
+persisted drafts/settings and runtime saves/downloads. Restoration first verifies
+and stages a copy, then retains previous private data while switching versions.
+It can resume or reverse interrupted renames. Android/provider acceptance remains
+open; the new guide explains exclusions and both required reopen steps.
+
+Splore now has an entry in Play. Its persistent downloaded cartridges are indexed
+on the same shelf after return, with labels, available names, favorites and recents.
+Direct launch uses the existing cache. Local fixtures are tested; actual downloading,
+offline launch and multicart continuation still need the handheld. Arbitrary external
+Downloads-folder synchronization remains unfinished.
+
+All 91 core suites and final integrated package verification passed locally.
+The local candidate uses one icon/APK, disabled debugging and the same signing
+certificate for an in-place update. README, setup/recovery instructions, draft release
+notes and 13 current host-rendered website previews are prepared. These are not new
+Android screenshots. [Images and build evidence](docs/showcase/0.0.93-en/README.md).
+
+**Still blocking publication:** native dependency matching-source/notice materials,
+authorized device/setup/update/restore/controller journeys, and the owner's actual
+candidate review/publication approval. The 77-file native inventory makes the
+remaining source work explicit. [Checklist](docs/release/beta1/README.md).
+
+Next: resolve the native distribution sources while the console remains occupied;
+when freed, test the exact candidate and replace useful previews with native captures.
+
+## Previous decision: alpha direction and setup changes (0.0.92)
 
 The first milestone is now an alpha: it will offer the existing player and tools,
 with Lua still needed for gameplay beyond the supported visual paths. Complete

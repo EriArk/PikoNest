@@ -23,6 +23,7 @@ final class LocalLibraryStorage implements LibraryRepository.Storage {
         synchronized(LocalLibraryStorage.class){File f=file(p);if(f.length()>20000)throw new IOException("Library resource is too large");try{return new AtomicFile(f).readFully();}catch(FileNotFoundException e){if(f.exists())throw e;return null;}}
     }
     private void write(String p,byte[] data)throws Exception{
+        if(BackupActivity.inProgress())throw new IOException("Finish backup or restore before editing resources.");
         if(LibraryStorage.activating)throw new IOException("Library activation is running. Finish or cancel before editing resources.");
         File f=file(p);if(!f.getParentFile().isDirectory()&&!f.getParentFile().mkdirs())throw new IOException("Cannot create library directory");
         AtomicFile target=new AtomicFile(f);FileOutputStream out=null;try{out=target.startWrite();out.write(data);target.finishWrite(out);}catch(Exception e){target.failWrite(out);throw e;}

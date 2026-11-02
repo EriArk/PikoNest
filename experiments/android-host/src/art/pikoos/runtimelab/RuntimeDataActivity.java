@@ -11,7 +11,7 @@ public final class RuntimeDataActivity extends Activity {
     private static final int PICK=72;RuntimeMigrationJob job;RuntimeDataView view;ControllerInput input;
     boolean importedWins;int conflictIndex;String notice="";private final RuntimeMigrationJob.Listener listener=()->{if(view!=null)view.invalidate();};
     @Override public void onCreate(Bundle saved){
-        super.onCreate(saved);if(saved!=null){importedWins=saved.getBoolean("importedWins");conflictIndex=saved.getInt("conflictIndex");}
+        super.onCreate(saved);if(BackupRecovery.guard(this))return;if(saved!=null){importedWins=saved.getBoolean("importedWins");conflictIndex=saved.getInt("conflictIndex");}
         view=new RuntimeDataView(this);input=new ControllerInput(this::action,()->getSharedPreferences("library-ui",0).getBoolean("swapAB",false));
         setContentView(view);view.requestFocus();if(RuntimeMigrationJob.current!=null)attach(RuntimeMigrationJob.current);immersive();
     }

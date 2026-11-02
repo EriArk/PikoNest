@@ -74,6 +74,7 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
         activity.startActivityForResult(intent,DIAGNOSTIC_REQUEST);
     }
     void checkAvailableForLaunch() throws Exception {
+        if(BackupActivity.inProgress()||BackupRecovery.pending(activity)||BackupRecovery.needsRestart)throw new Exception("Finish backup or restore before launching a game.");
         if(RuntimeArchiveJob.current!=null&&!RuntimeArchiveJob.current.done)throw new Exception("Finish or cancel PICO-8 preparation before starting a game.");
         if(RuntimeMigrationJob.pending())throw new Exception("Finish or cancel the runtime data import first.");
         if(RuntimeInstallation.integrated(activity))RuntimeHomes.current(activity);
@@ -128,13 +129,27 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
     @Override public void launch(art.pikoos.lab.core.RuntimeFileSet files)throws Exception{
         dispatch(files.transport(),"run.pikoset",CartProvider.FILES,"application/octet-stream",true);
     }
+    @Override public void launchSplore()throws Exception{
+        if(!RuntimeInstallation.integrated(activity))throw new Exception("Splore needs the integrated PikoNest runtime. Open runtime setup.");
+        dispatch(null,null,null,null,false);
+    }
+    @Override public void launchDownloaded(String cachePath)throws Exception{
+        if(!RuntimeInstallation.integrated(activity))throw new Exception("Downloaded games need the integrated runtime.");
+        if(!art.pikoos.lab.core.SploreCache.resolve(RuntimeHomes.current(activity),cachePath).isFile())throw new Exception("Downloaded game is unavailable. Refresh Play or reopen Splore.");
+        dispatch(null,null,null,null,false,cachePath);
+    }
     private void dispatch(byte[] cart,String filename,android.net.Uri uri,String mime,boolean fileSet)throws Exception{
+        dispatch(cart,filename,uri,mime,fileSet,"");
+    }
+    private void dispatch(byte[] cart,String filename,android.net.Uri uri,String mime,boolean fileSet,String cached)throws Exception{
         checkAvailableForLaunch();
         if(RuntimeInstallation.integrated(activity)&&!RuntimeInstallation.ready(activity))throw new Exception("Import and prepare your Raspberry Pi PICO-8 ZIP in runtime setup first.");
         PackageInfo selected = runtime();
         if(!RuntimeInstallation.integrated(activity)&&(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<7))throw new Exception("Update PIKOOS Runtime Test to version 7 for reliable return.");
         if(fileSet&&(!RuntimeInstallation.integrated(activity)&&(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<3)))
             throw new Exception("Обнови PIKOOS Runtime Test до версии 3 для запуска частей игры");
+        boolean direct=cart==null,splore=direct&&cached.isEmpty();
+        if(!direct){
         AtomicFile snapshot = new AtomicFile(new File(activity.getFilesDir(),filename));
         FileOutputStream out = null;
         try {
@@ -145,14 +160,16 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
             snapshot.failWrite(out);
             throw e;
         }
-        Intent intent = new Intent(Intent.ACTION_SEND);
+        }
+        Intent intent = new Intent(direct?Intent.ACTION_MAIN:Intent.ACTION_SEND);
         intent.setComponent(new ComponentName(selected.packageName, "com.godot.game.GodotAppLauncher"));
-        intent.setType(mime);
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        if(!direct){intent.setType(mime);intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.setClipData(ClipData.newRawUri("PICO-8 cartridge", uri));
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);}
+        intent.putExtra("pikonest.splore",splore);
+        intent.putExtra("pikonest.downloaded",cached);
         intent.putExtra("pikoos.swapAB",activity.getSharedPreferences("library-ui",0).getBoolean("swapAB",false));
         intent.putExtra("pikoos.controls",true);
-        intent.setClipData(ClipData.newRawUri("PICO-8 cartridge", uri));
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         String token=java.util.UUID.randomUUID().toString();
         Intent back=new Intent(activity,activity instanceof LaunchActivity?LaunchActivity.class:activity instanceof RuntimeSetupActivity?RuntimeSetupActivity.class:MainActivity.class).setAction(RETURN)
             .setData(Uri.parse("pikoos-return://session/"+token))

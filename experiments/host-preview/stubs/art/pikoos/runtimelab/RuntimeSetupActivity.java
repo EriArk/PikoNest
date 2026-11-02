@@ -1,0 +1,1 @@
+package art.pikoos.runtimelab;class RuntimeSetupActivity extends android.app.Activity {void action(art.pikoos.lab.core.WorkshopSession.Action a){}}

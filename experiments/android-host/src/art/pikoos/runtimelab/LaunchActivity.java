@@ -13,7 +13,7 @@ public final class LaunchActivity extends Activity {
     private boolean dispatched,left,busy;private volatile int generation;
     private SharedPreferences state;
     @Override public void onCreate(Bundle saved){
-        super.onCreate(saved);state=getSharedPreferences("external-launch",0);backend=new ExternalPicoBackend(this);
+        super.onCreate(saved);if(BackupRecovery.guard(this))return;state=getSharedPreferences("external-launch",0);backend=new ExternalPicoBackend(this);
         view=new LaunchView(this,this::action,getSharedPreferences("library-ui",0).getBoolean("swapAB",false));
         input=new ControllerInput(this::action,()->getSharedPreferences("library-ui",0).getBoolean("swapAB",false));
         setContentView(view);immersive();

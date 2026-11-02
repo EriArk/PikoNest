@@ -1,5 +1,12 @@
 # Первый запуск: папки и официальный PICO-8
 
+**Current early beta preparation (0.0.93):** the existing guide and flexible ARM64
+archive import now accompany [backup/restore](BACKUP_RESTORE.md) and [Splore → Play](SPLORE.md).
+Downloaded cache entries appear on Play independently of the selected Games folder;
+arbitrary external Splore Downloads synchronization is still unfinished. Projects
+and asset-library activation are separate verified-copy workflows. The candidate
+still needs independent native/novice acceptance. [Checklist](release/beta1/README.md).
+
 ## Alpha setup update — lab 0.0.92, 2 November 2026
 
 The guide now offers **Open creation folders** on step 2; it returns to Folders

@@ -1,0 +1,1 @@
+package android.content;public class Intent {public Intent(Context c,Class<?> k){}public Intent putExtra(String n,boolean b){return this;}}

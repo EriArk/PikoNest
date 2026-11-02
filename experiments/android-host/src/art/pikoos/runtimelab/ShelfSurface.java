@@ -60,7 +60,7 @@ abstract class ShelfSurface extends View {
         button("Play",16,48,90,false,play);
         button("Workshop",112,48,145,false,projects);
         rect(workshop?124:28,91,workshop?116:56,2,14);
-        // Splore is not yet wired. Do not present a non-working navigation button.
+        // PlayView adds Splore on wide screens; its shared menu covers every width.
         button("≡",w-60,48,44,false,()->action(Action.MENU));
         rect(16,98,w-32,1,13);
     }

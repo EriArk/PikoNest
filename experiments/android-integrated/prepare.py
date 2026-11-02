@@ -4,6 +4,8 @@ import sys, hashlib, struct, shutil, tarfile, io, xml.etree.ElementTree as ET
 
 app, repo, boot_source = map(Path, sys.argv[1:4])
 package = sys.argv[4] if len(sys.argv)>4 else 'art.pikoos.runtimelab'
+beta = len(sys.argv)>5 and sys.argv[5]=='beta'
+assert not beta or package=='art.pikoos.runtimelab'
 assert package in ('art.pikoos.runtimelab','art.pikoos.cleanlab')
 assets = app / 'assets'
 # Private runtime home, independent of the old wrapper's shared folder.
@@ -22,6 +24,12 @@ code=launch.read_text(encoding='utf-8')
 needle="var cmdline = env_setup + extra_bind_export"
 assert code.count(needle)==1
 code=code.replace(needle,'var cmdline = "export PIKONEST_DATA=\'" + PicoBootManager.PUBLIC_FOLDER + "\'; " + env_setup + extra_bind_export')
+needle='func _get_target_path() -> String:\n'
+assert code.count(needle)==1
+code=code.replace(needle,needle+'\tvar downloaded: String = JavaClassWrapper.wrap("art.pikoos.runtimeexperiment.RuntimeControls").downloadedCartRequested()\n\tif not downloaded.is_empty():\n\t\tis_intent_session = true\n\t\tintent_session_started.emit()\n\t\treturn PicoBootManager.PUBLIC_FOLDER + "/" + downloaded\n\tif JavaClassWrapper.wrap("art.pikoos.runtimeexperiment.RuntimeControls").sploreRequested():\n\t\tis_intent_session = true\n\t\tintent_session_started.emit()\n\t\treturn ""\n')
+needle='var start_with_splore = PicoBootManager.get_setting("settings", "start_with_splore", true)'
+assert code.count(needle)==1
+code=code.replace(needle,'var start_with_splore = JavaClassWrapper.wrap("art.pikoos.runtimeexperiment.RuntimeControls").sploreRequested() or PicoBootManager.get_setting("settings", "start_with_splore", true)')
 launch.write_text(code,encoding='utf-8')
 ns = 'http://schemas.android.com/apk/res/android'
 ET.register_namespace('android', ns)
@@ -34,9 +42,10 @@ host = ET.parse(repo / 'experiments/android-host/AndroidManifest.xml').getroot()
 if package != 'art.pikoos.runtimelab':
     host = ET.fromstring(ET.tostring(host,encoding='unicode').replace('art.pikoos.runtimelab',package))
 application = root.find('application')
+application.set(a('name'), package+'.PikoApplication')
 application.set(a('label'), 'PikoNest')
 if package != 'art.pikoos.runtimelab': application.set(a('label'),'PikoNest validation')
-application.set(a('debuggable'), 'true')
+application.set(a('debuggable'), 'false' if beta else 'true')
 application.set(a('allowBackup'), 'false')
 application.set(a('theme'), '@android:style/Theme.Material.Light.NoActionBar')
 application.attrib.pop(a('requestLegacyExternalStorage'), None)
@@ -76,6 +85,7 @@ config = (app/'apktool.yml').read_text(encoding='utf-8')
 config = config.replace('minSdkVersion: 24','minSdkVersion: 26')
 config = config.replace('versionCode: 1','versionCode: '+host.get(a('versionCode')))
 config = config.replace('versionName: 1.6.6','versionName: '+host.get(a('versionName')))
+if beta: config=config.replace('versionName: '+host.get(a('versionName')), 'versionName: 0.1.0-beta.1')
 (app/'apktool.yml').write_text(config,encoding='utf-8')
 
 # The host prepares a verified package before Godot starts. Do not invoke upstream

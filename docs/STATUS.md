@@ -1,5 +1,25 @@
 # Состояние PikoNest
 
+**2026-11-02 — Lab 0.0.93, first early beta preparation (P08/R07/Q05 partial):**
+Owner selected `0.1.0-beta.1`, superseding the earlier alpha name without claiming
+complete no-Lua creation. [Current scope](BETA_SCOPE.md). Checked ZIP backup and
+retained-version restore now cover active projects/library, persisted drafts/settings
+and runtime saves/downloads; restore normalizes to internal storage and requires
+fresh preference reload. Portable interruption/conflict checks do not close native
+provider/process/power-loss acceptance. [Data contract](BACKUP_RESTORE.md).
+
+Play connects official Splore and indexes its persistent BBS cache, including when
+no Games folder is selected. Return refreshes the combined shelf; downloaded carts
+retain labels/names/favorites/recents and launch in their original runtime home.
+[Splore contract](SPLORE.md). Network/real-cache/offline/multicart and external
+Downloads-folder synchronization remain open. The candidate keeps the package/signing
+identity, disables debugging and remains local. [Evidence](showcase/0.0.93-en/README.md).
+
+A 77-ELF bootstrap inventory exposes unresolved exact native source provenance;
+complete corresponding-source/notices before distribution. No device use or APK
+publication occurred. Next: close that source package, then complete the authorized
+[candidate journeys](release/beta1/README.md), owner review and explicit publication.
+
 **2026-11-02 — Lab 0.0.92, alpha scope and version-independent archive discovery:**
 Owner now targets an alpha with Lua allowed outside bounded visual workflows;
 full no-Lua creation remains a later product milestone. [Scope](ALPHA_SCOPE.md).

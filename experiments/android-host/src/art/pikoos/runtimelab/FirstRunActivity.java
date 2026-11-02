@@ -16,7 +16,7 @@ public final class FirstRunActivity extends Activity {
     private FirstRunSetup state;private FirstRunView view;private ControllerInput input;
     private SharedPreferences progress,folders;
     @Override public void onCreate(Bundle saved){
-        super.onCreate(saved);progress=getSharedPreferences("first-run",0);folders=getSharedPreferences("folder-setup",0);
+        super.onCreate(saved);if(BackupRecovery.guard(this))return;progress=getSharedPreferences("first-run",0);folders=getSharedPreferences("folder-setup",0);
         state=new FirstRunSetup(new FirstRunSetup.Port(){
             public void save(int step,boolean dismissed)throws Exception{
                 int oldStep=progress.getInt("step",0);boolean oldDismissed=progress.getBoolean("dismissed",false);

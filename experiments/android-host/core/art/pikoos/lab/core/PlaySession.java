@@ -18,10 +18,11 @@ public final class PlaySession {
         void launch(Game game);void refresh();void workshop();void folders();
         void favorite(Game game,boolean value)throws Exception;
         default void exit(){}
+        default void splore()throws Exception{throw new UnsupportedOperationException("Splore is unavailable in this backend.");}
     }
     private final Port port;
     public final ShelfMenu menu=new ShelfMenu(ShelfMenu.Command.WORKSHOP,ShelfMenu.Command.FILTER,
-        ShelfMenu.Command.REFRESH,ShelfMenu.Command.FOLDERS);
+        ShelfMenu.Command.REFRESH,ShelfMenu.Command.FOLDERS,ShelfMenu.Command.SPLORE);
     private List<Game> all=new ArrayList<>(),visible=new ArrayList<>();
     public int selected,filter,columns=3;
     public boolean busy;
@@ -39,6 +40,7 @@ public final class PlaySession {
     }
     public void select(int index){if(!busy&&!visible.isEmpty()){selected=Math.max(0,Math.min(visible.size()-1,index));error="";}}
     public void fail(String message){busy=false;error=message;}
+    public void splore(){if(busy)return;busy=true;error="";try{port.splore();}catch(Exception e){fail(e.getMessage()==null?"Could not open Splore. Try runtime setup.":e.getMessage());}}
     public void act(Action a){
         if(menu.open){
             ShelfMenu.Command command=menu.act(a);
@@ -46,6 +48,7 @@ public final class PlaySession {
             if(command==ShelfMenu.Command.FOLDERS)port.folders();
             if(command==ShelfMenu.Command.REFRESH&&!busy)port.refresh();
             if(command==ShelfMenu.Command.FILTER&&!busy)act(Action.UNDO);
+            if(command==ShelfMenu.Command.SPLORE)splore();
             return;
         }
         if(a==Action.MENU){menu.show();return;}

@@ -4,6 +4,27 @@ Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
 There is no public APK release as of 2 November 2026.
 
+## 2026-11-02 — Early beta preparation, backup and Splore (lab 0.0.93)
+
+- Named the first milestone an early beta (`0.1.0-beta.1`), with Lua still needed
+  outside supported visual workflows. No public APK release has been created.
+- Added checked backup ZIPs for active projects, reusable assets, persisted drafts,
+  settings and runtime saves/downloads. Staged restore retains original private
+  data, detects source conflicts and can resume or reverse an interrupted swap.
+- Connected official Splore to Play. Cached cartridges join the shelf after return,
+  with artwork, available names, favorites/recents and direct cached-file launch.
+  A Games folder or Workshop project is not required. Real network/offline tests
+  and external Downloads-folder synchronization remain open.
+- Prepared non-debug candidate packaging with the existing signing identity,
+  setup/data instructions, release text and a fresh labeled website preview pack.
+- Inventoried 77 native bootstrap files and added Godot/Press Start 2P notices.
+  Exact matching sources and remaining dependency notices still block publication.
+- Validation: 91 core suites and integrated beta packaging passed, including 154
+  backup checks, 16 cache checks, signing continuity and 77 native inventory hashes.
+  [Evidence](docs/showcase/0.0.93-en/README.md).
+  No handheld access, installation or new native captures. Device/provider/runtime,
+  physical/novice and owner acceptance are separate pending checks.
+
 ## 2026-11-02 — Alpha scope and flexible runtime setup (lab 0.0.92)
 
 - Set the first milestone to alpha, with Lua allowed beyond supported visual

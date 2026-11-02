@@ -1,0 +1,1 @@
+package art.pikoos.runtimelab;class FirstRunActivity extends android.app.Activity {}

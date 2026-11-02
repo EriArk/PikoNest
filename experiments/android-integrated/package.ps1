@@ -3,7 +3,9 @@ param(
     [Parameter(Mandatory=$true)][string]$Output,
     [string]$JdkRoot = 'C:\Program Files\Android\Android Studio\jbr',
     [string]$SdkRoot = (Join-Path $env:LOCALAPPDATA 'Android\Sdk'),
-    [switch]$ValidationOnly
+    [switch]$ValidationOnly,
+    [switch]$Beta,
+    [string]$SigningKeystore
 )
 $ErrorActionPreference = 'Stop'
 $pikoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
@@ -28,13 +30,19 @@ Copy-Item (Join-Path $pikoAssets 'package.dat') (Join-Path $pikoBuild 'original.
 Run $pikoJava @((Join-Path $pikoRuntime 'PatchBootstrap.java'),(Join-Path $pikoBuild 'original.dat'),(Join-Path $pikoAssets 'package.dat'),(Join-Path $pikoRuntime 'audio-session.sh'))
 & (Join-Path $pikoRuntime 'PatchLaunch.ps1') -Source $pikoRun -Assets $pikoAssets
 $pikoPackage='art.pikoos.runtimelab';if($ValidationOnly){$pikoPackage='art.pikoos.cleanlab'}
-Run py @('-3',(Join-Path $PSScriptRoot 'prepare.py'),$pikoDecoded,$pikoRoot,$pikoBoot,$pikoPackage)
+Run py @('-3',(Join-Path $PSScriptRoot 'prepare.py'),$pikoDecoded,$pikoRoot,$pikoBoot,$pikoPackage, $(if($Beta){'beta'}else{'lab'}))
 Copy-Item -LiteralPath $Dex -Destination (Join-Path $pikoDecoded 'classes2.dex')
 $pikoUnsigned = Join-Path $pikoBuild 'unsigned.apk'
 $pikoAligned = Join-Path $pikoBuild 'aligned.apk'
 Run $pikoJava @('-jar',$pikoApktool,'b',$pikoDecoded,'-o',$pikoUnsigned)
 Run (Join-Path $pikoTools 'zipalign.exe') @('-f','-P','16','4',$pikoUnsigned,$pikoAligned)
-Run $pikoJava @('-jar',(Join-Path $pikoTools 'lib\apksigner.jar'),'sign','--ks',(Join-Path $pikoRoot '.local\artifacts\runtime-lab-debug.keystore'),'--ks-key-alias','pikoos-lab','--ks-pass','pass:android','--key-pass','pass:android','--out',$Output,$pikoAligned)
+if($Beta){
+    if(-not $SigningKeystore -or -not $env:PIKONEST_SIGNING_PASSWORD){throw 'Beta signing configuration missing'}
+    Run $pikoJava @('-jar',(Join-Path $pikoTools 'lib\apksigner.jar'),'sign','--ks',$SigningKeystore,'--ks-key-alias','pikoos-lab','--ks-pass','env:PIKONEST_SIGNING_PASSWORD','--key-pass','env:PIKONEST_SIGNING_PASSWORD','--out',$Output,$pikoAligned)
+}else{
+    Run $pikoJava @('-jar',(Join-Path $pikoTools 'lib\apksigner.jar'),'sign','--ks',(Join-Path $pikoRoot '.local\artifacts\runtime-lab-debug.keystore'),'--ks-key-alias','pikoos-lab','--ks-pass','pass:android','--key-pass','pass:android','--out',$Output,$pikoAligned)
+}
 Run $pikoJava @('-jar',(Join-Path $pikoTools 'lib\apksigner.jar'),'verify',$Output)
 Run py @('-3',(Join-Path $PSScriptRoot 'verify.py'),$Output)
+if($Beta){Run py @('-3',(Join-Path $PSScriptRoot 'verify-beta.py'),$Output,(Join-Path $pikoTools 'aapt.exe'))}
 Get-FileHash -LiteralPath $Output

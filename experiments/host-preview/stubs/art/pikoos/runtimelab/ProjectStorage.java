@@ -1,0 +1,1 @@
+package art.pikoos.runtimelab;class ProjectStorage {static boolean selectedActive(android.content.Context c,String s){return false;}}

@@ -1,0 +1,1 @@
+package art.pikoos.runtimelab;import android.graphics.Paint;class PixelText {static void configure(Object c,Paint p){}static float size(float n){return Math.max(18,n);}}

@@ -100,7 +100,7 @@ public final class MainActivity extends Activity {
     }
     private final java.util.HashSet<String> codeRecoveryFailed=new java.util.HashSet<>();
     @Override public void onCreate(Bundle saved) {
-        super.onCreate(saved);
+        super.onCreate(saved);if(BackupRecovery.guard(this))return;
         prefs=getSharedPreferences("moon-garden-ui",MODE_PRIVATE);
         libraryPrefs=getSharedPreferences("library-ui",MODE_PRIVATE);
         toolCatalogue.restore(libraryPrefs.getString("favoriteTools",""),libraryPrefs.getInt("toolCategory",0));
@@ -261,6 +261,7 @@ public final class MainActivity extends Activity {
         persistUi();showingPlay=true;showingFolders=false;showingLibrary=false;
         play=new PlaySession(new PlaySession.Port(){
             public void launch(PlaySession.Game game){launchGame(game);}
+            public void splore()throws Exception{launchSplore();}
             public void exit(){moveTaskToBack(true);}
             public void refresh(){scanGames();}
             public void workshop(){try{showLibrary();}catch(Exception e){play.fail("Could not open Workshop.");}}
@@ -281,22 +282,26 @@ public final class MainActivity extends Activity {
     private void scanGames(){
         final int generation=++playGeneration;final PlaySession target=play;
         final String location=folderPrefs.getString("GAMES.uri","");
-        if(location.isEmpty()){target.replace(java.util.Collections.emptyList(),"");target.notice="Select: choose your games folder";playView.invalidate();return;}
         target.busy=true;target.error="";playView.invalidate();
         final android.content.ContentResolver resolver=getApplicationContext().getContentResolver();
         new Thread(()->{
-            GameFolder.Listing result=null;String failure=null;
-            try{result=GameFolder.list(resolver,location,playPrefs,()->generation!=playGeneration);}
+            GameFolder.Listing result=new GameFolder.Listing();String failure="";
+            if(!location.isEmpty())try{result=GameFolder.list(resolver,location,playPrefs,()->generation!=playGeneration);}
             catch(java.util.concurrent.CancellationException e){return;}
-            catch(Exception e){failure="Folder unavailable. Select: reconnect";Log.w(TAG,"Game scan failed",e);}
-            final GameFolder.Listing ready=result;final String error=failure;
+            catch(Exception e){failure="Games folder unavailable. Menu: reconnect. ";Log.w(TAG,"Game scan failed",e);}
+            int downloads=0;
+            try{
+                art.pikoos.lab.core.SploreCache.Result cached=art.pikoos.lab.core.SploreCache.list(RuntimeHomes.current(this),()->generation!=playGeneration);
+                for(PlaySession.Game game:cached.games){game.favorite=playPrefs.getBoolean("favorite:"+game.id,false);game.recent=playPrefs.getLong("recent:"+game.id,0);result.games.add(game);}
+                downloads=cached.games.size();result.limited|=cached.limited;result.unreadable+=cached.unreadable;
+            }catch(java.util.concurrent.CancellationException e){return;}
+            catch(Exception e){failure+="Splore storage unavailable. Open runtime data settings.";Log.w(TAG,"Splore scan failed",e);}
+            final GameFolder.Listing ready=result;final String error=failure;final int downloaded=downloads;
             runOnUiThread(()->{
                 if(isDestroyed()||!showingPlay||generation!=playGeneration||target!=play)return;
-                if(error!=null){target.replace(java.util.Collections.emptyList(),"");target.fail(error);}
-                else{
-                    target.replace(ready.games,playPrefs.getString("selected",""));
-                    target.notice=ready.limited?"Some games are hidden. Choose a smaller folder.":ready.unreadable>0?"Unreadable folders: "+ready.unreadable+" · Menu: retry":"Your games, ready to play";
-                }
+                target.replace(ready.games,playPrefs.getString("selected",""));
+                if(!error.isEmpty())target.fail(error);
+                target.notice=ready.limited?"Scan limit reached. Other downloads remain in Splore.":ready.unreadable>0?"Unreadable folders: "+ready.unreadable+" - Menu: retry":downloaded>0?downloaded+" Splore downloads on your shelf":ready.games.isEmpty()?"Menu: open Splore or choose a games folder":"Your games, ready to play";
                 playView.invalidate();
             });
         },"pikoos-game-scan").start();
@@ -308,9 +313,16 @@ public final class MainActivity extends Activity {
         new Thread(()->{
             byte[] bytes=null;art.pikoos.lab.core.RuntimeFileSet files=null;String failure=null;
             try{
+                if(game.id.startsWith(art.pikoos.lab.core.SploreCache.PREFIX)){
+                    String path=game.id.substring(art.pikoos.lab.core.SploreCache.PREFIX.length());
+                    bytes=art.pikoos.lab.core.SploreCache.read(RuntimeHomes.current(this),path);
+                    String problem=new art.pikoos.lab.core.PlayCartridge(game.title+".p8.png",bytes).problem;
+                    if(!problem.isEmpty())throw new IllegalArgumentException(problem);
+                }else{
                 bytes=GameFolder.read(resolver,game.id);
                 IncludeSource.Prepared ready=IncludeSource.launch(resolver,location,Uri.parse(game.id),game.title+game.format.extension,bytes,()->generation!=playGeneration);
                 bytes=ready.bytes;files=ready.files;
+                }
             }catch(java.util.concurrent.CancellationException e){return;}
             catch(IllegalArgumentException e){failure=e.getMessage();}
             catch(Exception e){failure="Could not read game. Menu: refresh";}
@@ -322,15 +334,24 @@ public final class MainActivity extends Activity {
                 try{
                     if(!backend.detect().launcherPresent)throw new Exception("Connect PICO-8 first. Runtime wrapper not found.");
                     persistPlay();
-                    if(!playPrefs.edit().putBoolean("runtime",true).putString("selected",game.id).commit())throw new Exception("Could not save library selection.");
+                    if(!playPrefs.edit().putBoolean("runtime",true).putBoolean("splore",false).putString("selected",game.id).commit())throw new Exception("Could not save library selection.");
                     awaitingReturn=true;leftForRuntime=false;
                     if(!libraryPrefs.edit().putBoolean("awaitingReturn",true).commit())throw new Exception("Could not save launch state.");
-                    if(fileSet!=null)backend.launch(fileSet);else backend.launch(snapshot,game.format);
+                    if(game.id.startsWith(art.pikoos.lab.core.SploreCache.PREFIX))backend.launchDownloaded(game.id.substring(art.pikoos.lab.core.SploreCache.PREFIX.length()));else if(fileSet!=null)backend.launch(fileSet);else backend.launch(snapshot,game.format);
                     game.recent=System.currentTimeMillis();playPrefs.edit().putLong("recent:"+game.id,game.recent).apply();
                 }catch(Exception e){awaitingReturn=false;playPrefs.edit().putBoolean("runtime",false).apply();libraryPrefs.edit().putBoolean("awaitingReturn",false).apply();target.fail(e.getMessage()==null?"Could not launch PICO-8.":e.getMessage());}
                 playView.invalidate();
             });
         },"pikoos-game-launch").start();
+    }
+    private void launchSplore()throws Exception{
+        try{
+            persistPlay();
+            if(!playPrefs.edit().putBoolean("runtime",true).putBoolean("splore",true).commit())throw new Exception("Could not save Play state.");
+            awaitingReturn=true;leftForRuntime=false;
+            if(!libraryPrefs.edit().putBoolean("awaitingReturn",true).commit())throw new Exception("Could not save launch state.");
+            backend.launchSplore();
+        }catch(Exception e){awaitingReturn=false;playPrefs.edit().putBoolean("runtime",false).putBoolean("splore",false).commit();libraryPrefs.edit().putBoolean("awaitingReturn",false).commit();throw e;}
     }
     private void showFolders(){showFolders(showingPlay);}
     private void showFolders(boolean fromPlay){
@@ -675,8 +696,8 @@ public final class MainActivity extends Activity {
             awaitingReturn=false;leftForRuntime=false;libraryPrefs.edit().putBoolean("awaitingReturn",false).apply();
             getSharedPreferences("moon-garden-ui",MODE_PRIVATE).edit().putBoolean("awaitingReturn",false).apply();
             if(playPrefs.getBoolean("runtime",false)){
-                playPrefs.edit().putBoolean("runtime",false).apply();
-                if(!showingPlay)showPlay();play.busy=false;play.notice=observed==art.pikoos.lab.core.RuntimeSession.Phase.INTERRUPTED?"The game was interrupted. Your library is ready.":"Back in Play. Choose your next game.";playView.invalidate();
+                boolean wasSplore=playPrefs.getBoolean("splore",false);playPrefs.edit().putBoolean("runtime",false).putBoolean("splore",false).apply();
+                if(!showingPlay)showPlay();else scanGames();play.notice=wasSplore?"Updating your Splore downloads...":"Updating Play...";playView.invalidate();
             }else{session.notice="Сохранено";surface.invalidate();}
             Log.i(TAG,"host_resumed tool="+session.tool+" focus="+session.focus+" result=unknown");
         }

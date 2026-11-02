@@ -35,7 +35,7 @@ final class SafProjectStore implements ProjectRepository.Storage {
     public boolean exists(String id)throws Exception{synchronized(SafProjectStore.class){return tree.exists(base(id).substring(0,base(id).length()-1));}}
     public byte[] read(String id)throws Exception{synchronized(SafProjectStore.class){RecoverableReplace.recover(port(id));return bytes(base(id)+"game.p8");}}
     public String importedTitle(String id)throws Exception{return new String(bytes(base(id)+".pikoos/import-name"),"UTF-8");}
-    public void publish(String id,byte[] data,String title)throws Exception{
+    public void publish(String id,byte[] data,String title)throws Exception{if(BackupActivity.inProgress())throw new IOException("Finish backup or restore before editing.");
         synchronized(SafProjectStore.class){
             if(exists(id))throw new IOException("Project already exists");
             String stage="projects/.creating-"+UUID.randomUUID();tree.directory(stage);
@@ -44,7 +44,7 @@ final class SafProjectStore implements ProjectRepository.Storage {
             tree.rename(stage,"projects/"+id);
         }
     }
-    public void replace(String id,byte[] expected,byte[] next)throws Exception{
+    public void replace(String id,byte[] expected,byte[] next)throws Exception{if(BackupActivity.inProgress())throw new IOException("Finish backup or restore before editing.");
         synchronized(SafProjectStore.class){
             try{RecoverableReplace.replace(port(id),expected,next);}
             catch(Exception e){throw new IOException("External save interrupted. Reopen this project to recover; versions were kept. "+e.getMessage(),e);}

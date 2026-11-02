@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-02",
+  "candidate": "0.1.0-beta.1",
+  "source_lab": "0.0.93",
+  "version_code": 93,
+  "package": "art.pikoos.runtimelab",
+  "apk": {
+    "local_path": ".local/artifacts/PikoNest-0.1.0-beta.1.apk",
+    "sha256": "a8a85b1804c8a7a67bee68010c19d4591a05901709df5b84a82eab01cf732e54",
+    "bytes": 51385423,
+    "signer_certificate_sha256": "b8a72962518f59c2585f68c9e0a189743068e0a76f6d7933f35cad53d4a8e008"
+  },
+  "local_validation": {
+    "build_exit": 0,
+    "core_suite_invocations": 91,
+    "backup_assertions": 154,
+    "splore_cache_assertions": 16,
+    "play_workflow_assertions": 16415,
+    "native_java_compilation": true,
+    "signature_verified": true,
+    "same_signing_identity": true,
+    "debuggable": false,
+    "launcher_count": 1,
+    "sdk_min": 26,
+    "sdk_target": 28,
+    "godot_index_entries_verified": 263,
+    "bootstrap_elf_hashes_matched_inventory": 77,
+    "official_pico8_payload_absent": true
+  },
+  "acceptance": {
+    "device_used_this_batch": false,
+    "candidate_installed": false,
+    "splore_network_download_return_offline": false,
+    "backup_restore_android_provider_lifecycle": false,
+    "update_data_preservation_on_device": false,
+    "physical_controller": false,
+    "novice_owner_review": false,
+    "native_dependency_matching_sources_complete": false,
+    "publication_approved": false,
+    "published": false
+  },
+  "remaining": "Complete matching native source/notice materials and authorized device journeys; obtain owner approval for the actual APK. No tag or Release was created."
+}

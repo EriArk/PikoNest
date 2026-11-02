@@ -1,4 +1,8 @@
-# First Android alpha
+# Earlier alpha scope decision
+
+**Superseded in name later on 2 November 2026:** the owner selected a first early
+beta, `0.1.0-beta.1`. See [current scope](BETA_SCOPE.md). This earlier record retains
+the runtime archive policy and the distinction between scope and acceptance.
 
 Owner decision, 2 November 2026: target an **alpha**, rather than waiting for a
 complete no-Lua creator. This changes the first milestone, not the long-term
@@ -30,8 +34,8 @@ an unrestricted desktop IDE has been implemented.
 - [ ] Play and a declared supported creation/edit/save/reopen/Test/export journey
   work on the supported physical controls and screens. Return retains context.
 - [ ] Updates, interrupted writes and backup/recovery have a verified, documented
-  data-preservation path. Full backup is currently unfinished; external folders
-  alone do not preserve settings, private drafts or interrupted-save records.
+  data-preservation path. Backup/restore is now locally implemented in lab 0.0.93; Android acceptance
+  remains open. See [the data guide](BACKUP_RESTORE.md).
 - [ ] The supported Android/runtime matrix is recorded. The approved interim
   target SDK 28 mode is explicit; modern-target R10 remains required follow-up,
   and alpha status is not evidence of broader Android compatibility.

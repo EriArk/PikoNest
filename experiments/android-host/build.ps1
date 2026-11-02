@@ -5,9 +5,13 @@ param(
     [string]$Platform = 'android-34',
     [switch]$HostOnly,
     [switch]$SkipCoreTests,
-    [switch]$ValidationOnly
+    [switch]$ValidationOnly,
+    [switch]$Beta,
+    [string]$SigningKeystore
 )
 $ErrorActionPreference = 'Stop'
+if($Beta -and ($HostOnly -or $ValidationOnly)){throw 'Beta packaging requires the normal integrated application identity'}
+if($Beta -and (-not $SigningKeystore -or -not $env:PIKONEST_SIGNING_PASSWORD)){throw 'Beta signing requires an explicit keystore and process-local PIKONEST_SIGNING_PASSWORD'}
 $pikoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $pikoBuild = Join-Path $pikoRoot ('.local\android-host-build\' + [guid]::NewGuid().ToString('N'))
 $pikoArtifacts = Join-Path $pikoRoot '.local\artifacts'
@@ -103,6 +107,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeBootIde
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LuaEditorTest',(Join-Path $PSScriptRoot 'assets\blank.p8'),(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'FolderSetupTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'FirstRunSetupTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'BackupTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'VerifiedTransferTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'ProjectRepositoryTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RecoverableReplaceTest')
@@ -114,6 +119,7 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeFileSet
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeArchiveTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'RuntimeProbeTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'P8PngTest',(Join-Path $PSScriptRoot 'tests\fixtures\lights-0.2.7.p8.png'))
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'SploreCacheTest',(Join-Path $PSScriptRoot 'tests\fixtures\lights-0.2.7.p8.png'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'PlayWorkflowTest',(Join-Path $PSScriptRoot 'assets\lights.p8'),(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'LabCartridgeTest',(Join-Path $PSScriptRoot 'assets\workshop.p8'))
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'WorkshopTest',(Join-Path $PSScriptRoot 'assets\moon-garden.p8'))
@@ -153,13 +159,14 @@ Invoke-PikoTool (Join-Path $pikoTools 'zipalign.exe') @('-f','4',$pikoUnsigned,$
 
 # Local experiment signing key, never a production credential or tracked artifact.
 $pikoKey = Join-Path $pikoArtifacts 'runtime-lab-debug.keystore'
-if (-not (Test-Path -LiteralPath $pikoKey)) {
+if (-not $Beta -and -not (Test-Path -LiteralPath $pikoKey)) {
     Invoke-PikoTool (Join-Path $JdkRoot 'bin\keytool.exe') @('-genkeypair','-keystore',$pikoKey,'-storepass','android','-keypass','android','-alias','pikoos-lab','-keyalg','RSA','-keysize','2048','-validity','3650','-dname','CN=PIKOOS Runtime Lab')
 }
 $pikoApk = Join-Path $pikoArtifacts 'pikoos-runtime-lab.apk'
+if($Beta){$pikoApk=Join-Path $pikoArtifacts 'PikoNest-0.1.0-beta.1.apk'}
 if($ValidationOnly){$pikoApk=Join-Path $pikoArtifacts 'pikonest-clean-validation.apk'}
 if(-not $HostOnly) {
-    & (Join-Path $pikoRoot 'experiments\android-integrated\package.ps1') -Dex (Join-Path $pikoBuild 'dex\classes.dex') -Output $pikoApk -JdkRoot $JdkRoot -SdkRoot $SdkRoot -ValidationOnly:$ValidationOnly
+    & (Join-Path $pikoRoot 'experiments\android-integrated\package.ps1') -Dex (Join-Path $pikoBuild 'dex\classes.dex') -Output $pikoApk -JdkRoot $JdkRoot -SdkRoot $SdkRoot -ValidationOnly:$ValidationOnly -Beta:$Beta -SigningKeystore $SigningKeystore
     return
 }
 Invoke-PikoTool $pikoJava @('-jar',(Join-Path $pikoTools 'lib\apksigner.jar'),'sign','--ks',$pikoKey,'--ks-key-alias','pikoos-lab','--ks-pass','pass:android','--key-pass','pass:android','--out',$pikoApk,$pikoAligned)

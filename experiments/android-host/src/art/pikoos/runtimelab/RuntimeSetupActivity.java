@@ -32,7 +32,7 @@ public final class RuntimeSetupActivity extends Activity {
         view.invalidate();
     };
     @Override public void onCreate(Bundle saved){
-        super.onCreate(saved);
+        super.onCreate(saved);if(BackupRecovery.guard(this))return;
         state=new RuntimeSetup(new RuntimeSetup.Port(){
             public void pick(){
                 try{
@@ -68,6 +68,7 @@ public final class RuntimeSetupActivity extends Activity {
     }
     private void attach(RuntimeArchiveJob next){if(job!=null)job.detach(listener);job=next;job.attach(listener);}
     private void prepareArchive(){
+        if(BackupActivity.inProgress()){state.problem="Finish backup or restore before preparing PICO-8.";view.invalidate();return;}
         ExternalPicoBackend backend=new ExternalPicoBackend(this);
         if(RuntimeMigrationJob.pending()||backend.hasSession()&&!art.pikoos.lab.core.RuntimeSession.ended(backend.sessionPhase())){
             state.problem="Finish the current game or data import before preparing PICO-8.";view.invalidate();return;

@@ -56,11 +56,11 @@ final class SafLibraryStorage implements LibraryRepository.Storage {
     }
     public byte[] read(String path)throws Exception{synchronized(SafLibraryStorage.class){LibraryRepository.path(path);RecoverableReplace.recover(port(path));return tree.exists(path)?bytes(path):null;}}
     private void writeNew(String path,byte[] data)throws Exception{try(OutputStream out=tree.create(path)){if(out==null)throw new IOException("Cannot open resource output");out.write(data);}if(!Arrays.equals(data,bytes(path)))throw new IOException("Could not verify resource candidate");}
-    public void create(String path,byte[] data)throws Exception{
+    public void create(String path,byte[] data)throws Exception{if(BackupActivity.inProgress())throw new IOException("Finish backup or restore before editing.");
         synchronized(SafLibraryStorage.class){
             LibraryRepository.path(path);if(tree.exists(path))throw new IOException("Resource already exists");int slash=path.lastIndexOf('/');String dir=slash<0?"":path.substring(0,slash+1);
             if(slash>=0)tree.directory(path.substring(0,slash));String stage=dir+".creating-"+UUID.randomUUID()+".bin";writeNew(stage,data);tree.rename(stage,path);
         }
     }
-    public void replace(String path,byte[] a,byte[] b)throws Exception{synchronized(SafLibraryStorage.class){try{RecoverableReplace.replace(port(path),a,b);}catch(Exception e){throw new IOException("Resource save interrupted. Reopen the library to recover. Versions kept. "+e.getMessage(),e);}}}
+    public void replace(String path,byte[] a,byte[] b)throws Exception{if(BackupActivity.inProgress())throw new IOException("Finish backup or restore before editing.");synchronized(SafLibraryStorage.class){try{RecoverableReplace.replace(port(path),a,b);}catch(Exception e){throw new IOException("Resource save interrupted. Reopen the library to recover. Versions kept. "+e.getMessage(),e);}}}
 }

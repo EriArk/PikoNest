@@ -1,5 +1,27 @@
 # PikoNest — путь к полному Android-продукту
 
+## Current first milestone — early beta, 2 November 2026
+
+The owner renamed the first milestone **early beta**, `0.1.0-beta.1`. Lua is allowed
+outside supported visual paths; this does not close the complete no-code product.
+Local backup/restore, Splore → Play and candidate packaging are implemented in
+0.0.93. [Scope](BETA_SCOPE.md) · [Candidate preparation](release/beta1/README.md).
+
+1. Complete the exact native dependency/source/notice distribution package. This
+   newly inventoried but pre-existing gap blocks APK publication.
+2. When the owner frees the handheld, test independent setup, in-place update,
+   storage/reconnect, backup/restore, physical controls, Play/external launcher and
+   the declared creation/export journeys. Keep the console untouched until then.
+3. Prove a new Splore download appears in Play and launches offline; check multicart
+   parts separately. Resolve findings and capture actual candidate screens.
+4. Owner reviews the exact result; only explicit approval permits its GitHub beta
+   publication. No Release/prerelease/tag is created as part of local preparation.
+5. Continue broader no-Lua, world/audio/library, external download synchronization,
+   modern-target and localization work after the first accepted beta.
+
+This queue supersedes older next-step prose below. Source/local evidence is separate
+from Android/runtime/provider/novice/owner acceptance.
+
 ## Alpha milestone — owner decision, 2 November 2026
 
 The first deliverable is an **alpha**. Lua may still be necessary for gameplay

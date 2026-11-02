@@ -33,6 +33,40 @@ Upstream MIT and native font notices are packaged. Complete transitive binary
 licensing/source obligations remain a pre-release task; source MIT does not
 relicense Godot, bootstrap libraries or third-party artwork.
 
+## Local beta candidate
+
+```powershell
+./experiments/android-integrated/prepare-beta.ps1 -JdkRoot 'C:\Program Files\Android\Android Studio\jbr'
+```
+
+Builds `.local/artifacts/PikoNest-0.1.0-beta.1.apk` and its `.apk.sha256`, with
+debugging disabled, version code 93, one launcher and the existing package ID.
+The script checks the final manifest, signature, runtime asset index, Splore
+launch patch and required added notices. It neither installs nor publishes.
+
+The first run requires the existing ignored development keystore. It copies that
+same signing identity into `%USERPROFILE%\.pikonest\signing\pikonest.jks`, protected
+by a random password stored with Windows DPAPI in `password.clixml`. Public
+certificate equality is checked before building: this is an update-compatible
+copy of the existing key, not a new identity. Original development keys remain
+untouched. Keys/passwords/APKs are never committed.
+
+Keep an owner-controlled secure backup of the signing material before publication.
+The DPAPI password file alone is tied to the Windows user/machine and is not a
+portable disaster-recovery plan. Do not delete the old key or rotate the certificate
+as an incidental cleanup. Record the public certificate fingerprint with the
+candidate. Successful local signature verification is not an on-device update test.
+
+Run scripts directly, or capture stdout/stderr with Python `subprocess.run`.
+Windows PowerShell 5.1 `*>` around native compiler calls can promote harmless
+compiler warnings to `NativeCommandError`; do not mistake that wrapper outcome
+for the actual compiler/build result. Preserve the process exit code and final
+verification output.
+
+See [early beta preparation](../../docs/release/beta1/README.md). Native dependency
+source provenance, device acceptance and the owner's publication gate are still
+open. A successful candidate build does not authorize a GitHub Release/prerelease.
+
 ## Isolated clean-install validation
 
 For an empty private installation without clearing the owner's current app:

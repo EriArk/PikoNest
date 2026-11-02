@@ -15,6 +15,16 @@ public final class RuntimeControls implements Application.ActivityLifecycleCallb
     private static RuntimeControls installed;
     private final Map<Activity,Controls> active=new HashMap<>();
     private static volatile int gameActivities;
+    private static volatile boolean splore;
+    private static volatile String downloaded="";
+    public static boolean sploreRequested(){return splore;}
+    public static String downloadedCartRequested(){return downloaded;}
+    private static void captureMode(Activity a){
+        boolean session=art.pikoos.lab.core.RuntimeSession.validToken(a.getIntent().getStringExtra("pikoos.session"));
+        splore=session&&a.getIntent().getBooleanExtra("pikonest.splore",false);
+        String path=a.getIntent().getStringExtra("pikonest.downloaded");
+        downloaded=session&&!splore&&path!=null&&path.matches("data/bbs/(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\\.p8\\.png")?path:"";
+    }
     static boolean gameOpen(){return gameActivities!=0;}
     public static void install(Application app){installed=new RuntimeControls();app.registerActivityLifecycleCallbacks(installed);}
     /** Called by the pinned Godot process monitor after its EXITED journal write, before quitting. */
@@ -24,10 +34,11 @@ public final class RuntimeControls implements Application.ActivityLifecycleCallb
         if(Looper.myLooper()==Looper.getMainLooper())finish.run();
         else{new Handler(Looper.getMainLooper()).post(finish);try{done.await(1,java.util.concurrent.TimeUnit.SECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();}}
     }
-    public void onActivityCreated(Activity a,Bundle b){if(a.getClass().getName().equals("com.godot.game.GodotApp"))gameActivities++;}
+    public void onActivityCreated(Activity a,Bundle b){if(a.getClass().getName().equals("com.godot.game.GodotApp")){gameActivities++;captureMode(a);}}
     public void onActivityStarted(Activity a){}
     public void onActivityResumed(Activity a){
         if(!a.getClass().getName().equals("com.godot.game.GodotApp"))return;
+        captureMode(a);
         Controls c=active.get(a);if(c==null){c=new Controls(a);active.put(a,c);}
         if(a.getIntent().getBooleanExtra("pikoos.controls",false)){c.enabled=true;c.swapAB=a.getIntent().getBooleanExtra("pikoos.swapAB",false);}
         c.captureReturn();

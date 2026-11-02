@@ -7,7 +7,7 @@ public final class ShelfMenu {
     public enum Command {
         PLAY("Play"), WORKSHOP("Workshop"), NEW("New project"), COPY("Copy project"),
         IMPORT("Import .p8"), EXPORT("Export .p8"), FILTER("Change filter"),
-        REFRESH("Refresh games"), FOLDERS("Folders & runtime");
+        REFRESH("Refresh games"), FOLDERS("Folders & runtime"), SPLORE("Splore: discover games");
         public final String label;
         Command(String label){this.label=label;}
     }

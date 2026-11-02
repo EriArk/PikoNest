@@ -32,6 +32,9 @@ public interface PicoRuntimeBackend {
     default void resume()throws Exception{throw new UnsupportedOperationException("Возврат в runtime недоступен");}
     /** Launch acceptance is not proof of successful official-runtime execution. */
     void launch(byte[] standardCart) throws Exception;
+    /** Open the user's official cartridge browser without creating a project/cart. */
+    default void launchSplore()throws Exception{throw new UnsupportedOperationException("Splore is unavailable in this runtime backend.");}
+    default void launchDownloaded(String cachePath)throws Exception{throw new UnsupportedOperationException("Downloaded cartridge launch is unavailable in this backend.");}
     /** Explicit bounded trial of a copy; adapter reports evidence asynchronously, never certifies gameplay. */
     default void diagnose(byte[] standardCart,boolean swapAB)throws Exception{throw new UnsupportedOperationException("Проверка недоступна в этом runtime");}
     default void launch(RuntimeFileSet files)throws Exception{

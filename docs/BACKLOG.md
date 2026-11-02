@@ -1,5 +1,25 @@
 # PikoNest — задачи полного цикла
 
+**2026-11-02 — Lab 0.0.93, first early beta preparation (P08/R07/Q05 partial):**
+Owner selected `0.1.0-beta.1`, superseding the earlier alpha name without claiming
+complete no-Lua creation. [Current scope](BETA_SCOPE.md). Checked ZIP backup and
+retained-version restore now cover active projects/library, persisted drafts/settings
+and runtime saves/downloads; restore normalizes to internal storage and requires
+fresh preference reload. Portable interruption/conflict checks do not close native
+provider/process/power-loss acceptance. [Data contract](BACKUP_RESTORE.md).
+
+Play connects official Splore and indexes its persistent BBS cache, including when
+no Games folder is selected. Return refreshes the combined shelf; downloaded carts
+retain labels/names/favorites/recents and launch in their original runtime home.
+[Splore contract](SPLORE.md). Network/real-cache/offline/multicart and external
+Downloads-folder synchronization remain open. The candidate keeps the package/signing
+identity, disables debugging and remains local. [Evidence](showcase/0.0.93-en/README.md).
+
+A 77-ELF bootstrap inventory exposes unresolved exact native source provenance;
+complete corresponding-source/notices before distribution. No device use or APK
+publication occurred. Next: close that source package, then complete the authorized
+[candidate journeys](release/beta1/README.md), owner review and explicit publication.
+
 **2026-11-02 — Lab 0.0.92, alpha scope and version-independent archive discovery:**
 Owner now targets an alpha with Lua allowed outside bounded visual workflows;
 full no-Lua creation remains a later product milestone. [Scope](ALPHA_SCOPE.md).
@@ -417,7 +437,7 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 | R04 | Исследование / R03 | Наблюдение запуска/ошибки/выхода, доступные raw logs и позиция ошибки; граница возможностей backend | Lua/runtime/environment error различаются насколько наблюдаемы; неизвестный результат явно неизвестен; наличие пакета/intent не означает Verified |
 | R05 | Частично / R03, P02 | Владение game saves/cartdata, cstore/save и рабочими копиями; запись обратно, конфликт, backup; безопасные runtime-зависимости | Сохранение переживает запуск из Play/external и обновление; источник не перезаписывается молча; неперенесённые записи остаются доступными; динамические пути имеют проверенный контракт |
 | R06 | Исследование / A01 | Матрица official runtime version/ABI/Android, определение версии и backend capabilities, смена runtime | «ZIP структурно читается», «архитектура подходит» и «эта версия проверена» различаются; инструкция архива соответствует backend, неподдержанная версия не маскируется |
-| R07 | Исследование / R02, P02, R05 | Splore: выбранные Downloads, реальные BBS-cache/зависимости, индекс Play, offline; восстановление переноса | Скачать новую игру, увидеть на полке, перезапустить без сети и сыграть; потеря папки не теряет загрузку; multicart проверен отдельно |
+| R07 | Частично, Splore/Play cache 0.0.93; native pending / R02, P02, R05 | Splore: выбранные Downloads, реальные BBS-cache/зависимости, индекс Play, offline; восстановление переноса | Скачать новую игру, увидеть на полке, перезапустить без сети и сыграть; потеря папки не теряет загрузку; multicart проверен отдельно |
 | R08 | Частично, 0.0.91 / R01, R02, R06, R07, P02 | Полный первый запуск и тот же путь в Settings; четыре назначения, правильный ZIP, progress/retry, отложенная настройка и продолжение Test/external | Чистая установка проходит ACC-06; отмена сохраняет сделанное; редактор доступен без runtime; нет обязательного аккаунта, курса или имени проекта |
 | R09 | Частично, 0.0.71 / A01, A06, R01, R03; #9/#10 | Один APK и одна иконка PikoNest: встроить адаптер запуска, убрать обязательную установку helper/runtime APK; сохранить границу backend и импорт купленного runtime. Требование владельца 2026-10-07 | Чистая установка работает без внешних wrapper-пакетов; Play/Test/возврат и восстановление проверены. Проверенный перенос проектов/сохранений/библиотеки предшествует удалению старых lab-приложений; proprietary runtime не включён в APK |
 | R10 | Исследование / R09, R06 | Современный Android target: заменить зависимость от исполнения writable app-private файлов; сохранить импорт официального runtime и backend | Запуск/выход/восстановление проверены на современных Android при актуальном target; не простая смена manifest, не встраивание proprietary binaries. SDK 28 разрешён владельцем только для первой интеграции |
@@ -529,7 +549,7 @@ outside the selected folder and a user rollback/cleanup path remain R09 work.
 | Q02 | Частично / A05 | Полный remapping/A-B convention, stick/D-pad, отсутствие плечевых/touch, reconnect, optional keyboard/mouse, системные picker-границы | Каждый основной путь пройден физическим контроллером; ограничения системы явно описаны и есть предусмотренный путь настройки; горячие клавиши не единственный вход |
 | Q03 | Частично / A06, R03 | Старт/сканирование/редактор/preview: отзывчивость, память, большие проекты, background/sleep; отмена/ограничение provider I/O и диагностика зависаний | По согласованному профилю измерены задержки/ресурсы; задачи не блокируют UI; зависший provider/длинная загрузка не теряют данные и имеют восстановление |
 | Q04 | План / функциональные задачи A/P/R/L/C/G/N/M/S/B/T/H | Выполнить ACC-01–07 и техническую часть ACC-08, corpus на границах ресурсов, разные жанры, внешний PICO-8 round-trip, восстановление/обновление | Доказательства привязаны к сборке/устройству/версии, ограничения перечислены; ни один обязательный путь не требует правки файлов разработчиком. Приёмка владельцем и разрешение выпуска закрываются отдельно в Q06 |
-| Q05 | План / A06, R02, P08 | Производственный package/signing/update, backup migration, notices/зависимости/permissions; инструкция установки/архива и known limits | Проверено обновление с сохранением проектов/сейвов, нет debug-only зависимости или proprietary runtime в APK; ключи/секреты вне репозитория; без автоматического release |
+| Q05 | Частично, local beta candidate 0.0.93; sources/device pending / A06, R02, P08 | Производственный package/signing/update, backup migration, notices/зависимости/permissions; инструкция установки/архива и known limits | Проверено обновление с сохранением проектов/сейвов, нет debug-only зависимости или proprietary runtime в APK; ключи/секреты вне репозитория; без автоматического release |
 | Q06 | План / Q01, Q02, Q03, Q04, Q05 | Демонстрация владельцу полного продукта, исправления замечаний; лишь затем отдельно разрешённый GitHub APK release | Записано явное подтверждение полной удовлетворённости и разрешение конкретного выпуска. Нет prerelease как обхода запрета; молчание/«продолжаем» не являются одобрением |
 
 Перед международным расширением запланированы:

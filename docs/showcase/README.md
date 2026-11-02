@@ -1,5 +1,11 @@
 # PikoNest — English website gallery
 
+[0.0.93: first early beta preparation and fresh website pictures](0.0.93-en/README.md)
+— 13 labeled host previews of Game view, tile art, sound/music, setup, backup and
+Splore/Play. [Download PNG pack](0.0.93-en/pikonest-early-beta-previews.zip).
+These are current production renderers with configured demo data, not new Android
+screenshots. Existing native captures below retain their original provenance.
+
 [0.0.86: editable starting games and contextual help](0.0.86-en/README.md) —
 original collection/switch games, shared tool guidance and safe project creation.
 Includes ordinary host-generated carts and labeled host previews, not device captures.

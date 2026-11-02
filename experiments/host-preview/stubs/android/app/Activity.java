@@ -1,0 +1,1 @@
+package android.app;public class Activity extends android.content.Context {public void startActivity(android.content.Intent i){}public void startActivityForResult(android.content.Intent i,int n){}}

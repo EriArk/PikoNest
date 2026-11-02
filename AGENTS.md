@@ -1,5 +1,15 @@
 # AGENTS.md — PikoNest contributor instructions
 
+Current owner decision and next queue (2026-11-02): prepare **first early beta**
+`0.1.0-beta.1` (source lab 0.0.93), superseding the alpha name from earlier today.
+Lua remains acceptable outside supported visual paths; complete no-code genre
+creation is a later milestone. Backup/restore and Splore → Play cache indexing are
+locally implemented; native/runtime/provider/physical/owner acceptance is open.
+Do not use the handheld until the owner explicitly frees it. No APK publication
+until candidate acceptance and explicit owner approval. Exact native dependency
+matching-source/notice materials remain a separate real distribution blocker.
+Follow `docs/BETA_SCOPE.md`, `docs/release/beta1/README.md` and the current ROADMAP.
+
 Owner milestone decision (2026-11-02): target an alpha first. Ordinary Lua may
 be required beyond supported visual workflows; complete no-Lua genre creation is
 a later milestone. Keep the full-product requirements below as the long-term
