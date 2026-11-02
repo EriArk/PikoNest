@@ -1,5 +1,28 @@
 # PikoNest — changelog
 
+## 2026-11-02 — First early beta on the handheld
+
+- Refreshed unidentified runtime-support files from authenticated packages; included
+  matching sources, original notices, BusyBox configuration and rebuild/replacement
+  instructions. The strict distribution check now passes: 82 native files, 80
+  official matches and 185 retained material files. Purchased PICO-8 is never bundled.
+- Expanded Splore indexing beyond 128 games and read current cached titles safely.
+  Fixed repeated sprite thumbnails and immediately visible archive-import errors.
+- Updated Retroid in place. All 56 existing project files and four library files
+  match the retained pre-update backup. Verified new Splore download/favorite/offline
+  launch, isolated first-run setup, blank sprite/movement/export, both starter wins,
+  sound/music previews, external intent/resume and clean-project backup/restore.
+- Replaced README previews with seven actual English Android screenshots and a
+  downloadable image pack. Updated setup, source-distribution and device evidence.
+- Disabled the obsolete separate runtime prototype on the reference handheld after
+  confirming integrated execution. Kept its data for rollback; the product needs one APK.
+- Validation: 91 core suites, 20 audit tests, final package checks and strict source
+  verification. Final UI corrections were inspected natively. Physical inputs,
+  audible sound, novice testing, wider device/provider/fault coverage and owner
+  acceptance remain open. No APK release was published in this batch.
+  [Device record](docs/release/beta1/DEVICE_ACCEPTANCE.md) ·
+  [Screenshots](docs/showcase/beta1-en/README.md).
+
 Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
 There is no public APK release as of 2 November 2026.

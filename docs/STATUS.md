@@ -1,5 +1,20 @@
 # Состояние PikoNest
 
+**2026-11-02 — Refreshed early-beta candidate and authorized device checks:**
+Dependency review/materials are complete for the recorded payload: 82 native files,
+80 official matches, 185 retained inputs and strict completion pass. Final APK
+`e496a14c…224f` is installed on Retroid. In-place update preserved 56 project and
+four library files byte-for-byte. Independent setup, Splore/offline title launch,
+blank art/movement/export, both starter wins, SFX/music preview, external intent
+resume and clean-project restore passed within the recorded scopes. Native thumbnail
+and setup-error fixes are included. 91 core suites and 20 audit tests passed.
+[Device/build boundaries](release/beta1/DEVICE_ACCEPTANCE.md) ·
+[Native gallery](showcase/beta1-en/README.md).
+Q05 distribution review is complete; beta/physical/novice/owner acceptance is not.
+Remaining provider interruption/reconnect, device matrix, audible audio and multicart
+checks stay open. No public release yet. This current note supersedes older paused
+device and unresolved dependency counts below; historical records are retained.
+
 **2026-11-02 — PRoot source recovery (Q05 partial):**
 Three shipped PRoot files match an archived 5.1.107-65 package. Source commit and
 checksum match the official Termux recipe; notices are retained. The secondary

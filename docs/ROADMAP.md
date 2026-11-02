@@ -7,23 +7,18 @@ outside supported visual paths; this does not close the complete no-code product
 Local backup/restore, Splore → Play and candidate packaging are implemented in
 0.0.93. [Scope](BETA_SCOPE.md) · [Candidate preparation](release/beta1/README.md).
 
-1. Finish the native source/notice package: 60 of 79 files now match official
-   artifacts; three PRoot files have secondary archive matches and recipe-checked
-   source. There are 156 source inputs and two catalogs collected. Resolve the remaining 14
-   unidentified Termux files and finish PRoot authentication/source review. Use a
-   pinned source/build tree where old provenance cannot be
-   recovered; complete component-specific notice and distribution review. Do not
-   require a byte-identical rebuild for permissive components merely to clear licensing.
-   Keep the current candidate as rollback baseline. [Evidence](release/beta1/DEPENDENCIES.md).
-2. When the owner frees the handheld, test independent setup, in-place update,
-   storage/reconnect, backup/restore, physical controls, Play/external launcher and
-   the declared creation/export journeys. Keep the console untouched until then.
-3. Prove a new Splore download appears in Play and launches offline; check multicart
-   parts separately. Resolve findings and capture actual candidate screens.
-4. Owner reviews the exact result; only explicit approval permits its GitHub beta
-   publication. No Release/prerelease/tag is created as part of local preparation.
-5. Continue broader no-Lua, world/audio/library, external download synchronization,
-   modern-target and localization work after the first accepted beta.
+1. **Completed distribution work:** authenticated support refresh, 82 reviewed native
+   files, 185 source materials/notices and strict completion pass. [Evidence](release/beta1/DEPENDENCIES.md).
+2. **Device work now authorized and partially demonstrated:** independent setup,
+   preserved update, Splore/offline, clean restore, two starter wins, blank movement,
+   SFX/music previews and external intent/resume. [Passes and limits](release/beta1/DEVICE_ACCEPTANCE.md).
+3. Review the installed candidate and native English gallery with the owner. Complete
+   or explicitly accept remaining physical/audio/provider/launcher and device-matrix
+   checks for the bounded early beta; do not label untested journeys passed.
+4. Publish only the owner-approved exact APK with hashes, corresponding support sources,
+   matching repository source and release notes. No release has been created yet.
+5. Continue broader no-Lua creation, world/audio/library, external download sync,
+   modern-target execution and localization after the accepted first beta.
 
 This queue supersedes older next-step prose below. Source/local evidence is separate
 from Android/runtime/provider/novice/owner acceptance.

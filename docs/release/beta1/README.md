@@ -1,103 +1,83 @@
-# PikoNest early beta 1 preparation
+# PikoNest early beta 1 candidate
 
-Prepared 2 November 2026. **Local candidate, not a published release.**
-Candidate version: `0.1.0-beta.1`, source lab `0.0.93`, Android version code `93`.
-The local build passed all 91 core suites and package verification.
-[Exact candidate hash and open gates](../../showcase/0.0.93-en/candidate.json).
-The APK remains outside Git. No release tag, download or publication is implied.
+Updated 2 November 2026. **Installed and technically checked; not yet published.**
+Version `0.1.0-beta.1`, source lab `0.0.93`, Android version code `93`.
+[Exact APK and source-bundle hashes](SHA256SUMS).
 
-Dependency follow-up: 60 of 79 native files now match official artifacts, with 155
-source inputs and two signed-catalog files collected. The existing candidate is unchanged;
-additional notices and native drift checks enter its next packaging pass. Seventeen
-Termux files and the remaining distribution review still block completion. See
-[dependency evidence](DEPENDENCIES.md); the local source-material ZIP is partial.
+Play, Workshop, runtime setup and backups are in one APK. Game view connects a
+supported subset of artwork, movement, collection/switch rules, animation, audio
+and tile-world editing. Blank and two examples share the same tools. More ambitious
+gameplay may require Lua; this is not a complete no-code creator.
 
-## What this beta is for
+## Install and start
 
-Play PICO-8 cartridges, remix supported resources, and make small games with a
-mixture of visual tools and ordinary Lua. Play, Workshop and purchased-runtime
-setup are in one APK. The bounded Game view can connect artwork, movement,
-collection/switch rules, animation, sound, music and a tile world. Its two starting
-games are editable examples using the same tools available in Blank.
+1. Install the owner-approved APK when published. There is no public download yet.
+   Update existing PikoNest **in place**, without uninstalling. One icon, no helper app.
+2. Choose Games in the guide, or skip it. Android's system picker may need touch.
+3. Import your purchased **PICO-8 Raspberry Pi ZIP containing `pico8_64` (ARM64)**
+   from your Lexaloffle purchase page. Windows/macOS/Linux x86 and ARM32-only
+   archives are unsupported. ZIP names, versions and enclosing folders can vary.
+4. Prepare, then press **Test**. Successful inspection alone does not prove every
+   older/future runtime executes correctly.
+5. Keep creation data internal or activate checked project/library copies in selected
+   folders. The external Splore folder is not yet an active download-sync destination;
+   current downloads live in persistent runtime storage and appear in Play.
+6. Open Play to play or Workshop to create. Save a [backup ZIP](../../BACKUP_RESTORE.md)
+   outside the app before uninstall/reset. Purchased runtime files and Android
+   permissions must be re-established separately after restoration.
 
-This is an early workshop, not a complete no-code creator for every genre.
-Unknown Lua is retained; visual actions may require recognized code. All tools
-remains available, with explicit limits rather than guessed rewrites. More complete
-no-Lua creation, advanced audio/library work and modern Android targeting follow.
+## Demonstrated result
 
-## Installation and first opening
+- Dependency review complete: 82 native records, 80 official matches, 185 pinned
+  materials and notices/configuration/rebuild map. [Evidence](DEPENDENCIES.md).
+- 91 core suites, 20 audit tests, final packaging and strict distribution checks.
+  Final Android-only view corrections were inspected on-device.
+- Retroid update preserved 56 prior project files and four library files byte-for-byte.
+  Final main-app backup verified 355 files.
+- Independent first-run import/Test, Splore download/favorite/offline title launch,
+  blank art/movement/export, both starter wins, SFX/music previews, external VIEW
+  intent/resume and clean-project restore demonstrated within recorded bounds.
+- Fixed repeated sprite thumbnails, visible archive errors and Splore's old 128-cart cap.
 
-1. Use the eventual owner-approved APK from this repository's Releases page.
-   **None has been published yet.** Do not uninstall an existing PikoNest to update.
-2. Install one APK. It supplies one PikoNest icon; there is no helper to install.
-3. In the guide, select an existing Games folder, or skip it for now. Android's
-   folder/document picker belongs to the system and may need touch on some devices.
-4. Download your purchased **PICO-8 Raspberry Pi ZIP containing `pico8_64`
-   (ARM64)** from your Lexaloffle purchase page. Select the ZIP in PikoNest.
-   Desktop Windows/macOS/Linux x86 archives and ARM32-only archives will not work.
-5. Preparation inspects and imports the files. ZIP filename, version number and
-   enclosing folder can vary. Use **Test** explicitly to check this runtime; a
-   successful import alone does not prove that an older or future release runs.
-6. Keep projects and assets inside PikoNest, or open creation folders to activate
-   separate external workspaces through a verified copy. Games browsing, Projects,
-   reusable assets and runtime saves/downloads have distinct storage roles.
-7. Enter Play for games, or Workshop to create/import. Save a
-   [backup ZIP](../../BACKUP_RESTORE.md) outside the app before an uninstall/reset.
+[Actual journeys and build identities](DEVICE_ACCEPTANCE.md) ·
+[Seven native English screenshots](../../showcase/beta1-en/README.md).
 
 ## Requirements and known limits
 
-| Area | Early beta position |
+| Area | Position |
 | --- | --- |
-| Android | Minimum API 26 / Android 8; ARM64 runtime backend. This is a package requirement, not proof of support on every Android 8+ device |
-| Compatibility mode | Target SDK 28, explicitly approved for this first integration; modern-target execution remains unfinished |
-| Device evidence | Retroid Pocket Classic is the reference device; lab 0.0.77 is the last complete native creation journey. The early beta candidate has not been installed/tested yet |
-| PICO-8 | Purchased separately. Supplied 0.2.7 Raspberry Pi archive has structural checks; no universal old/new runtime matrix |
-| Controls | Controller-first plus touch. Physical inputs, system pickers, rotation and narrow/wide layouts require candidate acceptance |
-| Creation | Bounded visual workflows; advanced/custom logic can require Lua and external editing. Unsupported editing must preserve source |
-| Language | Main shelves, setup and Game view are English. Some legacy tools/help remain incompletely translated |
-| Data | Backup/restore implemented and host-tested; Android document-provider, interrupted restore and update acceptance still open |
-| Downloads | Splore cache is connected to Play locally; real download/return/offline acceptance remains open. Arbitrary external Downloads-folder synchronization remains unfinished |
-| Distribution | [Native dependency notices and matching source provenance remain a publication blocker](DEPENDENCIES.md) |
+| Android | ARM64, API 26 minimum, interim target 28. Checked on Retroid Pocket Classic / Android 14, not every Android 8+ device. |
+| PICO-8 | Purchased separately. Execution checked with 0.2.7 Raspberry Pi ARM64; import does not whitelist this version. |
+| Creation | Bounded visual paths. Custom Lua is preserved; advanced logic can require code. |
+| Controls/audio | Injected keys/taps and muted runtime previews are not physical ergonomics or audible acceptance. |
+| Data | Clean-project SAF restore passed; unfinished-draft, interrupted/provider-failure restore remains open. |
+| Splore | Single-cart download/shelf/offline title passed; multicart continuation and external-folder sync remain unfinished/unverified. |
+| Language | Main shelves/setup/Game view are English; some legacy tools/help are incompletely translated. |
 
-## Candidate acceptance, in order
+## Remaining acceptance before publication
 
-Device work starts only after the owner frees the handheld. Keep system audio muted
-unless the owner allows an audio check. Preserve current data and record all evidence
-against the APK hash, Android version, runtime version and actual controller.
+The owner has freed the handheld. These items are not marked passed:
 
-- [ ] Complete the dependency/source package in [DEPENDENCIES](DEPENDENCIES.md).
-- [ ] Update the installed app with the same certificate; verify projects, drafts,
-  library favorites, saves and runtime configuration. Do not clear/uninstall it.
-- [ ] Test independent first-run setup on an empty authorized validation install:
-  skip/cancel/reopen, wrong desktop archive, valid ARM64 archive, preparation error
-  and retry, explicit Test and return, Games access and lost-grant reconnect.
-- [ ] Splore: download a previously uncached cart, return and see it on Play, favorite, restart without network and launch directly; test multicart parts separately.
-- [ ] Play an existing cart, return to the shelf, and launch it from a third-party
-  launcher without importing it into Workshop. Check suspend/resume and exit.
-- [ ] Blank and both starters: edit sprite/tile, behavior and world; animation,
-  SFX and music drafts; Test/return, Cancel/Keep, Save/Undo/reopen and `.p8` export.
-  Run the exported cart in official PICO-8 independently. Separate silent logic
-  checks from actual audible acceptance.
-- [ ] Projects and library: activate checked external copies, edit/reopen/reuse,
-  revoke/reconnect access, cancel a copy and resume. Verify originals retained.
-- [ ] Backup with a real unfinished draft and save. Restore into isolated validation
-  data, complete both reopen steps, compare files/draft candidate, then test process
-  interruption and rollback. Verify external originals stay unchanged. Only then
-  consider restoration of valuable owner data, with a separate retained copy.
-- [ ] Check physical D-pad/sticks/buttons, A/B convention, Android picker boundaries,
-  compact/wide layouts, backgrounding, storage-full and clear error/retry paths.
-- [ ] Review current English screens with the owner, resolve blocking findings and
-  replace host previews with native screenshots where useful.
-- [ ] Owner accepts these beta limits, is satisfied with the actual candidate and
-  explicitly approves publishing that APK. Only then create a GitHub prerelease.
+- [ ] Physical controls, audible playback, novice/owner review.
+- [ ] Fresh third-party launcher UI and content-URI variants; VIEW/resume already passed.
+- [ ] Broader world/tile draft and external library activation/reconnect journeys.
+- [ ] Real grant/provider loss, full storage, unfinished-draft restore and interrupted
+  rollback; host fault tests remain a separate evidence layer.
+- [ ] Wider devices/displays/orientations/runtime versions; multicart offline parts.
+- [ ] Owner reviews the exact candidate and explicitly accepts its early-beta limits,
+  including deliberately deferred checks, then approves publication.
 
-## Prepared materials
+A passing build does not waive the checklist. The owner may explicitly define a
+bounded first-beta matrix; deferred work remains tracked and must not be called tested.
 
-- [Local evidence and fresh image pack](../../showcase/0.0.93-en/README.md)
-- [Draft release text](RELEASE_NOTES.md)
-- [Backup and recovery guide](../../BACKUP_RESTORE.md)
-- [Candidate build/signing instructions](../../../experiments/android-integrated/README.md#local-beta-candidate)
-- [Native component inventory](DEPENDENCIES.md)
+## Publication materials
 
-If code changes after acceptance, rebuild and repeat the affected journeys. Never
-attach a newer, unreviewed APK under the hash of an accepted candidate.
+- `PikoNest-0.1.0-beta.1.apk` — exact tested product, 52,106,465 bytes.
+- `PikoNest-0.1.0-beta.1-support-sources.zip` — 193,164,522 bytes; corresponding
+  materials, recipes, notices and configuration. No purchased runtime.
+- `SHA256SUMS` and matching repository source/tag.
+- [Prepared release text](RELEASE_NOTES.md), [rebuild map](REBUILDING.md) and
+  [build/signing guide](../../../experiments/android-integrated/README.md).
+
+Create the GitHub prerelease only after final owner approval. If code changes,
+rebuild and repeat affected checks; never substitute an untested APK under these hashes.

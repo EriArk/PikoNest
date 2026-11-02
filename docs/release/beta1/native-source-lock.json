@@ -5,50 +5,53 @@
   "native_files": [
     {
       "path": "bootstrap:package/proot",
-      "bytes": 215664,
-      "sha256": "3dc28935e5701e23089c3ef21b27e23756f32afd8ff1b83ddc448e028f29665e",
-      "component": "termux:proot",
-      "status": "archived-package-match",
-      "evidence_id": "secondary:termux-proot:5.1.107-65",
+      "bytes": 214416,
+      "sha256": "125dff2415ae1dcb8b1ae97c51357de73ef11f28268b86cd50a0f13aa1c3ea91",
+      "evidence_id": "termux-refresh:proot:5.1.107-70",
       "evidence_member": "./data/data/com.termux/files/usr/bin/proot",
-      "source_revision": "60485d2646c1e09105099772da4a20deda8d020d",
-      "recipe_revision": "66a7206e299d7836687dfee2130e1e2967734915"
+      "component": "termux:proot",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/proot"
     },
     {
       "path": "bootstrap:package/prootlb/loader32",
-      "bytes": 6124,
-      "sha256": "4982242e6614fa6f5d2cac6f4aa2e16e355a055f6a1d73c942eb98dd74b35aa8",
-      "component": "termux:proot",
-      "status": "archived-package-match",
-      "evidence_id": "secondary:termux-proot:5.1.107-65",
+      "bytes": 6244,
+      "sha256": "25f6bd90bc5a3d3088026289a0d3eaf3e502bd2b00e5cb74fadd9791132efa34",
+      "evidence_id": "termux-refresh:proot:5.1.107-70",
       "evidence_member": "./data/data/com.termux/files/usr/libexec/proot/loader32",
-      "source_revision": "60485d2646c1e09105099772da4a20deda8d020d",
-      "recipe_revision": "66a7206e299d7836687dfee2130e1e2967734915"
+      "component": "termux:proot",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/proot"
     },
     {
       "path": "bootstrap:package/prootlb/loader",
-      "bytes": 5736,
-      "sha256": "dc27edf52bbb3b33e635ef636b37d473835bdddba793883330a6d20f458a9918",
-      "component": "termux:proot",
-      "status": "archived-package-match",
-      "evidence_id": "secondary:termux-proot:5.1.107-65",
+      "bytes": 18136,
+      "sha256": "44ef39c1e1a18c09f6e4c4b5d6f8bba82d30596598bd155ec162d05c5122ff04",
+      "evidence_id": "termux-refresh:proot:5.1.107-70",
       "evidence_member": "./data/data/com.termux/files/usr/libexec/proot/loader",
-      "source_revision": "60485d2646c1e09105099772da4a20deda8d020d",
-      "recipe_revision": "66a7206e299d7836687dfee2130e1e2967734915"
+      "component": "termux:proot",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/proot"
     },
     {
       "path": "bootstrap:package/busybox",
-      "bytes": 4240,
-      "sha256": "0d1decf834771c3f73f40aeae589c35c4b5dbc057d3691765b0e55393d30b703",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 4320,
+      "sha256": "61e50ba9f8dadc4fb9500631a70c6bec1342b044567921715a9abf64b9b12b91",
+      "evidence_id": "termux-refresh:busybox:1.37.0-3",
+      "evidence_member": "./data/data/com.termux/files/usr/bin/busybox",
+      "component": "termux:busybox",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/busybox"
     },
     {
       "path": "bootstrap:package/libtalloc.so.2",
-      "bytes": 31400,
-      "sha256": "368262b345120a4e09ae961f4bda92e0cdfc18004145317f923abe403df6facf",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 31440,
+      "sha256": "3c9b207c0a6ea2896b7523e03f55d9ab0d9e88baa115d4c32b84058ff4246fbb",
+      "evidence_id": "termux-refresh:libtalloc:2.4.3",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libtalloc.so.2.4.3",
+      "component": "termux:libtalloc",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libtalloc"
     },
     {
       "path": "bootstrap:package/bash",
@@ -72,10 +75,13 @@
     },
     {
       "path": "bootstrap:package/libbusybox.so.1.37.0",
-      "bytes": 862472,
-      "sha256": "167d87a41b9dc2375790288ea93511a6d008d5c245cd2d5183bf978b03601e36",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 864096,
+      "sha256": "1acedc5fd667e6c887348ce01b7fad3b1c5c03f248af6ea81690897a7a03ba91",
+      "evidence_id": "termux-refresh:busybox:1.37.0-3",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libbusybox.so.1.37.0",
+      "component": "termux:busybox",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/busybox"
     },
     {
       "path": "bootstrap:package/libncursesw.so.6",
@@ -252,7 +258,7 @@
       "bytes": 3741592,
       "sha256": "c22825223fe287864a263dc01adccd68626fdda67a5798451ee0c08f7133bdef",
       "component": "sdl2",
-      "status": "embedded-revision-source-collected",
+      "status": "permissive-notices-reviewed",
       "revision": "cd0cf8b855d1edd0cd30fe1edaabced23ea39e9a",
       "remaining": "Build options/local patches not established; source is the revision reported by the binary."
     },
@@ -491,16 +497,19 @@
       "bytes": 117920,
       "sha256": "63adcaf088d8d3deca3f4d4174095f689f31bbbe0cfd63c6c12fa2c33abb5246",
       "component": "wrapper-shim",
-      "status": "pinned-wrapper-source-collected",
+      "status": "permissive-notices-reviewed",
       "revision": "562662e35727ae7706fe97fed3390db249a35263",
       "remaining": "Pinned wrapper source and MIT notice retained; no rebuild comparison."
     },
     {
       "path": "bootstrap:package/pulselibs/libopus.so",
-      "bytes": 312120,
-      "sha256": "876a73008cc7ec21aede35c658a6e2cddc78e2b6ea132412464472e2bce7a375",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 321240,
+      "sha256": "6afdade25e445ddbd7ed1ad077acd8445ded67f4b295585ec0e9f501ce7305c7",
+      "evidence_id": "termux-refresh:libopus:1.6.1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libopus.so",
+      "component": "termux:libopus",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libopus"
     },
     {
       "path": "bootstrap:package/pulselibs/libprotocol-native.so",
@@ -524,10 +533,13 @@
     },
     {
       "path": "bootstrap:package/pulselibs/libvorbis.so",
-      "bytes": 151328,
-      "sha256": "aa76e77de21b8b9ed6f25b1dfbd0f647c3f0405cefc247b1def54e170e1b0690",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 150272,
+      "sha256": "8d0b6676b7ae54287021095cd2210f8241741f3cfee0702c8ecd7eb8a9474f45",
+      "evidence_id": "termux-refresh:libvorbis:1.3.7-4",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libvorbis.so",
+      "component": "termux:libvorbis",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libvorbis"
     },
     {
       "path": "bootstrap:package/pulselibs/module-suspend-on-idle.so",
@@ -551,10 +563,13 @@
     },
     {
       "path": "bootstrap:package/pulselibs/libsoxr.so",
-      "bytes": 961544,
-      "sha256": "66d8b0b74c4bfe3c01d06b27bd74ce5ddb455d7384b58406b2fd9c457b1db712",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 961800,
+      "sha256": "57381eeaeb85f85a0ec046d428af91fc1f46ecbf7f1dd1ee21d04c8609c89fb7",
+      "evidence_id": "termux-refresh:libsoxr:0.1.3-8",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libsoxr.so",
+      "component": "termux:libsoxr",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libsoxr"
     },
     {
       "path": "bootstrap:package/pulselibs/module-null-sink.so",
@@ -568,10 +583,13 @@
     },
     {
       "path": "bootstrap:package/pulselibs/libFLAC.so",
-      "bytes": 191000,
-      "sha256": "c59e1e2f2f6074b5e0a9eb72ee7a601de3f57de71a5774c7276210ada44150a9",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 210240,
+      "sha256": "8754519258cfa87889a08856dddd8dc45fb899f172ca96b425b7ed7edaf24ff0",
+      "evidence_id": "termux-refresh:libflac:1.5.0-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libFLAC.so",
+      "component": "termux:libflac",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libflac"
     },
     {
       "path": "bootstrap:package/pulselibs/module-native-protocol-unix.so",
@@ -615,10 +633,13 @@
     },
     {
       "path": "bootstrap:package/pulselibs/libogg.so",
-      "bytes": 26416,
-      "sha256": "5bad294de1956fd77b158cf30d0fe80ab70be6344d9ac0658abdb204672ebf61",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 27760,
+      "sha256": "bf430f65013e219a867ff927249022ee900edbd6642fa9c4f36104b7c681beaa",
+      "evidence_id": "termux-refresh:libogg:1.3.6-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libogg.so",
+      "component": "termux:libogg",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libogg"
     },
     {
       "path": "bootstrap:package/pulselibs/libprotocol-simple.so",
@@ -632,10 +653,13 @@
     },
     {
       "path": "bootstrap:package/pulselibs/libvorbisenc.so",
-      "bytes": 647312,
-      "sha256": "89b743e745b7e70fa1c794a8035ea2f1c46ad2c7bba374d1bbffc5f9d61ef55d",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 647104,
+      "sha256": "5aff8bb63cd4690364629e3b6024a8eb449277259406781cac3b726160bc0e36",
+      "evidence_id": "termux-refresh:libvorbis:1.3.7-4",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libvorbisenc.so",
+      "component": "termux:libvorbis",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libvorbis"
     },
     {
       "path": "bootstrap:package/pulselibs/libpulsecore-17.0.so",
@@ -659,24 +683,33 @@
     },
     {
       "path": "bootstrap:package/pulselibs/libspeexdsp.so",
-      "bytes": 56528,
-      "sha256": "f36dcaaa30fd98697f8f720a708b06c9792ea66910aeb41c1311842510805258",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 56792,
+      "sha256": "0a6d83cc06f42852ff7b4e31e926956ad8f169f6edd770fd5ddaea3092d02f66",
+      "evidence_id": "termux-refresh:speexdsp:1.2.1-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libspeexdsp.so",
+      "component": "termux:speexdsp",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/speexdsp"
     },
     {
       "path": "bootstrap:package/pulselibs/libdbus-1.so",
-      "bytes": 309984,
-      "sha256": "6b0dd575b54bca36368cc54c12fa1308887fad979fd4cedbfee79851ef5dbb88",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 307632,
+      "sha256": "e51bf7831bfd0bc950cc06d42e6518521825993d639ed0ad5faf880d1be365a3",
+      "evidence_id": "termux-refresh:dbus:1.16.2-2",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libdbus-1.so",
+      "component": "termux:dbus",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/dbus"
     },
     {
       "path": "bootstrap:package/pulselibs/libltdl.so",
-      "bytes": 36320,
-      "sha256": "b5f04b38396fca7f67acd7a275167daa726fcb0d8d816cfe9918ffda255d5451",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 36288,
+      "sha256": "c7d9f1e0bb34412f02755ed7fb4ae3986a38dac5cb9ffa25a86047ce4f918d8d",
+      "evidence_id": "termux-refresh:libltdl:2.5.4-2",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libltdl.so",
+      "component": "termux:libltdl",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libltdl"
     },
     {
       "path": "bootstrap:package/pulselibs/module-switch-on-connect.so",
@@ -720,17 +753,23 @@
     },
     {
       "path": "bootstrap:package/pulselibs/libandroid-execinfo.so",
-      "bytes": 33528,
-      "sha256": "db557738b5904b755b0c2326a47d8b14a489e884a66ed7da31ca17d14cd0ae1b",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 34696,
+      "sha256": "778fa9eaf0a6f53282af6f24d2f93f56653c008b0f6c0041b6844dbda05aae3d",
+      "evidence_id": "termux-refresh:libandroid-execinfo:0.1-3",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libandroid-execinfo.so",
+      "component": "termux:libandroid-execinfo",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libandroid-execinfo"
     },
     {
       "path": "bootstrap:package/pulselibs/libsndfile.so",
-      "bytes": 403232,
-      "sha256": "84686c989a48b8ce91323ecf2926202bd893fa5c1c93518322427b050a106231",
-      "component": "termux-unresolved",
-      "status": "unresolved-package-build"
+      "bytes": 421416,
+      "sha256": "e88d4facec39bd632a91e2861652cbac41b7cf8e241ec6d02b545d6d323dc6a0",
+      "evidence_id": "termux-refresh:libsndfile:1.2.2-2",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libsndfile.so",
+      "component": "termux:libsndfile",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libsndfile"
     },
     {
       "path": "apk:lib/arm64-v8a/libc++_shared.so",
@@ -749,6 +788,36 @@
       "status": "official-binary-match",
       "evidence_id": "godot:4.6-stable",
       "evidence_member": "jni/arm64-v8a/libgodot_android.so"
+    },
+    {
+      "path": "bootstrap:package/libandroid-selinux.so",
+      "bytes": 179056,
+      "sha256": "d769bc3757df751e4c302cdb55062a33cda2041ba0483d953d93100cd321a810",
+      "evidence_id": "termux-refresh:libandroid-selinux:14.0.0.11-1",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libandroid-selinux.so",
+      "component": "termux:libandroid-selinux",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libandroid-selinux"
+    },
+    {
+      "path": "bootstrap:package/libpcre2-8.so",
+      "bytes": 489384,
+      "sha256": "a6bbeb410e269e50aee795b4fd1b11cbddb8b54959d1cfcd927b55b04dc19f5c",
+      "evidence_id": "termux-refresh:pcre2:10.47",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libpcre2-8.so",
+      "component": "termux:pcre2",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/pcre2"
+    },
+    {
+      "path": "bootstrap:package/pulselibs/libmp3lame.so",
+      "bytes": 244848,
+      "sha256": "1b38fc64b5ed67b84c7b89b3b034a969b460a657a0d496eddccde8511faa56b1",
+      "evidence_id": "termux-refresh:libmp3lame:3.100-7",
+      "evidence_member": "./data/data/com.termux/files/usr/lib/libmp3lame.so",
+      "component": "termux:libmp3lame",
+      "status": "official-binary-match",
+      "source_key": "termux-refresh/libmp3lame"
     }
   ],
   "evidence": [
@@ -1126,20 +1195,196 @@
       "catalog_filename": "pool/main/p/pulseaudio/pulseaudio_17.0-1_aarch64.deb"
     },
     {
-      "id": "secondary:termux-proot:5.1.107-65",
-      "url": "https://raw.githubusercontent.com/TokiZeng/proot-distro-for-Termux-Android-5.0-7.0/e0a6f33314b231bd3e4aa7b37d468d7250e297cf/proot-distro_4.16.0_all.zip",
-      "format": "zip-deb",
-      "origin": "secondary-archive",
-      "package_record": {
-        "member": "proot_5.1.107-65_aarch64.deb",
-        "sha256": "a383e92ff55e692b13eb7bebaf251ff8550f10c054d101c25dbd02c413fd8ea0",
-        "bytes": 84884
-      },
+      "id": "termux-refresh:busybox:1.37.0-3",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/b/busybox/busybox_1.37.0-3_aarch64.deb",
+      "sha256": "c2cb3ad48e30f232d9dce8cc7e2412b5d7c3825689b75dd7384de89eb08f6b46",
+      "bytes": 466132,
+      "format": "deb",
+      "package": "busybox",
+      "version": "1.37.0-3",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/b/busybox/busybox_1.37.0-3_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:proot:5.1.107-70",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/p/proot/proot_5.1.107-70_aarch64.deb",
+      "sha256": "6c15d9a73319309c6b11556773471989338f3e83c17d2f118d614a63a1f64b96",
+      "bytes": 85320,
+      "format": "deb",
       "package": "proot",
-      "version": "5.1.107-65",
-      "authentication": "No official signed catalog or original checksum recovered; not an official binary match",
-      "sha256": "67ecf4ada17396f5457482e05d86c959f6c43999cd3bfb2ff9c13ebd9035bd55",
-      "bytes": 117000
+      "version": "5.1.107-70",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/p/proot/proot_5.1.107-70_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:libtalloc:2.4.3",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/libt/libtalloc/libtalloc_2.4.3_aarch64.deb",
+      "sha256": "ac81ad623d74c209718b9f3acb2dd702cc8a88c431e820d212229910b4db29da",
+      "bytes": 33128,
+      "format": "deb",
+      "package": "libtalloc",
+      "version": "2.4.3",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/libt/libtalloc/libtalloc_2.4.3_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:libandroid-selinux:14.0.0.11-1",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/liba/libandroid-selinux/libandroid-selinux_14.0.0.11-1_aarch64.deb",
+      "sha256": "00afd8c34087c2864737b51fd9d104dc5e955f6ec3c0f50c0c7ef5b4a56866b9",
+      "bytes": 59624,
+      "format": "deb",
+      "package": "libandroid-selinux",
+      "version": "14.0.0.11-1",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/liba/libandroid-selinux/libandroid-selinux_14.0.0.11-1_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:pcre2:10.47",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/p/pcre2/pcre2_10.47_aarch64.deb",
+      "sha256": "51f915d22de639bfca6ec029ae613987bbe3bc73626eede13319fd2e95f50b63",
+      "bytes": 961200,
+      "format": "deb",
+      "package": "pcre2",
+      "version": "10.47",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/p/pcre2/pcre2_10.47_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:dbus:1.16.2-2",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/d/dbus/dbus_1.16.2-2_aarch64.deb",
+      "sha256": "65efb2a8d38ee1a95878918ca09f198c58f99edd2781f6de7f28c28bebc4339d",
+      "bytes": 429272,
+      "format": "deb",
+      "package": "dbus",
+      "version": "1.16.2-2",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/d/dbus/dbus_1.16.2-2_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:libandroid-execinfo:0.1-3",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/liba/libandroid-execinfo/libandroid-execinfo_0.1-3_aarch64.deb",
+      "sha256": "725dd2c6da7fc96e860fcc928e18aa9fb0e85e0bdcaf4f8ce0f0654ca6860fc2",
+      "bytes": 14964,
+      "format": "deb",
+      "package": "libandroid-execinfo",
+      "version": "0.1-3",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/liba/libandroid-execinfo/libandroid-execinfo_0.1-3_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:libflac:1.5.0-1",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/libf/libflac/libflac_1.5.0-1_aarch64.deb",
+      "sha256": "d1d6fcac6fd6d15c36f34464cb01d5e2140e321d8448dfc396cd7eb1536b1f6c",
+      "bytes": 202828,
+      "format": "deb",
+      "package": "libflac",
+      "version": "1.5.0-1",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/libf/libflac/libflac_1.5.0-1_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:libltdl:2.5.4-2",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/libl/libltdl/libltdl_2.5.4-2_aarch64.deb",
+      "sha256": "320c0767f036356b922205f820e3c7424703b085c2c5c949d388b5aae2188fb4",
+      "bytes": 18024,
+      "format": "deb",
+      "package": "libltdl",
+      "version": "2.5.4-2",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/libl/libltdl/libltdl_2.5.4-2_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:libmp3lame:3.100-7",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/libm/libmp3lame/libmp3lame_3.100-7_aarch64.deb",
+      "sha256": "8c28c74209eb5c31675b4e9c1ee5193c1bf22c49ff5965612dcf9aede5d870d9",
+      "bytes": 114708,
+      "format": "deb",
+      "package": "libmp3lame",
+      "version": "3.100-7",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/libm/libmp3lame/libmp3lame_3.100-7_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:libogg:1.3.6-1",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/libo/libogg/libogg_1.3.6-1_aarch64.deb",
+      "sha256": "4f1700a532f251ad3600f44f88cd764f1f6b0542d3343391117944b47a92802d",
+      "bytes": 188636,
+      "format": "deb",
+      "package": "libogg",
+      "version": "1.3.6-1",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/libo/libogg/libogg_1.3.6-1_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:libopus:1.6.1",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/libo/libopus/libopus_1.6.1_aarch64.deb",
+      "sha256": "005a9335ce0ec0f510bbe6e0229c901d6f920cc375fcda56461e96cef70f8ff0",
+      "bytes": 191480,
+      "format": "deb",
+      "package": "libopus",
+      "version": "1.6.1",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/libo/libopus/libopus_1.6.1_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:libsndfile:1.2.2-2",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/libs/libsndfile/libsndfile_1.2.2-2_aarch64.deb",
+      "sha256": "f71cca07c3209d6baadd9bd51ab239d66ea89b5dc10bcb86637050b9463ad8da",
+      "bytes": 217128,
+      "format": "deb",
+      "package": "libsndfile",
+      "version": "1.2.2-2",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/libs/libsndfile/libsndfile_1.2.2-2_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:libsoxr:0.1.3-8",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/libs/libsoxr/libsoxr_0.1.3-8_aarch64.deb",
+      "sha256": "a1c5f66aae3b9900e9a492b43901b2b98586870c7905feb9f3c835cc9af464be",
+      "bytes": 282436,
+      "format": "deb",
+      "package": "libsoxr",
+      "version": "0.1.3-8",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/libs/libsoxr/libsoxr_0.1.3-8_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:libvorbis:1.3.7-4",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/libv/libvorbis/libvorbis_1.3.7-4_aarch64.deb",
+      "sha256": "6bfd70c4b570b85594bd06116b75a6f8109ec58cbc123e938b630a6eefdedf4e",
+      "bytes": 261740,
+      "format": "deb",
+      "package": "libvorbis",
+      "version": "1.3.7-4",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/libv/libvorbis/libvorbis_1.3.7-4_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
+    },
+    {
+      "id": "termux-refresh:speexdsp:1.2.1-1",
+      "url": "https://mirrors.sau.edu.cn/termux/apt/termux-main/pool/main/s/speexdsp/speexdsp_1.2.1-1_aarch64.deb",
+      "sha256": "21cd5d122a8d24dffb9b2926dff7059f8f42cde7c5a91f27ea5c9b4f40356be0",
+      "bytes": 37332,
+      "format": "deb",
+      "package": "speexdsp",
+      "version": "1.2.1-1",
+      "catalog_id": "termux-main:2026-01-23",
+      "catalog_filename": "pool/main/s/speexdsp/speexdsp_1.2.1-1_aarch64.deb",
+      "recipe_commit": "e96e5b38357d314b3696df051d93cacc982d8730"
     }
   ],
   "materials": [
@@ -2248,12 +2493,201 @@
       "kind": "source",
       "sha256": "e6942f8b94fb3840faa3a500295dd4d79147266f60404df7c026703436850737",
       "bytes": 446952
+    },
+    {
+      "path": "termux-refresh/busybox/busybox-1.37.0.tar.bz2",
+      "url": "https://busybox.net/downloads/busybox-1.37.0.tar.bz2",
+      "sha256": "3311dff32e746499f4df0d5df04d7eb396382d7e108bb9250e7b519b837043a4",
+      "bytes": 2565764,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/proot/4dba3afbf3a63af89b4d9c1a59bf2bda10f4d10f.zip",
+      "url": "https://github.com/termux/proot/archive/4dba3afbf3a63af89b4d9c1a59bf2bda10f4d10f.zip",
+      "sha256": "a72668607184f981e44181bfa47f86ef52d52bb237b4012ee94f0dc89cb39211",
+      "bytes": 447556,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/pcre2/pcre2-10.47.tar.bz2",
+      "url": "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2",
+      "sha256": "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7",
+      "bytes": 2145789,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/dbus/dbus-1.16.2.tar.xz",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "0ba2a1a4b16afe7bceb2c07e9ce99a8c2c3508e5dec290dbb643384bd6beb7e2",
+      "bytes": 1115644,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/libtalloc/talloc-2.4.3.tar.gz",
+      "url": "https://www.samba.org/ftp/talloc/talloc-2.4.3.tar.gz",
+      "sha256": "dc46c40b9f46bb34dd97fe41f548b0e8b247b77a918576733c528e83abd854dd",
+      "bytes": 684092,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/libtool/libtool-2.5.4.tar.gz",
+      "url": "https://mirrors.kernel.org/gnu/libtool/libtool-2.5.4.tar.gz",
+      "sha256": "da8ebb2ce4dcf46b90098daf962cffa68f4b4f62ea60f798d0ef12929ede6adf",
+      "bytes": 2016535,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/libsndfile/1.2.2.tar.gz",
+      "url": "https://github.com/libsndfile/libsndfile/archive/refs/tags/1.2.2.tar.gz",
+      "sha256": "ffe12ef8add3eaca876f04087734e6e8e029350082f3251f565fa9da55b52121",
+      "bytes": 684875,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/libsoxr/soxr-0.1.3-Source.tar.xz",
+      "url": "https://sourceforge.net/projects/soxr/files/soxr-0.1.3-Source.tar.xz",
+      "sha256": "b111c15fdc8c029989330ff559184198c161100a59312f5dc19ddeb9b5a15889",
+      "bytes": 94384,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/speexdsp/SpeexDSP-1.2.1.tar.gz",
+      "url": "https://github.com/xiph/speexdsp/archive/refs/tags/SpeexDSP-1.2.1.tar.gz",
+      "sha256": "d17ca363654556a4ff1d02cc13d9eb1fc5a8642c90b40bd54ce266c3807b91a7",
+      "bytes": 894360,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/libmp3lame/lame-3.100.tar.gz",
+      "url": "https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz",
+      "sha256": "ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e",
+      "bytes": 1524133,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/libogg/libogg-1.3.6.tar.xz",
+      "url": "https://github.com/xiph/ogg/releases/download/v1.3.6/libogg-1.3.6.tar.xz",
+      "sha256": "5c8253428e181840cd20d41f3ca16557a9cc04bad4a3d04cce84808677fa1061",
+      "bytes": 439952,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/libopus/opus-1.6.1.tar.gz",
+      "url": "https://downloads.xiph.org/releases/opus/opus-1.6.1.tar.gz",
+      "sha256": "6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1",
+      "bytes": 10472813,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/libvorbis/libvorbis-1.3.7.tar.xz",
+      "url": "https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.xz",
+      "sha256": "b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b",
+      "bytes": 1203792,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/libflac/flac-1.5.0.tar.xz",
+      "url": "https://downloads.xiph.org/releases/flac/flac-1.5.0.tar.xz",
+      "sha256": "f2c1c76592a82ffff8413ba3c4a1299b6c7ab06c734dee03fd88630485c2b920",
+      "bytes": 1078872,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/build-recipes/e96e5b38357d314b3696df051d93cacc982d8730.tar.gz",
+      "url": "https://codeload.github.com/termux/termux-packages/tar.gz/e96e5b38357d314b3696df051d93cacc982d8730",
+      "sha256": "6b0889dc581a7b1b35c8736fab7724b727d7deb517031f930a0cdde61f90fd87",
+      "bytes": 8553144,
+      "kind": "source"
+    },
+    {
+      "path": "termux-refresh/libandroid-selinux/1cbcdf624c248c66cd6153311d3e681ba1f9ff2a.tar.gz",
+      "url": "https://android.googlesource.com/platform/external/selinux/+archive/1cbcdf624c248c66cd6153311d3e681ba1f9ff2a.tar.gz",
+      "sha256": "829fc6caf91cf7197dff0e895283e745902ec7714aac0a879a3f3237f2225ba0",
+      "bytes": 6156591,
+      "kind": "source"
+    },
+    {
+      "path": "android-notices/androidx/LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/androidx/androidx/7f74894134e7a47e83eadf6c9961b0ef8b417396/LICENSE.txt",
+      "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0",
+      "bytes": 10175,
+      "kind": "source"
+    },
+    {
+      "path": "android-notices/coroutines/LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/Kotlin/kotlinx.coroutines/81e17dd37003a7105e542eb725f51ee0dc353354/LICENSE.txt",
+      "sha256": "b1febe6399dffb10d19d35e7663ab16300c93cb0476a94115df1cc0097a8ffd8",
+      "bytes": 11398,
+      "kind": "source"
+    },
+    {
+      "path": "android-notices/kotlin/license/LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/JetBrains/kotlin/658a2010b15a22583f9841e1a2d4bddf1baac612/license/LICENSE.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358,
+      "kind": "source"
+    },
+    {
+      "path": "android-notices/kotlin/license/NOTICE.txt",
+      "url": "https://raw.githubusercontent.com/JetBrains/kotlin/658a2010b15a22583f9841e1a2d4bddf1baac612/license/NOTICE.txt",
+      "sha256": "0b09a83d3ef7795c7dec65e815866597c066c53898f2852a76599b8f5552941a",
+      "bytes": 482,
+      "kind": "source"
+    },
+    {
+      "path": "android-notices/annotations/LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/JetBrains/java-annotations/5ed7516e96eebef2a0cedc470d776b7351f52d6b/LICENSE.txt",
+      "sha256": "8c1e966c7855fb54027bcaf6ebe7a43abe4785791e8cf9148c363761d493d097",
+      "bytes": 11352,
+      "kind": "source"
+    },
+    {
+      "path": "android-notices/filepicker/LICENSE",
+      "url": "https://raw.githubusercontent.com/SeppNel/Godot-File-Picker/914d535345c16372876d6c34d027af23b9f0beea/LICENSE",
+      "sha256": "b062622f18a6302dd4dbe89f533df6fb7b2b9e134acfef9ef336e0225f3db80a",
+      "bytes": 1116,
+      "kind": "source"
+    },
+    {
+      "path": "android-notices/applinks/LICENSE",
+      "url": "https://raw.githubusercontent.com/FoolLin/Godot-Applinks-Android-Plugin/0e2db68f84bbfb9b64fee1802d84090bee7b86fa/LICENSE",
+      "sha256": "7dcad3830a4541562fe1e5313ae058ddb624f0db1be43cad8cdeb2540b21dc8a",
+      "bytes": 1076,
+      "kind": "source"
+    },
+    {
+      "path": "android-notices/guava/COPYING",
+      "url": "https://raw.githubusercontent.com/google/guava/e98ea2340f6acc94ed9e2cca08976ccae68c3412/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358,
+      "kind": "source"
+    },
+    {
+      "path": "llvm/openmp-LICENSE.TXT.b64",
+      "url": "https://android.googlesource.com/toolchain/llvm-project/+/d8003a456d14a3deb8054cdaa529ffbf02d9b262/openmp/LICENSE.TXT?format=TEXT",
+      "sha256": "93c97611dc1484b9c09edb584fbd0385312eb52df000da70c3daad46f343d80c",
+      "bytes": 26324,
+      "kind": "source"
+    },
+    {
+      "path": "ubuntu/ca-certificates/ca-certificates_20240203.dsc",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20250701T000000Z/pool/main/c/ca-certificates/ca-certificates_20240203.dsc",
+      "sha256": "629afee9b327ce4df4ad0d77ad7b10383474a432e1af30516a7e81669420109b",
+      "bytes": 1766,
+      "kind": "source"
+    },
+    {
+      "path": "ubuntu/ca-certificates/ca-certificates_20240203.tar.xz",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20250701T000000Z/pool/main/c/ca-certificates/ca-certificates_20240203.tar.xz",
+      "sha256": "3286d3fc42c4d11b7086711a85f865b44065ce05cf1fb5376b2abed07622a9c6",
+      "bytes": 263276,
+      "kind": "source"
     }
   ],
   "notice_asset": {
     "path": "experiments/android-host/assets/NATIVE-NOTICES.txt",
-    "sha256": "09b901103a7d2e909e1e43c7f9683293da16d3e9169fba75ad5711507783ee2e",
-    "bytes": 882580
+    "sha256": "85c3a3bb291bd30237cf47ed89eca2a796da9eaa294058952915fa1d5907be39",
+    "bytes": 1373098
   },
   "notice_sections": [
     {
@@ -2645,6 +3079,354 @@
       "url": "https://github.com/termux/proot/archive/60485d2646c1e09105099772da4a20deda8d020d.zip",
       "sha256": "0ffa6454acbe7e410ac6f0007df83b9b3161fe55484c1f4b87487c0f2d228a6d",
       "bytes": 19106
+    },
+    {
+      "title": "Termux refresh busybox / busybox-1.37.0/AUTHORS",
+      "url": "https://busybox.net/downloads/busybox-1.37.0.tar.bz2",
+      "sha256": "384fc3a9cfc7c435bdd9d169e5ec60a7d898d9ef9557ec859394d7f97b4b6f07",
+      "bytes": 5386
+    },
+    {
+      "title": "Termux refresh busybox / busybox-1.37.0/LICENSE",
+      "url": "https://busybox.net/downloads/busybox-1.37.0.tar.bz2",
+      "sha256": "bbfc9843646d483c334664f651c208b9839626891d8f17604db2146962f43548",
+      "bytes": 18348
+    },
+    {
+      "title": "Termux refresh busybox / busybox-1.37.0/archival/libarchive/bz/LICENSE",
+      "url": "https://busybox.net/downloads/busybox-1.37.0.tar.bz2",
+      "sha256": "b5a136ed67798e51fe2e0ca0b2a21cb01b904ff0c9f7d563a6292e276607e58f",
+      "bytes": 1999
+    },
+    {
+      "title": "Termux refresh proot / proot-4dba3afbf3a63af89b4d9c1a59bf2bda10f4d10f/COPYING",
+      "url": "https://github.com/termux/proot/archive/4dba3afbf3a63af89b4d9c1a59bf2bda10f4d10f.zip",
+      "sha256": "0ffa6454acbe7e410ac6f0007df83b9b3161fe55484c1f4b87487c0f2d228a6d",
+      "bytes": 19106
+    },
+    {
+      "title": "Termux refresh pcre2 / pcre2-10.47/deps/sljit/LICENSE",
+      "url": "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2",
+      "sha256": "5f216505c0f6ea3273caec89e766eef93cdeb7bbb0c429f9360116d7c938feeb",
+      "bytes": 1444
+    },
+    {
+      "title": "Termux refresh pcre2 / pcre2-10.47/cmake/COPYING-CMAKE-SCRIPTS",
+      "url": "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2",
+      "sha256": "c666ec2313dba24523ccad88f4c04ea4b24fad6545263a35b1d4ab2b08efe50a",
+      "bytes": 1326
+    },
+    {
+      "title": "Termux refresh pcre2 / pcre2-10.47/AUTHORS.md",
+      "url": "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2",
+      "sha256": "66d9adef4d4bcb7c2dd99a499a89a52033375785edaa8a35ada0f2db7d05a1a4",
+      "bytes": 4013
+    },
+    {
+      "title": "Termux refresh pcre2 / pcre2-10.47/COPYING",
+      "url": "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2",
+      "sha256": "99272c55f3dcfa07a8a7e15a5c1a33096e4727de74241d65fa049fccfdd59507",
+      "bytes": 97
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/AUTHORS",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "a56f6628c407e46ec72eb5512591b4c6204e7c0854c15ed0af4daad807edb84f",
+      "bytes": 10813
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/COPYING",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "150e5d08e1cb5e62b65967d7931acad2c42d98ec1bbb584bebb01921cbc853c2",
+      "bytes": 1134
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/LICENSES/AFL-2.0.txt",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "7ecc7db84298adb05d2cf10339c63a5315a1c5c270a68d97d7d40a53b508ccde",
+      "bytes": 8987
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/LICENSES/AFL-2.1.txt",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "93bb4f7417aa775bab9026cc3d0af28aeb64451fc5a8ec651876785edd8eaf9b",
+      "bytes": 8948
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/LICENSES/Apache-2.0.txt",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff",
+      "bytes": 10280
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/LICENSES/BSD-3-Clause.txt",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "5a93d5831e1297ab10fe643e1a631e83be392896da14ee2951285a79012df69d",
+      "bytes": 1460
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/LICENSES/GPL-2.0-or-later.txt",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "aaf135472f81c5b4a0dca9367e5bb5e9750032b5bebe5442b36e4c0a47430df3",
+      "bytes": 17337
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/LICENSES/LGPL-2.1-or-later.txt",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "fa6f36630bb1e0c571d34b2bbdf188d08495c9dbf58f28cac112f303fc1f58fb",
+      "bytes": 25967
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/LICENSES/LicenseRef-CMakeScripts.txt",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "a4c1387064fda4c22bfca364b606eb4e0421efa37cad27c040a3d7ca7186d522",
+      "bytes": 1411
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/LICENSES/LicenseRef-GAP.txt",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "cf4bc4c56dd0837f3d53b8c1467e0d7dbb95223de8bcfe83a4981c318a738ae3",
+      "bytes": 400
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/LICENSES/LicenseRef-pycrypto-orig.txt",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "2cb8f4f410f0ffc5dcfbadd188e20c859fdbb161e616cf2f3d34dfbf8c740547",
+      "bytes": 151
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/LICENSES/MIT.txt",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "b85dcd3e453d05982552c52b5fc9e0bdd6d23c6f8e844b984a88af32570b0cc0",
+      "bytes": 1078
+    },
+    {
+      "title": "Termux refresh dbus / dbus-1.16.2/LICENSES/TCL.txt",
+      "url": "https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz",
+      "sha256": "36fc2d8a56a2a014ded51e298a7e63635eb4ec62e8bedb99c82b892542ac5e7d",
+      "bytes": 2251
+    },
+    {
+      "title": "Termux refresh libtalloc / talloc-2.4.3/LICENSE",
+      "url": "https://www.samba.org/ftp/talloc/talloc-2.4.3.tar.gz",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "bytes": 7651
+    },
+    {
+      "title": "Termux refresh libtool / libtool-2.5.4/AUTHORS",
+      "url": "https://mirrors.kernel.org/gnu/libtool/libtool-2.5.4.tar.gz",
+      "sha256": "51819efb0c4ce0e29703c12df280da98d8b4f2aa099d79041f39e23f32894eb5",
+      "bytes": 1752
+    },
+    {
+      "title": "Termux refresh libtool / libtool-2.5.4/COPYING",
+      "url": "https://mirrors.kernel.org/gnu/libtool/libtool-2.5.4.tar.gz",
+      "sha256": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6",
+      "bytes": 17984
+    },
+    {
+      "title": "Termux refresh libtool / libtool-2.5.4/libltdl/COPYING.LIB",
+      "url": "https://mirrors.kernel.org/gnu/libtool/libtool-2.5.4.tar.gz",
+      "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+      "bytes": 26419
+    },
+    {
+      "title": "Termux refresh libsndfile / libsndfile-1.2.2/AUTHORS",
+      "url": "https://github.com/libsndfile/libsndfile/archive/refs/tags/1.2.2.tar.gz",
+      "sha256": "373fb9abaa154db5da8ab692853da32ced8977b817a713913953c63e50eb4499",
+      "bytes": 11603
+    },
+    {
+      "title": "Termux refresh libsndfile / libsndfile-1.2.2/COPYING",
+      "url": "https://github.com/libsndfile/libsndfile/archive/refs/tags/1.2.2.tar.gz",
+      "sha256": "ad01ea5cd2755f6048383c8d54c88459cd6fcb17757c5c8892f8c5ea060f6140",
+      "bytes": 26518
+    },
+    {
+      "title": "Termux refresh libsndfile / libsndfile-1.2.2/src/ALAC/LICENSE",
+      "url": "https://github.com/libsndfile/libsndfile/archive/refs/tags/1.2.2.tar.gz",
+      "sha256": "232efbd83786e157286b0b96c68ebb673541b69b33036287bf1e5ec5067a49d9",
+      "bytes": 9112
+    },
+    {
+      "title": "Termux refresh libsoxr / soxr-0.1.3-Source/AUTHORS",
+      "url": "https://sourceforge.net/projects/soxr/files/soxr-0.1.3-Source.tar.xz",
+      "sha256": "e5d53cd6c716dfeabe47a9f3613a8c6815aa4a67f0f77900787c59445396aeff",
+      "bytes": 39
+    },
+    {
+      "title": "Termux refresh libsoxr / soxr-0.1.3-Source/COPYING.LGPL",
+      "url": "https://sourceforge.net/projects/soxr/files/soxr-0.1.3-Source.tar.xz",
+      "sha256": "f2f118b9029ec1871b953639ecc46651b2fc7b62e295e6cf3ef2ac4c9a058b33",
+      "bytes": 26432
+    },
+    {
+      "title": "Termux refresh speexdsp / speexdsp-SpeexDSP-1.2.1/AUTHORS",
+      "url": "https://github.com/xiph/speexdsp/archive/refs/tags/SpeexDSP-1.2.1.tar.gz",
+      "sha256": "6e5a9d92c5f9ccd28fe0b15ad59443fbf435bfc6ab2221f532006d3717ddf642",
+      "bytes": 502
+    },
+    {
+      "title": "Termux refresh speexdsp / speexdsp-SpeexDSP-1.2.1/COPYING",
+      "url": "https://github.com/xiph/speexdsp/archive/refs/tags/SpeexDSP-1.2.1.tar.gz",
+      "sha256": "2654a4264b2bfe298dedc508748d140111840c315cc8eb646a3a68c13fa75b01",
+      "bytes": 1773
+    },
+    {
+      "title": "Termux refresh libmp3lame / lame-3.100/COPYING",
+      "url": "https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz",
+      "sha256": "bfe4a52dc4645385f356a8e83cc54216a293e3b6f1cb4f79f5fc0277abf937fd",
+      "bytes": 25284
+    },
+    {
+      "title": "Termux refresh libmp3lame / lame-3.100/LICENSE",
+      "url": "https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz",
+      "sha256": "7a40cbd8818c57e5285e83c772a459a996d1662c824a879836b97b473c07cae4",
+      "bytes": 487
+    },
+    {
+      "title": "Termux refresh libmp3lame / lame-3.100/mpglib/AUTHORS",
+      "url": "https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz",
+      "sha256": "d8ecf9556aafa8c653796d6be3dc43deea374257680e21c30109a5c3c4484263",
+      "bytes": 604
+    },
+    {
+      "title": "Termux refresh libogg / libogg-1.3.6/COPYING",
+      "url": "https://github.com/xiph/ogg/releases/download/v1.3.6/libogg-1.3.6.tar.xz",
+      "sha256": "d2ab5758336489da61c12cc5bb757da5339c4ae9001f9bb0562b4370249af814",
+      "bytes": 1466
+    },
+    {
+      "title": "Termux refresh libogg / libogg-1.3.6/AUTHORS",
+      "url": "https://github.com/xiph/ogg/releases/download/v1.3.6/libogg-1.3.6.tar.xz",
+      "sha256": "6fcb33d0cdd60b5054e7df820916388b590427514288c2bab01c626bb8ae9506",
+      "bytes": 198
+    },
+    {
+      "title": "Termux refresh libopus / opus-1.6.1/AUTHORS",
+      "url": "https://downloads.xiph.org/releases/opus/opus-1.6.1.tar.gz",
+      "sha256": "f9fd849e652219ce98e008303370b352d37663d0ffb27b8dc514ad93c9c7438b",
+      "bytes": 239
+    },
+    {
+      "title": "Termux refresh libopus / opus-1.6.1/COPYING",
+      "url": "https://downloads.xiph.org/releases/opus/opus-1.6.1.tar.gz",
+      "sha256": "01e1167d54a096d123cf6dfbbeb19587278845c6481d2d66d545669846079551",
+      "bytes": 1945
+    },
+    {
+      "title": "Termux refresh libvorbis / libvorbis-1.3.7/COPYING",
+      "url": "https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.xz",
+      "sha256": "ec1815db59fcd302846df949d7424876cb2e2dc5ed1606c5fb0b36787b1cf43a",
+      "bytes": 1470
+    },
+    {
+      "title": "Termux refresh libvorbis / libvorbis-1.3.7/AUTHORS",
+      "url": "https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.xz",
+      "sha256": "f5cab9f16035f770f50299f85cf2938c06dc3a9a30425961067788102ec896d3",
+      "bytes": 65
+    },
+    {
+      "title": "Termux refresh libflac / flac-1.5.0/AUTHORS",
+      "url": "https://downloads.xiph.org/releases/flac/flac-1.5.0.tar.xz",
+      "sha256": "89d44b9c876a8a5cbfc886348a151abd74eeb49e4b690b0cfe96d44a9afe8118",
+      "bytes": 2354
+    },
+    {
+      "title": "Termux refresh libflac / flac-1.5.0/COPYING.GPL",
+      "url": "https://downloads.xiph.org/releases/flac/flac-1.5.0.tar.xz",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "bytes": 18092
+    },
+    {
+      "title": "Termux refresh libflac / flac-1.5.0/COPYING.FDL",
+      "url": "https://downloads.xiph.org/releases/flac/flac-1.5.0.tar.xz",
+      "sha256": "c5d2b95c2538d2e41d8eedd9ecc750cd5fee085c7bb2bc3e2f95f4e59cc0b10d",
+      "bytes": 22954
+    },
+    {
+      "title": "Termux refresh libflac / flac-1.5.0/COPYING.Xiph",
+      "url": "https://downloads.xiph.org/releases/flac/flac-1.5.0.tar.xz",
+      "sha256": "7866ee98760fc1f0156b4fe6bf530257e02be487ab3fd94e2b63799dd32d6b2c",
+      "bytes": 1509
+    },
+    {
+      "title": "Termux refresh libflac / flac-1.5.0/COPYING.LGPL",
+      "url": "https://downloads.xiph.org/releases/flac/flac-1.5.0.tar.xz",
+      "sha256": "5df07007198989c622f5d41de8d703e7bef3d0e79d62e24332ee739a452af62a",
+      "bytes": 26436
+    },
+    {
+      "title": "Termux android-execinfo / LICENSE",
+      "url": "https://codeload.github.com/termux/termux-packages/tar.gz/e96e5b38357d314b3696df051d93cacc982d8730",
+      "sha256": "0afde45efa53467e19a3a966cd26ed6f9fae3ee8c5bcac25b922486dda5057b6",
+      "bytes": 1317
+    },
+    {
+      "title": "Android libselinux / LICENSE",
+      "url": "https://android.googlesource.com/platform/external/selinux/+archive/1cbcdf624c248c66cd6153311d3e681ba1f9ff2a.tar.gz",
+      "sha256": "86657b4c0fe868d7cbd977cb04c63b6c667e08fa51595a7bc846ad4bed8fc364",
+      "bytes": 1034
+    },
+    {
+      "title": "Android / androidx / LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/androidx/androidx/7f74894134e7a47e83eadf6c9961b0ef8b417396/LICENSE.txt",
+      "bytes": 10175,
+      "sha256": "809fa1ed21450f59827d1e9aec720bbc4b687434fa22283c6cb5dd82a47ab9c0"
+    },
+    {
+      "title": "Android / coroutines / LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/Kotlin/kotlinx.coroutines/81e17dd37003a7105e542eb725f51ee0dc353354/LICENSE.txt",
+      "bytes": 11398,
+      "sha256": "b1febe6399dffb10d19d35e7663ab16300c93cb0476a94115df1cc0097a8ffd8"
+    },
+    {
+      "title": "Android / kotlin / license/LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/JetBrains/kotlin/658a2010b15a22583f9841e1a2d4bddf1baac612/license/LICENSE.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "title": "Android / kotlin / license/NOTICE.txt",
+      "url": "https://raw.githubusercontent.com/JetBrains/kotlin/658a2010b15a22583f9841e1a2d4bddf1baac612/license/NOTICE.txt",
+      "bytes": 482,
+      "sha256": "0b09a83d3ef7795c7dec65e815866597c066c53898f2852a76599b8f5552941a"
+    },
+    {
+      "title": "Android / annotations / LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/JetBrains/java-annotations/5ed7516e96eebef2a0cedc470d776b7351f52d6b/LICENSE.txt",
+      "bytes": 11352,
+      "sha256": "8c1e966c7855fb54027bcaf6ebe7a43abe4785791e8cf9148c363761d493d097"
+    },
+    {
+      "title": "Android / filepicker / LICENSE",
+      "url": "https://raw.githubusercontent.com/SeppNel/Godot-File-Picker/914d535345c16372876d6c34d027af23b9f0beea/LICENSE",
+      "bytes": 1116,
+      "sha256": "b062622f18a6302dd4dbe89f533df6fb7b2b9e134acfef9ef336e0225f3db80a"
+    },
+    {
+      "title": "Android / applinks / LICENSE",
+      "url": "https://raw.githubusercontent.com/FoolLin/Godot-Applinks-Android-Plugin/0e2db68f84bbfb9b64fee1802d84090bee7b86fa/LICENSE",
+      "bytes": 1076,
+      "sha256": "7dcad3830a4541562fe1e5313ae058ddb624f0db1be43cad8cdeb2540b21dc8a"
+    },
+    {
+      "title": "Android / guava / COPYING",
+      "url": "https://raw.githubusercontent.com/google/guava/e98ea2340f6acc94ed9e2cca08976ccae68c3412/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "title": "LLVM OpenMP (statically linked by Termux libsoxr)",
+      "url": "https://android.googlesource.com/toolchain/llvm-project/+/d8003a456d14a3deb8054cdaa529ffbf02d9b262/openmp/LICENSE.TXT?format=TEXT",
+      "bytes": 19741,
+      "sha256": "fdad1758a9e1f9d5a81e18879b3406772115edc92c24bfa36b70c654f325e8e4"
+    },
+    {
+      "title": "CA certificates / Mozilla Contributors / Debian copyright and MPL 2.0",
+      "url": "https://snapshot.ubuntu.com/ubuntu/20250701T000000Z/pool/main/c/ca-certificates/ca-certificates_20240203.tar.xz",
+      "bytes": 18940,
+      "sha256": "e85e1bcad3a915dc7e6f41412bc5bdeba275cadd817896ea0451f2140a93967c"
     }
   ],
   "bootstrap_non_elf": [
@@ -5586,12 +6368,7 @@
       "kind": "symlink"
     }
   ],
-  "open_gates": [
-    "Exact source/build provenance remains unresolved for 14 Android-side Termux ELF files; three PRoot files match a secondary archive with source collected but authenticity/source review remains open.",
-    "Bootstrap scripts/configuration/certificate stores and DEX/Android dependency notices still need complete distribution review.",
-    "Complete corresponding-source and applicable replacement/relink instructions remain pending for the combined support layer.",
-    "Updated notices must enter and be checked in the final candidate APK after dependency review."
-  ],
+  "open_gates": [],
   "catalogs": [
     {
       "id": "termux-main:2026-01-23",
@@ -5621,12 +6398,83 @@
   ],
   "provenance_followups": [
     "SDL source revision and shim source are retained under permissive terms. A byte-identical rebuild is not a license precondition; local build options remain unverified.",
-    "An entirely offline rebuild and auxiliary ncurses terminfo inputs have not been demonstrated. This is separate from the MIT notice requirement for that library.",
-    "PulseAudio recipe folder (8 files) matches the 17.0-1 package commit and the retained January 2025 snapshot. Actual runtime compatibility is unchanged, not re-tested.",
-    "PRoot 5.1.107-65: secondary package match only. Source ZIP matches the official recipe checksum; no signed original package catalog recovered and no rebuild performed. Review source/build correspondence and libtalloc before clearance."
+    "An entirely offline rebuild and auxiliary ncurses terminfo inputs have not been demonstrated. This is separate from the MIT notice requirement for that library."
   ],
   "release_gates": [
     "Authorized handheld/runtime/provider acceptance of the exact candidate.",
     "Explicit owner approval of the reviewed APK publication."
-  ]
+  ],
+  "busybox_configuration": {
+    "path": "docs/release/beta1/busybox.config",
+    "sha256": "21a66fed85143e04a119f4b6787cad25efd830bde9cbfeb666103134734ddab8",
+    "bytes": 31497,
+    "native_path": "bootstrap:package/libbusybox.so.1.37.0"
+  },
+  "support_refresh": {
+    "manifest": "tools/dependencies/runtime-support.json",
+    "previous_lock_commit": "a9ac77a",
+    "reason": "Replace unknown historical package builds with signed packages and retained corresponding sources"
+  },
+  "bootstrap_review": {
+    "empty_archive": "package/package.dat.tar has no members",
+    "openssl_helpers": "CA.pl, tsget.pl and openssl.cnf match the recorded Ubuntu openssl package exactly",
+    "certificates": {
+      "shipped": 146,
+      "official": 147,
+      "extra": [],
+      "absent": [
+        "6f07ad0a028ea35440539386765f070f71087cf7cb7f72dd8a365621ca26e774"
+      ]
+    },
+    "java_truststore": "146 trusted certificates, no private keys, each in the same Ubuntu 20240203 CA set",
+    "scripts": "Wrapper MIT scripts and configuration; PikoNest modifications are in PatchBootstrap.java and prepare.py",
+    "source": "ubuntu/ca-certificates/ca-certificates_20240203.tar.xz"
+  },
+  "android_review": {
+    "classes": 3924,
+    "groups": {
+      "android/support/": 14,
+      "androidx/": 1703,
+      "kotlin/": 1029,
+      "com/google/common/": 1,
+      "kotlinx/": 857,
+      "com/android/vending/": 8,
+      "com/godot/game/": 7,
+      "org/godotengine/": 210,
+      "com/google/android/vending/": 58,
+      "com/pattlebass/": 5,
+      "org/intellij/": 25,
+      "org/jetbrains/": 7
+    },
+    "basis": "Original upstream DEX class definitions; license families reviewed against original project texts. This does not assert a reconstructed exact Gradle resolution graph.",
+    "notices": "NATIVE-NOTICES.txt plus GODOT-COPYRIGHT.txt (engine, AOSP expansion/licensing code)"
+  },
+  "bundle_files": {
+    "busybox.config": {
+      "path": "docs/release/beta1/busybox.config",
+      "sha256": "21a66fed85143e04a119f4b6787cad25efd830bde9cbfeb666103134734ddab8",
+      "bytes": 31497
+    },
+    "REBUILDING.md": {
+      "path": "docs/release/beta1/REBUILDING.md",
+      "sha256": "2dcfad7ede1ceaacf6407e37bb57bb3f2f202c6360b771b609894c6d33ba28ca",
+      "bytes": 5828
+    },
+    "runtime-support.json": {
+      "path": "tools/dependencies/runtime-support.json",
+      "sha256": "cf9caf3bed1f457bf1d174dd26924fa93b47ac9add6354dc97a7cb7fcc1bbcc0",
+      "bytes": 8100
+    },
+    "GODOT-COPYRIGHT.txt": {
+      "path": "experiments/android-host/assets/GODOT-COPYRIGHT.txt",
+      "sha256": "770b334b09db9d4b32f13a901f9c091695a252e73c35681d819a1190c313e9bc",
+      "bytes": 99790
+    },
+    "GODOT-LICENSE.txt": {
+      "path": "experiments/android-host/assets/GODOT-LICENSE.txt",
+      "sha256": "b0435e3b3e4e55238f05f4b306f30524a1b2e20147810d436eaa554fa6855c80",
+      "bytes": 1149
+    }
+  },
+  "distribution_review": "2026-11-02: exact binary/source mapping, retained patches/configuration, native/Android/certificate notices, replacement instructions reviewed. Final candidate notice/native verification is mandatory separately."
 }

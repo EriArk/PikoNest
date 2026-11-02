@@ -225,6 +225,11 @@ def bundle(lock, directory, output):
     files = {'native-source-lock.json': (json.dumps(lock, indent=2) + '\n').encode(),
              'NATIVE-NOTICES.txt': notice,
              'README.md': (REPO / 'tools/dependencies/README.md').read_text(encoding='utf-8').encode()}
+    for name, row in lock.get('bundle_files', {}).items():
+        local_path(Path('.'), name)  # Validate the archive-relative name too.
+        if name in files or name.startswith('sources/'):
+            raise ValueError('Duplicate/reserved bundle file')
+        files[name] = checked(local_path(REPO, row['path']).read_bytes(), row)
     if output.exists():
         raise ValueError('Output already exists; use a new bundle filename')
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -275,7 +280,7 @@ def main():
     if args.bundle:
         if not args.materials:
             parser.error('--bundle requires --materials')
-        print('Partial source-material bundle SHA256:', bundle(lock, args.materials, args.bundle))
+        print('Source-material bundle SHA256:', bundle(lock, args.materials, args.bundle))
     print('Distribution review: INCOMPLETE' if incomplete(lock) else 'Distribution review: no recorded open gates')
     for gate in lock['open_gates']:
         print('- ' + gate)

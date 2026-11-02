@@ -1,62 +1,34 @@
 {
   "recorded": "2026-11-02",
-  "candidate_apk_sha256": "a8a85b1804c8a7a67bee68010c19d4591a05901709df5b84a82eab01cf732e54",
-  "candidate_unchanged": true,
-  "native_files_verified": 79,
-  "official_binary_matches": 60,
-  "official_artifacts_verified": 34,
-  "unresolved_termux_native_files": 14,
-  "source_input_files": 156,
-  "catalog_files": 2,
-  "material_files_verified": 158,
-  "material_bytes": 150932773,
-  "audit_tests_passed": 17,
-  "strict_completion_exit_code": 2,
+  "candidate_apk": "PikoNest-0.1.0-beta.1.apk",
+  "candidate_apk_sha256": "e496a14cc5751232850fa76b393f99ce9b5fb88668c9dbb6a8317ffc2cda224f",
+  "candidate_bytes": 52106465,
+  "native_files_verified": 82,
+  "official_binary_matches": 80,
+  "permissive_records_reviewed": 2,
+  "material_files_verified": 185,
+  "audit_tests_passed": 20,
+  "strict_completion_exit_code": 0,
   "signature": {
     "catalog": "termux-main:2026-01-23",
     "fingerprint": "CC72CF8BA7DBFA0182877D045A897D96E57CF20C",
-    "verification": "GnuPG valid signature; signed index and package hashes verified",
-    "tampered_catalog_rejected": true
-  },
-  "android_metadata": {
-    "version_markers": 22,
-    "invalid_version_markers": 6,
-    "complete_inventory": false
+    "authenticated_packages": 17
   },
   "bundle": {
-    "name": "PikoNest-beta1-partial-source-materials-r3.zip",
-    "sha256": "743f03231cd08b3efb121138375cec2ffead60ad2f0f82fddacc3a061e31e95c",
-    "bytes": 152058391,
-    "entries": 161,
-    "scope": "partial source materials and catalog evidence; PRoot secondary evidence; not cleared for publication"
+    "name": "PikoNest-0.1.0-beta.1-support-sources.zip",
+    "sha256": "9b4580bfe0bd2d7b6007a3a50892123763c529d1ff9c38405e2a6396b42a02bf",
+    "bytes": 193164522,
+    "entries": 193,
+    "scope": "Pinned corresponding support sources, recipes, notices, configuration and rebuilding instructions; repository source required separately"
   },
-  "new_notices_packaged": false,
-  "device_access": false,
+  "new_notices_packaged": true,
+  "device_access": true,
+  "device_record": "DEVICE_ACCEPTANCE.md",
   "apk_published": false,
-  "secondary_binary_matches": 3,
-  "secondary_artifacts_verified": 1,
-  "secondary_source_review_pending_files": 3,
-  "previous_bundles": [
-    {
-      "name": "PikoNest-beta1-partial-source-materials.zip",
-      "sha256": "5647cef4713cf20f8b09da186767fc1fc9320ae0a86f55e261f29e1d770b8153",
-      "bytes": 139914520,
-      "entries": 156,
-      "scope": "partial source materials; not cleared for publication"
-    },
-    {
-      "name": "PikoNest-beta1-partial-source-materials-r2.zip",
-      "sha256": "9016c2e9ce5868de315ae79481ac0b41afb5643798ba61a93f4c5cdcfaeb245c",
-      "bytes": 151588563,
-      "entries": 160,
-      "scope": "partial source materials and catalog evidence; not cleared for publication"
-    }
-  ],
-  "proot": {
-    "package": "5.1.107-65",
-    "source_revision": "60485d2646c1e09105099772da4a20deda8d020d",
-    "source_matches_recipe_checksum": true,
-    "original_signed_package_hash_verified": false,
-    "source_review_complete": false
-  }
+  "limitations": [
+    "Original resolved Gradle graph unavailable; notice review uses observed DEX class families.",
+    "Original SDL compiler options unavailable.",
+    "Full offline rebuild not performed.",
+    "Ubuntu provenance uses official dated HTTPS; its OpenPGP chain was not independently verified."
+  ]
 }

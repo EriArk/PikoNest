@@ -1,9 +1,10 @@
 # PikoNest: current scope and development map
 
-Latest source/package: [0.0.83 music composition](showcase/0.0.83-en/README.md).
-Tool contracts: [SFX](SFX_EDITOR.md) and [Music](MUSIC_EDITOR.md). Labs 0.0.78–83 are implemented with local validation; their complete native/runtime
-journeys remain pending while console use is paused. The last complete native
-creation journey is 0.0.77 below. Follow [ROADMAP](ROADMAP.md) for current order.
+Current candidate: **0.1.0-beta.1 / lab 0.0.93**. The handheld is available and
+bounded new device journeys have passed. Start with the [device record](release/beta1/DEVICE_ACCEPTANCE.md),
+[native gallery](showcase/beta1-en/README.md) and [remaining acceptance](release/beta1/README.md).
+Sound/music tool contracts: [SFX](SFX_EDITOR.md), [Music](MUSIC_EDITOR.md).
+Follow [ROADMAP](ROADMAP.md) for current order. Historical lab records follow.
 
 **2026-10-18 — Lab 0.0.77, connected small-game loop (partial UX07/UX08):**
 Game view now connects selected-sprite movement, contact collection/win/loss,

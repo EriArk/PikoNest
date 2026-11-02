@@ -1,6 +1,6 @@
 """Compose pinned runtime resources with our host; never consumes purchased binaries."""
 from pathlib import Path
-import sys, hashlib, struct, shutil, tarfile, io, xml.etree.ElementTree as ET
+import sys, hashlib, struct, shutil, tarfile, io, json, xml.etree.ElementTree as ET
 
 app, repo, boot_source = map(Path, sys.argv[1:4])
 package = sys.argv[4] if len(sys.argv)>4 else 'art.pikoos.runtimelab'
@@ -10,14 +10,33 @@ assert package in ('art.pikoos.runtimelab','art.pikoos.cleanlab')
 assets = app / 'assets'
 # Private runtime home, independent of the old wrapper's shared folder.
 bootstrap=assets/'package.dat'; buffer=io.BytesIO()
+support = json.loads((repo/'tools/dependencies/runtime-support.json').read_text(encoding='utf-8'))
+support_bytes = (repo/'.local/dependency-audit/runtime-support.tar.gz').read_bytes()
+assert len(support_bytes)==support['output']['bytes'] and hashlib.sha256(support_bytes).hexdigest()==support['output']['sha256'], 'Run the pinned runtime_support.py preparation first'
+(assets/'runtime-support-id.txt').write_text(support['output']['sha256'],encoding='ascii')
+refresh_rows = {r['path']:r for r in support['files']}
+with tarfile.open(fileobj=io.BytesIO(support_bytes),mode='r:gz') as refreshed:
+    refresh_data = {name:refreshed.extractfile(name).read() for name in refresh_rows}
+seen_refresh = set()
+# Keep the already-patched startup scripts from PatchBootstrap; replace only the
+# allowlisted native files, never the whole original bootstrap over those fixes.
 with tarfile.open(fileobj=io.BytesIO(bootstrap.read_bytes()),mode='r:gz') as source, tarfile.open(fileobj=buffer,mode='w:gz') as target:
     for member in source:
         stream=source.extractfile(member) if member.isfile() else None
+        if member.name in refresh_rows:
+            row=refresh_rows[member.name]
+            assert member.isfile() and hashlib.sha256(stream.read()).hexdigest()==row['previous_sha256']
+            content=refresh_data[member.name];member.size=len(content);stream=io.BytesIO(content)
+            seen_refresh.add(member.name)
         if member.name=='package/start_pico_proot.sh':
             code=stream.read().decode(); assert code.count('/sdcard/Documents/pico8')==2
             code=code.replace('/sdcard/Documents/pico8','${PIKONEST_DATA:?Missing runtime home}')
             content=code.encode(); member.size=len(content); stream=io.BytesIO(content)
         target.addfile(member,stream)
+    for name in sorted(refresh_rows.keys()-seen_refresh):
+        assert 'previous_sha256' not in refresh_rows[name]
+        content=refresh_data[name];member=tarfile.TarInfo(name);member.size=len(content);member.mode=0o755
+        target.addfile(member,io.BytesIO(content))
 bootstrap.write_bytes(buffer.getvalue())
 launch=assets/'run_pico_cmd_pikoos.gd'
 code=launch.read_text(encoding='utf-8')

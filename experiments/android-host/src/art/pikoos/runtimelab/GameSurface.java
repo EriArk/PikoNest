@@ -13,7 +13,7 @@ final class GameSurface {
     private final String project;
     private final Paint paint=new Paint();
     private final Bitmap bitmap=Bitmap.createBitmap(128,128,Bitmap.Config.ARGB_8888);
-    private final Bitmap thumbnail=Bitmap.createBitmap(32,32,Bitmap.Config.ARGB_8888);
+    private final ArrayList<Bitmap> thumbnails=new ArrayList<>();
     private final ArrayList<Hit> hits=new ArrayList<>();
     private Canvas canvas;
     private float width,height,scale;
@@ -279,6 +279,10 @@ final class GameSurface {
         outline(imageArea.left+(e.x()-game().viewX)*side/128,imageArea.top+(e.y()-game().viewY)*side/128,r.width*side/128,r.height*side/128,color);
     }
     private void drawThumbnail(int index,float x,float y,float size){
+        // Hardware Canvas records draws: mutating one bitmap for the next row
+        // can make every row display the last sprite in the frame.
+        while(thumbnails.size()<=index)thumbnails.add(Bitmap.createBitmap(32,32,Bitmap.Config.ARGB_8888));
+        Bitmap thumbnail=thumbnails.get(index);
         SpriteRegion r=game().region(index);int[] colors=new int[32*32];int longest=Math.max(r.width,r.height);
         int tw=Math.max(1,32*r.width/longest),th=Math.max(1,32*r.height/longest);
         for(int py=0;py<32;py++)for(int px=0;px<32;px++){

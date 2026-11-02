@@ -3,7 +3,7 @@
 Owner decision, 2 November 2026: call the first public milestone an **early beta**,
 with candidate version `0.1.0-beta.1`. This supersedes the alpha name chosen earlier
 that day. It does not claim a complete no-Lua creator or waive existing acceptance
-and publication gates. Handheld use remains paused until the owner frees it.
+and publication gates. The owner has now freed the handheld; bounded candidate checks are recorded below.
 
 ## Declared scope
 
@@ -20,12 +20,14 @@ and publication gates. Handheld use remains paused until the owner frees it.
 - Save/reopen/Test/return/export for supported paths, with originals preserved and
   errors made explicit. Full no-Lua genre journeys remain later product goals.
 
+[Current device evidence and remaining acceptance](release/beta1/DEVICE_ACCEPTANCE.md).
+
 ## Required before publication
 
 1. Complete native dependency notices and corresponding-source provenance for the
-   exact shipped binaries. This is an actual unresolved distribution blocker,
+   exact shipped binaries. This review is now complete for the refreshed candidate,
    documented in [the inventory](release/beta1/DEPENDENCIES.md).
-2. Complete the [candidate device checklist](release/beta1/README.md): independent
+2. Review the remaining [candidate device checklist](release/beta1/README.md): independent
    setup, update without data loss, controller journeys, third-party launcher,
    external storage/reconnect, backup/restore and interrupted-state recovery.
 3. Prove Splore download → return → Play entry → direct offline play on the device.

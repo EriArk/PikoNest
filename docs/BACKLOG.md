@@ -1,5 +1,16 @@
 # PikoNest — задачи полного цикла
 
+**2026-11-02 — Q05 distribution package complete; acceptance still partial:**
+Authenticated support refresh replaces unknown Termux files. All 82 native records
+are reviewed (80 official matches); 185 materials, notices/configuration and rebuild
+instructions are packaged. Strict completion passes. P08/R07 device slices now cover
+independent setup, retained in-place update, Splore/offline, clean-project backup/restore
+and external intent/resume. Creation slices cover blank art/movement/export, both
+starter wins and audio previews. Do not close broader tasks from these bounded checks.
+[Exact passes and open matrix](release/beta1/DEVICE_ACCEPTANCE.md).
+Next: owner candidate/limits review, remaining physical/provider/launcher acceptance
+or explicit bounded-beta decision, then approved publication. No release exists yet.
+
 **2026-11-02 — Q05 PRoot recovery, still partial:**
 Three PRoot files now have a secondary package match and recipe-checked source.
 Official matches remain 60/79; 14 other Termux files remain unidentified. PRoot

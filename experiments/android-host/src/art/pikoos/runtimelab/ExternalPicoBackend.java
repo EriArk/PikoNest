@@ -143,7 +143,7 @@ public final class ExternalPicoBackend implements PicoRuntimeBackend {
     }
     private void dispatch(byte[] cart,String filename,android.net.Uri uri,String mime,boolean fileSet,String cached)throws Exception{
         checkAvailableForLaunch();
-        if(RuntimeInstallation.integrated(activity)&&!RuntimeInstallation.ready(activity))throw new Exception("Import and prepare your Raspberry Pi PICO-8 ZIP in runtime setup first.");
+        if(RuntimeInstallation.integrated(activity)&&!RuntimeInstallation.ready(activity))throw new Exception("Open Runtime setup and choose Prepare to install or update PICO-8 support. Your saved archive, games and saves are kept.");
         PackageInfo selected = runtime();
         if(!RuntimeInstallation.integrated(activity)&&(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<7))throw new Exception("Update PIKOOS Runtime Test to version 7 for reliable return.");
         if(fileSet&&(!RuntimeInstallation.integrated(activity)&&(!RESTART_TEST_PACKAGE.equals(selected.packageName)||selected.versionCode<3)))

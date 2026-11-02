@@ -1,120 +1,48 @@
-# Distribution review: obligations and provenance
+# Distribution review and remaining provenance limits
 
-Research update, 2 November 2026. This records findings and remaining engineering
-work; it is not a completed distribution clearance. The purchased PICO-8 runtime
-is outside these support materials and remains user-imported.
+2 November 2026. The original PikoNest MIT scope is unchanged. Third-party
+components keep their own terms; the purchased PICO-8 runtime remains outside
+the distribution.
 
-## Do not make every dependency follow the same rule
+We retained corresponding GPL/LGPL sources, exact distribution patches/build
+recipes and applicable notices alongside the binary download. We also retained
+the BusyBox configuration and documented shared-library replacement and custom
+APK signing in [REBUILDING.md](REBUILDING.md). Permissive SDL/shim/Android notices
+were reviewed separately. Matching an official package is evidence of origin,
+not a universal requirement to produce a byte-identical source rebuild.
 
-- GPL/LGPL components that we distribute require the applicable corresponding
-  sources and notices. A later upstream version is not a substitute for the source
-  used in a shipped modified build. For downloaded binaries, retained source
-  packages/patches beside the download are the intended route.
-- Byte matching is our provenance technique. GNU explicitly distinguishes the
-  actual corresponding source from a requirement to reproduce an identical binary
-  hash. Timestamps and compiler differences can change the latter.
-- MIT/zlib components need their applicable notices/terms preserved. An unproven
-  local rebuild of SDL or the MIT shim is a provenance follow-up, not by itself a
-  reason to require a complete runtime rewrite before distribution.
-- Review actual linking and component terms. Separate executables in one APK do
-  not automatically put every file under the same license. Conversely, the
-  wrapper's MIT license does not license the bundled GPL/LGPL libraries.
+The final support refresh replaces the old secondary-archive PRoot and the 14
+previously unidentified Termux files with authenticated exact packages. It adds
+their three required libraries. The signed historical catalog authenticates 17
+package records, including unchanged PulseAudio. Sources are checked against the
+matching recipes; a newer source archive was not substituted for an older binary.
 
-Sources: [GNU FAQ: corresponding source and exact hashes](https://www.gnu.org/licenses/gpl-faq.en.html#MustSourceBuildToMatchExactHashOfBinary),
-[unchanged redistributed binaries](https://www.gnu.org/licenses/gpl-faq.en.html#UnchangedJustBinary),
-[LGPL static/dynamic distribution](https://www.gnu.org/licenses/gpl-faq.en.html#LGPLStaticVsDynamic).
-Preserved actual component terms are in `NATIVE-NOTICES.txt` and source archives.
+Actual source terms matter: talloc's library is LGPLv3; FLAC's C library carries
+BSD terms even though its broader source tree also includes GPL/LGPL material.
+PulseAudio's upstream terms and module headers are retained, rather than treating
+the package's short GPL label as the license of every linked library. SoXR's
+statically included LLVM OpenMP has its own notice. Full original texts, including
+source-family notices that cover unshipped tools, remain clearly attributed.
 
-The completion checker now permits an explicitly reviewed permissive component
-or a reviewed source build without requiring an official binary match. Unknown
-statuses, unresolved builds, source-only findings and recorded open gates still
-fail completion. Dependency review and owner/device release approval are separate.
+The Android DEX inventory identifies AndroidX/support, Kotlin/coroutines,
+JetBrains/IntelliJ annotations, Guava ListenableFuture, AOSP expansion/licensing,
+Godot, file-picker and app-links code. Original project notices were added where
+the upstream APK's packaging excluded generic META-INF notices. Invalid Gradle
+version markers were not treated as actual versions. An exact historical Gradle
+resolution graph and SDL local compiler options remain provenance follow-ups.
 
-## PulseAudio finding: no replacement needed to establish origin
+Bootstrap OpenSSL scripts/configuration match their official Ubuntu artifact.
+Both CA stores are subsets of the collected Mozilla/Ubuntu certificate source;
+MPL attribution and source are included. No hidden executable was found in the
+empty nested tar. The user-supplied proprietary runtime is never part of the
+source bundle, APK or public test artifacts.
 
-The main Termux endpoint no longer served the probed `17.0-1` package, but the
-[official mirror list](https://github.com/termux/termux-packages/wiki/Mirrors)
-identified `mirrors.sau.edu.cn`. Its historical catalog is dated **23 January 2026**.
-It is used solely as retained evidence, not configured as a system package source.
+A complete offline rebuild has not run. Ubuntu signatures were not independently
+verified; its source/binary indexes used official dated HTTPS. These limits remain
+explicit instead of being described as stronger evidence.
 
-The verified chain is:
-
-1. Existing pinned official Termux bootstrap ZIP supplies the public repository
-   key. Its SHA-256 was already checked against the official release checksum list.
-2. GnuPG validates the mirror's `InRelease` with fingerprint
-   `CC72CF8BA7DBFA0182877D045A897D96E57CF20C`, in an isolated temporary keyring.
-3. The signed SHA-256/size matches the ARM64 `Packages` index.
-4. That index supplies the exact package name/version/filename/size/hash for
-   `pulseaudio_17.0-1_aarch64.deb`.
-5. **All 16 shipped PulseAudio files** match the contents of that package.
-
-The upstream v17.0 source resolves to
-`1f020889c9aa44ea0f63d7222e8c2b62c3f45f68`. The complete Termux recipe tree at the
-17.0-1 package change, `0ab554db227f55a6ce8144f6f1e071d650c8ddae`, is collected.
-All eight files in its PulseAudio recipe folder also match the previously retained
-January 2025 recipe tree. This includes the Android AAudio/OpenSL ES module source.
-The upstream source and recipe archive are pinned in the source-material lock.
-
-Termux's short package label says GPL-2.0; upstream's
-[LICENSE](https://github.com/pulseaudio/pulseaudio/blob/1f020889c9aa44ea0f63d7222e8c2b62c3f45f68/LICENSE)
-describes LGPL with exceptions and effects from optional dependencies. Both the
-upstream terms and relevant module headers are retained. Do not infer the final
-license of every linked component from the short package label. The wider library
-review, including the remaining audio dependencies, stays open.
-
-## PRoot: recovered package identity, secondary evidence only
-
-The three shipped PRoot/loader files exactly match `proot_5.1.107-65_aarch64.deb`
-inside a [secondary archive pinned to its repository commit](https://github.com/TokiZeng/proot-distro-for-Termux-Android-5.0-7.0/blob/e0a6f33314b231bd3e4aa7b37d468d7250e297cf/proot-distro_4.16.0_all.zip).
-The ZIP, inner DEB and each shipped file have separate locked hashes. The audit
-reads the nested package without installing or executing it. This is recorded as
-`archived-package-match`, **not** an official authenticated binary match, and it
-does not clear the completion gate. An official signed package hash was not found.
-
-The official [Termux recipe](https://github.com/termux/termux-packages/blob/66a7206e299d7836687dfee2130e1e2967734915/packages/proot/build.sh)
-identifies version 5.1.107-65, source commit
-`60485d2646c1e09105099772da4a20deda8d020d`, and source ZIP SHA-256
-`e6942f8b94fb3840faa3a500295dd4d79147266f60404df7c026703436850737`.
-The downloaded source matches that hash. The retained recipe tree contains both
-`build.sh` and `termux-chroot`; the original `COPYING` is appended unchanged to
-the notice asset. The source includes GPLv2 terms and author notices. No claim of
-a completed rebuild or fully reviewed corresponding-source distribution is made.
-The talloc dependency remains unresolved separately.
-
-Bounded recovery findings: the checked Internet Archive package collections only
-retain newer PRoot/BusyBox revisions, and newer mirror packages do not match.
-Do not repeat broad mirror scans or accept a nearby version by name. The next
-step is targeted source/configuration review for BusyBox and linked libraries,
-with a controlled build only where existing provenance cannot be established.
-
-## Remaining native review
-
-Fourteen files still lack an exact package identity. Three additional PRoot files
-have the secondary match above and still need authentication/source review.
-
-| Group | Files | Next proof needed |
-| --- | ---: | --- |
-| PRoot and loaders | 3 | Secondary package match and recipe-checked source collected; finish authentication/source review or a pinned build |
-| Android BusyBox executable/library | 2 | Package revision and build configuration |
-| talloc | 1 | Exact package/source provenance |
-| Opus, Vorbis, FLAC, Ogg, SoXR, SpeexDSP | 7 | Package/source provenance; inspect statically included code as well |
-| D-Bus, libltdl, android-execinfo, libsndfile | 4 | Exact package/source provenance and applicable notices |
-
-Current/newer mirror packages were not accepted merely because their version
-names looked close. No binary was replaced and no device test was performed.
-Future replacement should be restricted to the components whose provenance
-cannot be recovered, with the existing candidate retained for comparison.
-
-## Android and other content
-
-[APK metadata evidence](android-metadata.json) records 22 Java/Kotlin version
-markers. Six contain literal Gradle task descriptions instead of versions.
-The other 16 are only hints, not proof of the complete resolved dependency graph.
-Do not claim that native inventory covers AndroidX/Kotlin, resources, scripts or
-certificate data. The pinned Godot Java build configuration also excludes generic
-`META-INF/LICENSE` and `META-INF/NOTICE` files, so absence of such files in the
-input APK does not mean there are no notice obligations.
-
-Still required: finish those notices, document the applicable source and library
-replacement path, package the updated material in the exact final candidate,
-and perform the separately authorized runtime/device and owner acceptance.
+Primary references: [GNU corresponding-source FAQ](https://www.gnu.org/licenses/gpl-faq.en.html#MustSourceBuildToMatchExactHashOfBinary),
+[unchanged binary redistribution](https://www.gnu.org/licenses/gpl-faq.en.html#UnchangedJustBinary),
+[LGPL linking guidance](https://www.gnu.org/licenses/gpl-faq.en.html#LGPLStaticVsDynamic),
+[Godot license guidance](https://docs.godotengine.org/en/latest/about/complying_with_licenses.html).
+The preserved component terms, not these summaries, govern their reuse.

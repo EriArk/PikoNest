@@ -150,6 +150,7 @@ class AuditTests(unittest.TestCase):
     def test_bundle_excludes_adjacent_private_files_and_is_deterministic(self):
         lock = audit.load_lock()
         data = b'locked source fixture'
+        extras = set(lock.get('bundle_files', {}))
         lock['materials'] = [dict(path='source/archive.tar', bytes=len(data), sha256=audit.sha(data))]
         path = self.root / 'source/archive.tar'; path.parent.mkdir(); path.write_bytes(data)
         (self.root / 'pico8_64').write_bytes(b'must not be included')
@@ -157,7 +158,7 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(audit.bundle(lock, self.root, first), audit.bundle(lock, self.root, second))
         with zipfile.ZipFile(first) as z:
             self.assertEqual(set(z.namelist()), {'native-source-lock.json', 'NATIVE-NOTICES.txt',
-                                               'README.md', 'sources/source/archive.tar'})
+                                               'README.md', 'sources/source/archive.tar'} | extras)
         with self.assertRaisesRegex(ValueError, 'already exists'):
             audit.bundle(lock, self.root, first)
 

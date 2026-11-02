@@ -1,4 +1,6 @@
-import sys,zipfile,struct,hashlib,tarfile,io
+import sys,zipfile,struct,hashlib,tarfile,io,json
+from pathlib import Path
+repo=Path(__file__).resolve().parents[2]
 with zipfile.ZipFile(sys.argv[1]) as apk:
     index=apk.read('assets/assets.sparsepck'); count,=struct.unpack_from('<I',index,104)
     assert count==263; pos=108
@@ -15,5 +17,16 @@ with zipfile.ZipFile(sys.argv[1]) as apk:
         names=tar.getnames()
         assert not any(n.rsplit('/',1)[-1] in forbidden for n in names)
         assert all(n.startswith('package/') or n=='package' for n in names)
+        start=tar.extractfile('package/start_pico_proot.sh').read().decode()
+        pulse=tar.extractfile('package/pulsar.sh').read().decode()
+        session=(repo/'experiments/runtime-restart/audio-session.sh').read_text().replace('\r\n','\n')
+        assert session in start, 'Support refresh lost audio startup/session fixes'
+        assert '${PIKONEST_DATA:?Missing runtime home}' in start
+        assert 'exec $PKG_DIR/pulseaudio' in pulse and './busybox killall pulseaudio' not in pulse
+        support=json.loads((repo/'tools/dependencies/runtime-support.json').read_text())
+        assert apk.read('assets/runtime-support-id.txt').decode()==support['output']['sha256']
+        for row in support['files']:
+            data=tar.extractfile(row['path']).read()
+            assert len(data)==row['bytes'] and hashlib.sha256(data).hexdigest()==row['sha256']
     assert 'classes2.dex' in apk.namelist()
 print('263 Godot assets verified; APK/bootstrap contain no official runtime binaries')

@@ -27,6 +27,10 @@ public final class GameTree {
     }
     public static void check(BooleanSupplier cancelled){if(cancelled.getAsBoolean())throw new CancellationException();}
     public static Result scan(Source source,String root,BooleanSupplier cancelled)throws Exception{
+        return scan(source,root,cancelled,MAX_ENTRIES,MAX_GAMES);
+    }
+    public static Result scan(Source source,String root,BooleanSupplier cancelled,int maxEntries,int maxGames)throws Exception{
+        if(maxEntries<1||maxEntries>32768||maxGames<1||maxGames>2048)throw new IllegalArgumentException("Invalid scan budget");
         Result result=new Result();int seen=0;
         Set<String> visited=new HashSet<>();visited.add(root);
         ArrayDeque<Folder> pending=new ArrayDeque<>();pending.add(new Folder(root,"",0));
@@ -36,7 +40,7 @@ public final class GameTree {
                 if(folder.depth>0)result.folders++;
                 while(true){
                     check(cancelled);Entry entry=children.next();if(entry==null)break;
-                    if(++seen>MAX_ENTRIES){result.limited=true;return result;}
+                    if(++seen>maxEntries){result.limited=true;return result;}
                     if(entry.id==null||entry.name==null||!visited.add(entry.id))continue;
                     if(entry.directory){
                         if(folder.depth>=MAX_DEPTH){result.limited=true;continue;}
@@ -45,7 +49,7 @@ public final class GameTree {
                     }else{
                         String lower=entry.name.toLowerCase(Locale.ROOT);
                         if(!lower.endsWith(".p8")&&!lower.endsWith(".p8.png"))continue;
-                        if(result.carts.size()>=MAX_GAMES){result.limited=true;return result;}
+                        if(result.carts.size()>=maxGames){result.limited=true;return result;}
                         result.carts.add(new Cart(entry,folder.path,folder.id));
                     }
                 }

@@ -1,5 +1,11 @@
 # PikoNest — English website gallery
 
+[Early beta 1: seven actual English Android screenshots](beta1-en/README.md)
+— Play/Splore, Game view, sprite/SFX/music tools and both starters in official PICO-8.
+[Download native PNG pack](beta1-en/pikonest-beta1-native-screenshots.zip).
+Retroid Pocket Classic, final candidate SHA recorded in the gallery. These replace
+host previews in the root README; historical provenance below remains unchanged.
+
 [0.0.93: first early beta preparation and fresh website pictures](0.0.93-en/README.md)
 — 13 labeled host previews of Game view, tile art, sound/music, setup, backup and
 Splore/Play. [Download PNG pack](0.0.93-en/pikonest-early-beta-previews.zip).
@@ -160,4 +166,3 @@ screenshot is included.
 ![The English project shelf with Moon Garden and a selected-project preview.](0.0.66-en/03-workshop.png)
 
 [Original PNG](0.0.66-en/03-workshop.png) · 0.0.66-en
-

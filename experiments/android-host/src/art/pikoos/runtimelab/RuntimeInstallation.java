@@ -17,7 +17,17 @@ final class RuntimeInstallation {
         try{return c.getPackageManager().getApplicationInfo(c.getPackageName(),PackageManager.GET_META_DATA).metaData.getBoolean("art.pikoos.integrated",false);}
         catch(Exception absent){return false;}
     }
-    static boolean ready(Context c){return new File(c.getFilesDir(),"package/pikonest-ready").isFile();}
+    static boolean ready(Context c){return matchesSaved(c);}
+    private static String identity(Context c,RuntimeArchiveJob.Saved saved)throws IOException{
+        String support;
+        try(InputStream in=c.getAssets().open("runtime-support-id.txt")){
+            byte[] bytes=new byte[65];int size=0,n;
+            while(size<bytes.length&&(n=in.read(bytes,size,bytes.length-size))!=-1)size+=n;
+            support=new String(bytes,0,size,"US-ASCII");
+        }
+        if(!support.matches("[0-9a-f]{64}"))throw new IOException("Runtime support identity is invalid");
+        return "pikonest-runtime-2\n"+support+"\n"+saved.hash;
+    }
     static boolean matchesSaved(Context c){
         try{
             RuntimeArchiveJob.Saved saved=RuntimeArchiveJob.saved(c);
@@ -26,7 +36,7 @@ final class RuntimeInstallation {
                 &&new File(c.getFilesDir(),"package/proot").isFile()
                 &&new File(c.getFilesDir(),"package/rootfs/home/pico/pico-8/pico8_64").isFile()
                 &&new File(c.getFilesDir(),"package/rootfs/home/pico/pico-8/pico8.dat").isFile()
-                &&new String(Files.readAllBytes(marker.toPath()),"US-ASCII").equals("pikonest-runtime-1\n"+saved.hash);
+                &&new String(Files.readAllBytes(marker.toPath()),"US-ASCII").equals(identity(c,saved));
         }catch(Exception unavailable){return false;}
     }
     static File prepare(Context c,RuntimeArchiveJob.Saved saved,BooleanSupplier cancelled)throws Exception{
@@ -35,7 +45,7 @@ final class RuntimeInstallation {
         RuntimeArchive.Result checked=RuntimeArchive.inspect(zipFile,cancelled);
         if(!saved.hash.equals(checked.sha256))throw new IOException("Saved archive changed. Select the original ZIP again.");
         File marker=new File(c.getFilesDir(),"package/pikonest-ready");
-        String identity="pikonest-runtime-1\n"+saved.hash;
+        String identity=identity(c,saved);
         if(matchesSaved(c))return null;
         // PulseAudio uses a pathname Unix socket (108-byte sockaddr_un limit).
         // Keep the canonical candidate path short; a long symlink target still fails.

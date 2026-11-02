@@ -14,34 +14,24 @@ a separate reuse license for original artwork and screenshot imagery.
 | Godot 4.6, integrated engine | [Godot Engine](https://godotengine.org/license/); pinned APK contains `4.6.stable.official` version strings | [MIT notice](experiments/android-host/assets/GODOT-LICENSE.txt) and [third-party copyright file](experiments/android-host/assets/GODOT-COPYRIGHT.txt), preserved from `godotengine/godot` tag `4.6-stable` |
 | Press Start 2P, upstream frontend font | CodeMan38; notice preserved from the pinned upstream wrapper source | [SIL OFL text](experiments/android-host/assets/PressStart2P-LICENSE.txt) |
 
-The experimental runtime build consumes separately downloaded tools and binaries.
-Pinned inputs appear in the [runtime build instructions](experiments/runtime-restart/README.md#reproducible-local-build).
-A full component/notice audit of that payload remains required before production
-redistribution. This table is an identified-materials inventory, not a completed
-audit of every transitive dependency.
+The early beta support payload has a pinned inventory of **82 native files**.
+Eighty match official Ubuntu, Termux and Godot artifacts. SDL and the shim have
+separate permissive source/notice review. Unknown historical Termux files were
+replaced with signed packages and their corresponding sources, rather than
+distributing unidentified builds. The source-material bundle contains 185 pinned
+inputs plus notices, build instructions and the exact BusyBox configuration.
 
-The 2 November dependency follow-up covers 79 ELF files (77 bootstrap and two APK
-libraries). Sixty match exact official Ubuntu/Termux/Godot artifacts; 156
-source inputs and two catalog files are collected with pinned URLs/hashes. See
-[the distribution evidence](docs/release/beta1/DEPENDENCIES.md) and preserved
-[native component notices](experiments/android-host/assets/NATIVE-NOTICES.txt).
-These include Ubuntu package copyright texts, full referenced common licenses,
-the identified Termux source notices, SDL/wrapper notices and LLVM C++ runtime
-licenses. The latter are separate from the Godot engine copyright list.
+[Distribution review](docs/release/beta1/DEPENDENCIES.md) ·
+[Full component notices](experiments/android-host/assets/NATIVE-NOTICES.txt) ·
+[Rebuilding and library replacement](docs/release/beta1/REBUILDING.md).
 
-The additional 16 PulseAudio files match the historical Termux 17.0-1 package
-through a verified repository signature, signed index and package checksum chain.
-Its upstream source, exact recipe snapshot and notices are now retained.
-
-Three PRoot files also match a secondary archived package, with source checked
-against the official recipe checksum and original notices retained. This is weaker
-evidence than an authenticated official package; its source review remains open.
-
-This remains incomplete: 14 other Termux files need exact source/build provenance or
-replacement, and non-native dependencies and final distribution requirements still
-need review. New notices enter the next APK packaging pass. The candidate stays
-local until the corresponding-source/notice package is complete. Original PikoNest
-MIT licensing is unchanged and does not cover those separate component terms.
+Notices cover native packages, LLVM runtimes/OpenMP, SDL, AndroidX, Kotlin,
+coroutines, JetBrains annotations, Guava ListenableFuture, the Android file picker
+and app-links plugin, and Mozilla certificate data. Godot/AOSP and font notices
+remain separate. Exact SDL build flags and the original Gradle dependency graph
+were not recovered; a complete offline rebuild is not claimed. GPL/LGPL source
+and replacement obligations are distinct from permissive notice requirements.
+Original PikoNest MIT licensing is unchanged.
 
 Third-party cartridges and extracted assets retain their authors' terms. Import
 or extraction does not grant redistribution permission. Screenshot captions

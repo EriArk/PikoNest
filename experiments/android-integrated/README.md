@@ -12,6 +12,17 @@ as `.local/downloads/boot-1.6.6.gd`:
 
 `3841e28ef49e53e88b09d55110ff4587f39a8e1c9f71fcebffad4982ab68da58` (SHA-256).
 
+Before packaging, compose the pinned support refresh:
+
+```powershell
+.local/dependency-audit/venv/Scripts/python.exe tools/dependencies/runtime_support.py
+```
+
+See [source verification and downloads](../../tools/dependencies/README.md). This
+requires the pinned upstream APK and an isolated Python environment with
+`zstandard==0.25.0`; it replaces 20 allowlisted support files while preserving the
+existing startup patches. The purchased runtime is not part of this operation.
+
 Python 3 (`py -3`), Java and Android build-tools 36.0.0 are required. Inputs are
 validated before preparation. `prepare.py` composes the manifest, private runtime
 home, boot script/class registry and sparse PCK. `verify.py` checks indexed
@@ -29,8 +40,8 @@ suite has already passed; it does not constitute a test run.
 
 The owner approved target SDK 28 for this first integration. See
 [the decision, boundaries and remaining gates](../../docs/SINGLE_APK.md).
-Upstream MIT and native font notices are packaged. Complete transitive binary
-licensing/source obligations remain a pre-release task; source MIT does not
+Upstream MIT and native font notices are packaged. The recorded dependency/source review is complete; see
+[distribution evidence](../../docs/release/beta1/DEPENDENCIES.md). Source MIT does not
 relicense Godot, bootstrap libraries or third-party artwork.
 
 ## Local beta candidate
@@ -63,9 +74,9 @@ compiler warnings to `NativeCommandError`; do not mistake that wrapper outcome
 for the actual compiler/build result. Preserve the process exit code and final
 verification output.
 
-See [early beta preparation](../../docs/release/beta1/README.md). Native dependency
-source provenance, device acceptance and the owner's publication gate are still
-open. A successful candidate build does not authorize a GitHub Release/prerelease.
+See [early beta preparation](../../docs/release/beta1/README.md). The native distribution package is reviewed;
+bounded device journeys passed. Remaining acceptance and the owner's publication
+gate are recorded separately. A successful candidate build does not authorize a GitHub Release/prerelease.
 
 ## Isolated clean-install validation
 

@@ -36,7 +36,10 @@ final class RuntimeSetupView extends View {
         int stage=state.testing||state.returned?2:state.prepared||state.busy&&state.verified?1:0;
         for(int i=0;i<3;i++){rect(left+i*step,104,step-6,4,i==stage?10:13);fit(new String[]{"1 Archive","2 Prepare","3 Test"}[i],left+i*step,130,16,i==stage?10:13,step-12);}
         buttonY=h-147;c.save();c.clipRect(left,144,left+width,buttonY-8);c.translate(0,-scroll);
-        float y=wrap("Download the Raspberry Pi ZIP from your PICO-8 purchase page.",left,164,20,7,width);
+        float y=164;
+        // Show a failed import before the long guidance, including on short screens.
+        if(!state.problem.isEmpty())y=wrap(state.problem,left,y,19,9,width)+12;
+        y=wrap("Download the Raspberry Pi ZIP from your PICO-8 purchase page.",left,y,20,7,width);
         y=wrap("Choose a Raspberry Pi ZIP with pico8_64 (ARM64). The version number and ZIP name can vary.",left,y+3,17,14,width);
         y=wrap("Older or newer runtimes can be imported if compatible. Preparation checks files; use Test to check playback.",left,y+2,17,6,width);
         float panel=y+12;rect(left,panel,width,111,0);
@@ -49,7 +52,7 @@ final class RuntimeSetupView extends View {
         fit(state.hasArchive?String.format(java.util.Locale.ROOT,"%.1f MiB · %s",state.archiveBytes/1048576.0,state.verified?"ARM64":"check needed"):"Your purchased archive",left+78,panel+84,16,13,width-93);
         y=panel+137;
         String message=state.problem.isEmpty()?(state.busy?"Cancel preparation with "+(swap?"A":"B")+".":state.testing?"The test is open. Use its game menu to finish and return here.":state.returned?"The test has closed. Picture and controls still need your review.":state.prepared?"PICO-8 is prepared. You can test it now or return to setup.":state.verified?"Prepare this archive inside PikoNest. A failed preparation keeps the previous runtime.":"We check the ZIP and its ARM64 runtime before preparation."):state.problem;
-        y=wrap(message,left,y,19,state.problem.isEmpty()?6:9,width);
+        if(state.problem.isEmpty())y=wrap(message,left,y,19,6,width);
         maxScroll=Math.max(0,y-(buttonY-8));c.restore();if(scroll>maxScroll){scroll=maxScroll;invalidate();}
         rect(left,buttonY,width,49,state.busy?5:2);rect(left,buttonY,4,49,state.busy?13:10);
         fit(state.busy?"Preparing...":(swap?"B":"A")+(state.testing?"  Return to test":state.prepared?"  Test PICO-8":state.verified?"  Prepare PICO-8":"  Choose ZIP"),left+16,buttonY+32,23,state.busy?6:10,width-30);
