@@ -43,7 +43,7 @@ public class LibraryRepositoryTest {
         SpriteAsset otherId=SpriteAsset.capture(cart,new SpriteRegion(0,0,8,8),"New","Other");reject(()->repo.update(edited,otherId),"resource identity cannot change");
         Store target=new Store();LibraryRepository reopened=new LibraryRepository(target);for(Map.Entry<String,byte[]> entry:repo.snapshot().entrySet())target.create(entry.getKey(),entry.getValue());
         check(reopened.sprites().get(0).favorite&&reopened.presets().get(0).favorite&&reopened.buffer().id.equals(second.id),"independent migrated library reopened");
-        FirstRunSetup setup=new FirstRunSetup(new FirstRunSetup.Port(){public void save(int n,boolean b){}public void games(){}public void runtime(){}public void leave(){}},1);setup.libraryExternal=true;
+        FirstRunSetup setup=new FirstRunSetup(new FirstRunSetup.Port(){public void save(int n,boolean b){}public void games(){}public void creations(){}public void runtime(){}public void leave(){}},1);setup.libraryExternal=true;
         check(setup.body().contains("projects stay inside")&&setup.status().contains("Library: external"),"independent library location explained");setup.projectsExternal=true;check(setup.status().contains("Projects + library"),"both external locations explained");
         System.out.println("LibraryRepositoryTest: "+checks+" checks passed");
     }

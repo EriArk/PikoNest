@@ -37,8 +37,8 @@ final class RuntimeSetupView extends View {
         for(int i=0;i<3;i++){rect(left+i*step,104,step-6,4,i==stage?10:13);fit(new String[]{"1 Archive","2 Prepare","3 Test"}[i],left+i*step,130,16,i==stage?10:13,step-12);}
         buttonY=h-147;c.save();c.clipRect(left,144,left+width,buttonY-8);c.translate(0,-scroll);
         float y=wrap("Download the Raspberry Pi ZIP from your PICO-8 purchase page.",left,164,20,7,width);
-        y=wrap("For example: pico-8_0.2.7_raspi.zip",left,y+3,17,14,width);
-        y=wrap("PikoNest prepares everything inside this app.",left,y+2,17,6,width);
+        y=wrap("Choose a Raspberry Pi ZIP with pico8_64 (ARM64). The version number and ZIP name can vary.",left,y+3,17,14,width);
+        y=wrap("Older or newer runtimes can be imported if compatible. Preparation checks files; use Test to check playback.",left,y+2,17,6,width);
         float panel=y+12;rect(left,panel,width,111,0);
         // A small archive cartridge, using exactly the PICO-8 palette.
         rect(left+14,panel+18,47,69,2);rect(left+20,panel+25,35,30,14);

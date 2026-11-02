@@ -429,7 +429,7 @@ public final class MainActivity extends Activity {
             return;
         }
         if(request==91){recreate();return;}
-        if(request==87){if(showingPlay)showPlay();else if(showingFolders)showFolders(folderReturnPlay);return;}
+        if(request==87){if(result==RESULT_OK&&data!=null&&data.getBooleanExtra("creationFolders",false))showFolders(showingPlay);else if(showingPlay)showPlay();else if(showingFolders)showFolders(folderReturnPlay);return;}
         if(request==PICK_FOLDER){folderResult(result,data);return;}
         if(request==SAVE_CART){exportResult(result,data);return;}
         if(request!=PICK_CART||library==null)return;

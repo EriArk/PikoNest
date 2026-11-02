@@ -1,5 +1,19 @@
 # Состояние PikoNest
 
+**2026-11-02 — Lab 0.0.92, alpha scope and version-independent archive discovery:**
+Owner now targets an alpha with Lua allowed outside bounded visual workflows;
+full no-Lua creation remains a later product milestone. [Scope](ALPHA_SCOPE.md).
+Runtime import discovers one ARM64 `pico8_64` with sibling `pico8.dat` regardless of
+outer ZIP name or inner directory. Readme is optional. Both installation and probe
+consume the same inspected entry mapping; outputs retain fixed private names.
+Multiple runtimes, missing sibling data, wrong ABI and unsafe/damaged archives
+are refused. The guide no longer shows a fixed runtime version and offers a
+creation-folders action without dismissing setup or launching PICO-8.
+Local core checks and host layouts are recorded in
+[0.0.92 evidence](showcase/0.0.92-en/README.md). No device use or release.
+Native wizard, runtime-version matrix and physical/novice/owner acceptance remain
+open. New ZIP layouts tested synthetically do not prove older/newer runtime execution.
+
 **2026-11-02 — Lab 0.0.91, external working library (partial P02/P08/R08):**
 Sprite assets, parameter presets and the shared sprite buffer now use a portable
 LibraryRepository with local/SAF adapters. Folders → Asset library → Start opens

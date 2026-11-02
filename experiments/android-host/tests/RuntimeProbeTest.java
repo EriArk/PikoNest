@@ -21,6 +21,13 @@ public class RuntimeProbeTest {
             check(Arrays.equals(Files.readAllBytes(target.resolve("pico8.dat")),new byte[]{1,2,3,4}),"exact data bytes");
             check(Arrays.equals(Files.readAllBytes(target.resolve("probe.p8")),cart),"ordinary test cart");
             check(Arrays.equals(Files.readAllBytes(archive.toPath()),source),"source ZIP unchanged");
+            for(String prefix:new String[]{"","old-release/","future/package/"}){
+                Map<String,byte[]> payload=new LinkedHashMap<>();payload.put(prefix+"pico8_64",RuntimeArchiveTest.elf());payload.put(prefix+"pico8.dat",new byte[]{5,6});
+                File moved=RuntimeArchiveTest.zip(root,payload);ByteArrayOutputStream packed=new ByteArrayOutputStream();
+                RuntimeProbe.prepare(moved,RuntimeArchive.hash(moved,()->false),cart,packed,()->false);
+                Path extracted=Files.createTempDirectory(root,"layout-");RuntimeProbe.unpack(new ByteArrayInputStream(packed.toByteArray()),extracted.toFile(),()->false);
+                check(Arrays.equals(Files.readAllBytes(extracted.resolve("pico8_64")),RuntimeArchiveTest.elf())&&Arrays.equals(Files.readAllBytes(extracted.resolve("pico8.dat")),new byte[]{5,6}),"discovered pair reaches fixed output paths byte-exactly");
+            }
             for(int offset:new int[]{0,8,12,50,transport.length-1}){byte[] b=transport.clone();b[offset]^=127;rejected(b,root);}
             rejected(Arrays.copyOf(transport,transport.length-1),root);rejected(Arrays.copyOf(transport,transport.length+1),root);
             try{RuntimeProbe.unpack(new ByteArrayInputStream(transport),target.toFile(),()->false);throw new AssertionError("overwrite");}catch(IOException expected){checks++;}

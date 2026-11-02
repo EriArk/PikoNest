@@ -13,8 +13,14 @@ public final class RuntimeArchive {
     public static final int MAX_ENTRIES=512;
     public static final class Result {
         public final long bytes,binaryBytes,dataBytes;
-        public final String sha256;
-        Result(long bytes,long binary,long data,String hash){this.bytes=bytes;binaryBytes=binary;dataBytes=data;sha256=hash;}
+        public final String sha256, binaryEntry, dataEntry;
+        Result(long bytes,long binary,long data,String hash,String entry){this.bytes=bytes;binaryBytes=binary;dataBytes=data;sha256=hash;binaryEntry=entry;dataEntry=entry.substring(0,entry.length()-8)+"pico8.dat";}
+        /** Only known payload names may be mapped; output paths remain caller-owned. */
+        public String entry(String name){
+            if(name.equals("pico8_64"))return binaryEntry;
+            if(name.equals("pico8.dat"))return dataEntry;
+            throw new IllegalArgumentException("Unknown runtime payload");
+        }
     }
     public static void check(BooleanSupplier cancelled){if(cancelled.getAsBoolean())throw new java.util.concurrent.CancellationException();}
     public static long copy(InputStream in,OutputStream out,BooleanSupplier cancelled)throws IOException{
@@ -25,7 +31,8 @@ public final class RuntimeArchive {
     }
     public static Result inspect(File archive,BooleanSupplier cancelled)throws IOException{
         if(archive.length()==0||archive.length()>MAX_ZIP)throw problem("Choose a ZIP archive up to 64 MiB");
-        long binary=0,data=0,total=0;boolean readme=false;int count=0;
+        long binary=0,data=0,total=0;int count=0;String binaryEntry=null;
+        Map<String,Long> dataEntries=new HashMap<>();
         Set<String> names=new HashSet<>();
         try(ZipFile zip=new ZipFile(archive)){
             Enumeration<? extends ZipEntry> entries=zip.entries();
@@ -47,17 +54,20 @@ public final class RuntimeArchive {
                     }
                 }
                 if(actual!=entry.getSize()||crc.getValue()!=entry.getCrc())throw problem("Archive damaged. Download it again.");
-                if(name.equals("pico-8/pico8_64")){
+                if(name.equals("pico8_64")||name.endsWith("/pico8_64")){
+                    if(binaryEntry!=null)throw problem("More than one PICO-8 runtime found. Choose a ZIP containing one version.");
                     if(kept<64||header[0]!=127||header[1]!='E'||header[2]!='L'||header[3]!='F'||header[4]!=2||header[5]!=1||header[6]!=1||(header[18]&255)!=183||header[19]!=0||!((header[16]==2||header[16]==3)&&header[17]==0))
                         throw problem("No supported ARM64 PICO-8 found. Choose the Raspberry Pi ZIP.");
-                    binary=actual;
+                    binary=actual;binaryEntry=name;
                 }
-                if(name.equals("pico-8/pico8.dat"))data=actual;
-                if(name.equals("pico-8/readme_raspi.txt"))readme=actual>0;
+                if(name.equals("pico8.dat")||name.endsWith("/pico8.dat"))dataEntries.put(name,actual);
             }
         }catch(ZipException e){throw problem("Cannot read the ZIP. Choose the complete PICO-8 archive.");}
-        if(binary==0||data==0||!readme)throw problem("Choose PICO-8 for Raspberry Pi. Linux amd64 and i386 are not supported by this backend.");
-        check(cancelled);return new Result(archive.length(),binary,data,hash(archive,cancelled));
+        if(binaryEntry==null)throw problem("This ZIP has no pico8_64 ARM64 runtime. Choose the Raspberry Pi ZIP with 64-bit support; 32-bit-only, desktop and exported-game builds are not supported.");
+        String paired=binaryEntry.substring(0,binaryEntry.length()-8)+"pico8.dat";
+        if(dataEntries.containsKey(paired))data=dataEntries.get(paired);
+        if(binary==0||data==0)throw problem("The runtime needs a non-empty pico8.dat beside pico8_64. Choose the complete Raspberry Pi ZIP.");
+        check(cancelled);return new Result(archive.length(),binary,data,hash(archive,cancelled),binaryEntry);
     }
     private static void path(String value,boolean directory)throws IOException{
         String name=directory?value.substring(0,value.length()-1):value;

@@ -28,7 +28,20 @@ public final class RuntimeArchiveTest {
             check(r.binaryBytes==80&&r.dataBytes==4&&r.sha256.length()==64&&r.bytes==good.length(),"metadata from archive contents");
             check(Arrays.equals(original,Files.readAllBytes(good.toPath())),"inspection never changes source");
             File renamed=root.resolve("wrong-name.bin").toFile();Files.copy(good.toPath(),renamed.toPath());check(RuntimeArchive.inspect(renamed,()->false).sha256.equals(r.sha256),"filename not authority");
-            for(String required:valid().keySet()){Map<String,byte[]> m=valid();m.remove(required);reject(()->RuntimeArchive.inspect(zip(root,m),()->false),"missing required file "+required);}
+            for(String required:new String[]{"pico-8/pico8_64","pico-8/pico8.dat"}){Map<String,byte[]> m=valid();m.remove(required);reject(()->RuntimeArchive.inspect(zip(root,m),()->false),"missing required file "+required);}
+            Map<String,byte[]> noReadme=valid();noReadme.remove("pico-8/readme_raspi.txt");
+            check(RuntimeArchive.inspect(zip(root,noReadme),()->false).binaryBytes==80,"documentation is optional");
+            for(String prefix:new String[]{"","pico-8/","pico-8_older/","new-version/runtime/"}){
+                Map<String,byte[]> moved=new LinkedHashMap<>();moved.put(prefix+"pico8_64",elf());moved.put(prefix+"pico8.dat",new byte[]{8,9});
+                RuntimeArchive.Result found=RuntimeArchive.inspect(zip(root,moved),()->false);
+                check(found.entry("pico8_64").equals(prefix+"pico8_64")&&found.entry("pico8.dat").equals(prefix+"pico8.dat"),"paired payload discovered regardless of folder or version");
+            }
+            Map<String,byte[]> split=valid();split.remove("pico-8/pico8.dat");split.put("other/pico8.dat",new byte[]{1});
+            reject(()->RuntimeArchive.inspect(zip(root,split),()->false),"data from another directory cannot complete a runtime");
+            Map<String,byte[]> multiple=valid();multiple.put("older/pico8_64",elf());multiple.put("older/pico8.dat",new byte[]{1});
+            reject(()->RuntimeArchive.inspect(zip(root,multiple),()->false),"multiple versions require explicit separate archive");
+            Map<String,byte[]> only32=valid();only32.remove("pico-8/pico8_64");byte[] arm32=elf();arm32[4]=1;arm32[18]=40;only32.put("pico-8/pico8",arm32);
+            reject(()->RuntimeArchive.inspect(zip(root,only32),()->false),"older ARM32-only archive not executable by ARM64 backend");
             for(String name:new String[]{"../outside","/absolute","pico-8/../outside","pico-8//file","pico-8\\file","C:/file","pico-8/./file","pico-8/\nfile"}){
                 Map<String,byte[]> m=valid();m.put(name,new byte[]{1});reject(()->RuntimeArchive.inspect(zip(root,m),()->false),"unsafe path");
             }

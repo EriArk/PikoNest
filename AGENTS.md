@@ -1,5 +1,14 @@
 # AGENTS.md — PikoNest contributor instructions
 
+Owner milestone decision (2026-11-02): target an alpha first. Ordinary Lua may
+be required beyond supported visual workflows; complete no-Lua genre creation is
+a later milestone. Keep the full-product requirements below as the long-term
+contract, not a claim of alpha completeness. Setup, source/data preservation,
+declared supported paths and the separate owner APK release gate remain required.
+Runtime import must not whitelist a PICO-8 version or outer archive filename;
+validate supported payload/architecture and distinguish inspection, preparation
+and actual execution. See [alpha scope](docs/ALPHA_SCOPE.md). Device use remains paused.
+
 This repository contains a working Android lab and product/architecture documents;
 it is not yet a complete creator. Treat this file as the primary implementation
 brief for Codex and other AI coding agents.

@@ -19,7 +19,7 @@ public final class RuntimeProbe {
         DataOutputStream out=new DataOutputStream(output);out.write("PIKORUN1".getBytes(StandardCharsets.US_ASCII));
         try(ZipFile zip=new ZipFile(zipFile)){
             for(String name:new String[]{"pico8_64","pico8.dat"}){
-                ZipEntry entry=zip.getEntry("pico-8/"+name);MessageDigest hash=digest();byte[] buffer=new byte[32768];
+                ZipEntry entry=zip.getEntry(checked.entry(name));MessageDigest hash=digest();byte[] buffer=new byte[32768];
                 try(InputStream in=zip.getInputStream(entry)){for(int n;(n=in.read(buffer))!=-1;){RuntimeArchive.check(cancelled);hash.update(buffer,0,n);}}
                 out.writeInt((int)entry.getSize());out.write(hash.digest());
                 try(InputStream in=zip.getInputStream(entry)){RuntimeArchive.copy(in,out,cancelled);}

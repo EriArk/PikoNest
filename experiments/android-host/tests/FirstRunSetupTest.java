@@ -6,9 +6,9 @@ public final class FirstRunSetupTest {
     static int checks;
     static void check(boolean value,String why){checks++;if(!value)throw new AssertionError(why);}
     static final class Port implements FirstRunSetup.Port {
-        int step,saves,games,runtime,leaves;boolean dismissed,fail;
+        int step,saves,games,creations,runtime,leaves;boolean dismissed,fail;
         public void save(int next,boolean later)throws Exception{if(fail)throw new Exception("disk full");step=next;dismissed=later;saves++;}
-        public void games(){games++;}public void runtime(){runtime++;}public void leave(){leaves++;}
+        public void games(){games++;}public void creations(){creations++;}public void runtime(){runtime++;}public void leave(){leaves++;}
     }
     public static void main(String[] args){
         for(boolean dismissed:new boolean[]{false,true})for(boolean pending:new boolean[]{false,true})for(boolean active:new boolean[]{false,true})
@@ -24,9 +24,11 @@ public final class FirstRunSetupTest {
         long third=s.beginCheck();s.checked(third,"Other","Access revoked");
         check(s.gamesName.equals("Games")&&s.gamesChecked&&s.problem.equals("Access revoked"),"failed replacement preserves previous accepted folder");
         s.act(Action.NEXT);check(s.step==1&&p.step==1&&!p.dismissed,"step persisted before moving");
-        check(s.body().contains("not active yet")&&s.status().contains("inside the app"),"intentions never presented as active external storage");
-        s.act(Action.CONFIRM);check(s.step==2&&p.runtime==0,"storage continuation does not launch runtime");
+        check(s.body().contains("choose and activate")&&s.status().contains("inside the app"),"internal default offers explicit external activation");
+        s.act(Action.CONFIRM);check(s.step==1&&p.creations==1&&!p.dismissed&&p.runtime==0,"storage action opens folders without dismissal or runtime launch");
+        s.act(Action.RIGHT);check(s.step==2&&p.runtime==0,"storage can be skipped");
         check(s.body().contains("Raspberry Pi ZIP"),"exact archive type explained");
+        check(s.body().contains("ARM64")&&s.body().contains("version and ZIP name can vary"),"archive guidance separates architecture from version");
         s.act(Action.CONFIRM);check(p.runtime==1&&!s.runtimePrepared,"runtime entry is not readiness");
         s.runtimePrepared=true;check(s.status().contains("optional test"),"prepared does not mean test passed");
         s.act(Action.RIGHT);check(s.step==3&&p.step==3,"finish is reachable without mandatory runtime");

@@ -55,7 +55,7 @@ public class RecoverableReplaceTest {
         check(session.cart().value(0)==3&&Arrays.equals(session.cart().bytes(),repo.read("moon-garden")),"real editor save through journaled provider model");
         session.act(WorkshopSession.Action.UNDO);check(Arrays.equals(raw,repo.read("moon-garden")),"real editor Undo exact bytes");session.act(WorkshopSession.Action.REDO);
         check(new WorkshopCartridge(repo.read("moon-garden")).value(0)==3,"reopen/export ordinary cart bytes");
-        FirstRunSetup setup=new FirstRunSetup(new FirstRunSetup.Port(){public void save(int n,boolean d){}public void games(){}public void runtime(){}public void leave(){}},1);setup.projectsExternal=true;check(setup.body().contains("external")&&setup.status().contains("assets: inside"),"onboarding describes split storage accurately");
+        FirstRunSetup setup=new FirstRunSetup(new FirstRunSetup.Port(){public void save(int n,boolean d){}public void games(){}public void creations(){}public void runtime(){}public void leave(){}},1);setup.projectsExternal=true;check(setup.body().contains("external")&&setup.status().contains("assets: inside"),"onboarding describes split storage accurately");
         System.out.println("RecoverableReplaceTest: "+checks+" checks passed");
     }
 }

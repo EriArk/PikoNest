@@ -1,5 +1,26 @@
 # Первый запуск: папки и официальный PICO-8
 
+## Alpha setup update — lab 0.0.92, 2 November 2026
+
+The guide now offers **Open creation folders** on step 2; it returns to Folders
+without dismissing setup. Choose Projects or Asset library, select a destination,
+then use Start for checked activation. Select in Folders reopens the saved guide
+step. Right/Next continues with internal storage instead. This is a connected
+entry to existing storage controls, not a new automatic migration wizard.
+
+Archive help names **Raspberry Pi ZIP with ARM64 support**, without a fixed version.
+Inspection discovers exactly one `pico8_64` and non-empty sibling `pico8.dat` in
+the ZIP root or any safe directory. It no longer requires `readme_raspi.txt`.
+Installation and probe transport use those exact inspected entries. Names and
+versions do not authorize execution; inspection, preparation and official Test
+remain separate. ARM32-only and desktop packages remain unsupported. There is no
+promise that every past/future runtime works with this Android environment.
+[Detailed archive policy and alpha gates](ALPHA_SCOPE.md#runtime-archive-policy).
+
+Local checks and host layout review are in [0.0.92 evidence](showcase/0.0.92-en/README.md).
+Device use is paused; independent first-run acceptance remains open. Historical
+sections below record earlier requirements and do not override this contract.
+
 ## Library location added in 0.0.91
 
 Folders → Asset library → Start now offers verified external library activation and

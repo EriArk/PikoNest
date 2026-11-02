@@ -4,6 +4,21 @@ Plain-language development updates for posts and the website, newest first.
 Version numbers below identify **development builds**, not public APK releases.
 There is no public APK release as of 2 November 2026.
 
+## 2026-11-02 — Alpha scope and flexible runtime setup (lab 0.0.92)
+
+- Set the first milestone to alpha, with Lua allowed beyond supported visual
+  workflows. Full no-Lua creation remains planned for later updates.
+- Removed the required readme and fixed inner-folder layout from runtime import.
+  A single ARM64 executable and its sibling data file are discovered by content;
+  outer filenames and version numbers are not whitelisted.
+- Connected discovered entries to both installation and isolated runtime probes.
+  Kept damaged/unsafe, ambiguous and unsupported-platform archives blocked.
+- Replaced fixed-version setup guidance and added Open creation folders to the
+  first-run guide, with optional continuation using internal storage.
+- Validation and limits: [local checks and host layout review](docs/showcase/0.0.92-en/README.md).
+  No console use, native install, old/new runtime execution matrix or public release.
+  Independent wizard acceptance and full backup/restore remain open.
+
 ## 2026-11-02 — External working library (lab 0.0.91)
 
 - Connected sprites, parameter presets and the shared sprite buffer to an independent

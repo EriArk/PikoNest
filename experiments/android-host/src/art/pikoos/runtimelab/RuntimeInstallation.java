@@ -62,7 +62,7 @@ final class RuntimeInstallation {
             for(String name:new String[]{"pico8_64","pico8.dat"}){
                 File target=new File(destination,name);
                 if(target.exists())throw new IOException("Runtime support unexpectedly contains purchased data");
-                try(InputStream in=zip.getInputStream(zip.getEntry("pico-8/"+name));FileOutputStream out=new FileOutputStream(target)){
+                try(InputStream in=zip.getInputStream(zip.getEntry(checked.entry(name)));FileOutputStream out=new FileOutputStream(target)){
                     RuntimeArchive.copy(in,out,cancelled);out.getFD().sync();
                 }
                 Os.chmod(target.getPath(),name.equals("pico8_64")?0500:0400);

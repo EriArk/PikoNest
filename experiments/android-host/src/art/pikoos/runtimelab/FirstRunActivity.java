@@ -33,6 +33,7 @@ public final class FirstRunActivity extends Activity {
                     startActivityForResult(intent,PICK);
                 }catch(Exception e){state.problem="Cannot open the Android folder picker. Try again.";}
             }
+            public void creations(){setResult(RESULT_OK,new Intent().putExtra("creationFolders",true));finish();}
             public void runtime(){startActivity(new Intent(FirstRunActivity.this,RuntimeSetupActivity.class));}
             public void leave(){finish();}
         },saved==null?progress.getInt("step",0):saved.getInt("step",0));

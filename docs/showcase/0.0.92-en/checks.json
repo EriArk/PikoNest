@@ -1,0 +1,20 @@
+{
+  "lab": "0.0.92",
+  "date": "2026-11-02",
+  "apk_sha256": "10d1db9cbfebf796c42408d0a88601c9967f58461084ece68c934dfe8ac0b3b7",
+  "core_suite_invocations": 89,
+  "RuntimeArchiveTest_synthetic": 44,
+  "RuntimeArchiveTest_with_supplied_archives": 46,
+  "RuntimeProbeTest": 19,
+  "FirstRunSetupTest": 42,
+  "android_compilation": "passed",
+  "integrated_packaging": "completed; signature and payload verified separately with exit 0",
+  "outer_logging_shell_exit": 1,
+  "outer_logging_shell_note": "PowerShell classified javac obsolete Java 8 stderr warnings as NativeCommandError; all build stages completed. No test or compiler failure recorded.",
+  "host_layout_review": true,
+  "native_visual_review": false,
+  "device_used": false,
+  "installed": false,
+  "runtime_execution": false,
+  "released": false
+}

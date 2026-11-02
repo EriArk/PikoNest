@@ -1,5 +1,16 @@
 # Приёмка полного цикла PikoNest
 
+## Alpha milestone — owner decision, 2 November 2026
+
+The first deliverable is an **alpha**. Lua may still be necessary for gameplay
+outside the supported visual paths; broader no-Lua creation follows in updates.
+This supersedes earlier statements requiring the whole no-Lua product before any
+first milestone. Full-product tasks/acceptance remain open, with no genre locked
+tools. Setup, data preservation, declared supported journeys and explicit owner
+APK publication approval still matter. [Alpha scope and gates](ALPHA_SCOPE.md).
+Handheld use remains paused. Next: verify backup/recovery locally, then complete
+first-run/runtime/provider/physical journeys when the owner permits device use.
+
 План проверок от 2026-10-03. **Все ACC-сценарии ниже пока открыты.** Отдельные
 операции уже доказаны в lab, но целые сценарии нельзя отмечать выполненными по
 существованию классов, экранов, образцов или ранее снятых скриншотов.

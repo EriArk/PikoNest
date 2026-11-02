@@ -11,13 +11,33 @@ setup live in one development APK; there is no public APK release yet.
 
 | Item | Current position |
 | --- | --- |
-| Stage | Early development; a small connected creation loop is demonstrated |
-| Android baseline | **0.0.91** built locally; **0.0.77** remains the last complete native creation journey |
-| Latest work | External working library alongside external Projects; device acceptance pending |
-| Current focus | Complete backup/restore; device journeys when permitted |
+| Stage | Alpha target; Lua remains necessary outside supported visual paths |
+| Android baseline | **0.0.92** built locally; **0.0.77** remains the last complete native creation journey |
+| Latest work | Flexible runtime archive import and clearer first-run entry; device acceptance pending |
+| Current focus | Alpha setup/data preservation; device journeys when permitted |
 | Platforms | Android first; Linux later |
 
-## Latest implementation: your reusable library in its own folder (0.0.91)
+## Alpha direction and setup changes (0.0.92)
+
+The first milestone is now an alpha: it will offer the existing player and tools,
+with Lua still needed for gameplay beyond the supported visual paths. Complete
+no-code creation for more genres will follow in updates. This is not publication
+approval. [Scope and remaining gates](docs/ALPHA_SCOPE.md).
+
+Runtime setup accepts supported Raspberry Pi ARM64 contents without requiring a
+particular ZIP name, version number, enclosing folder or readme. Multiple runtimes
+and incomplete/wrong-platform archives are refused. The guide explains the archive
+type without a fixed-version example and opens creation-folder settings directly.
+
+**Checked locally:** 89 core suites passed; integrated APK produced and its signature/content verified. Host previews were reviewed; no device use.
+
+Evidence and command outcomes are recorded in
+[0.0.92 evidence](docs/showcase/0.0.92-en/README.md). No handheld was used. The
+wizard still needs independent Android/provider/controller/novice acceptance;
+accepting archive structure is not proof that every old/new version runs.
+Full backup/recovery remains unfinished and is the next local block.
+
+## Previous implementation: your reusable library in its own folder (0.0.91)
 
 The library can now use a selected Android folder for sprites, tool settings and
 the shared sprite buffer. Naming, categories, favorites and reuse follow that
@@ -191,17 +211,16 @@ No public beta or release readiness is claimed.
 
 ## What comes next
 
-1. Complete a first-run path for folders and the correct purchased PICO-8 archive,
-   including preparation and recovery from errors without developer intervention.
-2. When console use is authorized, verify the collection/switch journeys, starters,
-   animation, audio and world/tile/camera editing, then repair observed UX findings.
-3. Finish remaining core tools, library reuse, contextual learning, storage/backup
-   and modern Android compatibility; verify supported screen/control configurations.
-4. Have a novice and the owner complete and review the intended paths, fix the
-   findings, then obtain separate approval for any public APK release.
+1. Finish the alpha's data-preservation path: complete backup/recovery alongside
+   the current setup and external storage controls.
+2. When console use is authorized, prove independent setup and the declared
+   Play/create/edit/Test/export journeys; fix observed usability problems.
+3. Document supported devices/runtime versions and remaining alpha limits, then
+   have the owner review the build and separately authorize any APK publication.
+4. Expand general rules, world/collision, animation/audio and reuse in updates
+   toward complete no-Lua creation. Full-product acceptance remains open.
 
-[ROADMAP](docs/ROADMAP.md) owns the sequence; [BACKLOG](docs/BACKLOG.md) owns task
-status. This summary does not replace either plan or waive acceptance gates.
+[ROADMAP](docs/ROADMAP.md) owns sequence; [BACKLOG](docs/BACKLOG.md) owns task status.
 
 ## Images for posts and the website
 
@@ -216,8 +235,8 @@ status. This summary does not replace either plan or waive acceptance gates.
 
 ## Short update to adapt for a post
 
-PikoNest now has two small starting games you can make your own: collect stars
-or solve a lamp puzzle. Their sprites, rules, sounds and scenery use the same
-tools as a blank project. Optional help explains an action and opens its editor.
-Local checks and the Android build pass; handheld and beginner review are still
-ahead. Next is making first-time setup work without developer help.
+We are aiming for a PikoNest alpha first. It will include the existing player and
+workshop, while more advanced game logic may still need Lua. Runtime setup now
+checks supported Raspberry Pi contents without tying the import to one ZIP name
+or version. The guide also leads directly to creation-folder settings. Local
+checks are recorded; handheld and beginner setup review are still ahead.

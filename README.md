@@ -7,17 +7,19 @@ safe. [Device checks and remaining setup/migration work](docs/showcase/0.0.71-en
 
 **A tiny PICO-8 home and game-making workshop for handhelds.**
 
-**Early development · Android first · No public APK release yet.**
-The working lab includes Play, project workflows and several editors. The complete
-game-creation workflow is still being built. Playing requires your own purchased
+**Working toward an alpha · Android first · No public APK release yet.**
+The working lab includes Play, project workflows and several editors. The first
+alpha will still require Lua beyond its supported visual workflows; broader no-code
+creation will arrive in later updates. [Alpha scope](docs/ALPHA_SCOPE.md). Playing requires your own purchased
 copy of official PICO-8; this project does not supply it.
 
 [Project status](PROJECT_STATUS.md) · [Development changelog](CHANGELOG.md) —
 plain-language progress, next steps and links to images for posts and the website.
 
-Latest code: [music composition and shared audio editing (0.0.83)](docs/showcase/0.0.83-en/README.md).
-Local tests and packaging passed; new Game view/animation/audio device checks and images
-are pending. The completed native creation evidence is linked below.
+Latest code: [alpha setup and flexible runtime archives (0.0.92)](docs/showcase/0.0.92-en/README.md).
+Runtime ZIP names and versions are not pinned; the current backend needs the
+Raspberry Pi ARM64 payload. Local checks do not replace device/setup acceptance.
+The completed native creation evidence is linked below.
 
 [Build two small games without opening Lua](docs/showcase/0.0.77-en/README.md) |
 [Draw and place directly in Game view](docs/showcase/0.0.76-en/README.md) |

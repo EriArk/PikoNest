@@ -6,7 +6,7 @@ import art.pikoos.lab.core.WorkshopSession.Action;
 public final class FirstRunSetup {
     public interface Port {
         void save(int step, boolean dismissed) throws Exception;
-        void games(); void runtime(); void leave();
+        void games(); void creations(); void runtime(); void leave();
     }
     public final Port port;
     public int step;
@@ -22,7 +22,7 @@ public final class FirstRunSetup {
         if(busy)return;
         if(a==Action.NEXT||a==Action.RIGHT){move(1);return;}
         if(a==Action.PREVIOUS||a==Action.LEFT){move(-1);return;}
-        if(a==Action.CONFIRM){if(step==0)port.games();else if(step==2)port.runtime();else if(step==3)leave();else move(1);}
+        if(a==Action.CONFIRM){if(step==0)port.games();else if(step==1)port.creations();else if(step==2)port.runtime();else leave();}
         if(a==Action.CONTEXT&&step==2)port.runtime();
     }
     private void move(int delta){
@@ -45,8 +45,8 @@ public final class FirstRunSetup {
         if(step==0)return "Connect a folder of PICO-8 games for the Play shelf. Your original files stay unchanged. No games yet? Continue and try a starter.";
         if(step==1&&libraryExternal)return (projectsExternal?"Projects and library use their selected external workspaces.":"The library uses its selected external workspace; projects stay inside PikoNest.")+" Splore, settings, drafts and recovery records remain inside the app. Keep the app installed.";
         if(step==1&&projectsExternal)return "Projects use your selected external workspace. Assets and Splore still stay inside PikoNest. Keep the app installed: settings, drafts and save recovery records remain inside it.";
-        if(step==1)return "Projects, reusable assets and Splore downloads currently stay inside PikoNest. Export important games before uninstalling. External project and library folders are not active yet.";
-        if(step==2)return "Choose the Raspberry Pi ZIP from your PICO-8 purchase page. PikoNest checks and prepares it inside this app. You can create now and set up play later.";
+        if(step==1)return "Projects and assets currently stay inside PikoNest. Open Folders to choose and activate their external workspaces, or continue with Right. Splore, settings and drafts stay inside the app. Keep the app installed. Reopen this guide with Select in Folders.";
+        if(step==2)return "Choose the Raspberry Pi ZIP with ARM64 support from your PICO-8 purchase page. The version and ZIP name can vary. Preparation checks files; Test checks playback. You can create now and set up play later.";
         return "Browse games in Play, or open Workshop to make your own. Setup is always available from Folders. Runtime preparation does not confirm picture, sound or controls.";
     }
     public String status(){
@@ -56,5 +56,5 @@ public final class FirstRunSetup {
         if(step==2)return runtimePrepared?"Prepared / optional test available":"Play needs your purchased runtime";
         return runtimePrepared?"Runtime prepared / try a game":"You can create / set up play later";
     }
-    public String primary(){return step==0?"Choose games folder":step==1?"Continue":step==2?"Set up PICO-8":"Enter PikoNest";}
+    public String primary(){return step==0?"Choose games folder":step==1?"Open creation folders":step==2?"Set up PICO-8":"Enter PikoNest";}
 }
