@@ -1,0 +1,18 @@
+[
+  {
+    "cart": "plate-audio.p8",
+    "result": "Generated plate Lua: 10601 checks passed (desktop Lua, not official PICO-8)"
+  },
+  {
+    "cart": "plate-goal.p8",
+    "result": "Generated plate Lua: 10593 checks passed (desktop Lua, not official PICO-8)"
+  },
+  {
+    "cart": "plate-starts-open.p8",
+    "result": "Generated plate Lua: 10599 checks passed (desktop Lua, not official PICO-8)"
+  },
+  {
+    "cart": "plate.p8",
+    "result": "Generated plate Lua: 10599 checks passed (desktop Lua, not official PICO-8)"
+  }
+]

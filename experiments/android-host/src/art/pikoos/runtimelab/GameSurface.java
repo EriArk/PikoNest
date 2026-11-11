@@ -153,23 +153,29 @@ final class GameSurface {
     }
     private void worldEditor(String yes,String back){
         GameCanvas g=game();WorldEditor e=g.world;if(e.art!=null){tileArtEditor(yes,back);return;}boolean grid=e.page==WorldEditor.Page.PAINT||e.page==WorldEditor.Page.TILES;
-        boolean wide=width>=540;float top=104,bottom=height-100;
-        float side=grid?Math.min(width-32,bottom-top-36):wide?Math.min(width*.43f,bottom-top-110):100;
+        boolean compact=e.page==WorldEditor.Page.WALL||e.page==WorldEditor.Page.PASSAGE||e.page==WorldEditor.Page.PASSAGE_TARGET;boolean wide=width>=540;float top=104,bottom=height-100;
+        float side=grid?Math.min(width-32,bottom-top-36):compact?100:wide?Math.min(width*.43f,bottom-top-110):100;
         float left=grid?(width-side)/2:16,listX=wide&&!grid?side+40:16,listY=wide&&!grid?top:top+side+24,listW=width-listX-48;
+        if(compact){listX=16;listY=top+172;listW=width-64;}
         int[] indices=e.image(),colors=new int[16384];for(int n=0;n<colors.length;n++)colors[n]=PicoPalette.COLORS[indices[n]];
         bitmap.setPixels(colors,0,128,0,0,128,128);RectF area=new RectF(left,top,left+side,top+side);canvas.drawBitmap(bitmap,null,area,paint);outline(left-1,top-1,side+2,side+2,13);
-        text(e.world.width/16+" x "+e.world.height/16+" screens / "+(e.world.tiles?"Map on":"Map hidden"),16,87,18,6,width-32);
+        text(e.world.width/16+"x"+e.world.height/16+" / "+(e.world.tiles?"Map on":"Map hidden")+" / Walls: "+e.world.wallCount(),16,87,18,6,width-32);
+        if(!grid&&e.page==WorldEditor.Page.WALL){float unit=side/16;for(int cy=0;cy<16;cy++)for(int cx=0;cx<16;cx++){int wx=e.previewX()/8+cx,wy=e.previewY()/8+cy;if(e.tile(wx,wy)==e.wallTile())outline(left+cx*unit,top+cy*unit,unit,unit,9);}}
+        if(compact&&e.page!=WorldEditor.Page.WALL)outline(left+(e.brush.x*8-e.previewX())*side/128,top+(e.brush.y*8-e.previewY())*side/128,side/16,side/16,12);
         if(grid){
             float cell=side/16;boolean tiles=e.page==WorldEditor.Page.TILES;int selected=tiles?e.brush.choice:(e.brush.y-e.top())*16+e.brush.x-e.left();
             for(int n=0;n<256;n++){final int index=n;float x=left+(n%16)*cell,y=top+(n/16)*cell;
                 if(!tiles){rect(x,y,cell,1,5);rect(x,y,1,cell,5);}
-                hits.add(new Hit(x,y,cell,cell,()->{if(tiles)e.brush.choice=index;else{e.point(e.left()+index%16,e.top()+index/16);e.paint();}changed();}));
+                if(tiles?e.world.walls[n]:e.wallAt(e.left()+n%16,e.top()+n/16))outline(x+1,y+1,cell-2,cell-2,9);
+                if(!tiles&&e.world.passage(e.left()+n%16,e.top()+n/16)!=null)outline(x+2,y+2,cell-4,cell-4,12);
+                hits.add(new Hit(x,y,cell,cell,()->{if(tiles)e.brush.choice=index;else{e.point(e.left()+index%16,e.top()+index/16);act(Action.CONFIRM);}changed();}));
             }
             outline(left+selected%16*cell,top+selected/16*cell,cell,cell,10);
-            text(tiles?"Tile "+e.brush.choice+(e.brush.choice==0?" / Empty":" / A keeps it"):(e.brush.tile==0?"Eraser":"Tile "+e.brush.tile)+" at "+e.brush.x+", "+e.brush.y,left,top+side+26,18,7,side);
+            text(tiles?"Tile "+e.brush.choice+(e.brush.choice==0?" / Empty":e.world.walls[e.brush.choice]?" / Wall":" / Walkable"):(e.brush.tile==0?"Eraser":"Tile "+e.brush.tile+(e.world.walls[e.brush.tile]?" / Wall":""))+" at "+e.brush.x+", "+e.brush.y,left,top+side+26,18,7,side);
         }else{
             float sx=wide?16:left+side+16,sy=wide?top+side+28:top+18,sw=wide?side:width-sx-16;
-            wrap(e.summary(),sx,sy,sw,wide?Math.max(1,(int)((bottom-sy)/26)):4);
+            if(compact){sx=left+side+16;sy=top+18;sw=width-sx-16;}
+            wrap(e.summary(),sx,sy,sw,compact?6:wide?Math.max(1,(int)((bottom-sy)/26)):4);
             String[] rows=g.rows();int visible=Math.max(1,(int)((bottom-listY)/50)),first=Math.max(0,Math.min(Math.max(0,rows.length-visible),g.focus-visible/2));
             for(int n=first;n<Math.min(rows.length,first+visible);n++){final int row=n;float y=listY+(n-first)*50;
                 button(rows[n],listX,y,listW,48,g.focus==n,()->{if(e.editing){if(row==g.focus)act(Action.RIGHT);return;}g.focus=row;act(Action.CONFIRM);});

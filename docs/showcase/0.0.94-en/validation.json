@@ -1,0 +1,34 @@
+{
+  "recorded": "2026-11-10",
+  "source_lab": "0.0.94",
+  "base_commit": "ac22d1088ae86081fafd532089c0327217573002",
+  "core_suites": 92,
+  "wall_workflow_checks": 17003,
+  "desktop_lua_checks": {
+    "maze": 8706,
+    "animated": 8711,
+    "hidden": 8706
+  },
+  "android_source_compilation": "JDK 21.0.13; --release 8; Android Platform 34",
+  "official_pico8_execution": false,
+  "device_actions": false,
+  "physical_input_acceptance": false,
+  "images": "Production GameSurface rendered through Java2D stubs; configured from the controller-action test cart. Host previews, not Android screenshots.",
+  "files": {
+    "animated.p8": "6b7f125dcaeef0207555912dccab0c7499346f26a8bc99c90896186ea6f7dcc5",
+    "hidden.p8": "163e3f6ca9288ad6f2c16fabd62ac8c640cb95dd0d7eacd5111634e5df3dfbcb",
+    "maze.p8": "abd2cf266865197ae360a99e87e6aad52a36c4d8d8e56251028e0cb8e6049c10",
+    "wall-map-620x540.png": "81d060c8dd1f728de98e937bc5a1e3e16ac62cf137e8ef1e1c6df829b30c1c66",
+    "wall-rule-360x480.png": "e2423ff41bc8ecdeb2d5867f43a8783bacfefa0813813a905959e4e7faff8d3c",
+    "wall-rule-620x540.png": "33e94f37e37b701af4ff3a7b8732e73723c49d48820c6ef1fcb22c9856f89401"
+  },
+  "package": "package.json",
+  "source_sha256": {
+    "experiments/android-host/AndroidManifest.xml": "8b30f1cbd372473651873e15540913d8c846a54e6d48888125bd0483f6ea761b",
+    "experiments/android-host/core/art/pikoos/lab/core/PlayWorld.java": "91b0ec9d92448940eb364b79ee89487c8a88e6856d37dd015bb2065082a84c23",
+    "experiments/android-host/core/art/pikoos/lab/core/PlayModel.java": "dc908ddee3dcb21f2a77c7a631d7cb695c00cd6e401addcde358b987acadc666",
+    "experiments/android-host/core/art/pikoos/lab/core/WorldEditor.java": "cb8a36b7f48765b1dfa68ad37280fff90e4a87072300916209d4349f2dfd6964",
+    "experiments/android-host/core/art/pikoos/lab/core/GameCanvas.java": "e67521b7178c0090a557ed5580b43442741039f18fb81dbb3ff56506ffd9c7e5",
+    "experiments/android-host/src/art/pikoos/runtimelab/GameSurface.java": "a9ed2036dff82a21871fb62511001e905c0c70e1880ed4592447c275a1c9b136"
+  }
+}

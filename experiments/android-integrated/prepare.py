@@ -104,7 +104,7 @@ config = (app/'apktool.yml').read_text(encoding='utf-8')
 config = config.replace('minSdkVersion: 24','minSdkVersion: 26')
 config = config.replace('versionCode: 1','versionCode: '+host.get(a('versionCode')))
 config = config.replace('versionName: 1.6.6','versionName: '+host.get(a('versionName')))
-if beta: config=config.replace('versionName: '+host.get(a('versionName')), 'versionName: 0.1.0-beta.1')
+if beta: config=config.replace('versionName: '+host.get(a('versionName')), 'versionName: 0.1.0-beta.2')
 (app/'apktool.yml').write_text(config,encoding='utf-8')
 
 # The host prepares a verified package before Godot starts. Do not invoke upstream

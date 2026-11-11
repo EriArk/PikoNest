@@ -70,6 +70,9 @@ Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'SoundWorkflowT
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'MusicDataTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'MusicWorkflowTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'WorldWorkflowTest')
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'WallWorkflowTest',$pikoRoot)
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'PassageWorkflowTest',$pikoRoot)
+Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'PlateWorkflowTest',$pikoRoot)
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'TileWorkflowTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'StarterWorkflowTest')
 Invoke-PikoTool $pikoJava @('-cp',(Join-Path $pikoBuild 'tests'),'GameAnimationTest',$pikoRoot)
@@ -163,7 +166,7 @@ if (-not $Beta -and -not (Test-Path -LiteralPath $pikoKey)) {
     Invoke-PikoTool (Join-Path $JdkRoot 'bin\keytool.exe') @('-genkeypair','-keystore',$pikoKey,'-storepass','android','-keypass','android','-alias','pikoos-lab','-keyalg','RSA','-keysize','2048','-validity','3650','-dname','CN=PIKOOS Runtime Lab')
 }
 $pikoApk = Join-Path $pikoArtifacts 'pikoos-runtime-lab.apk'
-if($Beta){$pikoApk=Join-Path $pikoArtifacts 'PikoNest-0.1.0-beta.1.apk'}
+if($Beta){$pikoApk=Join-Path $pikoArtifacts 'PikoNest-0.1.0-beta.2.apk'}
 if($ValidationOnly){$pikoApk=Join-Path $pikoArtifacts 'pikonest-clean-validation.apk'}
 if(-not $HostOnly) {
     & (Join-Path $pikoRoot 'experiments\android-integrated\package.ps1') -Dex (Join-Path $pikoBuild 'dex\classes.dex') -Output $pikoApk -JdkRoot $JdkRoot -SdkRoot $SdkRoot -ValidationOnly:$ValidationOnly -Beta:$Beta -SigningKeystore $SigningKeystore

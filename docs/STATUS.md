@@ -1,5 +1,38 @@
 # Состояние PikoNest
 
+**2026-11-11 — Beta 2, lab 0.0.96:** pressure plates derive On/Off from overlap
+with a selected element, drive passage links and state animation/goal, and trigger
+press SFX on a rising edge. Ordinary Lua, no mandatory hero or runtime extension.
+Journal v14 retains older recovery including v13 interaction Cancel. 94 core suites,
+final 16,442-check plate suite and four desktop Lua variants passed. Retroid update
+preserved 58 project/five library files. Native Blank game, draft Test/return,
+Save/Undo/Redo/reopen/export and independent win/restart passed; official probe
+passed 13 checks. Owner explicitly authorized beta-2 publication. Physical/audio,
+novice and broader acceptance remain open. [Exact evidence](release/beta2/README.md).
+
+**2026-11-10 — Lab 0.0.95, switch-operated passages:** existing toggles open
+selected wall cells to empty when On or Off. Up to 32 cell bindings share the world
+draft; closing waits for moving rectangles to leave. Restart restores initial
+states through ordinary mset calls. Linked resources/targets are protected, earlier
+object deletion reindexes references, and stale external-map bindings can be removed.
+Journal v13 reads older drafts; real v11/v12 fixtures and settings/animation recovery
+are covered. 93 core suites passed; the final focused passage suite passed 17,235
+checks. Five generated carts pass desktop-Lua gameplay/closure checks. Android
+source compilation, host layouts and local APK packaging are recorded separately
+from official-runtime/device acceptance. [Evidence](showcase/0.0.95-en/README.md).
+
+**2026-11-10 — Lab 0.0.94, functional wall-tile authoring:** World map options and
+the tile picker can mark a tile type as wall/walkable with all-use review. Bounded
+moving elements stop at tile edges and slide along walls; optional wall rules emit
+ordinary Lua without taking sprite flags. Tile copies retain the rule and can be
+made walkable independently. One world Save/Undo, isolated Test and journal v12
+include wall rules; v1–11 remain readable. Unknown Lua stays protected.
+92 portable suites passed, including the new 17,003-check workflow; emitted Lua
+passed desktop-Lua collision/gameplay checks, including animation/audio bindings.
+Android source compilation and compact/wide host rendering passed. These are not
+official-runtime, physical or Android-lifecycle acceptance. The owner paused device
+access and requested functional work first. [Evidence](showcase/0.0.94-en/README.md).
+
 **2026-11-02 — First public early beta:** the owner explicitly approved the exact
 installed APK and its disclosed limitations. [Release 0.1.0-beta.1](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.1).
 Physical/audio, wider-device, provider/interruption and multicart checks remain

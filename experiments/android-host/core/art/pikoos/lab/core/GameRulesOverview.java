@@ -14,7 +14,7 @@ public final class GameRulesOverview {
     public final List<Entry> entries=new ArrayList<>();
     public static String goalName(int goal){return new String[]{"No automatic win","Collect all items","All switches on"}[goal];}
     public static String goalDescription(PlayModel model,int goal){
-        int count=0;for(PlayModel.Element e:model.elements)if(e.rule==(goal==1?1:4))count++;
+        int count=0;for(PlayModel.Element e:model.elements)if(e.rule==(goal==1?1:4)||goal==2&&e.rule==5)count++;
         if(goal==0)return "No automatic goal. Contact win / lose rules still apply. X restarts.";
         if(count==0)return goal==1?"No collect rules yet. Give an element Collect this in Behavior.":"No switches yet. Give an element Toggle switch in Behavior.";
         return goal==1?"Win after collecting "+count+(count==1?" item.":" items.")+" Only Collect interactions count.":"Win when all "+count+(count==1?" switch is on.":" switches are on.")+" Linked switches count too.";
@@ -25,8 +25,8 @@ public final class GameRulesOverview {
         for(int n=0;n<model.elements.size();n++){
             PlayModel.Element e=model.elements.get(n);String name=labels.get(n);boolean any=false;
             if(e.movement!=0){any=true;entries.add(new Entry(Kind.MOVEMENT,n,name+"\nMove: "+PlayModel.MOVEMENT[e.movement],name+" moves "+(e.movement==2?"left / right":e.movement==3?"up / down":"in all directions")+" at "+e.speed+" px per step."));}
-            if(e.rule!=0){any=true;String description=e.rule==4?"O toggles "+name+(e.neighbor>=0?" + "+labels.get(e.neighbor):"")+".":labels.get(e.target)+" touches "+name+": "+new String[]{"","collect once","win","lose"}[e.rule]+".";
-                entries.add(new Entry(Kind.INTERACTION,n,name+"\n"+new String[]{"","Collect on contact","Win on contact","Lose on contact","Toggle switch"}[e.rule],description));}
+            if(e.rule!=0){any=true;String description=e.rule==5?name+" is on while "+labels.get(e.target)+" overlaps it.":e.rule==4?"O toggles "+name+(e.neighbor>=0?" + "+labels.get(e.neighbor):"")+".":labels.get(e.target)+" touches "+name+": "+new String[]{"","collect once","win","lose"}[e.rule]+".";
+                entries.add(new Entry(Kind.INTERACTION,n,name+"\n"+new String[]{"","Collect on contact","Win on contact","Lose on contact","Toggle switch","Pressure plate"}[e.rule],description));}
             if(e.animation!=null){any=true;entries.add(new Entry(Kind.ANIMATION,n,name+"\nAnimation: "+e.animation.frames.size()+" frames",name+": "+new String[]{"looping animation","animate while moving","animate while switched on"}[e.animation.mode]+". Edit frames or timing."));}
             if(!any)entries.add(new Entry(Kind.ADD,n,name+"\nAdd behavior","No movement or interaction yet. Choose what "+name+" does."));
         }

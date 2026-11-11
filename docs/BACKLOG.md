@@ -1,5 +1,33 @@
 # PikoNest — задачи полного цикла
 
+**2026-11-11 — N02 / G04 / UX08 partial, beta 2 (lab 0.0.96):** contact-driven
+plates now control wall passages, state animation, press audio and the all-on goal.
+94 core suites and focused recovery/gameplay checks passed. Owner-authorized native
+Blank creation through export/win/restart and preserved update are demonstrated.
+This advances bounded M1/M2 journeys without closing full no-Lua or physical/novice
+acceptance. Next: beta feedback/deferred checks, then richer state/event scenarios.
+[Evidence and limits](release/beta2/DEVICE_ACCEPTANCE.md).
+
+**2026-11-10 — N02 / G04 / UX08 partial, lab 0.0.95:** per-cell switch
+passages now connect existing toggles to wall maps, including On/Off selection,
+multiple linked cells, occupancy-safe closing, reset, preserved data, protected
+references, 32-step draft history and v13 recovery. 93 local core suites, emitted
+Lua and host layouts are checked. This does not close M1/M2 or establish official
+runtime/device/owner acceptance. Global switch selection still shares left/right
+with movement. Contact-driven activation/pressure plates remain proposed next work.
+[Evidence](showcase/0.0.95-en/README.md).
+
+**2026-11-10 — N02 / G04 / UX08 partial, lab 0.0.94:** connected wall-tile
+creation and editing in the world/map workflow. Wall/walkable applies to a reviewed
+tile type, with an independent-copy path for a single cell. Ordinary table/mget Lua,
+pixel-step edge collision, source recognition, safe starting placement, protected
+resource allocation, source-checked draft recovery and one Save/Undo are implemented.
+92 core suites plus desktop emitted-Lua checks and host UI previews pass; the
+handheld is unavailable. Official PICO-8 performance/execution, native UI, physical
+controls and owner acceptance remain open. [Evidence](showcase/0.0.94-en/README.md).
+Functional creation is now the owner's first priority; this does not close M1/M2
+or provide physics, dynamic doors, arbitrary Lua conversion or a new release.
+
 **2026-11-02 — Early-beta publication approved:** the owner accepted the installed
 candidate and documented limits. First release: `v0.1.0-beta.1`. This closes only
 the publication decision, not Q/UX/storage/core-tool tasks with unfinished scope.

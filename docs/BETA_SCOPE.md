@@ -1,5 +1,12 @@
 # First early Android beta
 
+**Current beta, 11 November 2026:** the owner reauthorized Retroid use and explicitly
+requested finishing and publishing **0.1.0-beta.2**. It adds walls, linked passages
+and pressure plates, with a complete native Blank → Test → Save → export → win /
+restart journey and verified preserved update. [Exact scope](release/beta2/README.md).
+Earlier beta-1 preparation/approval below is history. Publication does not close
+physical, audible, novice, provider or wider-device acceptance, or approve later APKs.
+
 **Publication decision, 2 November 2026:** the owner explicitly approved the exact
 installed `0.1.0-beta.1` with the declared limitations. The prior publication list
 below is retained as preparation history; remaining checks are deliberately deferred

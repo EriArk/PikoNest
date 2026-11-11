@@ -1,0 +1,16 @@
+{
+  "version": "0.0.95",
+  "version_code": 95,
+  "sha256": "dd44ada60b78809d40c996c345d8a1a5bf0990090786e22f581499440da977fd",
+  "bytes": 52110545,
+  "base_apk_sha256": "e496a14cc5751232850fa76b393f99ce9b5fb88668c9dbb6a8317ffc2cda224f",
+  "unchanged_payload_entries": 385,
+  "sdk_platform": 34,
+  "build_tools": "36.0.0",
+  "alignment": 16384,
+  "certificate_matches_beta1": true,
+  "installed": false,
+  "published": false,
+  "compiled_host_dex_sha256": "4412b214c3ea0c05bd8225270a5a7e0c835589c68f71591196d02cafd361bbe3",
+  "compiled_host_dex_matches_apk": true
+}

@@ -46,7 +46,7 @@ public final class PlayModelTest {
             row(s,3);row(s,3);row(s,1);check(s.game.play.elements.size()==2,"unreferenced item removable");
             sprite(s,40,80);check(s.game.play.elements.size()==3&&s.game.play.elements.get(2).rule==0,"add after behavior preserves existing rules");
             behavior(s,2);field(s,2,4);field(s,4,1);row(s,s.game.rows().length-2);check(s.game.play.elements.get(2).on==1,"switch starts on");
-            for(int n=0;n<2;n++){behavior(s,n);field(s,2,4);row(s,s.game.rows().length-2);}
+            for(int n=0;n<2;n++){behavior(s,n);field(s,2,4-s.game.settings.elements.get(n).rule);row(s,s.game.rows().length-2);}
             s.game.configure(false);field(s,0,1);row(s,2);check(s.game.play.goal==2,"switch goal");
             behavior(s,0);field(s,5,1);row(s,s.game.rows().length-2);
             check(s.game.play.elements.get(0).neighbor==1,"linked switch saved");

@@ -1,5 +1,22 @@
 # Game view: behavior and game rules
 
+## Pressure plates (beta 2 / lab 0.0.96)
+
+In Behavior choose **On contact / press → Pressure plate → Pressed by** and select
+another existing element. Save. The plate stays On while both visible image
+rectangles overlap, and turns Off after separation; edge contact alone stays Off.
+No hero or moving element is created automatically, and manual O selection does
+not toggle the plate. Each plate currently accepts one selected activator.
+
+Use that plate in **World & camera → Paint map → Options → Switch passage here**.
+Choose whether On or Off opens the wall cell. Existing state animation, press SFX
+and the all-switches-on goal accept the plate; SFX fires once on entry, not while
+held or during initialization. Initial overlap also sets its starting state.
+Deleting its activator requires changing the relationship first.
+
+The native Blank-to-export journey ran in official PICO-8 on Retroid; broader
+physical/audio/novice acceptance remains open. [Evidence](release/beta2/DEVICE_ACCEPTANCE.md).
+
 Lab 0.0.77 adds a bounded creation path to the existing native Game view.
 This is an ordinary PICO-8 Lua recipe, not a new runtime, universal entity
 model or promise to visually edit arbitrary Lua. All tools remains reachable.
@@ -116,8 +133,15 @@ The authoritative data is the `.p8`: numeric initial values, ordinary `_init`,
 `_update`, `_draw`, `btn`, `sspr`, rectangle overlap and drawing calls. Input edges
 are tracked explicitly because `btnp` has held-button repeat. Restart calls
 `_init`; it resets this recipe's game state, not every possible PICO-8 subsystem.
-Movement runs at `_update`'s 30 updates per second, stops at screen edges, and
-does not implement tile collision, physics or continuous collision detection.
+Movement runs at `_update`'s 30 updates per second and stops at screen/world edges.
+Lab 0.0.94 adds optional [wall tiles](WORLD_EDITOR.md#wall-tiles-lab-0094): ordinary
+Lua resolves movement in one-pixel steps against map tile edges, with full image
+rectangles. Existing carts without wall rules keep their original movement code.
+Lab 0.0.95 connects existing toggles to [individual map passages](WORLD_EDITOR.md#switch-operated-passages-lab-0095).
+On/Off opens chosen cells to empty; closing waits for moving elements to leave.
+The exported map stays closed; ordinary `mset` updates runtime state and restart
+reapplies initial switch states. Global switch selection remains left/right + O.
+Physics, slopes and continuous sprite-contact collision detection remain absent.
 Contacts run after all movement, in placement order; the first outcome wins.
 
 Reopening verifies the complete generated source by reconstructing and comparing
@@ -131,7 +155,7 @@ Lab 0.0.78 adds [editable frame sequences and movement/switch-state bindings](GA
 Current editor limits: 16 placements; speed 1–4 pixels per update; one contact
 or toggle rule per placement; one optional linked switch; fixed rectangular
 graphics; a solid background; fixed outcome text. These are PikoNest limitations,
-not limits of PICO-8. Maps, music events, richer conditions,
+not limits of PICO-8. Richer map interactions, music events, conditions,
 score/lives customization and library insertion still need connections to this
 creation path. Existing advanced tools remain available, but arbitrary code
 changes can take a project outside the recognized Game view subset.

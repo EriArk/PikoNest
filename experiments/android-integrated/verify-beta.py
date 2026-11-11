@@ -6,7 +6,7 @@ repo=Path(__file__).resolve().parents[2]
 badging=subprocess.check_output([str(aapt),'dump','badging',str(apk)],text=True)
 manifest=subprocess.check_output([str(aapt),'dump','xmltree',str(apk),'AndroidManifest.xml'],text=True)
 assert "package: name='art.pikoos.runtimelab'" in badging
-assert "versionName='0.1.0-beta.1'" in badging
+assert "versionName='0.1.0-beta.2'" in badging
 assert "sdkVersion:'26'" in badging and "targetSdkVersion:'28'" in badging
 assert 'application-debuggable' not in badging
 assert badging.count('launchable-activity:')==1

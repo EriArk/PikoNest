@@ -7,9 +7,13 @@ PikoNest brings **Play, Workshop and runtime setup into one APK**, built around
 handheld controls and the PICO-8 palette. You supply your purchased official
 PICO-8 runtime; it is never bundled with the app.
 
-**[Download the first early beta — 0.1.0-beta.1](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.1).**
+**[Download early beta 2 — 0.1.0-beta.2](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.2).**
 One APK, checked on Retroid Pocket Classic. More ambitious gameplay can still
-require Lua. [Tested scope and limits](docs/release/beta1/DEVICE_ACCEPTANCE.md).
+require Lua. [Tested scope and limits](docs/release/beta2/DEVICE_ACCEPTANCE.md).
+
+**New in beta 2:** paint walls, link passages to switches or pressure plates,
+and create a small win/restart game from Blank without editing Lua.
+[Native journey and screenshots](docs/showcase/beta2-en/README.md).
 
 [Project status](PROJECT_STATUS.md) · [Changelog](CHANGELOG.md) ·
 [Roadmap](docs/ROADMAP.md) · [Build and contribute](CONTRIBUTING.md) ·
@@ -57,7 +61,7 @@ general tools remain available in every project.
 <tr><td>Try a tiny collection game.</td><td>Or make a puzzle without a hero.</td></tr>
 </table>
 
-*All pictures above are unmodified captures from the current Android candidate,
+*All pictures above are unmodified captures from the first early beta,
 not mockups. [Captions, provenance and downloadable PNG pack](docs/showcase/beta1-en/README.md).*
 
 The workshop includes sprite/map editing, animation, cameras, backgrounds, rules,
@@ -80,7 +84,7 @@ journeys remain open. [Backup guide](docs/BACKUP_RESTORE.md).
 
 ## Getting started
 
-1. Download the APK from the [GitHub release](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.1). Update an existing installation
+1. Download the APK from the [GitHub release](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.2). Update an existing installation
    **in place**; do not uninstall it to update. There is one PikoNest icon and no
    separate helper app.
 2. Import your purchased **PICO-8 Raspberry Pi ZIP containing `pico8_64` (ARM64)**.

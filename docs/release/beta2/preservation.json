@@ -1,0 +1,12 @@
+{
+  "before_files": 355,
+  "after_files": 355,
+  "missing": 0,
+  "project_files_unchanged": 58,
+  "library_files_unchanged": 5,
+  "changed_categories": [
+    "pikonest-backup-v1.txt",
+    "preferences",
+    "runtime"
+  ]
+}

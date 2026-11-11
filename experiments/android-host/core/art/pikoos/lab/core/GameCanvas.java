@@ -107,7 +107,7 @@ public final class GameCanvas {
         if(screen==Screen.GOAL&&focus<3){PlayModel preview=settings.copy();preview.goal=focus;return preview;}
         if(screen==Screen.CHOICE&&focus<rows().length-1){
             PlayModel preview=settings.copy();if(choiceField==0)preview.elements.get(selected).movement=focus;
-            else{if(focus>=1&&focus<=3)throw new IllegalArgumentException("Confirm this interaction and choose who touches the element before Test.");preview.elements.get(selected).rule=focus;}return preview;
+            else{if(PlayModel.touchRule(focus))throw new IllegalArgumentException("Confirm this interaction and choose who touches the element before Test.");preview.elements.get(selected).rule=focus;}return preview;
         }
         if(screen!=Screen.RELATION||focus>=relationshipChoices().length)return settings;
         PlayModel preview=settings.copy();PlayModel.Element e=preview.elements.get(selected);int other=relationshipChoices()[focus];
@@ -117,7 +117,7 @@ public final class GameCanvas {
         if(screen==Screen.RELATION){int[] choices=relationshipChoices();return focus<choices.length?choices[focus]:-1;}
         if(screen!=Screen.BEHAVIOR&&screen!=Screen.OVERVIEW)return -1;
         if(screen==Screen.OVERVIEW&&(focus>=overview().entries.size()||overview().entries.get(focus).kind!=GameRulesOverview.Kind.INTERACTION))return -1;
-        PlayModel.Element e=(settings!=null?settings:play).elements.get(selected);int other=e.rule>=1&&e.rule<=3?e.target:e.rule==4?e.neighbor:-1;
+        PlayModel.Element e=(settings!=null?settings:play).elements.get(selected);int other=PlayModel.touchRule(e.rule)?e.target:e.rule==4?e.neighbor:-1;
         return other>=0&&other<uses.entries.size()&&other!=selected?other:-1;
     }
     public boolean globalRuleSelection(){return screen==Screen.GOAL||screen==Screen.SETTINGS||screen==Screen.OVERVIEW&&rowElement(focus)<0;}
@@ -125,7 +125,7 @@ public final class GameCanvas {
         if(screen!=Screen.GOAL&&!(screen==Screen.OVERVIEW&&focus==0)&&!(screen==Screen.SETTINGS&&focus==0))return new int[0];
         PlayModel model=settings!=null?settings:play;if(model==null)return new int[0];
         int goal=screen==Screen.GOAL&&focus<3?focus:model.goal;if(goal==0)return new int[0];
-        ArrayList<Integer> result=new ArrayList<>();for(int n=0;n<model.elements.size();n++)if(model.elements.get(n).rule==(goal==1?1:4))result.add(n);
+        ArrayList<Integer> result=new ArrayList<>();for(int n=0;n<model.elements.size();n++)if(model.elements.get(n).rule==(goal==1?1:4)||goal==2&&model.elements.get(n).rule==5)result.add(n);
         int[] indices=new int[result.size()];for(int n=0;n<indices.length;n++)indices[n]=result.get(n);return indices;
     }
     public int rowElement(int row){
@@ -157,10 +157,11 @@ public final class GameCanvas {
         if(screen==Screen.SETTINGS)return settings.readiness();
         PlayModel.Element e=model.elements.get(selected);
         if(e.rule>=1&&e.rule<=3)return "When "+label(e.target)+" touches this, "+(e.rule==1?"collect it once":e.rule==2?"win the game":"lose the game")+".";
+        if(e.rule==5)return "On while "+label(e.target)+" overlaps this plate. Link passage cells in World & camera.";
         if(e.rule==4)return "O toggles this"+(e.neighbor>=0?" and "+label(e.neighbor):"")+". Left/right select a switch.";
         return e.movement==0?"No behavior yet. Choose Behavior to add movement or an interaction.":"Directions move this "+(e.movement==2?"horizontally":e.movement==3?"vertically":"across the field")+".";
     }
-    private String contactAction(){int rule=settings.elements.get(selected).rule;return rule==1?"collect it once":rule==2?"win the game":"lose the game";}
+    private String contactAction(){int rule=settings.elements.get(selected).rule;return rule==5?"hold this plate on":rule==1?"collect it once":rule==2?"win the game":"lose the game";}
     public void openWorld(){supported();world=new WorldEditor(base);screen=Screen.WORLD;operation=Operation.WORLD;focus=0;}
     public void openMusic(boolean fromTools){MusicEditor next=new MusicEditor(base,fromTools);music=next;screen=Screen.MUSIC;operation=Operation.MUSIC;focus=0;}
     public void openSounds(boolean fromTools){SoundEditor next=new SoundEditor(base,fromTools);sound=next;screen=Screen.SOUND;operation=Operation.SOUND;focus=0;}
@@ -182,10 +183,10 @@ public final class GameCanvas {
             case OVERVIEW:{ArrayList<String> r=new ArrayList<>();for(GameRulesOverview.Entry e:overview().entries)r.add(e.row);r.add("Back to game");return r.toArray(new String[0]);}
             case GOAL:return new String[]{"Keep playing\nNo automatic win","Win by collecting\nAll items","Win with switches\nAll switches on","Cancel"};
             case NAME:return new String[]{"Keyboard","Save name","Cancel"};
-            case CHOICE:return choiceField==0?new String[]{"Stay in place","D-pad movement\nAll directions","D-pad movement\nLeft / right","D-pad movement\nUp / down","Cancel"}:new String[]{"No interaction","Collect this\nWhen touched","Win the game\nWhen touched","Lose the game\nWhen touched","Toggle switch\nPress O","Cancel"};
+            case CHOICE:return choiceField==0?new String[]{"Stay in place","D-pad movement\nAll directions","D-pad movement\nLeft / right","D-pad movement\nUp / down","Cancel"}:new String[]{"No interaction","Collect this\nWhen touched","Win the game\nWhen touched","Lose the game\nWhen touched","Toggle switch\nPress O","Pressure plate\nWhile touched","Cancel"};
             case ANIMATION:return animation.rows();
             case RELATION:{ArrayList<String> r=new ArrayList<>();for(int n:relationshipChoices())r.add(n<0?"No linked switch":label(n));if(r.isEmpty())r.add("Add another element first");r.add("Cancel selection");return r.toArray(new String[0]);}
-            case BEHAVIOR:{PlayModel.Element e=settings.elements.get(selected);String[] labels={"Movement\n"+PlayModel.MOVEMENT[e.movement],"Speed\n"+e.speed+" px / step","On contact / press\n"+new String[]{"Nothing yet","Collect this","Win the game","Lose the game","O: toggle"}[e.rule],"Touched by\n"+label(e.target),"Starts\n"+(e.on==1?"On":"Off"),"Also toggle\n"+(e.neighbor<0?"Choose a switch":label(e.neighbor))};ArrayList<String> result=new ArrayList<>();for(int f:formFields())result.add(labels[f]);result.add("Save behavior");result.add("Discard changes");return result.toArray(new String[0]);}
+            case BEHAVIOR:{PlayModel.Element e=settings.elements.get(selected);String[] labels={"Movement\n"+PlayModel.MOVEMENT[e.movement],"Speed\n"+e.speed+" px / step","On contact / press\n"+new String[]{"Nothing yet","Collect this","Win the game","Lose the game","O: toggle","Pressure plate"}[e.rule],(e.rule==5?"Pressed by\n":"Touched by\n")+label(e.target),"Starts\n"+(e.on==1?"On":"Off"),"Also toggle\n"+(e.neighbor<0?"Choose a switch":label(e.neighbor))};ArrayList<String> result=new ArrayList<>();for(int f:formFields())result.add(labels[f]);result.add("Save behavior");result.add("Discard changes");return result.toArray(new String[0]);}
             case SETTINGS:return new String[]{"Win when\n"+GameRulesOverview.goalName(settings.goal),"Background\nColor "+settings.background,"Save rules","Discard changes"};
             case SIZE:return new String[]{"Small  /  8 x 8","Medium  /  16 x 16","Wide  /  32 x 16","Large  /  32 x 32","Cancel"};
             case DRAW_MENU:return new String[]{operation==Operation.ADD?"Next: place":operation==Operation.ANIMATION?"Done: frames":"Done: save","Choose color",eraser?"Use brush":"Use eraser","Keep drawing","Discard changes"};
@@ -202,7 +203,7 @@ public final class GameCanvas {
         if(play!=null)for(PlayModel.Element e:play.elements)if(e.animation!=null)for(PlayAnimation.Frame f:e.animation.frames)reserve(occupied,f.region);
         // Keep tile zero out of allocation, including empty maps where zero has special meaning.
         reserve(occupied,new SpriteRegion(0,0,8,8));
-        for(int n=0;n<128;n++)if(base.flags(n)!=0)reserve(occupied,new SpriteRegion(n%16*8,n/16*8,8,8));
+        for(int n=0;n<128;n++)if(base.flags(n)!=0||play!=null&&play.world!=null&&play.world.walls[n])reserve(occupied,new SpriteRegion(n%16*8,n/16*8,8,8));
         P8Map map=base.map();for(int yy=0;yy<64;yy++)for(int xx=0;xx<128;xx++){
             int tile=map.tile(xx,yy);if(tile>0&&tile<128)reserve(occupied,new SpriteRegion(tile%16*8,tile/16*8,8,8));
         }
@@ -367,8 +368,8 @@ public final class GameCanvas {
                 throw new IllegalArgumentException(label(e.neighbor)+" is linked from "+label(n)+". Change that element's Also toggle setting first.");
             if(e.animation!=null&&e.animation.mode==1&&e.movement==0)
                 throw new IllegalArgumentException(label(n)+" animates when moving. Set its Animation to Loop before removing movement.");
-            if(e.animation!=null&&e.animation.mode==2&&e.rule!=4)
-                throw new IllegalArgumentException(label(n)+" animates when on. Set its Animation to Loop before removing Toggle.");
+            if(e.animation!=null&&e.animation.mode==2&&!PlayModel.isSwitch(e))
+                throw new IllegalArgumentException(label(n)+" animates when on. Set its Animation to Loop before removing Toggle / Pressure plate.");
         }
     }
     private WorkshopCartridge finish(WorkshopCartridge result){
@@ -446,7 +447,7 @@ public final class GameCanvas {
             if(focus==rows().length-1){endChoice();return Command.NONE;}
             PlayModel.Element e=settings.elements.get(selected);
             if(choiceField==0){e.movement=focus;endChoice();}
-            else{e.rule=focus;if(focus>=1&&focus<=3){focus=fieldFocus(3);beginRelationship(3);relationshipFromChoice=true;}else endChoice();}
+            else{e.rule=focus;if(PlayModel.touchRule(focus)){focus=fieldFocus(3);beginRelationship(3);relationshipFromChoice=true;}else endChoice();}
         }return Command.NONE;
     }
     public void animate(){supported();animation=new GameAnimation(base,selected);operation=Operation.ANIMATION;screen=Screen.ANIMATION;focus=0;editingField=false;}
@@ -469,7 +470,7 @@ public final class GameCanvas {
         animation.focus=screen==Screen.ANIMATION?focus:3;animation.editing=editingField;return Command.NONE;
     }
     public void configure(boolean element){supported();settings=PlayModel.fromStatic(base);operation=Operation.CONFIG;screen=element?Screen.BEHAVIOR:Screen.SETTINGS;focus=0;editingField=false;}
-    public int[] formFields(){if(screen==Screen.SETTINGS||screen==Screen.GOAL)return new int[]{0,1};PlayModel.Element e=settings.elements.get(selected);ArrayList<Integer> f=new ArrayList<>();f.add(0);if(e.movement!=0)f.add(1);f.add(2);if(e.rule>=1&&e.rule<=3)f.add(3);if(e.rule==4){f.add(4);f.add(5);}int[] result=new int[f.size()];for(int n=0;n<result.length;n++)result[n]=f.get(n);return result;}
+    public int[] formFields(){if(screen==Screen.SETTINGS||screen==Screen.GOAL)return new int[]{0,1};PlayModel.Element e=settings.elements.get(selected);ArrayList<Integer> f=new ArrayList<>();f.add(0);if(e.movement!=0)f.add(1);f.add(2);if(PlayModel.touchRule(e.rule))f.add(3);if(e.rule==4){f.add(4);f.add(5);}int[] result=new int[f.size()];for(int n=0;n<result.length;n++)result[n]=f.get(n);return result;}
     private int field(){int focus=formFields()[this.focus];if(screen==Screen.SETTINGS)return focus==0?settings.goal:settings.background;PlayModel.Element e=settings.elements.get(selected);return new int[]{e.movement,e.speed,e.rule,e.target,e.on,e.neighbor+1}[focus];}
     private void field(int v){int focus=formFields()[this.focus];if(screen==Screen.SETTINGS){if(focus==0)settings.goal=v;else settings.background=v;return;}PlayModel.Element e=settings.elements.get(selected);switch(focus){case 0:e.movement=v;break;case 1:e.speed=v;break;case 2:e.rule=v;break;case 3:e.target=v;break;case 4:e.on=v;break;case 5:e.neighbor=v-1;break;}}
     private Command formAction(WorkshopSession.Action a){
@@ -479,7 +480,7 @@ public final class GameCanvas {
             else if(a==WorkshopSession.Action.CANCEL){field(fieldBefore);editingField=false;}
             else if(a==WorkshopSession.Action.LEFT||a==WorkshopSession.Action.RIGHT||a==WorkshopSession.Action.UP||a==WorkshopSession.Action.DOWN){
                 int delta=a==WorkshopSession.Action.LEFT||a==WorkshopSession.Action.DOWN?-1:1;
-                int active=formFields()[focus];int max=screen==Screen.SETTINGS?(active==0?2:15):new int[]{3,4,4,settings.elements.size()-1,1,settings.elements.size()}[active];
+                int active=formFields()[focus];int max=screen==Screen.SETTINGS?(active==0?2:15):new int[]{3,4,5,settings.elements.size()-1,1,settings.elements.size()}[active];
                 int min=screen==Screen.BEHAVIOR&&active==1?1:0;field(clamp(field()+delta,min,max));
                 // Adding speed before the rule row must keep the active field selected.
                 for(int n=0;n<formFields().length;n++)if(formFields()[n]==active){focus=n;break;}
@@ -498,6 +499,7 @@ public final class GameCanvas {
         PlayModel.Element e=settings.elements.get(selected);
         int active=focus<formFields().length?formFields()[focus]:-1;
         if(active==0||active==1)return "Directions move this sprite. Higher speed is faster. It stops at the field edge.";
+        if(e.rule==5)return "On while the chosen sprite overlaps this plate. Link passage cells in World & camera; no O press is needed.";
         if(active==3||e.rule>=1&&e.rule<=3)return "When the chosen sprite overlaps this sprite: "+(e.rule==1?"collect this sprite once.":e.rule==2?"win the game.":e.rule==3?"lose the game.":"choose a touch rule first.");
         if(active==5)return "Also toggle another switch with this one. Set that sprite to Toggle first.";
         return "Toggle: left/right select a switch, O changes it once per press. X restarts the game.";
@@ -514,12 +516,12 @@ public final class GameCanvas {
         return image;
     }
     public byte[] encode(){try{
-        ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(bytes);o.writeInt(11);byte[] source=base.bytes();o.writeInt(source.length);o.write(source);
+        ByteArrayOutputStream bytes=new ByteArrayOutputStream();DataOutputStream o=new DataOutputStream(bytes);o.writeInt(14);byte[] source=base.bytes();o.writeInt(source.length);o.write(source);
         o.writeUTF(screen.name());o.writeUTF(operation.name());for(int v:new int[]{selected,focus,color,cursorX,cursorY,x,y})o.writeInt(v);o.writeBoolean(eraser);
         o.writeBoolean(target!=null);if(target!=null){for(int v:new int[]{target.x,target.y,target.width,target.height})o.writeInt(v);for(int p:pixels)o.writeByte(p);}o.writeBoolean(settings!=null);if(settings!=null){settings.encode(o);o.writeBoolean(editingField);o.writeInt(fieldBefore);settings.encodeAnimations(o);settings.encodeSounds(o);settings.encodeMusic(o);}o.writeBoolean(animation!=null);if(animation!=null){animation.focus=screen==Screen.ANIMATION?focus:3;animation.editing=editingField;animation.encode(o);}o.writeInt(relationshipField);o.writeInt(relationshipReturnFocus);o.writeBoolean(nameDraft!=null);if(nameDraft!=null){o.writeUTF(nameDraft.text());o.writeInt(nameDraft.key);o.writeBoolean(nameDraft.latin);o.writeBoolean(nameDraft.uppercase);o.writeBoolean(nameDraft.replaceAll);}o.writeInt(choiceField);o.writeInt(choiceBefore);o.writeBoolean(relationshipFromChoice);o.writeUTF(overviewReturn==null?"":overviewReturn.name());o.writeInt(overviewElement);o.writeBoolean(sound!=null);if(sound!=null){sound.focus=focus;sound.encode(o);}o.writeBoolean(music!=null);if(music!=null){music.focus=focus;music.encode(o);}o.writeInt(viewX);o.writeInt(viewY);o.writeBoolean(world!=null);if(world!=null){world.focus=focus;world.encode(o);}return bytes.toByteArray();
     }catch(IOException e){throw new IllegalStateException(e);}}
     public static GameCanvas restore(byte[] bytes,WorkshopCartridge cart){try{
-        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version!=1&&version!=2&&version!=3&&version!=4&&version!=5&&version!=6&&version!=7&&version!=8&&version!=9&&version!=10&&version!=11)throw new IOException();int length=i.readInt();if(length<0||length>2*1024*1024||length>i.available())throw new IOException();byte[] source=new byte[length];i.readFully(source);
+        if(bytes.length>3*1024*1024)throw new IOException();DataInputStream i=new DataInputStream(new ByteArrayInputStream(bytes));int version=i.readInt();if(version!=1&&version!=2&&version!=3&&version!=4&&version!=5&&version!=6&&version!=7&&version!=8&&version!=9&&version!=10&&version!=11&&version!=12&&version!=13&&version!=14)throw new IOException();int length=i.readInt();if(length<0||length>2*1024*1024||length>i.available())throw new IOException();byte[] source=new byte[length];i.readFully(source);
         if(!Arrays.equals(source,cart.bytes()))throw new IOException("The project changed; its source was preserved.");
         GameCanvas g=new GameCanvas(cart);g.screen=Screen.valueOf(i.readUTF());g.operation=Operation.valueOf(i.readUTF());g.selected=i.readInt();g.focus=i.readInt();g.color=i.readInt();g.cursorX=i.readInt();g.cursorY=i.readInt();g.x=i.readInt();g.y=i.readInt();g.eraser=i.readBoolean();
         if(i.readBoolean()){g.target=new SpriteRegion(i.readInt(),i.readInt(),i.readInt(),i.readInt());g.pixels=new int[g.target.width*g.target.height];for(int n=0;n<g.pixels.length;n++){g.pixels[n]=i.readUnsignedByte();if(g.pixels[n]>15)throw new IOException();}}
@@ -531,7 +533,7 @@ public final class GameCanvas {
         if(version>=6){String origin=i.readUTF();g.overviewReturn=origin.isEmpty()?null:GameRulesOverview.Kind.valueOf(origin);g.overviewElement=i.readInt();}
         if(version>=7&&i.readBoolean()){g.sound=SoundEditor.decode(i,cart);if(g.focus!=g.sound.focus)throw new IOException();}
         if(version>=8&&i.readBoolean()){g.music=MusicEditor.decode(i,cart);if(g.focus!=g.music.focus)throw new IOException();}
-        if(version>=9){g.viewX=i.readInt();g.viewY=i.readInt();if(i.readBoolean()){g.world=WorldEditor.decode(i,cart,version);if(g.world.focus!=g.focus)throw new IOException();}}
+        if(version>=9){g.viewX=i.readInt();g.viewY=i.readInt();if(i.readBoolean()){g.world=WorldEditor.decode(i,cart,version);if(version<12&&g.world.page==WorldEditor.Page.TILE_ACTIONS&&g.focus==3)g.focus=4;if(g.world.focus!=g.focus)throw new IOException();}}
         if(version<7&&g.screen==Screen.HOME&&g.focus>=(g.blocked.isEmpty()?g.uses.entries.size()+2:1))g.focus++;
         if(version<8&&g.screen==Screen.HOME&&g.focus>=(g.blocked.isEmpty()?g.uses.entries.size()+3:2))g.focus++;
         if(version<9&&g.blocked.isEmpty()&&g.screen==Screen.HOME&&g.focus>=g.uses.entries.size()+4)g.focus++;
@@ -539,6 +541,7 @@ public final class GameCanvas {
         if(version<5&&g.screen==Screen.ACTIONS&&g.focus==6)g.focus=7;
         if(version<7&&g.screen==Screen.ACTIONS&&g.focus==7)g.focus=8;
         if(i.available()!=0||g.color<0||g.color>15||g.selected<0||g.selected>=Math.max(1,g.uses.entries.size())||g.focus<0||g.focus>Math.max(16,g.rows().length)||g.x<-32768||g.x>32767||g.y<-32768||g.y>32767)throw new IOException();
+        if(version<14&&g.screen==Screen.CHOICE&&g.choiceField==2&&g.focus==5)g.focus=6;
         boolean editing=g.screen==Screen.DRAW||g.screen==Screen.DRAW_MENU||g.screen==Screen.PALETTE||g.screen==Screen.PLACE;
         if((g.operation!=Operation.NONE&&g.operation!=Operation.CONFIG&&g.operation!=Operation.ANIMATION&&g.operation!=Operation.RENAME&&g.operation!=Operation.SOUND&&g.operation!=Operation.MUSIC&&g.operation!=Operation.WORLD)!=editing&&g.operation!=Operation.ANIMATION||editing!=(g.target!=null))throw new IOException();
         if((g.sound!=null)!=(g.screen==Screen.SOUND)||(g.operation==Operation.SOUND)!=(g.screen==Screen.SOUND))throw new IOException();
@@ -549,17 +552,18 @@ public final class GameCanvas {
         if((g.animation!=null)!=(g.operation==Operation.ANIMATION)||g.screen==Screen.ANIMATION&&g.animation==null||g.animation!=null&&!(g.screen==Screen.ANIMATION||editing))throw new IOException();
         if((g.nameDraft!=null)!=(g.screen==Screen.NAME)||(g.operation==Operation.RENAME)!=(g.screen==Screen.NAME))throw new IOException();
         if((g.choiceField!=-1)!=(g.screen==Screen.CHOICE||g.relationshipFromChoice)||g.relationshipFromChoice&&(g.screen!=Screen.RELATION||g.choiceField!=2||g.relationshipField!=3))throw new IOException();
-        if(g.choiceField!=-1&&(g.choiceField!=0&&g.choiceField!=2||g.choiceBefore<0||g.choiceBefore>(g.choiceField==0?3:4)||g.editingField))throw new IOException();
+        if(g.choiceField!=-1&&(g.choiceField!=0&&g.choiceField!=2||g.choiceBefore<0||g.choiceBefore>(g.choiceField==0?3:5)||g.editingField))throw new IOException();
         if(g.screen==Screen.CHOICE&&(g.choiceField==0?g.settings.elements.get(g.selected).movement:g.settings.elements.get(g.selected).rule)!=g.choiceBefore)throw new IOException();
         if((g.relationshipField!=-1)!=(g.screen==Screen.RELATION))throw new IOException();
         if(g.screen==Screen.RELATION){
             if(g.relationshipField!=3&&g.relationshipField!=5||g.editingField)throw new IOException();
-            PlayModel.Element e=g.settings.elements.get(g.selected);if(g.relationshipField==3&&(e.rule<1||e.rule>3)||g.relationshipField==5&&e.rule!=4)throw new IOException();
+            PlayModel.Element e=g.settings.elements.get(g.selected);if(g.relationshipField==3&&!PlayModel.touchRule(e.rule)||g.relationshipField==5&&e.rule!=4)throw new IOException();
             if(g.relationshipReturnFocus<0||g.relationshipReturnFocus>=g.formFields().length||g.formFields()[g.relationshipReturnFocus]!=g.relationshipField)throw new IOException();
         }
         if(form){PlayModel original=PlayModel.fromStatic(cart);if(g.settings.elements.size()!=original.elements.size()||!g.settings.prefix.equals(original.prefix)||!g.settings.newline.equals(original.newline))throw new IOException();
-            PlayModel checked=g.settings.copy();for(int n=0;n<checked.elements.size();n++){PlayModel.Element a=checked.elements.get(n),b=original.elements.get(n);if(a.sx!=b.sx||a.sy!=b.sy||a.w!=b.w||a.h!=b.h||a.x!=b.x||a.y!=b.y)throw new IOException();a.rule=0;a.neighbor=-1;if(a.animation!=null)a.animation.mode=0;}checked.validate();
-            if(g.editingField){if(g.focus>=g.formFields().length)throw new IOException();int active=g.formFields()[g.focus];int min=g.screen==Screen.BEHAVIOR&&active==1?1:0,max=g.screen==Screen.SETTINGS?(active==0?2:15):new int[]{3,4,4,16,1,16}[active];if(g.fieldBefore<min||g.fieldBefore>max)throw new IOException();}
+            // Rule drafts may temporarily invalidate links; the world itself is restored from saved source.
+            PlayModel checked=g.settings.copy();if(checked.world!=null)checked.world.passages.clear();for(int n=0;n<checked.elements.size();n++){PlayModel.Element a=checked.elements.get(n),b=original.elements.get(n);if(a.sx!=b.sx||a.sy!=b.sy||a.w!=b.w||a.h!=b.h||a.x!=b.x||a.y!=b.y)throw new IOException();a.rule=0;a.neighbor=-1;if(a.animation!=null)a.animation.mode=0;}checked.validate();
+            if(g.editingField){if(g.focus>=g.formFields().length)throw new IOException();int active=g.formFields()[g.focus];int min=g.screen==Screen.BEHAVIOR&&active==1?1:0,max=g.screen==Screen.SETTINGS?(active==0?2:15):new int[]{3,4,5,16,1,16}[active];if(g.fieldBefore<min||g.fieldBefore>max)throw new IOException();}
         }
         if(g.screen==Screen.GOAL&&g.editingField)throw new IOException();
         if(g.screen==Screen.OVERVIEW&&(g.draft()||g.overviewReturn!=null))throw new IOException();

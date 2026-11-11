@@ -1,5 +1,22 @@
 # PikoNest — путь к полному Android-продукту
 
+## Current functional queue — 11 November 2026
+
+Beta 2 (lab 0.0.96) completes contact-driven pressure plates on the wall/passage
+work. The owner reauthorized Retroid use and explicitly requested publication.
+The exact candidate has preserved-update, native Blank creation, Save/Undo/Redo,
+Test/return/reopen/export and official-runtime evidence. [Scope and limits](release/beta2/README.md).
+This supersedes old device-pause and proposed-plate notes below.
+
+1. Collect beta-2 feedback; complete physical controls, audible sound and novice
+   journeys with the owner. Continue provider/launcher/device-matrix acceptance.
+2. Continue complete gameplay-authoring scenarios using the existing tools; richer
+   state and event actions are the next functional direction, not yet implemented.
+3. Keep #18 save-state research and #19 community links behind functional creation.
+   Broader no-Lua genres, reusable asset types and modern target remain required.
+
+Publication does not mark unfinished acceptance passed or approve a future APK.
+
 ## Current first milestone — early beta, 2 November 2026
 
 The owner renamed the first milestone **early beta**, `0.1.0-beta.1`. Lua is allowed

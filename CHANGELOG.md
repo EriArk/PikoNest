@@ -1,5 +1,61 @@
 # PikoNest — changelog
 
+## 2026-11-11 — PikoNest 0.1.0-beta.2
+
+- Second early beta: walls, switch-operated passages and pressure plates connect
+  into a complete small game authored from Blank, without editing Lua.
+- Choose which element presses a plate. Its On/Off state drives passage cells,
+  state animation and the all-switches-on goal; press sounds fire on entry.
+  Closing passages wait for moving objects to leave.
+- Save, Undo/Redo, draft Test and recovery preserve these changes. Old interaction
+  drafts keep their Cancel action after the new rule is inserted.
+- Retroid updated in place: all 58 prior project files and five library files
+  matched the pre-update backup. Native Blank creation, draft Test/return,
+  Save/Undo/Redo, reopen, exact export and independent win/restart passed.
+- Validation: 94 core suites, final focused recovery checks, four desktop Lua
+  variants, 13 official PICO-8 assertions and exact package/source verification.
+  The reviewed runtime payload and its source bundle remain unchanged.
+- Controls used ADB injection; sound stayed muted. Physical, audible, novice,
+  wider-device and remaining provider/launcher acceptance stay open.
+  [Download](https://github.com/EriArk/PikoNest/releases/tag/v0.1.0-beta.2) ·
+  [Evidence and original samples](docs/release/beta2/README.md) ·
+  [Native screenshots](docs/showcase/beta2-en/README.md).
+
+## 2026-11-10 — Switch-operated passages (development 0.0.95)
+
+- Link selected wall cells to named switches, choosing whether On or Off opens
+  them. One switch can open several cells; other uses of the tile stay walls.
+- Closing waits for moving objects to leave. Restart restores initial states.
+  The exported `.p8` uses ordinary Lua and map data, with no extra dependency.
+- Save, Undo/Redo, isolated Test and interrupted-draft recovery include the links.
+  Unsafe tile/switch changes explain how to unlink first; old journals remain readable.
+- Validation: 93 local core suites, focused follow-up checks, five generated carts
+  executed in desktop Lua, Android compilation, compact/wide host previews and
+  a verified local integrated APK using the existing reviewed runtime payload.
+- Scope: 32 individual passage cells; global left/right + O switch selection;
+  empty cells when open. Proximity interaction and pressure plates remain absent.
+  No official runtime/device/physical acceptance or publication is claimed.
+  [Evidence and original test carts](docs/showcase/0.0.95-en/README.md).
+
+## 2026-11-10 — Wall tiles in the game-making workshop (development 0.0.94)
+
+- Mark a map tile as a wall or walkable through the map options or tile picker.
+  Review all affected placements; orange outlines identify wall tiles.
+- Moving objects stop at tile edges and slide along walls. Copy a tile to make
+  one placement walkable without changing the others. Wall tiles keep their
+  meaning when copied, and their resources are protected from automatic reuse.
+- Save art, map, camera and walls together, with Undo/Redo, isolated draft Test,
+  failed-save retry and source-checked recovery. Older drafts remain readable.
+  Output is ordinary PICO-8 Lua/data; sprite flags and shared map/graphics bytes
+  are preserved. Invalid moving-object starts produce an actionable error.
+- Validation: 92 local core suites; generated Lua gameplay/collision checks in
+  desktop Lua; Android source compilation and host UI previews. Local integrated
+  packaging uses the existing reviewed beta runtime payload. No device access,
+  official PICO-8 execution, audible/physical acceptance or public release occurred.
+- Scope: rectangular top-down movement, all moving elements, per-tile-type walls.
+  Physics, slopes, one-way platforms and switch-operated doors are not included.
+  [Evidence, original test carts and clearly labelled host previews](docs/showcase/0.0.94-en/README.md).
+
 ## 2026-11-02 — PikoNest 0.1.0-beta.1
 
 - First owner-approved early beta: one Android APK for Play, Workshop and imported

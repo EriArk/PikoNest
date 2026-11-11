@@ -1,5 +1,29 @@
 # AGENTS.md — PikoNest contributor instructions
 
+Current owner authorization and result (2026-11-11): the owner made the Retroid
+available and explicitly instructed to finish and release the next beta. This
+supersedes earlier device pauses and authorizes `v0.1.0-beta.2`, not future releases.
+Beta 2 (lab 0.0.96) adds walls, switch passages and contact-driven pressure plates.
+The exact APK is installed; native Blank authoring, draft Test/return, Save/Undo/Redo,
+reopen, exact export, independent win/restart and a 13-check official PICO-8 probe
+passed. All 58 prior project files and five library files survived the update
+byte-for-byte. See `docs/release/beta2/DEVICE_ACCEPTANCE.md` and its exact hashes.
+94 core suites and final focused checks passed. Injected inputs and muted runtime
+are not physical/audio acceptance. Next: beta feedback and deferred acceptance,
+then richer connected state/event gameplay. Preserve backups and purchased files
+outside Git; GitHub Actions remain disabled.
+
+Previous owner direction (2026-11-10): the handheld is unavailable. Do not access
+or operate it until the owner reauthorizes device work. Prioritize functional
+creation features over Help/community links, save-state research or housekeeping.
+Lab 0.0.95 adds switch-operated passage cells on top of 0.0.94 walls: ordinary
+mset Lua, On/Off bindings, occupancy-safe closing, protected references, Save/Undo
+and journal v13 with real older fixtures. Local tests and host previews are evidence
+only; official-runtime/device acceptance remains deferred. See
+docs/showcase/0.0.95-en/README.md. Next proposed functional slice: contact-driven
+activation/pressure plates. Beta 1 remains the public release; approval of that APK
+does not authorize a later release.
+
 Current owner decision and queue (2026-11-02): the owner has explicitly freed the
 handheld for final checks. This supersedes older device-pause notes below. Early
 beta `0.1.0-beta.1` (lab 0.0.93) now has a refreshed, reviewed support payload and

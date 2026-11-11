@@ -1,9 +1,95 @@
 # Game view: world, map and camera
 
+## Current beta-2 result (lab 0.0.96)
+
+A passage can now use a **Pressure plate** as well as an O-toggle. Configure its
+**Pressed by** element in Behavior, then select it in the existing passage picker.
+It is On while the visible rectangles overlap; touching edges alone is not overlap.
+The same On/Off link choice and occupancy-safe closing apply. Initialization derives
+plate state before validating/applying initially open passages. Each update evaluates
+plates after movement and before passage, animation and outcome checks.
+
+Native Blank authoring, wall review, plate linking, draft Test/return, Save/Undo/Redo,
+reopen, export and independent official PICO-8 win/restart passed on Retroid.
+Journal v14 preserves older versions, including old interaction-picker Cancel.
+The sections below describe earlier implementation batches; their pending-device
+statements are historical. [Current exact evidence and limits](release/beta2/DEVICE_ACCEPTANCE.md).
+
 Lab 0.0.84 connects world/map/camera concepts to the recognized Game view creation
 path; 0.0.85 adds tile art directly inside the map. This is implemented and locally
 tested; official-runtime, physical controller and owner acceptance are pending.
 [World evidence](showcase/0.0.84-en/README.md) · [Tile evidence](showcase/0.0.85-en/README.md).
+
+## Switch-operated passages (lab 0.0.95)
+
+Set an existing element to **O: toggle** in Behavior. In **World & camera → Paint
+map**, select a wall cell, then **Options → Switch passage here → Choose switch**.
+Choose a named toggle from the list. **Open when** selects On or Off; **Remove
+switch link** leaves the original wall cell. Repeat to link several cells to one
+switch. Blue outlines distinguish passage cells from ordinary orange wall outlines.
+This bounded editor supports up to 32 individually linked cells, not a PICO-8 limit.
+
+The link affects only its selected cell. Open means map value zero; closed means
+its stored wall tile. Every other use of that tile keeps its wall behavior. A
+closing cell waits while any visible moving element overlaps it, using full image
+bounds; other cells may close independently. Stationary art does not hold a door
+open. Existing toggle selection remains global left/right + O, even when movement
+also uses directions. Pressure plates provide a separate contact-driven option in beta 2.
+
+Ordinary `mset()` calls update runtime map RAM after movement and switch input,
+before contact/outcome checks. An opening is visible that update and traversable
+on the next movement update. Reset reapplies initial switch states and every
+linked cell; it does not rely on runtime map reload. The saved map keeps closed
+tiles. A mover may start in a passage only if it initially opens. Editor previews
+show the saved map, not simulated open/closed runtime state.
+
+Replacing a linked cell, making its wall type walkable, removing its switch or
+changing that switch's behavior requires unlinking/rebinding first. Deleting an
+unrelated earlier element remaps switch indices. Shrinking past a linked cell
+refuses before changing dimensions. All tools can still change map data; if a
+linked cell no longer matches, Test/Save explains the conflict, and the passage
+page still allows removing the stale link without rewriting the new map data.
+
+Save/Undo/Redo, isolated Test and failed-save retry use the existing world
+transaction. Journal v13 preserves links, picker position and 32-step history;
+v1–12 remain readable, with real v11/v12 fixtures. Settings and animation recovery
+retain links, including a recoverable, temporarily invalid Behavior draft. No-link
+carts keep their exact previous Lua. Unknown Lua is not rewritten.
+
+[Evidence and original exported test carts](showcase/0.0.95-en/README.md).
+Official runtime, token/compression/CPU budgets and device acceptance remain open.
+
+## Wall tiles (lab 0.0.94)
+
+In **Paint map**, move to a non-empty cell, open **Options → Wall / walkable here**,
+then choose **Make wall**. The review counts every use inside and outside the current
+world. The tile picker also offers **X → Wall / walkable**. Orange outlines show
+wall types and affected cells. Confirm adds the rule to the world draft; Back
+leaves it unchanged. Test uses the current draft, and Review / save commits it.
+
+Walls stop every configured moving element's full rectangular image bounds. X and
+Y movement are resolved separately in one-pixel steps, preserving sliding along
+walls at speeds 1–4. The starting position must fit inside the world and avoid wall
+cells; an invalid start refuses Test/Save and explains how to fix it. Showing or
+hiding the map changes drawing only: walls remain active. Stationary objects and
+hero-free maps need no movement or player setup.
+
+The rule belongs to the tile type. To make one placement a passage, use **Edit tile
+here → Make a tile copy**, keep the copy, then make that copied tile walkable.
+Copies retain wall behavior until explicitly changed. Unused/transparent wall types
+remain reserved during automatic art allocation. No existing sprite flag is changed.
+
+The `.p8` contains an ordinary `world_walls` Lua table, `mget()` checks and movement
+functions. Tile zero stays empty in this bounded workflow; all nonzero tile IDs can
+be selected, including references to lower-sheet graphics. Existing lower-map/shared
+graphics data is preserved. Old carts with no wall rules keep their original generated
+Lua. Modified or unfamiliar Lua is not silently converted into this recipe.
+
+Wall changes share map/art/camera Undo, failed-save retry, isolated draft Test and
+source-checked recovery. Journal v12 also reads prior journals; a real v11 fixture
+checks migration and action focus. Local controller-action tests and desktop Lua
+execution are recorded in [the evidence](showcase/0.0.94-en/README.md); official
+PICO-8 execution, CPU budgets and handheld acceptance remain untested.
 
 ## Make a larger field
 
@@ -19,7 +105,7 @@ including the eraser. Touch selects/paints a cell; controller access is complete
 at the portable action layer, with physical validation still pending.
 
 The connected map brush does not create a sprite placement or a hero. Tile
-painting adds scenery, not collision. Existing rectangle/fill, region and
+painting adds scenery; the separate wall action opts a tile type into collision. Existing rectangle/fill, region and
 shared-memory operations remain in All tools.
 
 ## Create or change tile art without leaving the map
@@ -100,5 +186,5 @@ This connected editor currently offers **1–8 screens across and 1–2 down**,
 starting at map cell 0,0. Only upper map cells and upper graphics slots are changed. Lower map/shared-gfx
 bytes remain intact, and all 256 tile references can be selected. These are
 PikoNest workflow limits, not PICO-8 capacity rules. Custom memory layouts, layer
-masks, parallax, camera easing, door triggers and collision authoring are not
+masks, parallax, camera easing, proximity triggers, slopes, one-way platforms and physics are not
 silently inferred. The older independent tools and source data remain available.
