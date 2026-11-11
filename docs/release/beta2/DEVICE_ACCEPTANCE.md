@@ -30,10 +30,17 @@ UI-authored export: [native-blank-plate.p8](native-blank-plate.p8), SHA-256
 Probe: [plate-probe.p8](plate-probe.p8); original generated input [plate.p8](plate.p8).
 [Unmodified native captures and provenance](../../showcase/beta2-en/README.md).
 
+## Owner confirmation — 11 November 2026
+
+After publication, the owner confirmed that physical buttons and audible sound
+work on the Retroid. Record these as owner-confirmed for this device and beta.
+The automated checks above still used injected input and muted audio; this later
+confirmation is a separate source of evidence.
+
 ## Limits carried forward
 
-- Physical controls, audible sound, novice usability and independent owner screen
-  review were not performed by these automated checks.
+- Novice usability and a broader ergonomics/screen review remain open. Basic
+  physical-button operation and audible sound are owner-confirmed above.
 - Other hardware, Android/runtime versions, orientation changes and maximum
   world/object/token/CPU loads need broader validation.
 - Beta 1 setup/Splore/restore/audio evidence remains historical; the entire matrix

@@ -1,5 +1,13 @@
 # PikoNest — changelog
 
+## 2026-11-11 — Owner confirms Retroid buttons and sound
+
+- After beta-2 publication, the owner confirmed that physical buttons and audible
+  sound work on the Retroid. Updated current status and release notes to record
+  this separately from the automated checks, which used injected input and mute.
+- Documentation-only update; APK, source tag and download checksums are unchanged.
+  [Device record](docs/release/beta2/DEVICE_ACCEPTANCE.md#owner-confirmation--11-november-2026).
+
 ## 2026-11-11 — PikoNest 0.1.0-beta.2
 
 - Second early beta: walls, switch-operated passages and pressure plates connect

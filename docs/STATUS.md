@@ -7,8 +7,9 @@ Journal v14 retains older recovery including v13 interaction Cancel. 94 core sui
 final 16,442-check plate suite and four desktop Lua variants passed. Retroid update
 preserved 58 project/five library files. Native Blank game, draft Test/return,
 Save/Undo/Redo/reopen/export and independent win/restart passed; official probe
-passed 13 checks. Owner explicitly authorized beta-2 publication. Physical/audio,
-novice and broader acceptance remain open. [Exact evidence](release/beta2/README.md).
+passed 13 checks. Owner explicitly authorized beta-2 publication and afterwards
+confirmed working physical buttons and audible sound on Retroid. Novice and
+broader acceptance remain open. [Exact evidence](release/beta2/README.md).
 
 **2026-11-10 — Lab 0.0.95, switch-operated passages:** existing toggles open
 selected wall cells to empty when On or Off. Up to 32 cell bindings share the world

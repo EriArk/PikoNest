@@ -11,7 +11,9 @@ Create a small game from Blank: draw a moving sprite, paint a wall, connect a pl
 
 Validated with 94 core suites, focused recovery checks, desktop Lua variants, native Blank/Test/return/save/reopen/export, independent win/restart and a 13-check official-runtime probe. Runtime support and its corresponding-source bundle are unchanged from beta 1.
 
-This remains an early beta. Controls were ADB-injected and audio muted; physical ergonomics, audible playback, novice usability and wider device/provider/launcher checks remain open. Bounded visual recipes do not cover arbitrary Lua or every genre. Android minimum API 26 / interim target 28; tested on Retroid Pocket Classic / Android 14 / PICO-8 0.2.7.
+**Owner confirmation, 11 November:** physical buttons and audible sound work on the Retroid. [Updated device record](https://github.com/EriArk/PikoNest/blob/main/docs/release/beta2/DEVICE_ACCEPTANCE.md#owner-confirmation--11-november-2026). Automated checks used ADB-injected inputs and muted audio; the owner confirmation is separate evidence.
+
+This remains an early beta. Novice usability, broader ergonomics and wider device/provider/launcher checks remain open. Bounded visual recipes do not cover arbitrary Lua or every genre. Android minimum API 26 / interim target 28; tested on Retroid Pocket Classic / Android 14 / PICO-8 0.2.7.
 
 [Install, samples and limits](https://github.com/EriArk/PikoNest/blob/v0.1.0-beta.2/docs/release/beta2/README.md) · [Native screenshots](https://github.com/EriArk/PikoNest/blob/v0.1.0-beta.2/docs/showcase/beta2-en/README.md) · [Detailed changelog](https://github.com/EriArk/PikoNest/blob/v0.1.0-beta.2/CHANGELOG.md).
 

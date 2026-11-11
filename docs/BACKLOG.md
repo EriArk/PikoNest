@@ -4,8 +4,9 @@
 plates now control wall passages, state animation, press audio and the all-on goal.
 94 core suites and focused recovery/gameplay checks passed. Owner-authorized native
 Blank creation through export/win/restart and preserved update are demonstrated.
-This advances bounded M1/M2 journeys without closing full no-Lua or physical/novice
-acceptance. Next: beta feedback/deferred checks, then richer state/event scenarios.
+The owner subsequently confirmed Retroid physical buttons and audible sound.
+This advances bounded M1/M2 journeys without closing full no-Lua or novice/broader
+acceptance. Next: richer state/event scenarios alongside beta feedback/deferred checks.
 [Evidence and limits](release/beta2/DEVICE_ACCEPTANCE.md).
 
 **2026-11-10 — N02 / G04 / UX08 partial, lab 0.0.95:** per-cell switch

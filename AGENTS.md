@@ -8,9 +8,11 @@ The exact APK is installed; native Blank authoring, draft Test/return, Save/Undo
 reopen, exact export, independent win/restart and a 13-check official PICO-8 probe
 passed. All 58 prior project files and five library files survived the update
 byte-for-byte. See `docs/release/beta2/DEVICE_ACCEPTANCE.md` and its exact hashes.
-94 core suites and final focused checks passed. Injected inputs and muted runtime
-are not physical/audio acceptance. Next: beta feedback and deferred acceptance,
-then richer connected state/event gameplay. Preserve backups and purchased files
+94 core suites and final focused checks passed. After publication on 2026-11-11,
+the owner confirmed that physical buttons and audible sound work on the Retroid.
+This is owner evidence, separate from the injected/muted automated checks.
+Next: richer connected state/event gameplay alongside beta feedback and remaining
+novice/provider/device acceptance. Preserve backups and purchased files
 outside Git; GitHub Actions remain disabled.
 
 Previous owner direction (2026-11-10): the handheld is unavailable. Do not access

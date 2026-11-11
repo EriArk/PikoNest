@@ -36,9 +36,9 @@ Classic / Android 14 / official PICO-8 0.2.7 is the tested combination.
 
 This remains an early beta: bounded visual recipes, rectangular contact/movement,
 one activator per plate, no general physics or arbitrary-Lua conversion. Manual
-switches still share left/right selection with movement. Physical controls,
-audible sound, novice usability, broader devices and the remaining provider,
-launcher and multicart matrix are not newly accepted by this release.
+switches still share left/right selection with movement. After publication, the
+owner confirmed physical buttons and audible sound on Retroid. Novice usability,
+broader devices and the remaining provider, launcher and multicart matrix stay open.
 
 ## Artifacts and sources
 

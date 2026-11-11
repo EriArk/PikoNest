@@ -8,8 +8,9 @@ The exact candidate has preserved-update, native Blank creation, Save/Undo/Redo,
 Test/return/reopen/export and official-runtime evidence. [Scope and limits](release/beta2/README.md).
 This supersedes old device-pause and proposed-plate notes below.
 
-1. Collect beta-2 feedback; complete physical controls, audible sound and novice
-   journeys with the owner. Continue provider/launcher/device-matrix acceptance.
+1. Collect beta-2 feedback and complete novice journeys. The owner confirmed
+   Retroid buttons and sound after publication. Continue provider/launcher/device
+   acceptance for the remaining cases.
 2. Continue complete gameplay-authoring scenarios using the existing tools; richer
    state and event actions are the next functional direction, not yet implemented.
 3. Keep #18 save-state research and #19 community links behind functional creation.

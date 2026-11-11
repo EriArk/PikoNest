@@ -51,8 +51,9 @@ cartridges into visual projects. [Scope and samples](docs/release/beta2/README.m
   variants passed. Package, signature, exact host dex and native/source audits passed.
 
 [Exact candidate and evidence boundaries](docs/release/beta2/DEVICE_ACCEPTANCE.md).
-All inputs were ADB-injected; audio remained muted. These checks do not establish
-physical ergonomics, audible quality or novice usability.
+Automated inputs were ADB-injected and audio muted. After publication on
+11 November, the owner separately confirmed that physical buttons and audible
+sound work on the Retroid. Novice usability and broader ergonomics remain open.
 
 ## Existing Play and setup foundation
 
@@ -71,8 +72,8 @@ historical checks; the entire matrix was not repeated for beta 2.
 This is a bounded visual creator, not complete no-Lua support for every genre.
 General physics, richer event/state composition and broader asset reuse remain
 future work. Manual switches still share directional selection with movement.
-Physical controls, audible playback, novice usability, other devices/runtime
-versions, fresh third-party launcher UI, provider/interruption restore cases,
+Novice usability, other devices/runtime versions, fresh third-party launcher UI,
+provider/interruption restore cases,
 multicart continuation and external Splore-folder synchronization remain open.
 Modern Android targeting and complete localization are still required follow-ups.
 
@@ -82,6 +83,6 @@ Modern Android targeting and complete localization are still required follow-ups
 plate, passage binding, draft review, export and official-runtime results.
 [Beta-1 gallery](docs/showcase/beta1-en/README.md) covers the broader Play/editing UI.
 
-Next: gather beta-2 feedback and complete physical/audio checks with the owner;
-then extend connected gameplay scenarios, including richer state and event actions.
+Next: extend connected gameplay scenarios, including richer state and event
+actions, alongside beta-2 feedback and the remaining acceptance work.
 Keep save-state research and community-link work behind functional creation.
